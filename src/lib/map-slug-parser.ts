@@ -16,6 +16,7 @@ import {
     type CategoryKey,
     type CountySlug,
 } from './slug-mappings';
+import type { Locale } from '@/i18n/config';
 
 export type MapFilters = {
     category: CategoryKey | null;
@@ -42,7 +43,7 @@ export type ParseSlugResult =
  */
 export function parseMapSlug(
     slug: string[] | undefined,
-    locale: 'pl' | 'en',
+    locale: Locale,
     basePath: string = locale === 'pl' ? '/mapa' : '/map',
 ): ParseSlugResult {
     // No slug means no filters
@@ -87,7 +88,7 @@ export function parseMapSlug(
  */
 function parseSingleSegment(
     segment: string,
-    locale: 'pl' | 'en',
+    locale: Locale,
     basePath: string,
 ): ParseSlugResult {
     // Try category first
@@ -123,7 +124,7 @@ function parseSingleSegment(
 function parseTwoSegments(
     first: string,
     second: string,
-    locale: 'pl' | 'en',
+    locale: Locale,
     basePath: string,
 ): ParseSlugResult {
     // First segment: must be a category

@@ -16,6 +16,8 @@ export default getRequestConfig(async ({requestLocale}) => {
     const messages = {
         en: (await import('../../messages/en.json')).default,
         pl: (await import('../../messages/pl.json')).default,
+        ru: (await import('../../messages/ru.json')).default,
+        uk: (await import('../../messages/uk.json')).default,
     };
 
     return {

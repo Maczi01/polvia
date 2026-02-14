@@ -9,6 +9,7 @@ import { serviceNameFromCapitalLetter } from '@/lib/consts';
 import { parseMapSlug, extractFiltersFromQueryParams } from '@/lib/map-slug-parser';
 import { buildMapUrl, stringifyMapUrl, localizeMapPath } from '@/lib/map-url-builder';
 import { redirect, notFound } from 'next/navigation';
+import { locales, type Locale } from '@/i18n/config';
 
 type PageProps = {
     params: Promise<{ locale: string; slug?: string[] }>;
@@ -27,10 +28,10 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
     // Handle the localized path
     const mapPath = locale === 'pl' ? 'mapa' : 'map';
-    const localePrefix = locale === 'pl' ? '' : '/en';
+    const localePrefix = locale === 'pl' ? '' : `/${locale}`;
 
     // Parse slug to get filters
-    const parseResult = parseMapSlug(slug, locale as 'pl' | 'en', `${localePrefix}/${mapPath}`);
+    const parseResult = parseMapSlug(slug, locale as Locale, `${localePrefix}/${mapPath}`);
 
     let canonicalPath = `${localePrefix}/${mapPath}`;
     let titleSuffix = '';
@@ -40,8 +41,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
         // Build slug path for canonical URL
         if (category || county) {
-            const slugUrl = buildMapUrl({ category, county }, locale as 'pl' | 'en');
-            canonicalPath = `${localePrefix}${localizeMapPath(slugUrl.pathname, locale as 'pl' | 'en')}`;
+            const slugUrl = buildMapUrl({ category, county }, locale as Locale);
+            canonicalPath = `${localePrefix}${localizeMapPath(slugUrl.pathname, locale as Locale)}`;
 
             // Build title suffix with translations
             const parts: string[] = [];
@@ -62,17 +63,21 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const canonicalUrl = `${baseUrl}${canonicalPath}`;
 
     // Build language alternates with proper slug translations
-    let plUrl = `${baseUrl}/mapa`;
-    let enUrl = `${baseUrl}/en/map`;
+    const languageUrls: Record<string, string> = {
+        pl: `${baseUrl}/mapa`,
+        en: `${baseUrl}/en/map`,
+        ru: `${baseUrl}/ru/map`,
+        uk: `${baseUrl}/uk/map`,
+    };
 
     if (parseResult.success) {
         const { category, county } = parseResult.filters;
         if (category || county) {
-            // Generate properly translated URLs for each locale
-            const plSlugUrl = buildMapUrl({ category, county }, 'pl');
-            const enSlugUrl = buildMapUrl({ category, county }, 'en');
-            plUrl = `${baseUrl}${localizeMapPath(plSlugUrl.pathname, 'pl')}`;
-            enUrl = `${baseUrl}/en${enSlugUrl.pathname}`;
+            for (const loc of locales) {
+                const slugUrl = buildMapUrl({ category, county }, loc);
+                const prefix = loc === 'pl' ? '' : `/${loc}`;
+                languageUrls[loc] = `${baseUrl}${prefix}${localizeMapPath(slugUrl.pathname, loc)}`;
+            }
         }
     }
 
@@ -81,10 +86,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         description: t('description'),
         alternates: {
             canonical: canonicalUrl,
-            languages: {
-                pl: plUrl,
-                en: enUrl,
-            },
+            languages: languageUrls,
         },
         openGraph: {
             title: `${t('title')}${titleSuffix}`,
@@ -92,7 +94,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
             url: canonicalUrl,
             type: 'website',
             locale,
-            alternateLocale: locale === 'en' ? 'pl' : 'en',
+            alternateLocale: locales.filter(l => l !== locale),
             siteName: serviceNameFromCapitalLetter,
         },
         robots: {
@@ -113,15 +115,15 @@ export default async function MapPage(props: PageProps) {
     setRequestLocale(locale);
 
     const mapPath = locale === 'pl' ? 'mapa' : 'map';
-    const localePrefix = locale === 'pl' ? '' : '/en';
+    const localePrefix = locale === 'pl' ? '' : `/${locale}`;
     const basePath = `${localePrefix}/${mapPath}`;
 
     // Handle legacy /_/ URLs → redirect to clean canonical URLs (301)
     // e.g. /map/_/tyrone → /map/tyrone, /mapa/_/down → /mapa/down
     if (slug && slug.length >= 2 && slug[0] === '_') {
         const countySlug = slug[1];
-        const newUrl = buildMapUrl({ county: countySlug }, locale as 'pl' | 'en');
-        const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as 'pl' | 'en');
+        const newUrl = buildMapUrl({ county: countySlug }, locale as Locale);
+        const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as Locale);
         redirect(`${localePrefix}${localizedUrl}`);
     }
 
@@ -140,15 +142,15 @@ export default async function MapPage(props: PageProps) {
                 id: searchParams.id as string | undefined,
                 view: searchParams.view as 'map' | 'list' | undefined,
             },
-            locale as 'pl' | 'en',
+            locale as Locale,
         );
 
-        const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as 'pl' | 'en');
+        const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as Locale);
         redirect(`${localePrefix}${localizedUrl}`);
     }
 
     // Parse slug-based route
-    const parseResult = parseMapSlug(slug, locale as 'pl' | 'en', basePath);
+    const parseResult = parseMapSlug(slug, locale as Locale, basePath);
 
     // If parsing failed, return 404
     if (!parseResult.success) {

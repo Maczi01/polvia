@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 import { env } from '../../../../../env';
 
 export async function generateStaticParams() {
-    return ['en', 'pl'].map(locale => ({
+    return ['en', 'pl', 'ru', 'uk'].map(locale => ({
         locale,
     }));
 }

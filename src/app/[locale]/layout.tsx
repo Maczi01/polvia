@@ -51,6 +51,8 @@ export async function generateMetadata({
                 'x-default': baseUrl, // Root domain serves Polish
                 pl: baseUrl, // Polish gets root domain
                 en: `${baseUrl}/en`,
+                ru: `${baseUrl}/ru`,
+                uk: `${baseUrl}/uk`,
             },
         },
         openGraph: {
@@ -59,7 +61,7 @@ export async function generateMetadata({
             url: locale === 'pl' ? baseUrl : `${baseUrl}/${locale}`,
             type: 'website',
             locale,
-            alternateLocale: locale === 'en' ? 'pl' : 'en',
+            alternateLocale: locales.filter(l => l !== locale),
             siteName: serviceNameFromCapitalLetter,
         },
         twitter: {
@@ -112,7 +114,7 @@ export default async function RootLayout({
                         "name": "Northern Ireland"
                     }
                 ],
-                "knowsLanguage": ["pl", "en"],
+                "knowsLanguage": ["pl", "en", "ru", "uk"],
                 "mainEntityOfPage": {
                     "@type": "WebPage",
                     "@id": env.NEXT_PUBLIC_SITE_URL

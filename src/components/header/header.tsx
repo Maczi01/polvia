@@ -51,7 +51,7 @@ const BUSINESS_CATEGORIES = [
 
 const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const t = useTranslations('MapPage.Categories');
-    const locale = useLocale() as 'pl' | 'en';
+    const locale = useLocale() as Locale;
 
     if (!isOpen) return null;
 

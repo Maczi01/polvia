@@ -4,6 +4,7 @@ import { CategoryCard } from './category-card';
 import { AppPathnames } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { buildMapUrl } from '@/lib/map-url-builder';
+import type { Locale } from '@/i18n/config';
 
 type CategoryPreviewClientProps = {
     categories: {
@@ -32,7 +33,7 @@ type CategoryPreviewClientProps = {
 export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps) {
     const t = useTranslations('Main');
     const tCategories = useTranslations('MapPage.Categories');
-    const locale = useLocale() as 'pl' | 'en';
+    const locale = useLocale() as Locale;
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {

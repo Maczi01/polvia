@@ -9,7 +9,7 @@ import { Link } from '@/i18n/navigation';
 import { env } from '../../../../env';
 
 export async function generateStaticParams() {
-    return ['en', 'pl'].map(locale => ({
+    return ['en', 'pl', 'ru', 'uk'].map(locale => ({
         locale,
     }));
 }

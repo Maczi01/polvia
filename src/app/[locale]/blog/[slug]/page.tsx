@@ -16,7 +16,7 @@ export const dynamicParams = false;
 type Params = { locale: string; slug: string };
 
 export async function generateStaticParams() {
-    const locales = ['en', 'pl'] as const;
+    const locales = ['en', 'pl', 'ru', 'uk'] as const;
     const allParams: Params[] = [];
 
     for (const locale of locales) {
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         const baseUrl = env.NEXT_PUBLIC_SITE_URL;
         const postUrl = `${baseUrl}/${locale}/blog/${slug}`;
 
-        const allLocales = ['pl', 'en'] as const;
+        const allLocales = ['pl', 'en', 'ru', 'uk'] as const;
         const languagesMap: Record<string, string> = {
             ...Object.fromEntries(allLocales.map(l => [l, `${baseUrl}/${l}/blog/${slug}`])),
             'x-default': baseUrl,
@@ -122,6 +122,8 @@ type PostPageProps = { params: Promise<Params> };
 const translations = {
     en: { backToPosts: 'Back to Posts', readingTime: 'min read' },
     pl: { backToPosts: 'Powrót do postów', readingTime: 'min czytania' },
+    ru: { backToPosts: 'Назад к статьям', readingTime: 'мин чтения' },
+    uk: { backToPosts: 'Назад до статей', readingTime: 'хв читання' },
 };
 
 function calculateReadingTime(content: string): number {

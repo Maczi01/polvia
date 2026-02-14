@@ -86,7 +86,7 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
         const storedLocale = localStorage.getItem('preferred-locale') as Locale;
 
         if (storedLocale && storedLocale !== locale &&
-            ['en', 'pl'].includes(storedLocale)) {
+            ['en', 'pl', 'ru', 'uk'].includes(storedLocale)) {
             // Convert search params to object for the query parameter
             const queryObject: Record<string, string> = {};
             searchParams.forEach((value, key) => {
@@ -128,6 +128,24 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
                         </div>
                     ),
                     value: 'pl',
+                },
+                {
+                    label: (
+                        <div className="flex items-center">
+                            <Image src="/icons/ru.svg" alt="Russian flag" width={16} height={16} />
+                            <span className="ml-2 text-gray-900 dark:text-gray-100">Русский</span>
+                        </div>
+                    ),
+                    value: 'ru',
+                },
+                {
+                    label: (
+                        <div className="flex items-center">
+                            <Image src="/icons/ua.svg" alt="Ukrainian flag" width={16} height={16} />
+                            <span className="ml-2 text-gray-900 dark:text-gray-100">Українська</span>
+                        </div>
+                    ),
+                    value: 'uk',
                 },
             ]}
             placeholder="Select language"

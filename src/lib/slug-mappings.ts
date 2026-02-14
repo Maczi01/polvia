@@ -3,6 +3,8 @@
  * Provides bidirectional lookups between category/county names and URL slugs
  */
 
+import type { Locale } from '@/i18n/config';
+
 // Category name constants (normalized keys used internally)
 export const CATEGORY_KEYS = [
     'grocery',
@@ -51,6 +53,34 @@ export const CATEGORY_SLUGS = {
         education: 'education',
         others: 'others',
     },
+    ru: {
+        grocery: 'produkty',
+        transport: 'transport',
+        financial: 'finansovye',
+        renovation: 'remont',
+        law: 'pravovye',
+        beauty: 'krasota',
+        government: 'gosuslugi',
+        health: 'zdorovye',
+        mechanics: 'mehanik',
+        entertainment: 'razvlecheniya',
+        education: 'obrazovanie',
+        others: 'drugoe',
+    },
+    uk: {
+        grocery: 'produkty',
+        transport: 'transport',
+        financial: 'finansovi',
+        renovation: 'remont',
+        law: 'pravovi',
+        beauty: 'krasa',
+        government: 'derzhavni',
+        health: 'zdorovya',
+        mechanics: 'mehanik',
+        entertainment: 'rozvagy',
+        education: 'osvita',
+        others: 'inshe',
+    },
 } as const;
 
 // County slugs (same across all locales, kebab-case)
@@ -97,9 +127,11 @@ export type CountySlug = (typeof COUNTY_SLUGS)[number];
 const reverseCategoryMaps = {
     pl: null as Record<string, CategoryKey> | null,
     en: null as Record<string, CategoryKey> | null,
+    ru: null as Record<string, CategoryKey> | null,
+    uk: null as Record<string, CategoryKey> | null,
 };
 
-function buildReverseCategoryMap(locale: 'pl' | 'en'): Record<string, CategoryKey> {
+function buildReverseCategoryMap(locale: Locale): Record<string, CategoryKey> {
     if (reverseCategoryMaps[locale]) {
         return reverseCategoryMaps[locale]!;
     }
@@ -119,7 +151,7 @@ function buildReverseCategoryMap(locale: 'pl' | 'en'): Record<string, CategoryKe
  * @param locale - Current locale
  * @returns Category key or null if invalid
  */
-export function getCategoryFromSlug(slug: string, locale: 'pl' | 'en'): CategoryKey | null {
+export function getCategoryFromSlug(slug: string, locale: Locale): CategoryKey | null {
     const reverseMap = buildReverseCategoryMap(locale);
     return reverseMap[slug.toLowerCase()] || null;
 }
@@ -130,7 +162,7 @@ export function getCategoryFromSlug(slug: string, locale: 'pl' | 'en'): Category
  * @param locale - Current locale
  * @returns URL slug or null if invalid
  */
-export function getSlugFromCategory(category: string, locale: 'pl' | 'en'): string | null {
+export function getSlugFromCategory(category: string, locale: Locale): string | null {
     const normalizedCategory = category.toLowerCase() as CategoryKey;
     return CATEGORY_SLUGS[locale][normalizedCategory] || null;
 }
@@ -167,7 +199,7 @@ export function isValidCategoryKey(category: string): category is CategoryKey {
  * @param locale - Current locale
  * @returns Array of all category slugs
  */
-export function getAllCategorySlugs(locale: 'pl' | 'en'): string[] {
+export function getAllCategorySlugs(locale: Locale): string[] {
     return Object.values(CATEGORY_SLUGS[locale]);
 }
 

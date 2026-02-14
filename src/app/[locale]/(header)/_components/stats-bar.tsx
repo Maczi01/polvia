@@ -26,7 +26,7 @@ export const StatsBar = async () => {
         {
             id: 'docs',
             icon: ScrollText,
-            value: '400+',
+            value: '100+',
             label: t('Card1.title'),
             description: t('Card1.description'),
         },
@@ -40,7 +40,7 @@ export const StatsBar = async () => {
         {
             id: 'cities',
             icon: MapPinPlus,
-            value: '2',
+            value: '1',
             label: t('Card2.title'),
             description: t('Card2.description'),
         },

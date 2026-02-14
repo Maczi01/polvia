@@ -4,6 +4,7 @@
  */
 
 import { getSlugFromCategory, normalizeCountySlug, isValidCountySlug } from './slug-mappings';
+import type { Locale } from '@/i18n/config';
 
 export type MapUrlParams = {
     category?: string | null;
@@ -35,7 +36,7 @@ export type MapUrl = {
  * @param locale - Current locale
  * @returns URL object with pathname and optional query params
  */
-export function buildMapUrl(params: MapUrlParams, locale: 'pl' | 'en'): MapUrl {
+export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
     const { category, county, query, id, view } = params;
 
     // Base pathname
@@ -95,7 +96,7 @@ export function buildMapUrl(params: MapUrlParams, locale: 'pl' | 'en'): MapUrl {
  * @param locale - Current locale
  * @returns URL object
  */
-export function buildCategoryUrl(category: string, locale: 'pl' | 'en'): MapUrl {
+export function buildCategoryUrl(category: string, locale: Locale): MapUrl {
     return buildMapUrl({ category }, locale);
 }
 
@@ -105,7 +106,7 @@ export function buildCategoryUrl(category: string, locale: 'pl' | 'en'): MapUrl 
  * @param locale - Current locale
  * @returns URL object
  */
-export function buildCountyUrl(county: string, locale: 'pl' | 'en'): MapUrl {
+export function buildCountyUrl(county: string, locale: Locale): MapUrl {
     return buildMapUrl({ county }, locale);
 }
 
@@ -115,7 +116,7 @@ export function buildCountyUrl(county: string, locale: 'pl' | 'en'): MapUrl {
  * @param locale - Current locale
  * @returns URL object with ID as query param
  */
-export function buildServiceUrl(id: string, locale: 'pl' | 'en'): MapUrl {
+export function buildServiceUrl(id: string, locale: Locale): MapUrl {
     return buildMapUrl({ id }, locale);
 }
 
@@ -130,7 +131,7 @@ export function buildServiceUrl(id: string, locale: 'pl' | 'en'): MapUrl {
  * @param locale - Current locale
  * @returns Localized pathname (e.g. '/mapa/zdrowie' for PL, '/map/health' for EN)
  */
-export function localizeMapPath(pathname: string, locale: 'pl' | 'en'): string {
+export function localizeMapPath(pathname: string, locale: Locale): string {
     if (locale === 'pl') {
         return pathname.replace(/^\/map(?=\/|$)/, '/mapa');
     }

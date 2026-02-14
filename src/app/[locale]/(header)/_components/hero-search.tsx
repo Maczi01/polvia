@@ -10,10 +10,11 @@ import { AppPathnames } from '@/i18n/routing';
 import { useRouter } from '@/i18n/navigation';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { buildMapUrl, stringifyMapUrl } from '@/lib/map-url-builder';
+import type { Locale } from '@/i18n/config';
 
 export const HeroSearch = () => {
     const t = useTranslations('Main');
-    const locale = useLocale() as 'pl' | 'en';
+    const locale = useLocale() as Locale;
     const [searchInput, setSearchInput] = useState('');
     const [isSearching, setIsSearching] = useState(false);
     const [searchError, setSearchError] = useState('');
