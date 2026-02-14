@@ -33,11 +33,11 @@ const fadeInKeyframes = `
 }
 
 .theme-button.light::before {
-  background-color: rgb(34 197 94); /* green-500 */
+  background-color: #1877F2;
 }
 
 .theme-button.dark::before {
-  background-color: rgb(34 197 94); /* green-500 */
+  background-color: #1877F2;
 }
 
 .theme-button.active::before {

@@ -85,7 +85,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 <div className="relative">
                     {/* Left search icon */}
                     <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                        <Search size="20" color="#22c55e" className="dark:text-green-400" />
+                        <Search size="20" className="text-green dark:text-green-400" />
                     </div>
 
                     <input
