@@ -1,0 +1,1 @@
+import { categories } from '@/lib/consts';import { CategoryPreviewClient } from '@/app/[locale]/(header)/_components/category-preview-client';export async function CategoryPreviewServer() {    return <CategoryPreviewClient categories={categories} />;}

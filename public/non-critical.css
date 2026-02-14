@@ -1,0 +1,290 @@
+/* Non-critical CSS - Loaded after initial paint */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px; /* Wider fixed part */
+    background: transparent; /* No visible track */
+    padding-right: 4px; /* Extra padding */
+}
+
+/* Scrollbar Track (Fixed part, bigger) */
+::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Light background */
+    border-radius: 10px;
+    margin: 0 2px; /* Padding at top and bottom */
+}
+
+/* Scrollbar Thumb (Movable part, smaller) */
+::-webkit-scrollbar-thumb {
+    background: #b0b0b0; /* Soft gray */
+    border-radius: 10px;
+    width: 4px; /* Smaller than track */
+    margin: 2px; /* More spacing */
+}
+
+/* Hover effect */
+::-webkit-scrollbar-thumb:hover {
+    background: #909090;
+}
+
+/* Remove scrollbar arrows */
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Track - Fixed part (Pink) */
+.scrollbar-custom::-webkit-scrollbar-track {
+    background: #ffb6c1; /* Light pink */
+    border-radius: 10px;
+    margin-top: 32px;
+    padding-right: 15px; /* Moves scrollbar away from the edge */
+}
+
+/* Thumb - Movable part (Red) */
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background: #d60000; /* Red */
+    border-radius: 10px;
+    margin-right: 5px; /* Forces the scrollbar slightly left */
+}
+
+/* Hover Effect */
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background: #a30000; /* Darker red on hover */
+}
+
+/* Remove scrollbar arrows */
+.scrollbar-custom::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Keyframe animations */
+@keyframes rotate360 {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.rotate-360 {
+    animation: rotate360 0.5s ease-in;
+}
+
+/* Mapbox specific styles */
+.mapboxgl-popup-tip {
+    /*display: none;*/
+    transform: translate(0, -18px) !important;
+}
+
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+    border-top-color: #C52289 !important;
+}
+
+.mapboxgl-popup-close-button {
+    /*display: none;*/
+    position: absolute;
+    /*right: -43px !important;*/
+    right: 10px !important;
+    color: blue;
+    padding: 20px;
+    /*border: 2px solid red;*/
+    /*background-image: src("/globe.svg");*/
+    /*top: 8px !important;*/
+}
+
+.marker-popup-qos .mapboxgl-popup-close-button {
+    position: absolute;
+    /*border: 2px solid red;*/
+    /*transform: translate(0, 130px) !important;*/
+}
+.marker-popup-qos .mapboxgl-popup-content {
+    padding: 0 !important ;
+
+    background-color: transparent !important;
+}
+
+.mapboxgl-popup-close-button {
+    position: absolute;
+    top: 5px !important;
+    right: 5px !important;
+    width: 20px;
+    height: 20px;
+    background: #ffffff;
+    color: #000000;
+    border-radius: 50% !important;
+    border: 1px solid #000000 !important;
+    font-size: 16px;
+    font-weight: normal;
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    padding: 0;
+    z-index: 99;
+    transition: all 0.3s ease;
+
+    &:hover {
+        color: #ffffff;
+        border: 1px solid #000000 !important;
+        background-color: #000000 !important;
+    }
+}
+
+.mapboxgl-popup-content {
+    overflow: hidden;
+    width: 300px !important;
+    border-radius: 0.75rem !important;
+    border-bottom: 4px solid #C52289;
+    padding: 0 !important ;
+    background-color: transparent !important;
+    transform: translate(-30px, -15px) !important;
+}
+
+.mapboxgl-popup {
+    /*   when width:  < 768px display none. Add media query */
+    display: none;
+}
+
+.hamburger-icon {
+    transition: transform 0.3s ease-in-out;
+}
+
+.hamburger-icon.open {
+    transform: rotate(90deg);
+}
+
+.mobile-map-controls {
+    display: none; /* Hidden by default */
+}
+
+@media (max-width: 768px) {
+    .mobile-map-controls {
+        display: flex; /* Show only on mobile */
+    }
+
+    /* Make the buttons larger and easier to tap on mobile */
+    .mobile-map-controls button {
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease;
+    }
+
+    .mobile-map-controls button:active {
+        transform: scale(0.95);
+    }
+
+    /* Add a slight background blur for better readability */
+    .mobile-map-controls {
+        backdrop-filter: blur(2px);
+        border-radius: 8px;
+        padding: 4px;
+    }
+}
+
+/* Adjust popup positioning on mobile */
+@media (max-width: 768px) {
+    .mapboxgl-popup {
+        display: block; /* Override your display: none rule */
+    }
+
+    .mapboxgl-popup-content {
+        width: 250px !important; /* Slightly smaller on mobile */
+        transform: translate(-30px, -25px) !important; /* Adjust position */
+    }
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Add a new class for your layout that contains the map */
+.map-layout-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+}
+
+.map-container {
+    position: relative;
+    flex: 1; /* This will make it expand to fill available space */
+    min-height: 0; /* This is crucial for flex children to shrink properly */
+    width: 100%;
+}
+
+/*!* Update your filter component to have a fixed height if needed *!*/
+/*.filter-container {*/
+/*    flex-shrink: 0; !* Prevents the filter from shrinking *!*/
+/*    z-index: 10;*/
+/*}*/
+
+.hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-card-expansion {
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateZ(0); /* Enable hardware acceleration */
+        will-change: max-height, height;
+    }
+
+    .mobile-card-expansion.expanded {
+        overflow: visible;
+    }
+
+    .mobile-card-expansion.collapsed {
+        overflow: hidden;
+    }
+}
+
+.mapboxgl-canvas {
+    border-radius: 12px; /* Match your rounded-xl/md:rounded-md */
+}
+
+@supports (-webkit-appearance: none) and (not (appearance: none)) {
+    .safari-only-pt-16 {
+        padding-top: 5rem; /* equivalent to pt-16 in Tailwind */
+    }
+}
+
+.mobile-content-offset {
+    padding-top: 0; /* Your perfect spacing */
+}
+
+/* Remove padding when it's map view */
+.mobile-content-offset.map-view {
+    padding-top: 0;
+}
+
+@media (min-width: 768px) {
+    .mobile-content-offset {
+        padding-top: 0;
+    }
+}

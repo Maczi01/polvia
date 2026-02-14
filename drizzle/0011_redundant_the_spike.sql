@@ -1,0 +1,1 @@
+ALTER TABLE "tags_translations" ALTER COLUMN "name" SET DATA TYPE text;
