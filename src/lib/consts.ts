@@ -99,7 +99,7 @@ export const mapCategoryToBadgeColor = (category: string) => {
         case 'grocery':
             return 'red';
         case 'gastronomy':
-            return 'cherry';
+            return 'oversky';
         case 'education':
             return 'sapphire';
         case 'law':

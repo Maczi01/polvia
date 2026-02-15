@@ -25,6 +25,7 @@ const badgeVariants = cva(
                 darkviolet: 'bg-gradient-to-r from-[#6441A5]/30 to-[#2a0845]/30',
                 starfall: 'bg-gradient-to-r from-[#4b1248]/30 to-[#cc9e54]/30',
                 overworld: 'bg-gradient-to-r from-[#4776e6] to-[#8e54e9]',
+                oversky: 'bg-gradient-to-r from-[#3D0DAF] to-[#0998A2]',
                 mojito: 'bg-gradient-to-r from-[#1488CC]/10 to-[#2B32B2]/20',
                 pinkred: 'bg-gradient-to-r from-[#DD81FF]/80 to-[#FF0929]/70',
                 sapphire: 'bg-gradient-to-r from-[#4776e6]/80 to-[#8e54e9]/80',
