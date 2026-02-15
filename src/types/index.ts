@@ -43,7 +43,9 @@ export type View = 'map' | 'list' | 'both';
 export type PartialService = Omit<Service, 'embedding' | 'createdAt' | 'updatedAt' | 'priority' | 'clicks'>;
 
 export type Service = {
-    id: number;
+    id: string;
+    serviceId: string;
+    slug?: string;
     createdAt: string;
     updatedAt: string;
     name: string;
@@ -52,15 +54,14 @@ export type Service = {
     tags: string[] | null;
     city: string | null;
     street: string | null;
-    county: string | null;
+    voivodeship: string | null;
     postcode: string | null;
     latitude: number;
     longitude: number;
-    openingHours: string;
+    openingHours: Record<string, { open: string; close: string }>;
     phoneNumber: string | null;
     email: string | null;
     webpage: string | null;
-    part: string | null;
     image: string | null;
     priority: number;
     clicks: number;

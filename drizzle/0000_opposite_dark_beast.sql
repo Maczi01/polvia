@@ -1,4 +1,4 @@
-CREATE TYPE "public"."category" AS ENUM('others', 'education', 'renovation', 'financial', 'beauty', 'grocery', 'transport', 'law', 'mechanics', 'health');--> statement-breakpoint
+CREATE TYPE "public"."category" AS ENUM('others', 'education', 'renovation', 'financial', 'beauty', 'grocery', 'grocery' 'transport', 'law', 'mechanics', 'health');--> statement-breakpoint
 CREATE TYPE "public"."county" AS ENUM('Antrim', 'Armagh', 'Derry', 'Down', 'Fermanagh', 'Tyrone', 'Carlow', 'Cavan', 'Clare', 'Cork', 'Donegal', 'Dublin', 'Galway', 'Kerry', 'Kildare', 'Kilkenny', 'Laois', 'Leitrim', 'Limerick', 'Longford', 'Louth', 'Mayo', 'Meath', 'Monaghan', 'Offaly', 'Roscommon', 'Sligo', 'Tipperary', 'Waterford', 'Westmeath', 'Wexford', 'Wicklow');--> statement-breakpoint
 CREATE TABLE "promoted_services" (
 	"service_id" integer PRIMARY KEY NOT NULL,

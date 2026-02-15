@@ -16,18 +16,16 @@ export async function GET() {
                 const existing = await db
                     .select()
                     .from(serviceEngagementsTable)
-                    .where(eq(serviceEngagementsTable.serviceId, Number(serviceId)));
+                    .where(eq(serviceEngagementsTable.serviceId, serviceId));
 
                 if (existing.length > 0) {
-                    // ✅ Aktualizacja liczby kliknięć w Supabase
                     await db
                         .update(serviceEngagementsTable)
                         .set({ clicks: existing[0].clicks + Number(clicks) })
-                        .where(eq(serviceEngagementsTable.serviceId, Number(serviceId)));
+                        .where(eq(serviceEngagementsTable.serviceId, serviceId));
                 } else {
-                    // ✅ Dodanie nowego rekordu, jeśli nie istnieje
                     await db.insert(serviceEngagementsTable).values({
-                        serviceId: Number(serviceId),
+                        serviceId,
                         clicks: Number(clicks),
                     });
                 }

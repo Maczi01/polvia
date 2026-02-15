@@ -22,7 +22,7 @@ function getClientIP(request: Request): string {
     return realIP || cfConnectingIP || '127.0.0.1';
 }
 
-async function checkPopularityRateLimit(ip: string, serviceId: number) {
+async function checkPopularityRateLimit(ip: string, serviceId: string) {
     // Check IP-based rate limiting (total clicks per hour)
     const ipKey = `popularity_ip:${ip}`;
     const ipClicks = await redis.get(ipKey);
@@ -50,7 +50,7 @@ async function checkPopularityRateLimit(ip: string, serviceId: number) {
     return { blocked: false };
 }
 
-async function incrementPopularityRateLimit(ip: string, serviceId: number) {
+async function incrementPopularityRateLimit(ip: string, serviceId: string) {
     const pipeline = redis.pipeline();
 
     // Increment IP clicks counter
@@ -77,8 +77,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const parsedServiceId = Number.parseInt(serviceId);
-        if (Number.isNaN(parsedServiceId) || parsedServiceId <= 0) {
+        if (typeof serviceId !== 'string' || serviceId.trim().length === 0) {
             return NextResponse.json(
                 { success: false, message: 'Invalid service ID' },
                 { status: 400 },
@@ -89,7 +88,7 @@ export async function POST(request: Request) {
         const clientIP = getClientIP(request);
 
         // Check rate limits
-        const rateLimitCheck = await checkPopularityRateLimit(clientIP, parsedServiceId);
+        const rateLimitCheck = await checkPopularityRateLimit(clientIP, serviceId);
 
         if (rateLimitCheck.blocked) {
             return NextResponse.json(
@@ -108,10 +107,10 @@ export async function POST(request: Request) {
         }
 
         // Increment the popularity counter
-        await redis.incr(`service:${parsedServiceId}:clicks`);
+        await redis.incr(`service:${serviceId}:clicks`);
 
         // Update rate limiting counters
-        await incrementPopularityRateLimit(clientIP, parsedServiceId);
+        await incrementPopularityRateLimit(clientIP, serviceId);
 
         return NextResponse.json({ success: true, message: 'Vote recorded successfully' });
 

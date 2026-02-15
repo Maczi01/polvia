@@ -1,17 +1,17 @@
-// apiKey: "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",
-
 import OpenAI from 'openai';
 import { eq } from 'drizzle-orm';
 import {
+    serviceLocationsTable,
     servicesTable,
     servicesTagsTable,
     servicesTranslationsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
 import { db } from '@/db';
+import { env } from '../../env';
 
 const openai = new OpenAI({
-    apiKey: "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",
+    apiKey: env.OPENAI_API_KEY,
 });
 
 // Enhanced category contexts for better embeddings
@@ -214,7 +214,7 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
 }
 
 // Enhanced single service embedding generation
-export async function generateEmbeddingForService(serviceId: number) {
+export async function generateEmbeddingForService(serviceId: string) {
     console.log(`🔄 Generating embedding for service ${serviceId}`);
 
     // Get comprehensive service data
@@ -223,9 +223,9 @@ export async function generateEmbeddingForService(serviceId: number) {
             serviceId: servicesTable.id,
             serviceName: servicesTable.name,
             serviceCategory: servicesTable.category,
-            serviceCity: servicesTable.city,
-            serviceStreet: servicesTable.street,
-            serviceCounty: servicesTable.county,
+            locationCity: serviceLocationsTable.city,
+            locationStreet: serviceLocationsTable.street,
+            locationVoivodeship: serviceLocationsTable.voivodeship,
             translationName: servicesTranslationsTable.name,
             translationDescription: servicesTranslationsTable.description,
             translationLanguage: servicesTranslationsTable.languageCode,
@@ -233,6 +233,10 @@ export async function generateEmbeddingForService(serviceId: number) {
             tagLanguage: tagsTranslationsTable.languageCode,
         })
         .from(servicesTable)
+        .leftJoin(
+            serviceLocationsTable,
+            eq(servicesTable.id, serviceLocationsTable.serviceId)
+        )
         .leftJoin(
             servicesTranslationsTable,
             eq(servicesTable.id, servicesTranslationsTable.serviceId)
@@ -248,17 +252,17 @@ export async function generateEmbeddingForService(serviceId: number) {
         .where(eq(servicesTable.id, serviceId));
 
     if (serviceData.length === 0) {
-        throw new Error(`❌ Service with ID ${serviceId} not found`);
+        throw new Error(`Service with ID ${serviceId} not found`);
     }
 
-    // Process the data
+    // Process the data — collect all unique locations for embedding context
     const service = {
         id: serviceData[0].serviceId,
         name: serviceData[0].serviceName,
         category: serviceData[0].serviceCategory,
-        city: serviceData[0].serviceCity,
-        street: serviceData[0].serviceStreet,
-        county: serviceData[0].serviceCounty,
+        city: serviceData[0].locationCity,
+        street: serviceData[0].locationStreet,
+        county: serviceData[0].locationVoivodeship,
     };
 
     const translations = serviceData

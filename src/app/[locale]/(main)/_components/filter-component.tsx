@@ -38,6 +38,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
     // Category and county now managed via router navigation (slug-based)
     const [selectedCategory, setSelectedCategory] = useState(initialFilters?.category || null);
     const [selectedCounty, setSelectedCounty] = useState(initialFilters?.county || null);
+    const [selectedCity, setSelectedCity] = useState(initialFilters?.city || null);
 
     // Keep query params for search, id, and view
     const [searchInput, setSearchInput] = useQueryState('query', { defaultValue: '' });
@@ -55,17 +56,19 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
     useEffect(() => {
         setSelectedCategory(initialFilters?.category || null);
         setSelectedCounty(initialFilters?.county || null);
-    }, [initialFilters?.category, initialFilters?.county]);
+        setSelectedCity(initialFilters?.city || null);
+    }, [initialFilters?.category, initialFilters?.county, initialFilters?.city]);
 
     // Update URL with new filters WITHOUT navigation (instant, client-side only)
     const navigateWithFilters = useCallback(
-        (category: string | null, county: string | null) => {
+        (category: string | null, county: string | null, city: string | null = null) => {
             // Update local state immediately for instant UI feedback
             setSelectedCategory(category as any);
             setSelectedCounty(county as any);
+            setSelectedCity(city);
 
             // Notify parent component of filter changes
-            onFiltersChange?.({ category: category as any, county: county as any });
+            onFiltersChange?.({ category: category as any, county: county as any, city });
 
             // Build the new URL path (localized for browser URL bar)
             const url = buildMapUrl({ category, county }, locale);
@@ -87,9 +90,10 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         // Clear filter state immediately
         setSelectedCategory(null);
         setSelectedCounty(null);
+        setSelectedCity(null);
 
         // Notify parent component of filter changes
-        onFiltersChange?.({ category: null, county: null });
+        onFiltersChange?.({ category: null, county: null, city: null });
 
         // Update URL to base path without navigation
         const basePath = locale === 'pl' ? '/mapa' : '/en/map';
@@ -98,22 +102,30 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
 
     const clearCategories = useCallback(() => {
         // Navigate to update URL (state will sync via useEffect)
-        navigateWithFilters(null, selectedCounty);
-    }, [navigateWithFilters, selectedCounty]);
+        navigateWithFilters(null, selectedCounty, selectedCity);
+    }, [navigateWithFilters, selectedCounty, selectedCity]);
 
     // Category selection handler
     const handleCategoryClick = (category: string) => {
         const newCategory =
             selectedCategory?.toLowerCase() === category.toLowerCase() ? null : category.toLowerCase();
         // Navigate to update URL (state will sync via useEffect)
-        navigateWithFilters(newCategory, selectedCounty);
+        navigateWithFilters(newCategory, selectedCounty, selectedCity);
     };
 
-    // County selection handler
-    const handleCountyChange = (county: string) => {
-        const newCounty = county === 'both-ireland' || !county ? null : county.toLowerCase();
-        // Navigate to update URL (state will sync via useEffect)
-        navigateWithFilters(selectedCategory, newCounty);
+    // County/City selection handler
+    const handleCountyChange = (value: string) => {
+        if (value === 'all-voivodeships' || !value) {
+            navigateWithFilters(selectedCategory, null, null);
+            return;
+        }
+
+        if (value.startsWith('city:')) {
+            const cityName = value.slice(5);
+            navigateWithFilters(selectedCategory, null, cityName);
+        } else {
+            navigateWithFilters(selectedCategory, value.toLowerCase(), null);
+        }
     };
 
     // Scroll button handlers
@@ -183,7 +195,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         categoryReference.current?.scrollBy({ left: 200, behavior: 'smooth' });
     }, []);
 
-    const hasActiveFilters = selectedCategory || searchInput || selectedCounty;
+    const hasActiveFilters = selectedCategory || searchInput || selectedCounty || selectedCity;
 
     return (
         <>
@@ -191,11 +203,11 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                 isOpen={isMobileFilterOpen}
                 onClose={() => setIsMobileFilterOpen(false)}
                 selectedCategory={selectedCategory || ''}
-                selectedCounty={selectedCounty || ''}
+                selectedCounty={selectedCity ? `city:${selectedCity}` : selectedCounty || ''}
                 onCategoryChange={(category) => {
                     const newCategory = category?.toLowerCase() || null;
                     // Navigate to update URL (state will sync via useEffect)
-                    navigateWithFilters(newCategory, selectedCounty);
+                    navigateWithFilters(newCategory, selectedCounty, selectedCity);
                 }}
                 onCountyChange={handleCountyChange}
                 onSearchChange={setSearchInput}
@@ -230,7 +242,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                                 <SelectScrollable
                                                     onValueChange={handleCountyChange}
                                                     options={counties}
-                                                    value={selectedCounty || ''}
+                                                    value={selectedCity ? `city:${selectedCity}` : selectedCounty || ''}
                                                     placeholder={t('selectCounty')}
                                                     className="w-full"
                                                 />
@@ -299,7 +311,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                             </div>
                             <div className="w-1/2">
                                 <SelectScrollable
-                                    value={selectedCounty || ''}
+                                    value={selectedCity ? `city:${selectedCity}` : selectedCounty || ''}
                                     onValueChange={handleCountyChange}
                                     options={counties}
                                     placeholder={t('selectCounty')}

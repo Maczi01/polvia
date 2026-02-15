@@ -14,12 +14,12 @@ interface MapPageClientProps {
 export function MapPageClient({ services, initialFilters }: MapPageClientProps) {
     // Manage filter state at this level so both FilterComponent and ServicesClientComponent can access it
     const [currentFilters, setCurrentFilters] = useState<MapFilters>(
-        initialFilters || { category: null, county: null }
+        initialFilters || { category: null, county: null, city: null }
     );
 
     // Sync with initial filters when they change (browser back/forward)
     useEffect(() => {
-        setCurrentFilters(initialFilters || { category: null, county: null });
+        setCurrentFilters(initialFilters || { category: null, county: null, city: null });
     }, [initialFilters]);
 
     return (

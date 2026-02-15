@@ -31,15 +31,17 @@ export const categoryImage = (category: string) => {
             return '/markers/glass.svg';
         case 'government':
             return '/markers/government.svg';
+        case 'gastronomy':
+            return '/markers/gastronomy.svg';
         default:
             return '/markers/default.svg';
     }
 };
 
 export const initialViewState = {
-    latitude: 53.430_255_829_367_695,
-    longitude: -7.859_398_399_644_760_5,
-    zoom: 5.75,
+    latitude: 51.960_298_484_367_69,
+    longitude: 19.210_655_292_701_76,
+    zoom: 5.55,
     bearing: 0,
     pitch: 0,
 };

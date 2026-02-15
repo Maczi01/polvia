@@ -107,7 +107,7 @@ export const Footer = async () => {
                             </svg>
                         </a>
                         <a
-                            href="https://www.instagram.com/pol.ie00/"
+                            href="https://www.instagram.com/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-600 dark:text-gray-400 hover:text-[#E4405F] dark:hover:text-[#E4405F] transition-colors focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 rounded-md p-1"
@@ -118,7 +118,7 @@ export const Footer = async () => {
                             </svg>
                         </a>
                         <a
-                            href="https://www.tiktok.com/@pol.ie8"
+                            href="https://www.tiktok.com"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-gray-600 dark:text-gray-400 hover:text-[#000000] dark:hover:text-[#FFFFFF] transition-colors focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 rounded-md p-1"

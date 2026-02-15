@@ -37,6 +37,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     // Use filters from URL slugs (passed as props)
     const selectedCounty = initialFilters?.county || '';
     const selectedCategory = initialFilters?.category || '';
+    const selectedCity = initialFilters?.city || '';
     const [popup, setPopup] = useState<PopupMarkerData | null>(null);
     const [selectedService, setSelectedService] = useState<PartialService | null>(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -59,7 +60,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     }, []);
 
     const currentView = isMobile ? viewParam : 'both';
-    const [cardToExpand, setCardToExpand] = useState<number | null>(null);
+    const [cardToExpand, setCardToExpand] = useState<string | null>(null);
     const mapRef = useRef<MapRef>(null);
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
     const mapListRef = useRef<{
@@ -87,9 +88,13 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             );
         }
 
-        if (selectedCounty) {
+        if (selectedCity) {
             filtered = filtered.filter(
-                s => s.county?.toLowerCase() === selectedCounty.toLowerCase(),
+                s => s.city?.toLowerCase() === selectedCity.toLowerCase(),
+            );
+        } else if (selectedCounty) {
+            filtered = filtered.filter(
+                s => s.voivodeship?.toLowerCase() === selectedCounty.toLowerCase(),
             );
         }
 
@@ -100,10 +105,10 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         }
 
         return filtered;
-    }, [searchInput, selectedCounty, selectedCategory, initialServices]);
+    }, [searchInput, selectedCounty, selectedCity, selectedCategory, initialServices]);
 
     const fetchEmbeddingResults = useCallback(
-        async (query: string, category?: string, county?: string, excludeIds: number[] = []) => {
+        async (query: string, category?: string, county?: string, excludeIds: string[] = []) => {
             try {
                 const params = new URLSearchParams();
                 params.set('query', query);
@@ -205,7 +210,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             setIsLoadingEmbeddings(true);
 
             debounceTimeoutRef.current = setTimeout(() => {
-                const excludeIds = frontendFilteredServices.map(s => s.id);
+                const excludeIds = frontendFilteredServices.map(s => s.serviceId);
                 fetchEmbeddingResults(
                     searchInput.trim(),
                     selectedCategory || undefined,
@@ -238,9 +243,13 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         return {
             frontendFiltered: frontendFilteredServices,
             embeddingResults: embeddingResults.filter(service => {
-                if (
+                if (selectedCity) {
+                    if (service.city?.toLowerCase() !== selectedCity.toLowerCase()) {
+                        return false;
+                    }
+                } else if (
                     selectedCounty &&
-                    service.county?.toLowerCase() !== selectedCounty.toLowerCase()
+                    service.voivodeship?.toLowerCase() !== selectedCounty.toLowerCase()
                 ) {
                     return false;
                 }
@@ -255,14 +264,14 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 return true;
             })
         };
-    }, [frontendFilteredServices, embeddingResults, selectedCounty, selectedCategory]);
+    }, [frontendFilteredServices, embeddingResults, selectedCounty, selectedCity, selectedCategory]);
 
     const filteredServices = useMemo(() => {
         return [...finalServices.frontendFiltered, ...finalServices.embeddingResults];
     }, [finalServices]);
 
     const handleHoverPlace = useCallback(
-        (serviceId: number | null) => {
+        (serviceId: string | null) => {
             if (popup) return;
 
             const found = filteredServices.find(s => s.id === serviceId);
@@ -280,7 +289,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     }, []);
 
     const handleClickedPlace = useCallback(
-        (id: number) => {
+        (id: string) => {
             const service = filteredServices.find(s => s.id === id);
             if (!service) return;
 
@@ -358,8 +367,8 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         if (ref.current) {
             ref.current.fitBounds(
                 [
-                    [-10.5819, 50.7039],
-                    [-5.5659, 56.0059],
+                    [14.07, 49.0],
+                    [24.15, 54.84],
                 ],
                 { duration: 1000, padding: 0 },
             );
@@ -430,10 +439,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
 
     useEffect(() => {
         if (selectedId) {
-            const id = Number.parseInt(selectedId, 10);
-            const service = filteredServices.find(s => s.id === id);
+            const service = filteredServices.find(s => s.id === selectedId);
             if (service) {
-                setCardToExpand(id);
+                setCardToExpand(selectedId);
                 setSelectedService(service);
                 setPendingScrollAfterViewChange(true);
             } else {
@@ -451,28 +459,35 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     }, [cardToExpand, setSelectedId]);
 
     useEffect(() => {
-        if (!selectedCounty || !mapRef.current) return;
+        if ((!selectedCounty && !selectedCity) || !mapRef.current) return;
 
-        // Filter services for the selected county
-        const countyServices = filteredServices.filter(
-            service => service.county?.toLowerCase() === selectedCounty.toLowerCase(),
-        );
+        // Filter services for the selected city or county
+        let locationServices;
+        if (selectedCity) {
+            locationServices = filteredServices.filter(
+                service => service.city?.toLowerCase() === selectedCity.toLowerCase(),
+            );
+        } else {
+            locationServices = filteredServices.filter(
+                service => service.voivodeship?.toLowerCase() === selectedCounty.toLowerCase(),
+            );
+        }
 
-        const servicesBounds = calculateServicesBounds(countyServices) as LngLatBoundsLike;
+        const servicesBounds = calculateServicesBounds(locationServices) as LngLatBoundsLike;
 
-        if (servicesBounds && countyServices.length > 0) {
-            console.log(`Zooming to ${countyServices.length} services in ${selectedCounty}`);
+        if (servicesBounds && locationServices.length > 0) {
+            console.log(`Zooming to ${locationServices.length} services in ${selectedCity || selectedCounty}`);
             mapRef.current.fitBounds(servicesBounds, {
                 duration: 1000,
                 padding: { top: 50, bottom: 50, left: 50, right: 50 },
             });
         } else {
-            console.log(`No services found in ${selectedCounty} - showing whole Ireland`);
-            // Show whole Ireland when no services in selected county
+            console.log(`No services found in ${selectedCity || selectedCounty} - showing whole Poland`);
+            // Show whole Poland when no services in selected location
             mapRef.current.fitBounds(
                 [
-                    [-10.5819, 51.4439], // Southwest of Ireland
-                    [-5.431, 55.3878], // Northeast of Ireland
+                    [14.07, 49.0], // Southwest of Poland
+                    [24.15, 54.84], // Northeast of Poland
                 ],
                 {
                     duration: 1000,
@@ -481,11 +496,11 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             );
         }
 
-        // Close any open popups when changing county
+        // Close any open popups when changing location
         setPopup(null);
         setSelectedService(null);
         setCardToExpand(null);
-    }, [filteredServices, selectedCounty]); // Only depend on selectedCounty - that's it!
+    }, [filteredServices, selectedCounty, selectedCity]);
 
     useEffect(() => {
         if (

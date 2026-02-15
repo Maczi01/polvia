@@ -12,7 +12,7 @@ const meta: Meta<typeof Filter> = {
     },
     args: {
         searchQuery: '',
-        selectedCounty: 'both-ireland',
+        selectedCounty: 'all-voivodeships',
         selectedCategory: '',
         onSearchChange: query => console.log('Search changed:', query),
         onCountyChange: county => console.log('County changed:', county),

@@ -19,13 +19,13 @@ type CardProps = {
     index: number;
     handleFlyTo: (latitude: number, longitude: number) => void;
     resetMap: () => void;
-    handleHoverPlace: (id: number | null) => void;
-    setCardToExpand: (id: number | null) => void;
-    cardToExpand: number | null;
+    handleHoverPlace: (id: string | null) => void;
+    setCardToExpand: (id: string | null) => void;
+    cardToExpand: string | null;
     setPopup: (popup: PopupMarkerData | null) => void;
 } & PartialService;
 
-const handleIncreasePopularityCounter = async (serviceId: number) => {
+const handleIncreasePopularityCounter = async (serviceId: string) => {
     await fetch('/api/increase-popularity-counter', {
         method: 'POST',
         body: JSON.stringify({ serviceId }),
@@ -37,13 +37,14 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
     (
         {
             id,
+            serviceId,
             className,
             image,
             name,
             city,
             category,
             street,
-            county,
+            voivodeship,
             tags,
             postcode,
             phoneNumber,
@@ -180,7 +181,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
                     setTimeout(() => {
                         setCardToExpand(id);
-                        handleIncreasePopularityCounter(id);
+                        handleIncreasePopularityCounter(serviceId);
 
                         if (latitude !== undefined && longitude !== undefined) {
                             handleFlyTo(longitude, latitude);
@@ -221,7 +222,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
                 // Direct expansion
                 setCardToExpand(id);
-                handleIncreasePopularityCounter(id);
+                handleIncreasePopularityCounter(serviceId);
 
                 if (latitude !== undefined && longitude !== undefined) {
                     handleFlyTo(longitude, latitude);
@@ -281,7 +282,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             }
         };
 
-        const addressParts = [street, postcode, city, county]
+        const addressParts = [street, postcode, city, voivodeship]
             .map(part => part?.trim())
             .filter(Boolean);
         const address = addressParts.join(', ');
@@ -340,7 +341,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                         className="mr-1 shrink-0 dark:brightness-0 dark:invert"
                                     />
                                     <span className="max-w-full break-words">
-                                        {expanded ? address : city || county}
+                                        {expanded ? address : city || voivodeship}
                                     </span>
                                 </div>
                             </div>
@@ -405,7 +406,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                     <div className="break-words text-sm text-muted-foreground dark:text-gray-400">
                                         {expanded
                                             ? address
-                                            : `${city}${county ? `, ${county}` : ''}`}
+                                            : `${city}${voivodeship ? `, ${voivodeship}` : ''}`}
                                     </div>
                                 </div>
                             </div>

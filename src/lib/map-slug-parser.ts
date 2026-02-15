@@ -21,6 +21,7 @@ import type { Locale } from '@/i18n/config';
 export type MapFilters = {
     category: CategoryKey | null;
     county: CountySlug | null;
+    city: string | null;
 };
 
 export type ParseSlugResult =
@@ -50,7 +51,7 @@ export function parseMapSlug(
     if (!slug || slug.length === 0) {
         return {
             success: true,
-            filters: { category: null, county: null },
+            filters: { category: null, county: null, city: null },
         };
     }
 
@@ -96,7 +97,7 @@ function parseSingleSegment(
     if (category) {
         return {
             success: true,
-            filters: { category, county: null },
+            filters: { category, county: null, city: null },
         };
     }
 
@@ -105,7 +106,7 @@ function parseSingleSegment(
     if (isValidCountySlug(normalizedCounty)) {
         return {
             success: true,
-            filters: { category: null, county: normalizedCounty },
+            filters: { category: null, county: normalizedCounty, city: null },
         };
     }
 
@@ -147,7 +148,7 @@ function parseTwoSegments(
 
     return {
         success: true,
-        filters: { category, county: normalizedCounty },
+        filters: { category, county: normalizedCounty, city: null },
     };
 }
 

@@ -42,6 +42,9 @@ export const routing = defineRouting({
             ru: '/pricing',
             uk: '/pricing',
         },
+        '/dashboard': '/dashboard',
+        '/dashboard/services': '/dashboard/services',
+        '/dashboard/services/new': '/dashboard/services/new',
     },
 });
 

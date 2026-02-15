@@ -101,7 +101,7 @@ export const MobileFilterModal = ({
                             text={t('Categories.RemoveFilterMobile')}
                             variant={
                                 selectedCategory ||
-                                (selectedCounty && selectedCounty !== 'both-ireland')
+                                (selectedCounty && selectedCounty !== 'all-voivodeships')
                                     ? 'removeFilter'
                                     : 'default'
                             }
@@ -110,7 +110,7 @@ export const MobileFilterModal = ({
                             disabled={
                                 !selectedCategory &&
                                 !searchQuery &&
-                                (!selectedCounty || selectedCounty === 'both-ireland')
+                                (!selectedCounty || selectedCounty === 'all-voivodeships')
                             }
                         />
 

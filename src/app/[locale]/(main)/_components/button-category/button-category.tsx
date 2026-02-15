@@ -47,6 +47,9 @@ const buttonVariants = cva(
                 overworld: 'bg-gradient-to-r from-[#4776e6] to-[#8e54e9] text-white ' +
                     'dark:from-[#5887F7] dark:to-[#9F65FA] dark:shadow-lg',
 
+                oversky: 'bg-gradient-to-r from-[#3D0DAF] to-[#0998A2] text-white ' +
+                    'dark:from-[#5887F7] dark:to-[#9F65FA] dark:shadow-lg',
+
                 mojito: 'bg-gradient-to-r from-[#1488CC] to-[#2B32B2] text-white ' +
                     'dark:from-[#1488CC] dark:to-[#2B32B2] dark:shadow-lg',
 

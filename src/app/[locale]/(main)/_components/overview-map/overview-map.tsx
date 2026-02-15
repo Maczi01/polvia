@@ -20,14 +20,14 @@ type OverviewMapProps = {
     services: PartialService[];
     selectedService: PartialService | null;
     resetMap: () => void;
-    handleClickedPlace: (id: number) => void;
+    handleClickedPlace: (id: string) => void;
     scrollToTop: () => void;
     popup: PopupMarkerData | null;
     setPopup: (popup: PopupMarkerData | null) => void;
     handleOpenPopup?: (popup: PopupMarkerData) => void;
 };
 
-export type PopupMarkerData = MarkerData & { id: number };
+export type PopupMarkerData = MarkerData & { id: string };
 
 // Utility function to throttle function calls
 const throttle = <T extends (...args: any[]) => void>(func: T, limit: number): T => {

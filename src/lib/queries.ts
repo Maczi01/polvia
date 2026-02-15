@@ -1,14 +1,15 @@
 import { db } from '@/db';
 import {
-    newsletter,
+    newsletterTable,
     promotedServicesTable,
     serviceEngagementsTable,
+    serviceLocationsTable,
     servicesTable,
     servicesTagsTable,
-    servicesTranslationsAlias,
     tagsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
+import { servicesTranslationsAlias } from '@/db/aliases';
 import { and, desc, eq, gt, sql } from 'drizzle-orm';
 import 'server-only';
 import { Service } from '@/types';
@@ -16,37 +17,31 @@ import { Service } from '@/types';
 export async function getServices(locale: string = 'en') {
     const results = await db
         .select({
-            id: servicesTable.id,
+            id: serviceLocationsTable.id,
+            serviceId: servicesTable.id,
 
-            // Use COALESCE(...) if you have a fallback name in services
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',
             ),
 
-            // If you have fallback for description:
             description: servicesTranslationsAlias.description,
 
             category: servicesTable.category,
-            city: servicesTable.city,
-            street: servicesTable.street,
-            county: servicesTable.county,
-            postcode: servicesTable.postcode,
-            latitude: servicesTable.latitude,
-            longitude: servicesTable.longitude,
-            openingHours: servicesTable.openingHours,
-            phoneNumber: servicesTable.phoneNumber,
-            email: servicesTable.email,
+            city: serviceLocationsTable.city,
+            street: serviceLocationsTable.street,
+            voivodeship: serviceLocationsTable.voivodeship,
+            postcode: serviceLocationsTable.postcode,
+            latitude: serviceLocationsTable.latitude,
+            longitude: serviceLocationsTable.longitude,
+            openingHours: serviceLocationsTable.openingHours,
+            phoneNumber: serviceLocationsTable.phoneNumber,
+            email: serviceLocationsTable.email,
             webpage: servicesTable.webpage,
-            part: servicesTable.part,
             image: servicesTable.image,
 
-            // Priority & clicks from your existing tables if needed
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
 
-            // ***** Subselect for tags array *****
-            // We run a SELECT that joins the pivot + tags + tags_translations
-            // filtering by the same service_id and the user’s locale.
             tags: sql<string[]>`
               (
                 SELECT array_agg(ttt.name)
@@ -62,7 +57,8 @@ export async function getServices(locale: string = 'en') {
         })
         .from(servicesTable)
 
-        // Left-join for service translations (name/desc in chosen locale)
+        .innerJoin(serviceLocationsTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
+
         .leftJoin(
             servicesTranslationsAlias,
             and(
@@ -71,7 +67,6 @@ export async function getServices(locale: string = 'en') {
             ),
         )
 
-        // Optional: Join for priority/clicks
         .leftJoin(
             promotedServicesTable,
             and(
@@ -81,7 +76,6 @@ export async function getServices(locale: string = 'en') {
         )
         .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
 
-        // Example ordering
         .orderBy(
             desc(sql`COALESCE(${promotedServicesTable.priority}, 0)`),
             desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`),
@@ -92,7 +86,7 @@ export async function getServices(locale: string = 'en') {
 
 export async function addEmailToNewsletter(email: string) {
     try {
-        const result = await db.insert(newsletter)
+        const result = await db.insert(newsletterTable)
             .values({ email })
             .onConflictDoNothing()
             .returning();
@@ -106,48 +100,36 @@ export async function addEmailToNewsletter(email: string) {
         console.error('Database error:', error);
         return { success: false, message: 'Database error' };
     }
-    // await db.insert(newsletter).values({
-    //     email,
-    //     createdAt: new Date(),
-    //     updatedAt: new Date(),
-    // }).onConflictDoNothing();
-    // return { success: true, message: 'Email added to newsletter!' };
 }
 
 export async function getMostPopular(locale: string) {
     const results = await db
         .select({
-            id: servicesTable.id,
+            id: serviceLocationsTable.id,
+            serviceId: servicesTable.id,
 
-            // Use COALESCE(...) if you have a fallback name in services
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',
             ),
 
-            // If you have fallback for description:
             description: servicesTranslationsAlias.description,
 
             category: servicesTable.category,
-            city: servicesTable.city,
-            street: servicesTable.street,
-            county: servicesTable.county,
-            postcode: servicesTable.postcode,
-            latitude: servicesTable.latitude,
-            longitude: servicesTable.longitude,
-            openingHours: servicesTable.openingHours,
-            phoneNumber: servicesTable.phoneNumber,
-            email: servicesTable.email,
+            city: serviceLocationsTable.city,
+            street: serviceLocationsTable.street,
+            voivodeship: serviceLocationsTable.voivodeship,
+            postcode: serviceLocationsTable.postcode,
+            latitude: serviceLocationsTable.latitude,
+            longitude: serviceLocationsTable.longitude,
+            openingHours: serviceLocationsTable.openingHours,
+            phoneNumber: serviceLocationsTable.phoneNumber,
+            email: serviceLocationsTable.email,
             webpage: servicesTable.webpage,
-            part: servicesTable.part,
             image: servicesTable.image,
 
-            // Priority & clicks from your existing tables if needed
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
 
-            // ***** Subselect for tags array *****
-            // We run a SELECT that joins the pivot + tags + tags_translations
-            // filtering by the same service_id and the user’s locale.
             tags: sql<string[]>`
               (
                 SELECT array_agg(ttt.name)
@@ -163,7 +145,8 @@ export async function getMostPopular(locale: string) {
         })
         .from(servicesTable)
 
-        // Left-join for service translations (name/desc in chosen locale)
+        .innerJoin(serviceLocationsTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
+
         .leftJoin(
             servicesTranslationsAlias,
             and(
@@ -172,7 +155,6 @@ export async function getMostPopular(locale: string) {
             ),
         )
 
-        // Optional: Join for priority/clicks
         .leftJoin(
             promotedServicesTable,
             and(
@@ -182,14 +164,10 @@ export async function getMostPopular(locale: string) {
         )
         .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
 
-        // Example ordering
         .orderBy(
-            // desc(sql`COALESCE(${promotedServicesTable.priority}, 0)`),
             desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`),
         )
-        .limit(5)
-    ;
+        .limit(5);
 
     return results as Service[];
 }
-

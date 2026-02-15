@@ -44,7 +44,7 @@ export function SelectScrollable({
     onValueChange,
     showDefault = true,
     translationNamespace = 'MapPage',
-    defaultOptionTranslateKey = 'bothIreland',
+    defaultOptionTranslateKey = 'allVoivodeships',
     translationPrefix = 'counties',
     ariaLabel,
 }: SelectScrollableProps) {
@@ -89,8 +89,8 @@ export function SelectScrollable({
     // Default option handling
     const defaultOptionLabel = showDefault
         ? translateOption({
-              value: 'both-ireland',
-              label: 'Republic & Northern',
+              value: 'all-voivodeships',
+              label: 'Wszystkie województwa',
               translateKey: defaultOptionTranslateKey,
           })
         : null;
@@ -104,17 +104,21 @@ export function SelectScrollable({
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
-                {showDefault && <SelectItem value="both-ireland">{defaultOptionLabel}</SelectItem>}
+                {showDefault && <SelectItem value="all-voivodeships">{defaultOptionLabel}</SelectItem>}
 
                 {isGroupedOptions(options) ? (
                     Object.entries(options).map(([groupKey, group]) => (
                         <SelectGroup key={groupKey}>
                             <SelectLabel>{translateOption(group.tile)}</SelectLabel>
-                            {group.options.map(option => (
-                                <SelectItem key={option} value={option.toLowerCase()}>
-                                    {translateOption(option)}
-                                </SelectItem>
-                            ))}
+                            {group.options.map(option => {
+                                const isCity = option.startsWith('city:');
+                                const displayName = isCity ? option.slice(5) : option;
+                                return (
+                                    <SelectItem key={option} value={option.toLowerCase()}>
+                                        {translateOption(displayName)}
+                                    </SelectItem>
+                                );
+                            })}
                         </SelectGroup>
                     ))
                 ) : (

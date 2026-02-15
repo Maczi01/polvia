@@ -35,10 +35,10 @@ type MapListProps = {
     embeddingMeta: EmbeddingMeta;
     handleFlyTo: (latitude: number, longitude: number) => void;
     resetMap: () => void;
-    handleHoverPlace: (id: number | null) => void;
+    handleHoverPlace: (id: string | null) => void;
     cardRefs: RefObject<(HTMLDivElement | null)[]>;
-    setCardToExpand: (id: number | null) => void;
-    cardToExpand: number | null;
+    setCardToExpand: (id: string | null) => void;
+    cardToExpand: string | null;
     scrollToTop: () => void;
     setPopup: (popup: PopupMarkerData | null) => void;
 };

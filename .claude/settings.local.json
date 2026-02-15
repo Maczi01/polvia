@@ -3,7 +3,10 @@
     "allow": [
       "Bash(find:*)",
       "Bash(ls:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(taskkill:*)",
+      "Bash(node:*)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

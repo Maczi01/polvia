@@ -8,6 +8,7 @@ export function formatDate(date: string) {
 
 export const categories = [
     { text: 'Grocery', image: '/icons/grocery.svg', variant: 'red' as const },
+    { text: 'Gastronomy', image: '/icons/gastronomy.svg', variant: 'oversky' as const },
     { text: 'Transport', image: '/icons/transport.svg', variant: 'green' as const },
     { text: 'Financial', image: '/icons/financial.svg', variant: 'orange' as const },
     { text: 'Renovation', image: '/icons/renovation.svg', variant: 'blue' as const },
@@ -22,39 +23,37 @@ export const categories = [
 ];
 
 export const counties = {
-    groupTwo: {
-        tile: 'Northern Ireland',
-        options: ['Antrim', 'Armagh', 'Derry', 'Down', 'Fermanagh', 'Tyrone'],
-    },
-    groupOne: {
-        tile: 'Republic of Ireland',
+    cities: {
+        tile: 'Największe miasta',
         options: [
-            'Carlow',
-            'Cavan',
-            'Clare',
-            'Cork',
-            'Donegal',
-            'Dublin',
-            'Galway',
-            'Kerry',
-            'Kildare',
-            'Kilkenny',
-            'Laois',
-            'Leitrim',
-            'Limerick',
-            'Longford',
-            'Louth',
-            'Mayo',
-            'Meath',
-            'Monaghan',
-            'Offaly',
-            'Roscommon',
-            'Sligo',
-            'Tipperary',
-            'Waterford',
-            'Westmeath',
-            'Wexford',
-            'Wicklow',
+            'city:Warszawa',
+            'city:Kraków',
+            'city:Łódź',
+            'city:Wrocław',
+            'city:Poznań',
+            'city:Gdańsk',
+            'city:Szczecin',
+        ],
+    },
+    voivodeships: {
+        tile: 'Województwa',
+        options: [
+            'Dolnośląskie',
+            'Kujawsko-Pomorskie',
+            'Lubelskie',
+            'Lubuskie',
+            'Łódzkie',
+            'Małopolskie',
+            'Mazowieckie',
+            'Opolskie',
+            'Podkarpackie',
+            'Podlaskie',
+            'Pomorskie',
+            'Śląskie',
+            'Świętokrzyskie',
+            'Warmińsko-Mazurskie',
+            'Wielkopolskie',
+            'Zachodniopomorskie',
         ],
     },
 };
@@ -99,6 +98,8 @@ export const mapCategoryToBadgeColor = (category: string) => {
     switch (category) {
         case 'grocery':
             return 'red';
+        case 'gastronomy':
+            return 'cherry';
         case 'education':
             return 'sapphire';
         case 'law':
@@ -152,18 +153,18 @@ export function formatAddress({
                                   street,
                                   postcode,
                                   city,
-                                  county,
+                                  voivodeship,
                               }: Pick<
     PartialService,
-    'street' | 'postcode' | 'city' | 'county'
+    'street' | 'postcode' | 'city' | 'voivodeship'
 >): string {
-    return [street, postcode, city, county]        // keep original order
+    return [street, postcode, city, voivodeship]    // keep original order
         .map(part => part?.trim())                   // trim whitespace / handle undefined
         .filter(Boolean)                             // drop falsy entries
         .join(', ');
 }
 
-export const serviceName = "pol.ie";
-export const serviceNameFromCapitalLetter = "Pol.ie";
+export const serviceName = "polvia";
+export const serviceNameFromCapitalLetter = "Polvia";
 
 

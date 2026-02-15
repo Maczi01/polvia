@@ -8,7 +8,7 @@ import { Service, View } from '@/types';
 
 type PartialService = Omit<
     Service,
-    'createdAt' | 'openingHours' | 'part' | 'updatedAt' | 'embedding' | 'priority'
+    'createdAt' | 'openingHours' | 'updatedAt' | 'embedding' | 'priority'
 >;
 
 const meta = {

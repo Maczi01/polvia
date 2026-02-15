@@ -93,7 +93,7 @@ export const Filter = memo(
         const hasActiveFilters =
             selectedCategory ||
             searchQuery ||
-            (selectedCounty && selectedCounty !== 'both-ireland');
+            (selectedCounty && selectedCounty !== 'all-voivodeships');
 
         return (
             <div className="w-full max-w-full overflow-x-hidden px-3 pb-4 pt-2">
