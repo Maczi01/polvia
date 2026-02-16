@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select/select';
-import { createService, updateService, createTag, type ActionResult, type Tag, type ServiceEditData } from '../_actions';
+import { createService, createTag, type ActionResult, type Tag } from '../_actions';
 
 const categories = [
     'others', 'education', 'renovation', 'financial', 'beauty', 'gastronomy',
@@ -49,15 +49,8 @@ const languages = [
 
 const initialState: ActionResult = { success: false, message: '' };
 
-type ServiceFormProps = {
-    tags: Tag[];
-    mode: 'create' | 'edit';
-    initialData?: ServiceEditData;
-};
-
-export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFormProps) {
-    const action = mode === 'edit' ? updateService : createService;
-    const [state, formAction, isPending] = useActionState(action, initialState);
+export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
+    const [state, formAction, isPending] = useActionState(createService, initialState);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const latRef = useRef<HTMLInputElement>(null);
     const lonRef = useRef<HTMLInputElement>(null);
@@ -65,8 +58,6 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
     const [showNewTag, setShowNewTag] = useState(false);
     const [newTagNames, setNewTagNames] = useState({ pl: '', en: '', uk: '', ru: '' });
     const [creatingTag, setCreatingTag] = useState(false);
-
-    const d = initialData;
 
     const handleCreateTag = async () => {
         setCreatingTag(true);
@@ -81,13 +72,6 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
     return (
         <form action={formAction} className="space-y-8">
-            {mode === 'edit' && d && (
-                <>
-                    <input type="hidden" name="serviceId" value={d.id} />
-                    <input type="hidden" name="existingImage" value={d.image} />
-                </>
-            )}
-
             {state.message && (
                 <div className={`rounded-lg p-4 text-sm ${
                     state.success
@@ -111,7 +95,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name *</Label>
-                        <Input id="name" name="name" required placeholder="Service name" defaultValue={d?.name} />
+                        <Input id="name" name="name" required placeholder="Service name" />
                         {state.errors?.name && (
                             <p className="text-sm text-destructive">{state.errors.name[0]}</p>
                         )}
@@ -119,7 +103,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="category">Category *</Label>
-                        <Select name="category" required defaultValue={d?.category}>
+                        <Select name="category" required>
                             <SelectTrigger className="rounded-md">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
@@ -138,7 +122,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="status">Status</Label>
-                        <Select name="status" defaultValue={d?.status ?? 'active'}>
+                        <Select name="status" defaultValue="active">
                             <SelectTrigger className="rounded-md">
                                 <SelectValue placeholder="Select status" />
                             </SelectTrigger>
@@ -154,7 +138,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="webpage">Webpage</Label>
-                        <Input id="webpage" name="webpage" placeholder="https://example.com" defaultValue={d?.webpage} />
+                        <Input id="webpage" name="webpage" placeholder="https://example.com" />
                         {state.errors?.webpage && (
                             <p className="text-sm text-destructive">{state.errors.webpage[0]}</p>
                         )}
@@ -162,7 +146,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="nip">NIP</Label>
-                        <Input id="nip" name="nip" placeholder="1234567890" maxLength={10} defaultValue={d?.nip} />
+                        <Input id="nip" name="nip" placeholder="1234567890" maxLength={10} />
                         {state.errors?.nip && (
                             <p className="text-sm text-destructive">{state.errors.nip[0]}</p>
                         )}
@@ -185,19 +169,13 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                                 }
                             }}
                         />
-                        {imagePreview ? (
+                        {imagePreview && (
                             <img
                                 src={imagePreview}
                                 alt="Preview"
                                 className="mt-2 h-24 w-24 rounded-md object-cover border"
                             />
-                        ) : d?.image ? (
-                            <img
-                                src={`/services/${d.image}`}
-                                alt="Current image"
-                                className="mt-2 h-24 w-24 rounded-md object-cover border"
-                            />
-                        ) : null}
+                        )}
                         {state.errors?.image && (
                             <p className="text-sm text-destructive">{state.errors.image[0]}</p>
                         )}
@@ -205,7 +183,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
-                        <Input id="whatsappNumber" name="whatsappNumber" placeholder="+48..." defaultValue={d?.whatsappNumber} />
+                        <Input id="whatsappNumber" name="whatsappNumber" placeholder="+48..." />
                         {state.errors?.whatsappNumber && (
                             <p className="text-sm text-destructive">{state.errors.whatsappNumber[0]}</p>
                         )}
@@ -221,7 +199,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                                     type="checkbox"
                                     name="languages"
                                     value={lang.value}
-                                    defaultChecked={d ? d.languages.includes(lang.value) : lang.value === 'pl'}
+                                    defaultChecked={lang.value === 'pl'}
                                     className="h-4 w-4 rounded border-gray-300"
                                 />
                                 <span className="text-sm">{lang.label}</span>
@@ -240,7 +218,6 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                                         type="checkbox"
                                         name="tags"
                                         value={tag.id}
-                                        defaultChecked={d?.tags.includes(tag.id)}
                                         className="h-4 w-4 rounded border-gray-300"
                                     />
                                     <span className="text-sm">
@@ -335,7 +312,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="city">City</Label>
-                        <Input id="city" name="city" placeholder="Warsaw" defaultValue={d?.city} />
+                        <Input id="city" name="city" placeholder="Warsaw" />
                         {state.errors?.city && (
                             <p className="text-sm text-destructive">{state.errors.city[0]}</p>
                         )}
@@ -343,7 +320,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="street">Street</Label>
-                        <Input id="street" name="street" placeholder="ul. Marszalkowska 1" defaultValue={d?.street} />
+                        <Input id="street" name="street" placeholder="ul. Marszalkowska 1" />
                         {state.errors?.street && (
                             <p className="text-sm text-destructive">{state.errors.street[0]}</p>
                         )}
@@ -351,7 +328,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="voivodeship">Voivodeship</Label>
-                        <Select name="voivodeship" defaultValue={d?.voivodeship || undefined}>
+                        <Select name="voivodeship">
                             <SelectTrigger className="rounded-md">
                                 <SelectValue placeholder="Select voivodeship" />
                             </SelectTrigger>
@@ -370,7 +347,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="postcode">Postcode</Label>
-                        <Input id="postcode" name="postcode" placeholder="00-001" defaultValue={d?.postcode} />
+                        <Input id="postcode" name="postcode" placeholder="00-001" />
                         {state.errors?.postcode && (
                             <p className="text-sm text-destructive">{state.errors.postcode[0]}</p>
                         )}
@@ -414,7 +391,6 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             step="any"
                             required
                             placeholder="52.2297"
-                            defaultValue={d?.latitude}
                             className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-base text-gray-900 dark:text-white shadow-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                         />
                         {state.errors?.latitude && (
@@ -432,7 +408,6 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             step="any"
                             required
                             placeholder="21.0122"
-                            defaultValue={d?.longitude}
                             className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-base text-gray-900 dark:text-white shadow-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                         />
                         {state.errors?.longitude && (
@@ -442,7 +417,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="phoneNumber">Phone Number</Label>
-                        <Input id="phoneNumber" name="phoneNumber" placeholder="+48 123 456 789" defaultValue={d?.phoneNumber} />
+                        <Input id="phoneNumber" name="phoneNumber" placeholder="+48 123 456 789" />
                         {state.errors?.phoneNumber && (
                             <p className="text-sm text-destructive">{state.errors.phoneNumber[0]}</p>
                         )}
@@ -450,7 +425,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" name="email" type="email" placeholder="contact@example.com" defaultValue={d?.email} />
+                        <Input id="email" name="email" type="email" placeholder="contact@example.com" />
                         {state.errors?.email && (
                             <p className="text-sm text-destructive">{state.errors.email[0]}</p>
                         )}
@@ -464,31 +439,31 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="socials.facebook">Facebook</Label>
-                        <Input id="socials.facebook" name="socials.facebook" placeholder="https://facebook.com/..." defaultValue={d?.socials?.facebook} />
+                        <Input id="socials.facebook" name="socials.facebook" placeholder="https://facebook.com/..." />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.instagram">Instagram</Label>
-                        <Input id="socials.instagram" name="socials.instagram" placeholder="https://instagram.com/..." defaultValue={d?.socials?.instagram} />
+                        <Input id="socials.instagram" name="socials.instagram" placeholder="https://instagram.com/..." />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.telegram">Telegram</Label>
-                        <Input id="socials.telegram" name="socials.telegram" placeholder="https://t.me/..." defaultValue={d?.socials?.telegram} />
+                        <Input id="socials.telegram" name="socials.telegram" placeholder="https://t.me/..." />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.tiktok">TikTok</Label>
-                        <Input id="socials.tiktok" name="socials.tiktok" placeholder="https://tiktok.com/@..." defaultValue={d?.socials?.tiktok} />
+                        <Input id="socials.tiktok" name="socials.tiktok" placeholder="https://tiktok.com/@..." />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.youtube">YouTube</Label>
-                        <Input id="socials.youtube" name="socials.youtube" placeholder="https://youtube.com/..." defaultValue={d?.socials?.youtube} />
+                        <Input id="socials.youtube" name="socials.youtube" placeholder="https://youtube.com/..." />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.viber">Viber</Label>
-                        <Input id="socials.viber" name="socials.viber" placeholder="Viber link or number" defaultValue={d?.socials?.viber} />
+                        <Input id="socials.viber" name="socials.viber" placeholder="Viber link or number" />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="socials.whatsapp">WhatsApp</Label>
-                        <Input id="socials.whatsapp" name="socials.whatsapp" placeholder="https://wa.me/..." defaultValue={d?.socials?.whatsapp} />
+                        <Input id="socials.whatsapp" name="socials.whatsapp" placeholder="https://wa.me/..." />
                     </div>
                 </div>
             </section>
@@ -503,11 +478,11 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="namePl">Name (Polish)</Label>
-                                <Input id="namePl" name="namePl" placeholder="Nazwa usługi" defaultValue={d?.namePl} />
+                                <Input id="namePl" name="namePl" placeholder="Nazwa usługi" />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="descriptionPl">Description (Polish)</Label>
-                                <Textarea id="descriptionPl" name="descriptionPl" rows={3} placeholder="Opis usługi po polsku..." defaultValue={d?.descriptionPl} />
+                                <Textarea id="descriptionPl" name="descriptionPl" rows={3} placeholder="Opis usługi po polsku..." />
                             </div>
                         </div>
                     </div>
@@ -517,11 +492,11 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="nameEn">Name (English)</Label>
-                                <Input id="nameEn" name="nameEn" placeholder="Service name" defaultValue={d?.nameEn} />
+                                <Input id="nameEn" name="nameEn" placeholder="Service name" />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="descriptionEn">Description (English)</Label>
-                                <Textarea id="descriptionEn" name="descriptionEn" rows={3} placeholder="Service description in English..." defaultValue={d?.descriptionEn} />
+                                <Textarea id="descriptionEn" name="descriptionEn" rows={3} placeholder="Service description in English..." />
                             </div>
                         </div>
                     </div>
@@ -531,11 +506,11 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="nameUk">Name (Ukrainian)</Label>
-                                <Input id="nameUk" name="nameUk" placeholder="Назва послуги" defaultValue={d?.nameUk} />
+                                <Input id="nameUk" name="nameUk" placeholder="Назва послуги" />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="descriptionUk">Description (Ukrainian)</Label>
-                                <Textarea id="descriptionUk" name="descriptionUk" rows={3} placeholder="Опис послуги українською..." defaultValue={d?.descriptionUk} />
+                                <Textarea id="descriptionUk" name="descriptionUk" rows={3} placeholder="Опис послуги українською..." />
                             </div>
                         </div>
                     </div>
@@ -545,11 +520,11 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="nameRu">Name (Russian)</Label>
-                                <Input id="nameRu" name="nameRu" placeholder="Название услуги" defaultValue={d?.nameRu} />
+                                <Input id="nameRu" name="nameRu" placeholder="Название услуги" />
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="descriptionRu">Description (Russian)</Label>
-                                <Textarea id="descriptionRu" name="descriptionRu" rows={3} placeholder="Описание услуги на русском..." defaultValue={d?.descriptionRu} />
+                                <Textarea id="descriptionRu" name="descriptionRu" rows={3} placeholder="Описание услуги на русском..." />
                             </div>
                         </div>
                     </div>
@@ -565,10 +540,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     disabled={isPending}
                     className="rounded-md bg-green hover:bg-green/90 text-white px-6"
                 >
-                    {isPending
-                        ? (mode === 'edit' ? 'Saving...' : 'Creating...')
-                        : (mode === 'edit' ? 'Save Changes' : 'Create Service')
-                    }
+                    {isPending ? 'Creating...' : 'Create Service'}
                 </Button>
             </div>
         </form>

@@ -146,7 +146,7 @@ export function PopularServicesGridClient({ services }: PopularServicesGridClien
                             key={service.id}
                             href={{
                                 pathname: '/map' as AppPathnames,
-                                query: { id: service.id },
+                                query: { slug: service.slug },
                             }}
                             icon={imageMap(service.image!)}
                             name={service.name}

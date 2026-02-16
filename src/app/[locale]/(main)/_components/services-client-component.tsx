@@ -32,7 +32,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const locale = useLocale();
     const [searchInput] = useQueryState('query', { defaultValue: '' });
     const [viewParam] = useQueryState('view', { defaultValue: 'map' });
-    const [selectedId, setSelectedId] = useQueryState('id', { defaultValue: '' });
+    const [selectedSlug, setSelectedSlug] = useQueryState('slug', { defaultValue: '' });
 
     // Use filters from URL slugs (passed as props)
     const selectedCounty = initialFilters?.county || '';
@@ -361,7 +361,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const resetMap = useCallback(() => {
         setCardToExpand(null);
         handleClosePopup();
-        setSelectedId(null);
+        setSelectedSlug(null);
 
         const ref = mapRef as RefObject<MapRef>;
         if (ref.current) {
@@ -373,7 +373,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 { duration: 1000, padding: 0 },
             );
         }
-    }, [handleClosePopup, setSelectedId]);
+    }, [handleClosePopup, setSelectedSlug]);
 
     const scrollToTop = useCallback(() => {
         if (mapListRef.current) {
@@ -438,25 +438,28 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     }, []);
 
     useEffect(() => {
-        if (selectedId) {
-            const service = filteredServices.find(s => s.id === selectedId);
+        if (selectedSlug) {
+            const service = filteredServices.find(s => s.slug === selectedSlug);
             if (service) {
-                setCardToExpand(selectedId);
+                setCardToExpand(service.id);
                 setSelectedService(service);
                 setPendingScrollAfterViewChange(true);
             } else {
-                setSelectedId(null);
+                setSelectedSlug(null);
             }
         }
-    }, [selectedId, filteredServices, setSelectedId]);
+    }, [selectedSlug, filteredServices, setSelectedSlug]);
 
     useEffect(() => {
         if (cardToExpand === null) {
-            setSelectedId(null);
+            setSelectedSlug(null);
         } else {
-            setSelectedId(cardToExpand.toString());
+            const service = filteredServices.find(s => s.id === cardToExpand);
+            if (service?.slug) {
+                setSelectedSlug(service.slug);
+            }
         }
-    }, [cardToExpand, setSelectedId]);
+    }, [cardToExpand, filteredServices, setSelectedSlug]);
 
     useEffect(() => {
         if ((!selectedCounty && !selectedCity) || !mapRef.current) return;

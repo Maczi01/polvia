@@ -19,6 +19,7 @@ export async function getServices(locale: string = 'en') {
         .select({
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
+            slug: servicesTable.slug,
 
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',
@@ -107,6 +108,7 @@ export async function getMostPopular(locale: string) {
         .select({
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
+            slug: servicesTable.slug,
 
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',

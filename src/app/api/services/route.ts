@@ -139,6 +139,7 @@ export async function GET(request: NextRequest) {
             .select({
                 id: serviceLocationsTable.id,
                 serviceId: servicesTable.id,
+                slug: servicesTable.slug,
                 name: servicesTable.name,
                 category: servicesTable.category,
                 city: serviceLocationsTable.city,
@@ -209,6 +210,7 @@ export async function GET(request: NextRequest) {
                 return {
                     id: service.id,
                     serviceId: service.serviceId,
+                    slug: service.slug,
                     name: preferredTranslation?.name || service.name,
                     category: service.category,
                     city: service.city,

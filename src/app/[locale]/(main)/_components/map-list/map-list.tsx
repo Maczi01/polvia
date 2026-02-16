@@ -5,6 +5,7 @@ import {
     useCallback,
     useEffect,
     useImperativeHandle,
+    useMemo,
     useRef,
     useState,
 } from 'react';
@@ -104,7 +105,10 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         const CARD_COLLAPSE_MS = 300;
 
         // Combine services for internal logic (refs, scrolling, etc.)
-        const allServices = [...frontendFilteredServices, ...embeddingResults];
+        const allServices = useMemo(
+            () => [...frontendFilteredServices, ...embeddingResults],
+            [frontendFilteredServices, embeddingResults],
+        );
 
         useScrollableListHandle(ref, containerRef, virtuaListRef, allServices);
 

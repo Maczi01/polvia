@@ -205,6 +205,8 @@ async function mainSeed() {
         name: 'Piana Vyshnia', slug: 'piana-vyshnia', category: 'gastronomy',
         plDesc: 'Słynna lwowskia nalewka wiśniowa podawana w wyjątkowej atmosferze.',
         ukDesc: 'Знаменита львівська настоянка в унікальній атмосфері.',
+        image: 'pijana-visnia.png',
+        webpage: 'https://pianavyshnia.com/',
         tags: ['alcohol', 'atmosphere'],
         locations: [{ city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2330, longitude: 21.0176, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -444,16 +446,6 @@ async function mainSeed() {
         locations: [{ city: 'Warszawa', street: 'Chmielna 21', voivodeship: 'mazowieckie', latitude: 52.2325, longitude: 21.0145, isMainLocation: true, openingHours: standardGastroHours }]
     });
 
-
-    // 14
-    await seedService({
-        name: 'Sushi Master', slug: 'sushi-master-wroclaw', category: 'gastronomy',
-        plDesc: 'Popularna sieć sushi.',
-        ukDesc: 'Популярна мережа суші.',
-        tags: ['sushi', 'delivery'],
-        locations: [{ city: 'Wrocław', street: 'Tęczowa 83', voivodeship: 'dolnoslaskie', latitude: 51.1020, longitude: 17.0150, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
     // 15
     await seedService({
         name: 'Kanapka Bar', slug: 'kanapka-bar-warszawa', category: 'gastronomy',
@@ -496,6 +488,8 @@ async function mainSeed() {
         name: 'Kresowe Smaki Valentyny', slug: 'kresowe-smaki-valentyny', category: 'gastronomy',
         plDesc: 'Domowe smaki Kresów i Ukrainy.',
         ukDesc: 'Домашні страви за традиційними рецептами.',
+        image: 'smaki-valentyny.png',
+        webpage: 'https://kresowe-smaki-valentyny-sienna89.eatbu.com/',
         tags: ['home', 'tradition'],
         locations: [{ city: 'Warszawa', street: 'Sienna 89', voivodeship: 'mazowieckie', latitude: 52.2302, longitude: 20.9934, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -513,12 +507,15 @@ async function mainSeed() {
 
     // 23
     await seedService({
-        zmienic, 2 lokalizacje : https://www.google.com/search?q=Kozaczok&sourceid=chrome&ie=UTF-8
         name: 'Kozaczok', slug: 'kozaczok', category: 'gastronomy',
         plDesc: 'Ukraiński punkt gastronomiczny.',
         ukDesc: 'Українська кухня у торговому центрі.',
+        webpage: 'https://kozaczok.eatbu.com/',
         tags: ['lunch', 'dumplings'],
-        locations: [{ city: 'Warszawa', street: 'al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.2541, longitude: 20.9839, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [
+            { city: 'Warszawa', street: 'ul.Sokratesa 9', voivodeship: 'mazowieckie', latitude: 52.2839, longitude: 20.92699, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'C.H. Arkadia al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.25659, longitude: 20.98429, isMainLocation: true, openingHours: standardGastroHours }
+    ]
     });
 
     // 24
@@ -578,12 +575,13 @@ async function mainSeed() {
 
     // 30
     await seedService({
-        zmienic!! https://www.facebook.com/profile.php?id=100089888416051
         name: 'Restauracja Dumka', slug: 'restauracja-dumka-kielce', category: 'gastronomy',
         plDesc: 'Miejsce spotkań z ukraińską kulturą.',
         ukDesc: 'Місце зустрічі з українською культурою.',
+        webpage: 'https://www.dumkarest.pl/',
+        image: 'dumka.png',
         tags: ['culture', 'atmosphere'],
-        locations: [{ city: 'Kielce', street: 'Paderewskiego 34/3', voivodeship: 'swietokrzyskie', latitude: 50.8741, longitude: 20.6272, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Chełm', street: 'Lubelska 17/1', voivodeship: 'lubelskie', latitude: 51.1322, longitude: 23.47611, isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 31
@@ -604,6 +602,8 @@ async function mainSeed() {
         locations: [{ city: 'Płock', street: 'Fryderyka Chopina 28', voivodeship: 'mazowieckie', latitude: 52.5501, longitude: 19.6972, isMainLocation: true, openingHours: standardGastroHours }]
     });
 
+    // DODAC KOSCIOLY PRAWOSLAWNE
+
     // 33
     await seedService({
         name: 'Willa Biała', slug: 'willa-biala-warszawa', category: 'gastronomy',
@@ -611,15 +611,6 @@ async function mainSeed() {
         ukDesc: 'Елегантний ресторан у старій віллі.',
         tags: ['atmosphere', 'modern'],
         locations: [{ city: 'Warszawa', street: 'Narbutta 10', voivodeship: 'mazowieckie', latitude: 52.2091, longitude: 21.0189, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
-    // 34
-    await seedService({
-        name: 'Ukraińskie Smaki', slug: 'ukrainskie-smaki-poznan', category: 'gastronomy',
-        plDesc: 'Tradycyjna kuchnia ukraińska.',
-        ukDesc: 'Традиційна українська кухня.',
-        tags: ['tradition', 'home'],
-        locations: [{ city: 'Poznań', street: 'Półwiejska 17', voivodeship: 'wielkopolskie', latitude: 52.4019, longitude: 16.9271, isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 36

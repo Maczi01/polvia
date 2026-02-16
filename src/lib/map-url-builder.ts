@@ -10,7 +10,7 @@ export type MapUrlParams = {
     category?: string | null;
     county?: string | null;
     query?: string | null;
-    id?: string | null;
+    slug?: string | null;
     view?: 'map' | 'list' | null;
 };
 
@@ -37,7 +37,7 @@ export type MapUrl = {
  * @returns URL object with pathname and optional query params
  */
 export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
-    const { category, county, query, id, view } = params;
+    const { category, county, query, slug, view } = params;
 
     // Base pathname
     const basePath = '/map';
@@ -72,8 +72,8 @@ export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
         queryParams.query = query.trim();
     }
 
-    if (id && id.trim().length > 0) {
-        queryParams.id = id.trim();
+    if (slug && slug.trim().length > 0) {
+        queryParams.slug = slug.trim();
     }
 
     if (view && (view === 'map' || view === 'list')) {
@@ -111,13 +111,13 @@ export function buildCountyUrl(county: string, locale: Locale): MapUrl {
 }
 
 /**
- * Build a map URL for a specific service (by ID)
- * @param id - Service ID
+ * Build a map URL for a specific service (by slug)
+ * @param slug - Service slug
  * @param locale - Current locale
- * @returns URL object with ID as query param
+ * @returns URL object with slug as query param
  */
-export function buildServiceUrl(id: string, locale: Locale): MapUrl {
-    return buildMapUrl({ id }, locale);
+export function buildServiceUrl(slug: string, locale: Locale): MapUrl {
+    return buildMapUrl({ slug }, locale);
 }
 
 /**

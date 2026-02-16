@@ -139,7 +139,7 @@ export default async function MapPage(props: PageProps) {
                 category: oldFilters.category,
                 county: oldFilters.county,
                 query: searchParams.query as string | undefined,
-                id: searchParams.id as string | undefined,
+                slug: searchParams.slug as string | undefined,
                 view: searchParams.view as 'map' | 'list' | undefined,
             },
             locale as Locale,

@@ -45,7 +45,7 @@ export type PartialService = Omit<Service, 'embedding' | 'createdAt' | 'updatedA
 export type Service = {
     id: string;
     serviceId: string;
-    slug?: string;
+    slug: string;
     createdAt: string;
     updatedAt: string;
     name: string;
