@@ -157,7 +157,7 @@ async function mainSeed() {
         image: 'lviv-croissants.png',
         locations: [
             { city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2331, longitude: 21.0175, openingHours: standardGastroHours, isMainLocation: true },
-            { city: 'Kraków', street: 'Grodzka 50', voivodeship: 'malopolskie', latitude: 50.0570, longitude: 19.9385, openingHours: standardGastroHours }
+            { city: 'Kraków', street: 'Grodzka 50', voivodeship: 'malopolskie', latitude: 50.057, longitude: 19.9385, openingHours: standardGastroHours }
         ]
     });
 
@@ -245,16 +245,6 @@ async function mainSeed() {
         ]
     });
 
-    // 5
-    await seedService({
-        name: 'Bilyi Nalyv', slug: 'bilyi-nalyv', category: 'gastronomy',
-        plDesc: 'Koncept one-euro-bar z cydrem i ostrygami.',
-        ukDesc: 'Формат one-euro-bar: сидр, хот-доги та устриці.',
-        tags: ['cider', 'streetfood'],
-        locations: [{ city: 'Kraków', street: 'Bracka 4', voivodeship: 'malopolskie', latitude: 50.0608, longitude: 19.9372, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
-    // 6
 // 6
     await seedService({
         name: 'Odessa Market',
@@ -350,15 +340,6 @@ async function mainSeed() {
         ]
     });
 
-    // 7
-    await seedService({
-        name: 'ChiChi Koza', slug: 'chichi-koza', category: 'gastronomy',
-        plDesc: 'Nowoczesna kuchnia ukraińska z naciskiem na domowe pierogi.',
-        ukDesc: 'Сучасна українська кухня, особливий акцент на варениках.',
-        tags: ['dumplings', 'modern'],
-        locations: [{ city: 'Gdynia', street: 'Świętojańska 110', voivodeship: 'pomorskie', latitude: 54.5120, longitude: 18.5410, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
     // 8
     await seedService({
         name: 'Multi Cook', slug: 'multi-cook-warszawa', category: 'grocery',
@@ -396,8 +377,8 @@ async function mainSeed() {
         locations: [
             // WARSZAWA (Główne oddziały)
             { city: 'Warszawa', street: 'ul. Męcińska 18', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0825, openingHours: standardShopHours, isMainLocation: true },
-            { city: 'Warszawa', street: 'ul. Jana Pawła II 27', voivodeship: 'mazowieckie', latitude: 52.2370, longitude: 20.9985, openingHours: standardShopHours },
-            { city: 'Warszawa', street: 'ul. Kaliskiego 15', voivodeship: 'mazowieckie', latitude: 52.2530, longitude: 20.8985, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Jana Pawła II 27', voivodeship: 'mazowieckie', latitude: 52.237, longitude: 20.9985, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Kaliskiego 15', voivodeship: 'mazowieckie', latitude: 52.253, longitude: 20.8985, openingHours: standardShopHours },
 
             // KRAKÓW
             { city: 'Kraków', street: 'ul. Kamienna 19b', voivodeship: 'malopolskie', latitude: 50.0765, longitude: 19.9415, openingHours: standardShopHours },
@@ -428,57 +409,31 @@ async function mainSeed() {
         ]
     });
 
-    // 10
-    await seedService({
-        name: 'Rebernia', slug: 'rebernia-lodz', category: 'gastronomy',
-        plDesc: 'Słynne grillowane żeberka według lwowskiej receptury.',
-        ukDesc: 'Знамениті ребра на грилі за львівським рецептом.',
-        tags: ['grill', 'atmosphere'],
-        locations: [{ city: 'Łódź', street: 'Ogrodowa 17', voivodeship: 'lodzkie', latitude: 51.7788, longitude: 19.4485, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
-    // 11
-    await seedService({
-        name: 'Cukiernias', slug: 'cukiernias-warszawa', category: 'gastronomy',
-        plDesc: 'Autentyczne ukraińskie wypieki i torty.',
-        ukDesc: 'Автентична українська випічка та торти.',
-        tags: ['bakery', 'desserts'],
-        locations: [{ city: 'Warszawa', street: 'Chmielna 21', voivodeship: 'mazowieckie', latitude: 52.2325, longitude: 21.0145, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
-    // 15
-    await seedService({
-        name: 'Kanapka Bar', slug: 'kanapka-bar-warszawa', category: 'gastronomy',
-        plDesc: 'Szybkie przekąski w lwowskim stylu.',
-        ukDesc: 'Швидкі перекуски у львівському стилі.',
-        tags: ['streetfood', 'atmosphere'],
-        locations: [{ city: 'Warszawa', street: 'Koszykowa 63', voivodeship: 'mazowieckie', latitude: 52.2220, longitude: 21.0120, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
 // 16
     await seedService({
         name: 'Czarnomorka', slug: 'czarnomorka', category: 'gastronomy',
         plDesc: 'Restauracja rybna znana ze świeżych owoców morza.',
         ukDesc: 'Рибний ресторан, відомий свіжими морепродуктами.',
         tags: ['seafood', 'tradition'],
-        locations: [{ city: 'Warszawa', street: 'Hoża 43/49', voivodeship: 'mazowieckie', latitude: 52.2269, longitude: 21.0118, isMainLocation: true, openingHours: standardGastroHours }]
+        image: 'czarnomorka.png',
+        webpage: 'https://czarnomorka.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'Grzybowska 56', voivodeship: 'mazowieckie', phoneNumber:'+48 722 760 505', latitude: 52.2354, longitude: 20.9876, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'Nowy Świat 49', voivodeship: 'mazowieckie', phoneNumber:'+48 727 860 505', latitude: 52.2353, longitude: 21.0182, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'Grzybowska 9', voivodeship: 'mazowieckie', phoneNumber:'+48 727 850 505', latitude: 52.2359, longitude: 20.9992, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'Hoża 43/49', voivodeship: 'mazowieckie', phoneNumber:'+48 722 700 505', latitude: 52.2269, longitude: 21.0118, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Wrocław', street: 'Świętego Mikołaja 67', voivodeship: 'dolnoslaskie', phoneNumber:'+48 722 750 505', latitude: 51.1114, longitude: 17.0286, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Poznań', street: 'Stary Rynek 62', voivodeship: 'wielkopolskie', phoneNumber:'+48 799 495 495', latitude: 52.409, longitude: 16.9338, isMainLocation: true, openingHours: standardGastroHours }
+        ]
     });
-
-    // 17
-    await seedService({
-        name: 'Wesoła Pani', slug: 'wesola-pani', category: 'grocery',
-        plDesc: 'Sklep oferujący mrożone domowe dania.',
-        ukDesc: 'Магазин домашніх напівфабрикатів.',
-        tags: ['frozen', 'home'],
-        locations: [{ city: 'Warszawa', street: 'al. Jerozolimskie 148', voivodeship: 'mazowieckie', latitude: 52.2137, longitude: 20.9654, isMainLocation: true, openingHours: standardShopHours }]
-    });
-
 
     // 19
     await seedService({
         name: 'Restauracja U sióstr', slug: 'u-siostr', category: 'gastronomy',
         plDesc: 'Tradycyjna kuchnia ukraińska w sercu Warszawy.',
         ukDesc: 'Традиційна українська кухня в центрі Варшави.',
+        webpage: 'https://usiostr.choiceqr.com/',
+        image: 'usiostr.png',
         tags: ['tradition', 'home'],
         locations: [{ city: 'Warszawa', street: 'Złota 63A', voivodeship: 'mazowieckie', latitude: 52.2305, longitude: 21.0003, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -501,6 +456,8 @@ async function mainSeed() {
         name: 'Kamanda Lwowska', slug: 'kamanda-lwowska', category: 'gastronomy',
         plDesc: 'Restauracja nawiązująca do przedwojennego klimatu Lwowa.',
         ukDesc: 'Ресторан, що відтворює атмосферу довоєнного Львова.',
+        webpage: 'https://kamandalwowska.pl/',
+        image: 'kamanda-lwowa.png',
         tags: ['atmosphere', 'culture'],
         locations: [{ city: 'Warszawa', street: 'Foksal 10', voivodeship: 'mazowieckie', latitude: 52.2335, longitude: 21.0219, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -510,30 +467,13 @@ async function mainSeed() {
         name: 'Kozaczok', slug: 'kozaczok', category: 'gastronomy',
         plDesc: 'Ukraiński punkt gastronomiczny.',
         ukDesc: 'Українська кухня у торговому центрі.',
+        image: 'kozaczok.png',
         webpage: 'https://kozaczok.eatbu.com/',
         tags: ['lunch', 'dumplings'],
         locations: [
-            { city: 'Warszawa', street: 'ul.Sokratesa 9', voivodeship: 'mazowieckie', latitude: 52.2839, longitude: 20.92699, isMainLocation: true, openingHours: standardGastroHours },
-            { city: 'Warszawa', street: 'C.H. Arkadia al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.25659, longitude: 20.98429, isMainLocation: true, openingHours: standardGastroHours }
+            { city: 'Warszawa', street: 'ul.Sokratesa 9', voivodeship: 'mazowieckie', latitude: 52.2839, longitude: 20.9269, isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'C.H. Arkadia al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.2565, longitude: 20.9842, isMainLocation: true, openingHours: standardGastroHours }
     ]
-    });
-
-    // 24
-    await seedService({
-        name: 'Dikańka', slug: 'dikanka', category: 'gastronomy',
-        plDesc: 'Tradycyjne potrawy ukraińskie w przytulnym wnętrzu.',
-        ukDesc: 'Традиційні українські страви у затишному інтер’єрі.',
-        tags: ['tradition', 'atmosphere'],
-        locations: [{ city: 'Warszawa', street: 'Olesińska 2', voivodeship: 'mazowieckie', latitude: 52.2044, longitude: 21.0217, isMainLocation: true, openingHours: standardGastroHours }]
-    });
-
-    // 25
-    await seedService({
-        name: 'W Kuchni', slug: 'w-kuchni-bar-kuchnia-ukrainska', category: 'gastronomy',
-        plDesc: 'Domowe jedzenie ukraińskie dostępne w drodze.',
-        ukDesc: 'Домашня українська їжа, зручно по дорозі.',
-        tags: ['home', 'streetfood'],
-        locations: [{ city: 'Warszawa', street: 'Al. Jerozolimskie 54', voivodeship: 'mazowieckie', latitude: 52.2289, longitude: 21.0062, isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 26
@@ -541,6 +481,8 @@ async function mainSeed() {
         name: 'Bistro Kozacka Chatka', slug: 'bistro-kozacka-chatka', category: 'gastronomy',
         plDesc: 'Kultowe miejsce we Wrocławiu.',
         ukDesc: 'Культове місце у Вроцлаві.',
+        webpage: 'https://kozackachatka.pl/',
+        image: 'kozacka-chatka.png',
         tags: ['tradition', 'culture'],
         locations: [{ city: 'Wrocław', street: 'Energetyczna 14/1b', voivodeship: 'dolnoslaskie', latitude: 51.0913, longitude: 17.0204, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -550,6 +492,8 @@ async function mainSeed() {
         name: 'Smak Ukraiński', slug: 'smak-ukrainski-krakow', category: 'gastronomy',
         plDesc: 'Klasyki kuchni ukraińskiej.',
         ukDesc: 'Класичні українські страви.',
+        webpage: 'https://ukrainska.pl/',
+        image: 'smak-ukraini.png',
         tags: ['tradition', 'lunch'],
         locations: [{ city: 'Kraków', street: 'Grodzka 21', voivodeship: 'malopolskie', latitude: 50.0594, longitude: 19.9381, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -569,6 +513,8 @@ async function mainSeed() {
         name: 'Ukraineczka', slug: 'ukraineczka-szczecin', category: 'gastronomy',
         plDesc: 'Szczecińska restauracja z bogatym menu.',
         ukDesc: 'Ресторан у Щецині з багатим меню.',
+        webpage: 'https://www.ukraineczka.com.pl/',
+        image: 'ukraineczka.png',
         tags: ['culture', 'home'],
         locations: [{ city: 'Szczecin', street: 'Panieńska 19', voivodeship: 'zachodniopomorskie', latitude: 53.4249, longitude: 14.5599, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -589,6 +535,8 @@ async function mainSeed() {
         name: 'Kulinarna Ukraina', slug: 'kulinarna-ukraina-gdynia', category: 'gastronomy',
         plDesc: 'Prawdziwe smaki Ukrainy nad morzem.',
         ukDesc: 'Справжні смаки України над морем.',
+        webpage: 'https://kulinarnaukraina.eatbu.com/',
+        image: 'kulinarnaukraina.png',
         tags: ['seafood', 'home'],
         locations: [{ city: 'Gdynia', street: 'Świętojańska 66', voivodeship: 'pomorskie', latitude: 54.5165, longitude: 18.5391, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -598,6 +546,8 @@ async function mainSeed() {
         name: 'Koronkowa Robota', slug: 'koronkowa-robota-plock', category: 'gastronomy',
         plDesc: 'Autorska kuchnia łącząca tradycję z nowoczesnością.',
         ukDesc: 'Авторська кухня та сучасність.',
+        webpage: 'https://www.facebook.com/KoronkowaRobotaRestauracja/',
+        image: 'koronkowa-robota.png',
         tags: ['modern', 'tradition'],
         locations: [{ city: 'Płock', street: 'Fryderyka Chopina 28', voivodeship: 'mazowieckie', latitude: 52.5501, longitude: 19.6972, isMainLocation: true, openingHours: standardGastroHours }]
     });
@@ -609,6 +559,8 @@ async function mainSeed() {
         name: 'Willa Biała', slug: 'willa-biala-warszawa', category: 'gastronomy',
         plDesc: 'Elegancka restauracja w zabytkowej willi.',
         ukDesc: 'Елегантний ресторан у старій віллі.',
+        webpage: 'https://willabiala.pl/',
+        image: 'willa-biala.png',
         tags: ['atmosphere', 'modern'],
         locations: [{ city: 'Warszawa', street: 'Narbutta 10', voivodeship: 'mazowieckie', latitude: 52.2091, longitude: 21.0189, isMainLocation: true, openingHours: standardGastroHours }]
     });
