@@ -111,9 +111,9 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
                 <div className="mb-12 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">
                         {t('latestOn')}{' '}
-                        <Link className="text-green" href="/blog">
-                            {t('blog')}
-                        </Link>
+                        {/*<Link className="text-green" href="/blog">*/}
+                        {/*    {t('blog')}*/}
+                        {/*</Link>*/}
                         {/*<span className="text-green dark:text-green">Blog</span>*/}
                     </h2>
                     <p className="mx-auto max-w-2xl text-base text-gray-600 dark:text-gray-300 lg:text-lg">

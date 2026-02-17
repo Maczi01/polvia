@@ -39,6 +39,9 @@ export async function getServices(locale: string = 'en') {
             email: serviceLocationsTable.email,
             webpage: servicesTable.webpage,
             image: servicesTable.image,
+            languages: servicesTable.languages,
+            socials: servicesTable.socials,
+            whatsappNumber: servicesTable.whatsappNumber,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
@@ -128,6 +131,9 @@ export async function getMostPopular(locale: string) {
             email: serviceLocationsTable.email,
             webpage: servicesTable.webpage,
             image: servicesTable.image,
+            languages: servicesTable.languages,
+            socials: servicesTable.socials,
+            whatsappNumber: servicesTable.whatsappNumber,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),

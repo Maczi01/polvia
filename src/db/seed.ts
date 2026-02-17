@@ -732,6 +732,113 @@ async function mainSeed() {
         ]
     });
 
+
+    // await seedService({
+    //     name: 'Sindbad',
+    //     slug: 'sindbad',
+    //     category: 'transport',
+    //     plDesc: 'Międzynarodowy przewoźnik autokarowy – połączenia m.in. z Polski do miast w Ukrainie.',
+    //     ukDesc: 'Міжнародний автобусний перевізник – рейси, зокрема з Польщі до міст України.',
+    //     webpage: 'https://sindbad.pl/',
+    //     image: 'sindbad.png',
+    //     tags: ['bus', 'passenger', 'poland-ukraine', 'international'],
+    //     locations: [
+    //         {
+    //             city: 'Opole',
+    //             street: 'ul. Podróżnicza 2',
+    //             voivodeship: 'opolskie',
+    //             latitude: 50.6640,
+    //             longitude: 17.9290,
+    //             isMainLocation: true,
+    //         }
+    //     ]
+    // });
+    //
+    // await seedService({
+    //     name: 'ECOLINES',
+    //     slug: 'ecolines',
+    //     category: 'transport',
+    //     plDesc: 'Międzynarodowe połączenia autokarowe – obsługa tras m.in. Polska ↔ Ukraina (w zależności od rozkładu).',
+    //     ukDesc: 'Міжнародні автобусні перевезення – маршрути, зокрема Польща ↔ Україна (залежно від розкладу).',
+    //     webpage: 'https://ecolines.net/',
+    //     image: 'ecolines.png',
+    //     tags: ['bus', 'passenger', 'poland-ukraine', 'international'],
+    //     locations: [
+    //         {
+    //             city: 'Białystok',
+    //             street: 'ul. Bohaterów Monte Cassino 8',
+    //             voivodeship: 'podlaskie',
+    //             latitude: 53.1324,
+    //             longitude: 23.1359,
+    //             isMainLocation: true,
+    //         }
+    //     ]
+    // });
+    //
+    // // --- Parcels / courier ---
+    // await seedService({
+    //     name: 'Meest (Meest Post / Meest Express)',
+    //     slug: 'meest',
+    //     category: 'courier',
+    //     plDesc: 'Operator logistyczny specjalizujący się m.in. w przesyłkach międzynarodowych do Ukrainy.',
+    //     ukDesc: 'Логістичний оператор, що спеціалізується, зокрема, на міжнародних відправленнях до України.',
+    //     webpage: 'https://meest.com/',
+    //     image: 'meest.png',
+    //     tags: ['parcels', 'courier', 'poland-ukraine', 'international'],
+    //     locations: [
+    //         {
+    //             city: 'Zielona Góra',
+    //             street: 'ul. Kożuchowska 20C',
+    //             voivodeship: 'lubuskie',
+    //             latitude: 51.9355,
+    //             longitude: 15.5064,
+    //             isMainLocation: true,
+    //         }
+    //     ]
+    // });
+    //
+    // await seedService({
+    //     name: 'UPS',
+    //     slug: 'ups',
+    //     category: 'courier',
+    //     plDesc: 'Międzynarodowy kurier – przesyłki z Polski do Ukrainy (usługi międzynarodowe).',
+    //     ukDesc: 'Міжнародний кур’єр – відправлення з Польщі до України (міжнародні послуги).',
+    //     webpage: 'https://www.ups.com/pl/pl/Home.page',
+    //     image: 'ups.png',
+    //     tags: ['parcels', 'courier', 'poland-ukraine', 'international'],
+    //     locations: [
+    //         {
+    //             city: 'Warszawa',
+    //             street: 'ul. Ignacego Prądzyńskiego 1/3',
+    //             voivodeship: 'mazowieckie',
+    //             latitude: 52.223311,
+    //             longitude: 20.968148,
+    //             isMainLocation: true,
+    //         }
+    //     ]
+    // });
+    //
+    // await seedService({
+    //     name: 'FedEx',
+    //     slug: 'fedex',
+    //     category: 'courier',
+    //     plDesc: 'Międzynarodowy kurier ekspresowy – wysyłki międzynarodowe z Polski do Ukrainy.',
+    //     ukDesc: 'Міжнародний експрес-кур’єр – міжнародні відправлення з Польщі до України.',
+    //     webpage: 'https://www.fedex.com/pl-pl/home.html',
+    //     image: 'fedex.png',
+    //     tags: ['parcels', 'courier', 'express', 'poland-ukraine'],
+    //     locations: [
+    //         {
+    //             city: 'Warszawa',
+    //             street: 'ul. Wolska 64A',
+    //             voivodeship: 'mazowieckie',
+    //             latitude: 52.2334128,
+    //             longitude: 20.9638178,
+    //             isMainLocation: true,
+    //         }
+    //     ]
+    // });
+
     console.log('✅ Seed zakończony z tagami!');
 }
 

@@ -139,7 +139,10 @@
     "navigate": "Navigate",
     "page": "Official webpage",
     "map": "Map",
-    "mail": "Email"
+    "mail": "Email",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "languages": "LANGUAGES"
   },
   "Calculator": {
     "monthlyIncome": "Monthly income",
@@ -365,7 +368,7 @@
     "terms":"Terms",
     "privacy":"Privacy",
     "cookies":"Cookies",
-    "allRights": "© 2025 Polvia. All rights reserved.",
+    "allRights": "© 2026 Polvia. All rights reserved.",
     "home": "Home",
     "contact": "Contact",
     "blog": "Blog",

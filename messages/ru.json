@@ -139,7 +139,10 @@
     "navigate": "Маршрут",
     "page": "Официальный сайт",
     "map": "Карта",
-    "mail": "Email"
+    "mail": "Email",
+    "call": "Позвонить",
+    "whatsapp": "WhatsApp",
+    "languages": "ЯЗЫКИ"
   },
   "Calculator": {
     "monthlyIncome": "Месячный доход",
@@ -364,7 +367,7 @@
     "terms": "Условия",
     "privacy": "Конфиденциальность",
     "cookies": "Cookie",
-    "allRights": "© 2025 Polvia. Все права защищены.",
+    "allRights": "© 2026 Polvia. Все права защищены.",
     "home": "Главная",
     "contact": "Контакт",
     "blog": "Блог",

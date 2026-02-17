@@ -42,6 +42,16 @@ export type View = 'map' | 'list' | 'both';
 
 export type PartialService = Omit<Service, 'embedding' | 'createdAt' | 'updatedAt' | 'priority' | 'clicks'>;
 
+export type Socials = {
+    instagram?: string;
+    telegram?: string;
+    tiktok?: string;
+    facebook?: string;
+    youtube?: string;
+    viber?: string;
+    whatsapp?: string;
+};
+
 export type Service = {
     id: string;
     serviceId: string;
@@ -63,6 +73,9 @@ export type Service = {
     email: string | null;
     webpage: string | null;
     image: string | null;
+    languages: string[];
+    socials: Socials | null;
+    whatsappNumber: string | null;
     priority: number;
     clicks: number;
 };

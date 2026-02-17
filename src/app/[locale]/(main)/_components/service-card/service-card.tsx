@@ -1,18 +1,44 @@
 'use client';
 
 import Image from 'next/image';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utilities';
 import { Button } from '@/components/ui/button/button';
 import { mapCategoryToBadgeColor } from '@/lib/consts';
-import { Copy, Mail, Map, MapPin, Pin } from 'lucide-react';
-import { useViewState } from '@/hooks/use-view-state';
+import { Clock, Globe, MapPin, Phone, MessageCircle, Navigation } from 'lucide-react';
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
+
+const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
+    pl: { src: '/icons/pl.svg', alt: 'Polish' },
+    en: { src: '/icons/gb.svg', alt: 'English' },
+    ru: { src: '/icons/ru.svg', alt: 'Russian' },
+    uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
+};
+
+const FacebookIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+    </svg>
+);
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+);
+
+const TikTokIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.53a6.27 6.27 0 00-.79-.05A6.34 6.34 0 003.15 15.65a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.22a8.16 8.16 0 004.76 1.52V7.3a4.82 4.82 0 01-1-.61z" />
+    </svg>
+);
 
 type CardProps = {
     className?: string;
@@ -32,6 +58,42 @@ const handleIncreasePopularityCounter = async (serviceId: string) => {
         headers: { 'Content-Type': 'application/json' },
     });
 };
+
+const getDomainFromUrl = (url: string): string => {
+    try {
+        const parsed = new URL(url.startsWith('http') ? url : `https://${url}`);
+        return parsed.hostname.replace(/^www\./, '');
+    } catch {
+        return url;
+    }
+};
+
+const getTodayHours = (
+    openingHours: Record<string, { open: string; close: string }> | undefined | null,
+): { open: string; close: string } | null => {
+    if (!openingHours) return null;
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = days[new Date().getDay()];
+    return openingHours[today] || null;
+};
+
+const SocialLink = ({
+    href,
+    children,
+}: {
+    href: string;
+    children: React.ReactNode;
+}) => (
+    <Link
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex size-9 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-200"
+        onClick={e => e.stopPropagation()}
+    >
+        {children}
+    </Link>
+);
 
 export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
     (
@@ -53,6 +115,10 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             description,
             latitude,
             longitude,
+            openingHours,
+            languages,
+            socials,
+            whatsappNumber,
             handleFlyTo,
             resetMap,
             handleHoverPlace,
@@ -67,42 +133,27 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const cardRef = useRef<HTMLDivElement>(null);
         const [contentHeight, setContentHeight] = useState<number>(0);
         const [isHovering, setIsHovering] = useState<boolean>(false);
-        const [emailCopied, setEmailCopied] = useState(false);
-        const [isEmailHovering, setIsEmailHovering] = useState(false);
         const [isExpanding, setIsExpanding] = useState(false);
         const t = useTranslations('MapCard');
-        const { handleViewChange } = useViewState();
 
-        const COLLAPSE_MS = 300; // Increased for smoother animation
+        const COLLAPSE_MS = 300;
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
-        const handleMapButtonClick = () => {
-            handleViewChange('map');
-        };
+        const todayHours = useMemo(() => getTodayHours(openingHours), [openingHours]);
 
-        //! Culprit
-        // Improved height calculation with Safari-specific fixes
-        // simpler fix - just measure scrollHeight directly without resetting styles
         useEffect(() => {
             const content = contentRef.current;
             if (!content) return;
 
             if (expanded) {
                 setIsExpanding(true);
-
-                // Set initial collapsed state
                 content.style.height = '0px';
                 content.style.maxHeight = '0px';
                 content.style.overflow = 'hidden';
 
-                // Measure height by reading scrollHeight of inner content
                 const height = content.scrollHeight;
-
-                // Force reflow - critical for Safari
                 void content.offsetHeight;
 
-                // Animate to expanded state
-                // Use double RAF for Safari compatibility
                 requestAnimationFrame(() => {
                     requestAnimationFrame(() => {
                         if (content && expanded) {
@@ -110,7 +161,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             content.style.maxHeight = `${height}px`;
                             setContentHeight(height);
 
-                            // Clear expanding flag after animation
                             setTimeout(() => {
                                 setIsExpanding(false);
                                 if (content && expanded) {
@@ -123,7 +173,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 });
             } else {
                 if (content.style.height === 'auto') {
-                    // Get current height before starting collapse
                     const currentHeight = content.scrollHeight;
                     content.style.height = `${currentHeight}px`;
                     content.style.maxHeight = `${currentHeight}px`;
@@ -142,7 +191,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             }
         }, [expanded, COLLAPSE_MS]);
 
-        // Simplified ref handling
         const setRefs = useCallback(
             (element: HTMLDivElement | null) => {
                 if (typeof ref === 'function') {
@@ -155,15 +203,13 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             [ref],
         );
 
-        // Improved card expansion with mobile-specific scrolling
         const handleCardExpand = useCallback(
             (e?: React.MouseEvent) => {
                 if (e) {
                     const target = e.target as HTMLElement;
                     if (
                         target.closest('a') ||
-                        (target.closest('button') && !target.closest('.card-expand-button')) ||
-                        target.closest('.email-clickable-area')
+                        (target.closest('button') && !target.closest('.card-expand-button'))
                     ) {
                         return;
                     }
@@ -175,7 +221,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     return;
                 }
 
-                // Handle expansion with improved mobile scrolling
                 if (cardToExpand !== null) {
                     setCardToExpand(null);
 
@@ -197,15 +242,10 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         }
                         handleHoverPlace(id);
 
-                        // Mobile-specific scroll handling
                         if (isMobile && cardRef.current) {
-                            // Wait for expansion to start, then scroll
                             setTimeout(() => {
                                 if (cardRef.current) {
                                     const cardRect = cardRef.current.getBoundingClientRect();
-                                    const viewportHeight = window.innerHeight;
-
-                                    // Only scroll if card is not already at top
                                     if (cardRect.top > 100) {
                                         cardRef.current.scrollIntoView({
                                             behavior: 'smooth',
@@ -220,7 +260,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     return;
                 }
 
-                // Direct expansion
                 setCardToExpand(id);
                 handleIncreasePopularityCounter(serviceId);
 
@@ -238,7 +277,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 }
                 handleHoverPlace(id);
 
-                // Mobile scroll for direct expansion
                 if (isMobile && cardRef.current) {
                     setTimeout(() => {
                         if (cardRef.current) {
@@ -267,28 +305,37 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 setCardToExpand,
                 isMobile,
                 COLLAPSE_MS,
+                serviceId,
             ],
         );
 
-        const handleCopyEmail = async () => {
-            if (email) {
-                try {
-                    await navigator.clipboard.writeText(email);
-                    setEmailCopied(true);
-                    setTimeout(() => setEmailCopied(false), 2000);
-                } catch (error) {
-                    console.error('Failed to copy email:', error);
-                }
-            }
-        };
-
-        const addressParts = [street, postcode, city, voivodeship]
+        const addressParts = [street, city, voivodeship]
             .map(part => part?.trim())
             .filter(Boolean);
         const address = addressParts.join(', ');
 
         const img = image ? `/services/${image.trimEnd()}` : '/default.png';
         const badgeColor = mapCategoryToBadgeColor(category);
+        const domain = webpage ? getDomainFromUrl(webpage) : '';
+        const webpageHref = webpage
+            ? webpage.startsWith('http')
+                ? webpage
+                : `https://${webpage}`
+            : '';
+
+        const whatsappLink = whatsappNumber
+            ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`
+            : socials?.whatsapp
+              ? socials.whatsapp
+              : phoneNumber
+                ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`
+                : null;
+
+        const navigateLink = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+
+        const hasSocials = socials && (socials.facebook || socials.instagram || socials.tiktok);
+
+        const actionButtonCount = [phoneNumber, whatsappLink, true].filter(Boolean).length;
 
         return (
             <Card
@@ -296,10 +343,10 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 data-service-id={id}
                 className={cn(
                     'transition-all duration-300 ease-in-out bg-white dark:bg-gray-800',
-                    expanded ? `border-b-4 border-[#C52289] z-[99]` : 'h-auto z-auto',
+                    expanded ? 'border-t-4 border-[#C52289] z-[99]' : 'h-auto z-auto',
                     'flex flex-col overflow-hidden border-gray-200 dark:border-gray-700',
                     !expanded &&
-                    'cursor-pointer hover:bg-green-50/30 dark:hover:bg-green-900/10 hover:border-green-500/30 dark:hover:border-green-400/30',
+                        'cursor-pointer hover:bg-green-50/30 dark:hover:bg-green-900/10 hover:border-green-500/30 dark:hover:border-green-400/30',
                     className,
                 )}
                 onMouseEnter={() => {
@@ -312,149 +359,70 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 }}
                 onClick={handleCardExpand}
             >
-                <div className="md:hidden">
-                    {/* Mobile Layout */}
-                    <div className="relative p-3">
-                        <div className="flex items-start">
-                            <div className="mr-3 shrink-0 pt-1">
-                                <Image
-                                    src={img}
-                                    alt="service image"
-                                    className="overflow-hidden rounded-full border border-gray-300 object-cover dark:border-gray-600"
-                                    width={48}
-                                    height={48}
-                                />
-                            </div>
-
-                            <div className="flex min-w-0 flex-1 flex-col pr-12">
-                                <h3
-                                    className={`${expanded ? 'break-words' : 'truncate'} text-base font-bold text-gray-900 dark:text-gray-100`}
-                                >
-                                    {name}
-                                </h3>
-                                <div className="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
-                                    <Image
-                                        src="/icons/location.svg"
-                                        alt="location"
-                                        width={16}
-                                        height={16}
-                                        className="mr-1 shrink-0 dark:brightness-0 dark:invert"
-                                    />
-                                    <span className="max-w-full break-words">
-                                        {expanded ? address : city || voivodeship}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <Button
-                                variant="ghost"
-                                size="arrow"
-                                className="card-expand-button absolute right-3 top-3 shrink-0 rounded-full bg-green-100 dark:bg-green-900/30"
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    handleCardExpand(e);
-                                }}
-                            >
-                                <Image
-                                    src="/icons/arrow.svg"
-                                    alt="arrow"
-                                    width={24}
-                                    height={24}
-                                    className={cn(
-                                        'transition-transform duration-500 dark:brightness-0 dark:invert',
-                                        expanded ? '' : 'rotate-90',
-                                    )}
-                                />
-                            </Button>
+                {/* Header - always visible */}
+                <div className="relative p-1 md:p-0">
+                    <div className="flex items-start gap-3">
+                        <div className="shrink-0">
+                            <Image
+                                src={img}
+                                alt="service image"
+                                className="overflow-hidden rounded-full border-2 border-gray-200 object-cover dark:border-gray-600"
+                                width={56}
+                                height={56}
+                            />
                         </div>
 
-                        <div className="mt-2 flex max-w-[80%] flex-wrap gap-1.5 overflow-hidden">
-                            {tags
-                                ?.slice(0, 2)
-                                .map((tag, idx) => (
-                                    <Badge
-                                        label={tag?.toString() || ''}
-                                        key={idx}
-                                        color="gray"
-                                        variant={badgeColor}
-                                    />
-                                ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Desktop Layout */}
-                <div className="hidden md:block">
-                    <div className="flex shrink-0 flex-row justify-between pb-2">
-                        <CardContent className="flex flex-row items-start gap-x-3">
-                            <div className="shrink-0 pt-1">
-                                <Image
-                                    src={img}
-                                    alt="service image"
-                                    className="overflow-hidden rounded-full border-2 border-gray-300 object-cover dark:border-gray-600"
-                                    width={68}
-                                    height={68}
-                                />
-                            </div>
-
-                            <div className="min-w-0 flex-1 flex-col">
-                                <div className="truncate text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                    {name}
-                                </div>
-                                <div className="mt-2 flex items-center">
-                                    <MapPin className="size-5 mr-1" color="#737373" />
-                                    <div className="break-words text-sm text-muted-foreground dark:text-gray-400">
-                                        {expanded
-                                            ? address
-                                            : `${city}${voivodeship ? `, ${voivodeship}` : ''}`}
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-
-                        <CardContent className="flex flex-row items-center gap-x-6">
-                            <div className="flex gap-x-2">
-                                {!expanded &&
-                                    tags
-                                        ?.slice(0, 3)
-                                        .map((tag, idx) => (
-                                            <Badge
-                                                label={tag || ''}
-                                                key={idx}
-                                                color="gray"
-                                                variant={badgeColor}
-                                            />
-                                        ))}
-                            </div>
-                            <Button
-                                variant="explore"
+                        <div className="min-w-0 flex-1 pr-10">
+                            <h3
                                 className={cn(
-                                    'card-expand-button w-36 shrink-0 transition-all duration-300',
-                                    isHovering
-                                        ? 'ring-2 ring-[#49C55E]/50 dark:ring-green-400/50'
-                                        : '',
+                                    'text-base font-bold text-gray-900 dark:text-gray-100 md:text-lg',
+                                    expanded ? 'break-words' : 'truncate',
                                 )}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    handleCardExpand(e);
-                                }}
                             >
-                                <span className="font-bold text-[#49C55E] dark:text-green-400">
-                                    {expanded ? t('showLess') : t('showMore')}
-                                </span>
-                                <Image
-                                    src="/icons/arrow.svg"
-                                    alt="arrow"
-                                    width={16}
-                                    height={16}
-                                    className={cn(
-                                        'transition-transform duration-500 dark:brightness-0 dark:invert',
-                                        expanded ? '' : 'rotate-90',
-                                    )}
-                                />
-                            </Button>
-                        </CardContent>
+                                {name}
+                            </h3>
+                            <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                                {expanded
+                                    ? description || `${city}${voivodeship ? `, ${voivodeship}` : ''}`
+                                    : `${city}${voivodeship ? `, ${voivodeship}` : ''}`}
+                            </p>
+                        </div>
+
+                        <Button
+                            variant="ghost"
+                            size="arrow"
+                            className="card-expand-button absolute right-1 top-1 shrink-0 rounded-full bg-green-100 md:right-0 md:top-0 dark:bg-green-900/30"
+                            onClick={e => {
+                                e.stopPropagation();
+                                handleCardExpand(e);
+                            }}
+                        >
+                            <Image
+                                src="/icons/arrow.svg"
+                                alt="arrow"
+                                width={24}
+                                height={24}
+                                className={cn(
+                                    'transition-transform duration-500 dark:brightness-0 dark:invert',
+                                    expanded ? '' : 'rotate-90',
+                                )}
+                            />
+                        </Button>
                     </div>
+
+                    {/* Tags when collapsed */}
+                    {!expanded && tags && tags.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                            {tags.slice(0, isMobile ? 2 : 3).map((tag, idx) => (
+                                <Badge
+                                    label={tag?.toString() || ''}
+                                    key={idx}
+                                    color="gray"
+                                    variant={badgeColor}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Expandable Content */}
@@ -462,131 +430,207 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     ref={contentRef}
                     style={{
                         height: expanded ? (isExpanding ? `${contentHeight}px` : 'auto') : '0px',
-                        maxHeight: expanded ? (isExpanding ? `${contentHeight}px` : 'none') : '0px',
+                        maxHeight: expanded
+                            ? isExpanding
+                                ? `${contentHeight}px`
+                                : 'none'
+                            : '0px',
                         overflow: expanded && !isExpanding ? 'visible' : 'hidden',
                         transition: `all ${COLLAPSE_MS}ms ease-in-out`,
                     }}
                     onClick={e => e.stopPropagation()}
                 >
-                    <CardContent className="mt-4 flex flex-col border-t border-gray-200 pt-4 dark:border-gray-700 md:border-b">
-                        {description && (
-                            <div className="mb-6 ml-4 mt-2 text-sm text-muted-foreground dark:text-gray-400">
-                                {description}
-                            </div>
-                        )}
-                        <div className="flex flex-row items-end justify-between">
-                            {(phoneNumber || email || webpage) && (
-                                <div className="mb-4 ml-4 flex flex-col gap-y-2">
-                                    {phoneNumber && (
-                                        <a
-                                            href={`tel:${phoneNumber}`}
-                                            className="flex cursor-pointer flex-row items-center gap-x-2 rounded p-0 m-0 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700"
-                                            onClick={e => e.stopPropagation()}
-                                        >
-                                            <Image
-                                                src="/icons/phone.svg"
-                                                alt="icon"
-                                                width={18}
-                                                height={18}
-                                                className="shrink-0 dark:brightness-0 dark:invert"
-                                            />
-                                            <div className="truncate text-sm text-black dark:text-gray-100">
-                                                {phoneNumber}
-                                            </div>
-                                        </a>
-                                    )}
-
-                                    {email && (
-                                        <div className="relative">
-                                            <div
-                                                className="flex cursor-pointer flex-row items-center gap-x-2 rounded p-0 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 email-clickable-area"
-                                                onClick={e => {
-                                                    e.stopPropagation();
-                                                    handleCopyEmail();
-                                                }}
-                                                onMouseEnter={() => setIsEmailHovering(true)}
-                                                onMouseLeave={() => setIsEmailHovering(false)}
-                                            >
-                                                <div className="relative">
-                                                    {isEmailHovering ? (
-                                                        <Copy className="m-0 size-4 shrink-0 p-0" />
-                                                    ) : (
-                                                        <Mail className="m-0 size-4 shrink-0 p-0" />
-                                                    )}
-                                                </div>
-                                                <div className="truncate text-sm text-black dark:text-gray-100">
-                                                    <span className="md:hidden">
-                                                        {email.length > 20
-                                                            ? t('mail') || 'Mail'
-                                                            : email}
-                                                    </span>
-                                                    <span className="hidden md:inline">
-                                                        {email}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            {emailCopied && (
-                                                <div className="animate-fade-in absolute -top-10 left-0 z-50 whitespace-nowrap rounded bg-green-500 px-2 py-1 text-xs text-white shadow-lg">
-                                                    Email copied!
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {webpage && (
-                                        <div className="flex flex-row items-center gap-x-2">
-                                            <Image
-                                                src="/icons/page.svg"
-                                                alt="icon"
-                                                width={18}
-                                                height={18}
-                                                className="shrink-0 dark:brightness-0 dark:invert"
-                                            />
-                                            <Link
-                                                href={webpage}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="max-w-[200px] truncate text-sm text-black hover:text-blue-500 hover:underline dark:text-gray-100 dark:hover:text-blue-400"
-                                                onClick={e => e.stopPropagation()}
-                                            >
-                                                {t('page')}
-                                            </Link>
-                                        </div>
-                                    )}
+                    <div className="space-y-4 px-1 pb-1 md:px-0 md:pb-0">
+                        {/* Detail rows */}
+                        <div className="flex flex-col gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+                            {/* Address */}
+                            {address && (
+                                <div className="flex items-start gap-2.5 text-sm">
+                                    <MapPin
+                                        size={16}
+                                        className="mt-0.5 shrink-0 text-gray-400"
+                                    />
+                                    <span className="text-gray-700 dark:text-gray-300">
+                                        {address}
+                                    </span>
                                 </div>
                             )}
-                            <Button
-                                variant="explore"
-                                className="w-24 shrink-0 md:hidden"
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    handleMapButtonClick();
-                                }}
-                            >
-                                <Map
-                                    color="#49C55E"
-                                    className="mr-2 size-5 bg-transparent dark:text-green-400"
-                                />
-                                <span className="font-bold text-[#49C55E] dark:text-green-400">
-                                    {t('map')}
-                                </span>
-                            </Button>
-                        </div>
-                    </CardContent>
 
-                    <CardContent className="ml-4 mt-4 hidden md:flex">
-                        <div className="flex gap-x-2">
-                            {tags?.map(tag => (
-                                <Badge
-                                    label={tag?.toString() || ''}
-                                    key={tag}
-                                    color="gray"
-                                    variant={badgeColor}
-                                />
-                            ))}
+                            {/* Today's hours */}
+                            {todayHours && (
+                                <div className="flex items-center gap-2.5 text-sm">
+                                    <Clock
+                                        size={16}
+                                        className="shrink-0 text-gray-400"
+                                    />
+                                    <span className="text-gray-700 dark:text-gray-300">
+                                        {t('today')}:{' '}
+                                        <span className="font-semibold">
+                                            {todayHours.open} – {todayHours.close}
+                                        </span>
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Phone */}
+                            {phoneNumber && (
+                                <a
+                                    href={`tel:${phoneNumber}`}
+                                    className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    <Phone
+                                        size={16}
+                                        className="shrink-0 text-gray-400"
+                                    />
+                                    <span className="text-gray-700 dark:text-gray-300">
+                                        {phoneNumber}
+                                    </span>
+                                </a>
+                            )}
+
+                            {/* Website */}
+                            {webpage && (
+                                <Link
+                                    href={webpageHref}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2.5 text-sm"
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    <Globe
+                                        size={16}
+                                        className="shrink-0 text-gray-400"
+                                    />
+                                    <span className="text-blue-600 hover:underline dark:text-blue-400">
+                                        {domain}
+                                    </span>
+                                </Link>
+                            )}
                         </div>
-                    </CardContent>
+
+                        {/* Languages */}
+                        {languages && languages.length > 0 && (
+                            <div>
+                                <span className="text-xs font-semibold tracking-wider text-gray-400 dark:text-gray-500">
+                                    {t('languages')}
+                                </span>
+                                <div className="mt-1.5 flex gap-2">
+                                    {languages.map(lang => {
+                                        const flag = LANGUAGE_FLAGS[lang];
+                                        if (!flag) return null;
+                                        return (
+                                            <Image
+                                                key={lang}
+                                                src={flag.src}
+                                                alt={flag.alt}
+                                                width={28}
+                                                height={20}
+                                                className="rounded-sm"
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Tags */}
+                        {tags && tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {tags.map((tag, idx) => (
+                                    <Badge
+                                        label={tag?.toString() || ''}
+                                        key={idx}
+                                        color="gray"
+                                        variant={badgeColor}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Social media */}
+                        {hasSocials && (
+                            <div className="flex gap-3">
+                                {socials.facebook && (
+                                    <SocialLink href={socials.facebook}>
+                                        <FacebookIcon />
+                                    </SocialLink>
+                                )}
+                                {socials.instagram && (
+                                    <SocialLink href={socials.instagram}>
+                                        <InstagramIcon />
+                                    </SocialLink>
+                                )}
+                                {socials.tiktok && (
+                                    <SocialLink href={socials.tiktok}>
+                                        <TikTokIcon />
+                                    </SocialLink>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Action buttons */}
+                        <div
+                            className={cn(
+                                'grid gap-2 pt-2',
+                                actionButtonCount === 3
+                                    ? 'grid-cols-3'
+                                    : actionButtonCount === 2
+                                      ? 'grid-cols-2'
+                                      : 'grid-cols-1',
+                            )}
+                        >
+                            {phoneNumber && (
+                                <a
+                                    href={`tel:${phoneNumber}`}
+                                    onClick={e => e.stopPropagation()}
+                                    className="block"
+                                >
+                                    <button
+                                        type="button"
+                                        className="flex w-full flex-col items-center gap-1 rounded-xl border border-gray-200 px-2 py-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                    >
+                                        <Phone size={18} className="text-gray-500 dark:text-gray-400" />
+                                        {t('call')}
+                                    </button>
+                                </a>
+                            )}
+
+                            {whatsappLink && (
+                                <Link
+                                    href={whatsappLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={e => e.stopPropagation()}
+                                    className="block"
+                                >
+                                    <button
+                                        type="button"
+                                        className="flex w-full flex-col items-center gap-1 rounded-xl border border-green-500 bg-green-50 px-2 py-3 text-xs font-medium text-green-700 transition-colors hover:bg-green-100 dark:border-green-600 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+                                    >
+                                        <MessageCircle size={18} />
+                                        {t('whatsapp')}
+                                    </button>
+                                </Link>
+                            )}
+
+                            <Link
+                                href={navigateLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="block"
+                            >
+                                <button
+                                    type="button"
+                                    className="flex w-full flex-col items-center gap-1 rounded-xl border border-gray-200 px-2 py-3 text-xs font-medium text-green-600 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-green-400 dark:hover:bg-gray-700"
+                                >
+                                    <Navigation size={18} />
+                                    {t('navigate')}
+                                </button>
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </Card>
         );

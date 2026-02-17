@@ -55,12 +55,12 @@ export const Footer = async () => {
                         >
                             {t('contact')}
                         </Link>
-                        <Link
-                            href="/blog"
-                            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 rounded-md px-0 md:px-2 py-1 transition-colors whitespace-nowrap"
-                        >
-                            {t('blog')}
-                        </Link>
+                        {/*<Link*/}
+                        {/*    href="/blog"*/}
+                        {/*    className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 rounded-md px-0 md:px-2 py-1 transition-colors whitespace-nowrap"*/}
+                        {/*>*/}
+                        {/*    {t('blog')}*/}
+                        {/*</Link>*/}
                     </nav>
 
                     {/* Newsletter section */}

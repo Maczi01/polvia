@@ -140,7 +140,10 @@
     "navigate": "Nawiguj",
     "page": "Oficjalna strona",
     "map": "Mapa",
-    "mail": "Email"
+    "mail": "Email",
+    "call": "Zadzwoń",
+    "whatsapp": "WhatsApp",
+    "languages": "JĘZYKI"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
@@ -365,7 +368,7 @@
     "terms": "Regulamin",
     "privacy": "Polityka prywatności",
     "cookies": "Polityka cookies",
-    "allRights": "© 2025 Polvia. Wszelkie prawa zastrzeżone.",
+    "allRights": "© 2026 Polvia. Wszelkie prawa zastrzeżone.",
     "home": "Strona główna",
     "contact": "Kontakt",
     "blog": "Blog",

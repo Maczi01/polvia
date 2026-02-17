@@ -139,7 +139,10 @@
     "navigate": "Маршрут",
     "page": "Офіційний сайт",
     "map": "Карта",
-    "mail": "Email"
+    "mail": "Email",
+    "call": "Зателефонувати",
+    "whatsapp": "WhatsApp",
+    "languages": "МОВИ"
   },
   "Calculator": {
     "monthlyIncome": "Місячний дохід",
@@ -364,7 +367,7 @@
     "terms": "Умови",
     "privacy": "Конфіденційність",
     "cookies": "Cookie",
-    "allRights": "© 2025 Polvia. Усі права захищені.",
+    "allRights": "© 2026 Polvia. Усі права захищені.",
     "home": "Головна",
     "contact": "Контакт",
     "blog": "Блог",
