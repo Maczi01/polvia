@@ -108,13 +108,13 @@ describe('<Badge />', () => {
         );
 
         expect(screen.getByText('Index 0')).toHaveClass(
-            'bg-gradient-to-r from-[#F86187]/30 to-[#E94464]/30',
+            'bg-[#FDE8EC] border-[#F9C4CE]',
         ); // red
         expect(screen.getByText('Index 1')).toHaveClass(
-            'bg-gradient-to-r from-[#00AA66]/30 to-[#49C55E]/30',
+            'bg-[#E6F7EF] border-[#B8E6CC]',
         ); // green
         expect(screen.getByText('Index 2')).toHaveClass(
-            'bg-gradient-to-r from-[#FB6D13]/10 to-[#FF9D00]/20',
+            'bg-[#FFF3E0] border-[#FFD9A8]',
         ); // orange
     });
 });
