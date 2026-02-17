@@ -133,13 +133,13 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        whereConditions.push(sql`${servicesTable.embedding} IS NOT NULL`);
+        whereConditions.push(sql`${serviceLocationsTable.embedding} IS NOT NULL`);
 
         const results = await db
             .select({
                 id: serviceLocationsTable.id,
                 serviceId: servicesTable.id,
-                slug: servicesTable.slug,
+                slug: serviceLocationsTable.slug,
                 name: servicesTable.name,
                 category: servicesTable.category,
                 city: serviceLocationsTable.city,
@@ -151,14 +151,14 @@ export async function GET(request: NextRequest) {
                 openingHours: serviceLocationsTable.openingHours,
                 phoneNumber: serviceLocationsTable.phoneNumber,
                 email: serviceLocationsTable.email,
-                webpage: servicesTable.webpage,
+                webpage: serviceLocationsTable.webpage,
                 image: servicesTable.image,
                 languages: servicesTable.languages,
-                socials: servicesTable.socials,
-                whatsappNumber: servicesTable.whatsappNumber,
+                socials: serviceLocationsTable.socials,
+                whatsappNumber: serviceLocationsTable.whatsappNumber,
                 priority: sql<number>`COALESCE(${activePromotions.priority}, 0)`.as('priority'),
                 clicks: sql<number>`COALESCE(${totalClicks.clicks}, 0)`.as('clicks'),
-                relevanceScore: sql<number>`1 - (${servicesTable.embedding} <=> ${embeddingVector}::vector)`.as('relevanceScore')
+                relevanceScore: sql<number>`1 - (${serviceLocationsTable.embedding} <=> ${embeddingVector}::vector)`.as('relevanceScore')
             })
             .from(servicesTable)
             .innerJoin(serviceLocationsTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
             .leftJoin(totalClicks, eq(servicesTable.id, totalClicks.serviceId))
             .where(and(...whereConditions))
             .orderBy(
-                desc(sql`1 - (${servicesTable.embedding} <=> ${embeddingVector}::vector)`),
+                desc(sql`1 - (${serviceLocationsTable.embedding} <=> ${embeddingVector}::vector)`),
                 desc(sql`priority`),
                 desc(sql`clicks`)
             )

@@ -59,27 +59,13 @@ export const statusEnum = pgEnum('status', [
 
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
-    slug: varchar('slug', { length: 255 }).unique().notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
     category: categoryEnum('category').notNull(),
     status: statusEnum('status').notNull().default('active'),
-    webpage: varchar('webpage', { length: 255 }),
-    nip: varchar('nip', { length: 10 }),
     image: varchar('image', { length: 255 }),
     languages: varchar('languages', { length: 5 }).array().notNull().default(sql`ARRAY['pl']::varchar[]`),
-    socials: jsonb('socials').$type<{
-        instagram?: string;
-        telegram?: string;
-        tiktok?: string;
-        facebook?: string;
-        youtube?: string;
-        viber?: string;
-        whatsapp?: string;
-    }>(),
-    whatsappNumber: varchar('whatsapp_number', { length: 20 }),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-    embedding: vector('embedding', { dimensions: 1536 }),
 });
 
 export const servicesRelations = relations(servicesTable, ({ many }) => ({
@@ -94,6 +80,7 @@ export const serviceLocationsTable = pgTable('service_locations', {
     serviceId: uuid('service_id')
         .notNull()
         .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    slug: varchar('slug', { length: 255 }).unique().notNull(),
     city: varchar('city', { length: 255 }),
     street: varchar('street', { length: 255 }),
     voivodeship: voivodeshipEnum('voivodeship'),
@@ -103,8 +90,22 @@ export const serviceLocationsTable = pgTable('service_locations', {
     openingHours: jsonb('opening_hours').$type<Record<string, { open: string; close: string }>>().notNull(),
     phoneNumber: varchar('phone_number', { length: 50 }),
     email: varchar('email', { length: 255 }),
+    webpage: varchar('webpage', { length: 255 }),
+    nip: varchar('nip', { length: 10 }),
+    socials: jsonb('socials').$type<{
+        instagram?: string;
+        telegram?: string;
+        tiktok?: string;
+        facebook?: string;
+        youtube?: string;
+        viber?: string;
+        whatsapp?: string;
+        tripadvisor?: string;
+    }>(),
+    whatsappNumber: varchar('whatsapp_number', { length: 20 }),
     isMainLocation: boolean('is_main_location').notNull().default(false),
     confirmed: boolean('confirmed').notNull().default(false),
+    embedding: vector('embedding', { dimensions: 1536 }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [

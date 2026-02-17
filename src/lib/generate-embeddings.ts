@@ -99,55 +99,58 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
     console.log('🚀 Starting embedding generation for all services...');
     console.log(`🔄 Force regenerate: ${forceRegenerate}`);
 
-    // Get all services with their translations
-    const services = await db
+    // Get all locations with their service data and translations
+    const locations = await db
         .select()
-        .from(servicesTable)
+        .from(serviceLocationsTable)
+        .innerJoin(servicesTable, eq(serviceLocationsTable.serviceId, servicesTable.id))
         .leftJoin(
             servicesTranslationsTable,
             eq(servicesTable.id, servicesTranslationsTable.serviceId)
         );
 
-    if (services.length === 0) {
-        console.log('❌ No services found in database');
+    if (locations.length === 0) {
+        console.log('❌ No service locations found in database');
         return;
     }
 
-    // Group services with their translations
-    const servicesMap = new Map();
-    services.forEach(row => {
+    // Group locations with their translations
+    const locationsMap = new Map();
+    locations.forEach(row => {
+        const location = row.service_locations;
         const service = row.services;
         const translation = row.services_translations;
 
-        if (!servicesMap.has(service.id)) {
-            servicesMap.set(service.id, {
+        if (!locationsMap.has(location.id)) {
+            locationsMap.set(location.id, {
+                location,
                 service,
                 translations: []
             });
         }
 
         if (translation) {
-            servicesMap.get(service.id).translations.push(translation);
+            locationsMap.get(location.id).translations.push(translation);
         }
     });
 
     let processed = 0;
     let skipped = 0;
     let errors = 0;
-    const total = servicesMap.size;
+    const total = locationsMap.size;
 
-    console.log(`📊 Found ${total} services to process`);
+    console.log(`📊 Found ${total} service locations to process`);
 
-    for (const [serviceId, { service, translations }] of servicesMap) {
+    for (const [locationId, { location, service, translations }] of locationsMap) {
         try {
             // Skip if embedding already exists and not forcing regeneration
-            if (service.embedding && !forceRegenerate) {
-                console.log(`⏭️  Skipping service ${serviceId} - embedding already exists`);
+            if (location.embedding && !forceRegenerate) {
+                console.log(`⏭️  Skipping location ${locationId} - embedding already exists`);
                 skipped++;
                 continue;
             }
 
-            console.log(`🔄 Processing service ${serviceId}: "${service.name}" (${service.category})`);
+            console.log(`🔄 Processing location ${locationId}: "${service.name}" (${service.category})`);
 
             // Get tags for this service
             const tagsData = await db
@@ -160,10 +163,10 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
                     tagsTranslationsTable,
                     eq(servicesTagsTable.tagId, tagsTranslationsTable.tagId)
                 )
-                .where(eq(servicesTagsTable.serviceId, serviceId));
+                .where(eq(servicesTagsTable.serviceId, service.id));
 
             // Create enhanced searchable text
-            const searchableText = createSearchableText(service, translations, tagsData);
+            const searchableText = createSearchableText({ ...service, city: location.city, street: location.street }, translations, tagsData);
             console.log(`📝 Searchable text (${searchableText.length} chars): "${searchableText.slice(0, 150)}..."`);
 
             // Generate embedding
@@ -172,15 +175,15 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
 
             // Save embedding to database
             await db
-                .update(servicesTable)
+                .update(serviceLocationsTable)
                 .set({
                     embedding: embedding,
                     updatedAt: new Date()
                 })
-                .where(eq(servicesTable.id, serviceId));
+                .where(eq(serviceLocationsTable.id, locationId));
 
             processed++;
-            console.log(`✅ Saved embedding for service ${serviceId} (${processed}/${total - skipped})`);
+            console.log(`✅ Saved embedding for location ${locationId} (${processed}/${total - skipped})`);
 
             // Progress logging
             if (processed % 10 === 0) {
@@ -191,14 +194,13 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
             await new Promise(resolve => setTimeout(resolve, 200));
 
         } catch (error) {
-            console.error(`❌ Error processing service ${serviceId}:`, error);
+            console.error(`❌ Error processing location ${locationId}:`, error);
             errors++;
 
             // Handle rate limiting
             if (error instanceof Error && error.message?.includes('rate limit')) {
                 console.log('⏰ Rate limit hit, waiting 10 seconds...');
                 await new Promise(resolve => setTimeout(resolve, 10_000));
-                // Retry this service
                 continue;
             }
         }
@@ -213,29 +215,30 @@ export async function generateEmbeddingsForAllServices(forceRegenerate = false) 
     return { processed, skipped, errors, total };
 }
 
-// Enhanced single service embedding generation
-export async function generateEmbeddingForService(serviceId: string) {
-    console.log(`🔄 Generating embedding for service ${serviceId}`);
+// Enhanced single location embedding generation
+export async function generateEmbeddingForLocation(locationId: string) {
+    console.log(`🔄 Generating embedding for location ${locationId}`);
 
-    // Get comprehensive service data
-    const serviceData = await db
+    // Get comprehensive location data
+    const locationData = await db
         .select({
-            serviceId: servicesTable.id,
-            serviceName: servicesTable.name,
-            serviceCategory: servicesTable.category,
+            locationId: serviceLocationsTable.id,
             locationCity: serviceLocationsTable.city,
             locationStreet: serviceLocationsTable.street,
             locationVoivodeship: serviceLocationsTable.voivodeship,
+            serviceId: servicesTable.id,
+            serviceName: servicesTable.name,
+            serviceCategory: servicesTable.category,
             translationName: servicesTranslationsTable.name,
             translationDescription: servicesTranslationsTable.description,
             translationLanguage: servicesTranslationsTable.languageCode,
             tagName: tagsTranslationsTable.name,
             tagLanguage: tagsTranslationsTable.languageCode,
         })
-        .from(servicesTable)
-        .leftJoin(
-            serviceLocationsTable,
-            eq(servicesTable.id, serviceLocationsTable.serviceId)
+        .from(serviceLocationsTable)
+        .innerJoin(
+            servicesTable,
+            eq(serviceLocationsTable.serviceId, servicesTable.id)
         )
         .leftJoin(
             servicesTranslationsTable,
@@ -249,23 +252,22 @@ export async function generateEmbeddingForService(serviceId: string) {
             tagsTranslationsTable,
             eq(servicesTagsTable.tagId, tagsTranslationsTable.tagId)
         )
-        .where(eq(servicesTable.id, serviceId));
+        .where(eq(serviceLocationsTable.id, locationId));
 
-    if (serviceData.length === 0) {
-        throw new Error(`Service with ID ${serviceId} not found`);
+    if (locationData.length === 0) {
+        throw new Error(`Location with ID ${locationId} not found`);
     }
 
-    // Process the data — collect all unique locations for embedding context
     const service = {
-        id: serviceData[0].serviceId,
-        name: serviceData[0].serviceName,
-        category: serviceData[0].serviceCategory,
-        city: serviceData[0].locationCity,
-        street: serviceData[0].locationStreet,
-        county: serviceData[0].locationVoivodeship,
+        id: locationData[0].serviceId,
+        name: locationData[0].serviceName,
+        category: locationData[0].serviceCategory,
+        city: locationData[0].locationCity,
+        street: locationData[0].locationStreet,
+        county: locationData[0].locationVoivodeship,
     };
 
-    const translations = serviceData
+    const translations = locationData
         .filter(row => row.translationName)
         .map(row => ({
             name: row.translationName,
@@ -278,7 +280,7 @@ export async function generateEmbeddingForService(serviceId: string) {
                 )
         );
 
-    const tags = serviceData
+    const tags = locationData
         .filter(row => row.tagName)
         .map(row => ({
             name: row.tagName,
@@ -297,14 +299,14 @@ export async function generateEmbeddingForService(serviceId: string) {
     const embedding = await generateEmbedding(searchableText);
 
     await db
-        .update(servicesTable)
+        .update(serviceLocationsTable)
         .set({
             embedding: embedding,
             updatedAt: new Date()
         })
-        .where(eq(servicesTable.id, serviceId));
+        .where(eq(serviceLocationsTable.id, locationId));
 
-    console.log(`✅ Updated embedding for service ${serviceId}: "${service.name}" (${service.category})`);
+    console.log(`✅ Updated embedding for location ${locationId}: "${service.name}" (${service.category})`);
     console.log(`   📝 Included ${translations.length} translations and ${tags.length} tags`);
 
     return embedding;

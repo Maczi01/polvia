@@ -40,7 +40,7 @@ export type ItemPointClusterProperties = PointClusterProperties<{
 
 export type View = 'map' | 'list' | 'both';
 
-export type PartialService = Omit<Service, 'embedding' | 'createdAt' | 'updatedAt' | 'priority' | 'clicks'>;
+export type PartialService = Omit<Service, 'createdAt' | 'updatedAt' | 'priority' | 'clicks'>;
 
 export type Socials = {
     instagram?: string;

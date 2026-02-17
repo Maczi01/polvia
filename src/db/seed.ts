@@ -1,3 +1,4 @@
+import slugify from 'slugify';
 import { db } from '../db';
 import {
     servicesTable,
@@ -87,6 +88,16 @@ async function mainSeed() {
         { key: 'ngo', pl: 'Organizacja pozarządowa', uk: 'Громадська організація' },
         { key: 'pediatrician', pl: 'Pediatra', uk: 'Педіатр' },
         { key: 'polish-courses', pl: 'Kursy polskiego', uk: 'Курси польської' },
+        { key: 'freight', pl: 'Fracht', uk: 'Вантаж' },
+        { key: 'road-transport', pl: 'Transport drogowy', uk: 'Автоперевезення' },
+        { key: 'spedycja', pl: 'Spedycja', uk: 'Експедиція' },
+        { key: 'poland-ukraine', pl: 'Polska-Ukraina', uk: 'Польща-Україна' },
+        { key: 'international', pl: 'Międzynarodowy', uk: 'Міжнародний' },
+        { key: 'ftl', pl: 'FTL', uk: 'FTL' },
+        { key: 'ltl', pl: 'LTL', uk: 'LTL' },
+        { key: 'oversize', pl: 'Ponadgabarytowy', uk: 'Негабаритний' },
+        { key: 'ukraine', pl: 'Ukraina', uk: 'Україна' },
+        { key: 'customs', pl: 'Odprawa celna', uk: 'Митне оформлення' },
     ];
 
     for (const t of tagsToCreate) {
@@ -100,8 +111,6 @@ async function mainSeed() {
 
     // --- HELPER: SEEDER FUNCTION ---
     // To keep this readable and handle tags easily
-    const slugCounter: Record<string, number> = {};
-
     async function seedService(data: {
         name: string, slug: string, category: any, webpage?: string,
         image?: string,
@@ -109,24 +118,15 @@ async function mainSeed() {
         locations: any[],
         tags: string[],
         languages?: string[],
-        socials?: any
+        socials?: any,
+        nip?: string,
+        whatsappNumber?: string,
     }) {
-        let slug = data.slug;
-        if (slugCounter[slug] !== undefined) {
-            slugCounter[slug]++;
-            slug = `${data.slug}-${slugCounter[slug]}`;
-        } else {
-            slugCounter[slug] = 0;
-        }
-
         const [service] = await db.insert(servicesTable).values({
             name: data.name,
-            slug,
             category: data.category,
-            webpage: data.webpage,
             image: data.image,
             languages: data.languages || ['pl', 'uk'],
-            socials: data.socials,
             status: 'active'
         }).returning();
 
@@ -135,8 +135,32 @@ async function mainSeed() {
             { serviceId: service.id, languageCode: 'uk', name: data.name, description: data.ukDesc }
         ]);
 
+        // Count locations per city for slug generation
+        const cityCount: Record<string, number> = {};
+        for (const loc of data.locations) {
+            const citySlug = slugify(loc.city || 'unknown', { lower: true, strict: true });
+            cityCount[citySlug] = (cityCount[citySlug] || 0) + 1;
+        }
+        const cityIndex: Record<string, number> = {};
+
         await db.insert(serviceLocationsTable).values(
-            data.locations.map(loc => ({ ...loc, serviceId: service.id }))
+            data.locations.map(loc => {
+                const citySlug = slugify(loc.city || 'unknown', { lower: true, strict: true });
+                cityIndex[citySlug] = (cityIndex[citySlug] || 0) + 1;
+                const needsIndex = cityCount[citySlug] > 1;
+                const slug = needsIndex
+                    ? `${data.slug}-${citySlug}-${cityIndex[citySlug]}`
+                    : `${data.slug}-${citySlug}`;
+                return {
+                    ...loc,
+                    serviceId: service.id,
+                    slug,
+                    webpage: loc.webpage ?? data.webpage,
+                    nip: loc.nip ?? data.nip,
+                    socials: loc.socials ?? data.socials,
+                    whatsappNumber: loc.whatsappNumber ?? data.whatsappNumber,
+                };
+            })
         );
 
         if (data.tags.length > 0) {
@@ -155,6 +179,7 @@ async function mainSeed() {
         ukDesc: 'Легендарна українська мережа пекарень. Свіжоспечені круасани.',
         tags: ['bakery', 'coffee'],
         image: 'lviv-croissants.png',
+        webpage: 'https://lvivcroissants.com/',
         locations: [
             { city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2331, longitude: 21.0175, openingHours: standardGastroHours, isMainLocation: true },
             { city: 'Kraków', street: 'Grodzka 50', voivodeship: 'malopolskie', latitude: 50.057, longitude: 19.9385, openingHours: standardGastroHours }
@@ -207,8 +232,9 @@ async function mainSeed() {
         ukDesc: 'Знаменита львівська настоянка в унікальній атмосфері.',
         image: 'pijana-visnia.png',
         webpage: 'https://pianavyshnia.com/',
+        socials: { instagram: 'https://www.instagram.com/pianavyshnia/', facebook: 'https://www.facebook.com/PianaVyshnia', tiktok: 'https://www.tiktok.com/@pianavyshnia' },
         tags: ['alcohol', 'atmosphere'],
-        locations: [{ city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2330, longitude: 21.0176, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2330, longitude: 21.0176, email: 'pianavyshnia.info@fest.foundation', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 4
@@ -219,7 +245,7 @@ async function mainSeed() {
         plDesc: 'Największa na świecie sieć barów beauty pochodząca z Ukrainy. Kompleksowe usługi: od manicure po profesjonalne makijaże i stylizacje włosów w wyjątkowej atmosferze.',
         ukDesc: 'Найбільша у світі мережа бʼюті-барів родом з України. Комплексні послуги: від манікюру до професійного макіяжу та укладок у винятковій атмосфері.',
         tags: ['beauty', 'nails', 'haircare', 'atmosphere'],
-        webpage: 'https://gbar.com.pl/',
+        webpage: 'https://gbar.pl/pl',
         locations: [
 
             { city: 'Warszawa', street: 'ul. Przyokopowa 26', voivodeship: 'mazowieckie', latitude: 52.2302,  longitude: 20.9811, openingHours: standardShopHours, isMainLocation: true },
@@ -417,6 +443,7 @@ async function mainSeed() {
         tags: ['seafood', 'tradition'],
         image: 'czarnomorka.png',
         webpage: 'https://czarnomorka.pl/',
+        socials: { instagram: 'https://www.instagram.com/czarnomorka/', facebook: 'https://www.facebook.com/czarnomorka.warszawa/' },
         locations: [
             { city: 'Warszawa', street: 'Grzybowska 56', voivodeship: 'mazowieckie', phoneNumber:'+48 722 760 505', latitude: 52.2354, longitude: 20.9876, isMainLocation: true, openingHours: standardGastroHours },
             { city: 'Warszawa', street: 'Nowy Świat 49', voivodeship: 'mazowieckie', phoneNumber:'+48 727 860 505', latitude: 52.2353, longitude: 21.0182, isMainLocation: true, openingHours: standardGastroHours },
@@ -434,8 +461,9 @@ async function mainSeed() {
         ukDesc: 'Традиційна українська кухня в центрі Варшави.',
         webpage: 'https://usiostr.choiceqr.com/',
         image: 'usiostr.png',
+        socials: { facebook: 'https://www.facebook.com/usester/?ref=page_internal' },
         tags: ['tradition', 'home'],
-        locations: [{ city: 'Warszawa', street: 'Złota 63A', voivodeship: 'mazowieckie', latitude: 52.2305, longitude: 21.0003, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Złota 63A', voivodeship: 'mazowieckie', latitude: 52.2305, longitude: 21.0003, phoneNumber: '+48 888 769 423', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 20
@@ -445,8 +473,9 @@ async function mainSeed() {
         ukDesc: 'Домашні страви за традиційними рецептами.',
         image: 'smaki-valentyny.png',
         webpage: 'https://kresowe-smaki-valentyny-sienna89.eatbu.com/',
+        socials: { facebook: 'https://www.facebook.com/pages/Kresowe-Smaki-Walentyny/157643074689529', tripadvisor: 'https://www.tripadvisor.com/Restaurant_Review-g274856-d12005947-Reviews-Kresowe_Smaki_Walentyny-Warsaw_Mazovia_Province_Central_Poland.html' },
         tags: ['home', 'tradition'],
-        locations: [{ city: 'Warszawa', street: 'Sienna 89', voivodeship: 'mazowieckie', latitude: 52.2302, longitude: 20.9934, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Sienna 89', voivodeship: 'mazowieckie', latitude: 52.2302, longitude: 20.9934, phoneNumber: '+48 796 820 030', email: 'witoldgortat@gmail.com', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
 
@@ -458,8 +487,9 @@ async function mainSeed() {
         ukDesc: 'Ресторан, що відтворює атмосферу довоєнного Львова.',
         webpage: 'https://kamandalwowska.pl/',
         image: 'kamanda-lwowa.png',
+        socials: { facebook: 'https://www.facebook.com/profile.php?id=61556365557030', instagram: 'https://www.facebook.com/profile.php?id=61556365557030' },
         tags: ['atmosphere', 'culture'],
-        locations: [{ city: 'Warszawa', street: 'Foksal 10', voivodeship: 'mazowieckie', latitude: 52.2335, longitude: 21.0219, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Foksal 10', voivodeship: 'mazowieckie', latitude: 52.2335, longitude: 21.0219, phoneNumber: '+48 512 240 502', email: 'kontakt@kamandalwowska.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 23
@@ -469,10 +499,11 @@ async function mainSeed() {
         ukDesc: 'Українська кухня у торговому центрі.',
         image: 'kozaczok.png',
         webpage: 'https://kozaczok.eatbu.com/',
+        socials: { facebook: 'https://www.facebook.com/Kozaczok-165814574084653/' },
         tags: ['lunch', 'dumplings'],
         locations: [
-            { city: 'Warszawa', street: 'ul.Sokratesa 9', voivodeship: 'mazowieckie', latitude: 52.2839, longitude: 20.9269, isMainLocation: true, openingHours: standardGastroHours },
-            { city: 'Warszawa', street: 'C.H. Arkadia al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.2565, longitude: 20.9842, isMainLocation: true, openingHours: standardGastroHours }
+            { city: 'Warszawa', street: 'ul.Sokratesa 9', voivodeship: 'mazowieckie', latitude: 52.2839, longitude: 20.9269, phoneNumber: '+48 535 353 027', isMainLocation: true, openingHours: standardGastroHours },
+            { city: 'Warszawa', street: 'C.H. Arkadia al. Jana Pawła II 82', voivodeship: 'mazowieckie', latitude: 52.2565, longitude: 20.9842, phoneNumber: '+48 535 353 027', isMainLocation: true, openingHours: standardGastroHours }
     ]
     });
 
@@ -483,8 +514,9 @@ async function mainSeed() {
         ukDesc: 'Культове місце у Вроцлаві.',
         webpage: 'https://kozackachatka.pl/',
         image: 'kozacka-chatka.png',
+        socials: { facebook: 'https://www.facebook.com/KozackaChatka', instagram: 'https://www.instagram.com/kozackachatka/', tripadvisor: 'https://www.tripadvisor.com/Restaurant_Review-g274812-d12173535-Reviews-Kozacka_Chatka-Wroclaw_Lower_Silesia_Province_Southern_Poland.html?m=69573' },
         tags: ['tradition', 'culture'],
-        locations: [{ city: 'Wrocław', street: 'Energetyczna 14/1b', voivodeship: 'dolnoslaskie', latitude: 51.0913, longitude: 17.0204, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Wrocław', street: 'Energetyczna 14/1b', voivodeship: 'dolnoslaskie', latitude: 51.0913, longitude: 17.0204, phoneNumber: '+48 537 312 298', email: 'biuro@kozackachatka.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 27
@@ -495,7 +527,7 @@ async function mainSeed() {
         webpage: 'https://ukrainska.pl/',
         image: 'smak-ukraini.png',
         tags: ['tradition', 'lunch'],
-        locations: [{ city: 'Kraków', street: 'Grodzka 21', voivodeship: 'malopolskie', latitude: 50.0594, longitude: 19.9381, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Kraków', street: 'Grodzka 21', voivodeship: 'malopolskie', latitude: 50.0594, longitude: 19.9381, phoneNumber: '+48 12 421 92 94', email: 'restauracja@ukrainska.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 28
@@ -504,8 +536,10 @@ async function mainSeed() {
         plDesc: 'Kawiarnia i pierogarnia w Gdańsku.',
         ukDesc: 'Кафе та варенична у Гданську.',
         image: 'pan-kotowski.png',
+        webpage: 'https://pan-kotowski-kuchnia-ukrainska.eatbu.com/',
+        socials: { instagram: 'https://instagram.com/pankotowski_restaurant?igshid=s9xu5cl4h96r', facebook: 'https://www.facebook.com/KotowskiPan', tiktok: 'https://www.tiktok.com/@pankotowski.gdansk?_t=ZN-8tRdv0b4jxe&_r=1' },
         tags: ['coffee', 'dumplings'],
-        locations: [{ city: 'Gdańsk', street: 'Ogarna 11/12', voivodeship: 'pomorskie', latitude: 54.3481, longitude: 18.6508, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Gdańsk', street: 'Ogarna 11/12', voivodeship: 'pomorskie', latitude: 54.3481, longitude: 18.6508, phoneNumber: '+48 512 060 823', email: 'pankotowski.reservations@gmail.com', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 29
@@ -515,8 +549,9 @@ async function mainSeed() {
         ukDesc: 'Ресторан у Щецині з багатим меню.',
         webpage: 'https://www.ukraineczka.com.pl/',
         image: 'ukraineczka.png',
+        socials: { facebook: 'https://www.facebook.com/ukraineczkaszczecin/', instagram: 'https://www.instagram.com/restauracja_ukraineczka/' },
         tags: ['culture', 'home'],
-        locations: [{ city: 'Szczecin', street: 'Panieńska 19', voivodeship: 'zachodniopomorskie', latitude: 53.4249, longitude: 14.5599, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Szczecin', street: 'Panieńska 19', voivodeship: 'zachodniopomorskie', latitude: 53.4249, longitude: 14.5599, phoneNumber: '+48 603 480 590', email: 'restauracjaukraineczka@wp.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 30
@@ -526,8 +561,9 @@ async function mainSeed() {
         ukDesc: 'Місце зустрічі з українською культурою.',
         webpage: 'https://www.dumkarest.pl/',
         image: 'dumka.png',
+        socials: { instagram: 'https://www.instagram.com/dumka_restauracja_/' },
         tags: ['culture', 'atmosphere'],
-        locations: [{ city: 'Chełm', street: 'Lubelska 17/1', voivodeship: 'lubelskie', latitude: 51.1322, longitude: 23.47611, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Chełm', street: 'Lubelska 17/1', voivodeship: 'lubelskie', latitude: 51.1322, longitude: 23.47611, phoneNumber: '+48 538 344 013', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 31
@@ -537,20 +573,12 @@ async function mainSeed() {
         ukDesc: 'Справжні смаки України над морем.',
         webpage: 'https://kulinarnaukraina.eatbu.com/',
         image: 'kulinarnaukraina.png',
+        socials: { facebook: 'https://www.facebook.com/kulinarnaukrainarestaurant/', instagram: 'https://www.instagram.com/kulinarnaukraina/' },
         tags: ['seafood', 'home'],
-        locations: [{ city: 'Gdynia', street: 'Świętojańska 66', voivodeship: 'pomorskie', latitude: 54.5165, longitude: 18.5391, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Gdynia', street: 'Świętojańska 66', voivodeship: 'pomorskie', latitude: 54.5165, longitude: 18.5391, phoneNumber: '+48 667 557 757', email: 'restauracja.kulinarnaukraina@onet.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
-    // 32
-    await seedService({
-        name: 'Koronkowa Robota', slug: 'koronkowa-robota-plock', category: 'gastronomy',
-        plDesc: 'Autorska kuchnia łącząca tradycję z nowoczesnością.',
-        ukDesc: 'Авторська кухня та сучасність.',
-        webpage: 'https://www.facebook.com/KoronkowaRobotaRestauracja/',
-        image: 'koronkowa-robota.png',
-        tags: ['modern', 'tradition'],
-        locations: [{ city: 'Płock', street: 'Fryderyka Chopina 28', voivodeship: 'mazowieckie', latitude: 52.5501, longitude: 19.6972, isMainLocation: true, openingHours: standardGastroHours }]
-    });
+
 
     // DODAC KOSCIOLY PRAWOSLAWNE
 
@@ -561,8 +589,9 @@ async function mainSeed() {
         ukDesc: 'Елегантний ресторан у старій віллі.',
         webpage: 'https://willabiala.pl/',
         image: 'willa-biala.png',
+        socials: { instagram: 'https://www.instagram.com/willa_biala/', facebook: 'https://www.facebook.com/WillaBiala' },
         tags: ['atmosphere', 'modern'],
-        locations: [{ city: 'Warszawa', street: 'Narbutta 10', voivodeship: 'mazowieckie', latitude: 52.2091, longitude: 21.0189, isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Narbutta 10', voivodeship: 'mazowieckie', latitude: 52.2091, longitude: 21.0189, phoneNumber: '+48 577 454 333', email: 'manager@willabiala.pl', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 36
@@ -838,6 +867,248 @@ async function mainSeed() {
     //         }
     //     ]
     // });
+
+    // --- PRAWO / KANCELARIE ---
+
+    await seedService({
+        name: 'Ukrainian Desk – Traple Konarski Podrecki',
+        slug: 'ukrainian-desk-tkp',
+        category: 'law',
+        plDesc: 'Kancelaria prawna z 25-letnim doświadczeniem oferująca kompleksową obsługę prawną dla osób i firm z Ukrainy prowadzących działalność w Polsce. Pomoc w zakładaniu biznesu, prawie pracy i relacjach z administracją publiczną.',
+        ukDesc: 'Юридична фірма з 25-річним досвідом, що надає комплексний правовий супровід для осіб та компаній з України, які ведуть бізнес у Польщі. Допомога у відкритті бізнесу, трудовому праві та відносинах з державними органами.',
+        webpage: 'https://www.traple.pl/ukrainian-desk-tkp/',
+        tags: ['legal', 'documents'],
+        locations: [
+            {
+                city: 'Kraków',
+                street: 'ul. Królowej Jadwigi 170',
+                voivodeship: 'malopolskie',
+                latitude: 50.0555,
+                longitude: 19.9055,
+                phoneNumber: '+48 12 426 05 30',
+                email: 'office@traple.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+            {
+                city: 'Warszawa',
+                street: 'ul. Twarda 4',
+                voivodeship: 'mazowieckie',
+                latitude: 52.2325,
+                longitude: 20.9995,
+                phoneNumber: '+48 22 850 10 10',
+                email: 'office@traple.pl',
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'Kancelaria Adwokacka Adwokat Oxana Piątkowska',
+        slug: 'adwokat-piatkowska',
+        category: 'law',
+        plDesc: 'Kompleksowe usługi prawne dla przedsiębiorców i klientów indywidualnych w językach polskim, ukraińskim i rosyjskim. Specjalizacja: prawo handlowe, cywilne, karne, administracyjne, obsługa cudzoziemców oraz prawo podatkowe.',
+        ukDesc: 'Комплексні юридичні послуги для підприємців та приватних клієнтів польською, українською та російською мовами. Спеціалізація: комерційне, цивільне, кримінальне, адміністративне право, обслуговування іноземців та податкове право.',
+        webpage: 'https://www.adwokatpiatkowska.pl/',
+        tags: ['legal', 'documents'],
+        locations: [
+            {
+                city: 'Warszawa',
+                street: 'ul. Krakowskie Przedmieście 41',
+                voivodeship: 'mazowieckie',
+                latitude: 52.2445087,
+                longitude: 21.0138772,
+                phoneNumber: '+48 22 465 17 17',
+                whatsappNumber: '+48 698 641 555',
+                email: 'kancelaria@adwokatpiatkowska.pl',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '10:00', close: '17:00' },
+                    tuesday: { open: '10:00', close: '17:00' },
+                    wednesday: { open: '10:00', close: '17:00' },
+                    thursday: { open: '10:00', close: '17:00' },
+                    friday: { open: '10:00', close: '17:00' },
+                },
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'Kancelaria Wschodnia – Adwokat Olga Dugil',
+        slug: 'kancelaria-wschodnia-dugil',
+        category: 'law',
+        plDesc: 'Kancelaria specjalizująca się w prawie wschodnioeuropejskim (Ukraina, Rosja, Białoruś, Kazachstan) z 20-letnim doświadczeniem. Rejestracja firm, legalizacja pracowników, obsługa celna, reprezentacja przed sądami i urzędami.',
+        ukDesc: 'Юридична фірма, що спеціалізується на східноєвропейському праві (Україна, Росія, Білорусь, Казахстан) з 20-річним досвідом. Реєстрація компаній, легалізація працівників, митне оформлення, представництво в судах та органах влади.',
+        webpage: 'https://dugilolga.pl/pl',
+        socials: { facebook: 'https://www.facebook.com/dugilolga.eu/' },
+        tags: ['legal', 'documents'],
+        locations: [
+            {
+                city: 'Warszawa',
+                street: 'ul. Krakowskie Przedmieście',
+                voivodeship: 'mazowieckie',
+                latitude: 52.2440,
+                longitude: 21.0140,
+                phoneNumber: '+48 608 115 622',
+                whatsappNumber: '+48 608 115 622',
+                email: 'office@dugilolga.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'Kancelaria Radcy Prawnego Piotr Kamler',
+        slug: 'kancelaria-kamler',
+        category: 'law',
+        plDesc: 'Kancelaria radcy prawnego specjalizująca się w pomocy prawnej dla obywateli Ukrainy. Legalizacja pobytu, zezwolenia na pracę, pobyt tymczasowy, zakładanie firm oraz konsultacje z zakresu prawa administracyjnego.',
+        ukDesc: 'Юридична фірма, що спеціалізується на правовій допомозі громадянам України. Легалізація перебування, дозволи на роботу, тимчасове проживання, реєстрація фірм та консультації з адміністративного права.',
+        webpage: 'https://kancelariakamler.pl/pomoc-prawna-dla-obywateli-ukrainy',
+        socials: { facebook: 'https://www.facebook.com/kancelaria.radcy.prawnego.piotr.kamler' },
+        tags: ['legal', 'documents'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'al. Armii Krajowej 12B/3',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.1100,
+                longitude: 16.9930,
+                phoneNumber: '+48 608 882 171',
+                email: 'biuro@kancelariakamler.pl',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '09:00', close: '17:00' },
+                    tuesday: { open: '09:00', close: '17:00' },
+                    wednesday: { open: '09:00', close: '17:00' },
+                    thursday: { open: '09:00', close: '17:00' },
+                    friday: { open: '09:00', close: '17:00' },
+                },
+            },
+        ],
+    });
+
+    // --- TRANSPORT MIĘDZYNARODOWY (Polska ↔ Ukraina) ---
+
+    await seedService({
+        name: 'INTER-LOGISTIC',
+        slug: 'inter-logistic',
+        category: 'transport',
+        plDesc: 'Międzynarodowa spedycja i transport drogowy na kierunku Ukraina ↔ Polska/UE; obsługa m.in. FTL/LTL oraz wsparcie organizacyjne przy przewozach.',
+        ukDesc: 'Міжнародна експедиція та автоперевезення напрямком Україна ↔ Польща/ЄС; зокрема FTL/LTL та організаційний супровід перевезень.',
+        webpage: 'https://inter-logistic.pl/zasieg-dzialania-2/transport-ukraina/',
+        image: 'inter-logistic.png',
+        tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl'],
+        locations: [
+            {
+                city: 'Gliwice',
+                street: 'ul. Portowa 28',
+                voivodeship: 'slaskie',
+                latitude: 50.29761,
+                longitude: 18.67658,
+                phoneNumber: '+48 32 331 67 30',
+                email: 'biuro@inter-logistic.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'GONERA TRANSPORT I SPEDYCJA',
+        slug: 'gonera-transport',
+        category: 'transport',
+        plDesc: 'Transport Polska ↔ Ukraina: kompleksowe usługi przewozowe (m.in. niskopodwoziowy, FTL/LTL, kontenery, maszyny) z obsługą formalną i logistyczną.',
+        ukDesc: 'Перевезення Польща ↔ Україна: комплексні транспортні послуги (зокрема низькорамні, FTL/LTL, контейнери, техніка) з логістичним та документальним супроводом.',
+        webpage: 'https://gonera-transport.pl/transport-polska-ukraina/',
+        image: 'gonera.png',
+        tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl', 'oversize'],
+        locations: [
+            {
+                city: 'Międzybórz',
+                street: 'Bukowina Sycowska 58/4',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.38483,
+                longitude: 17.57266,
+                phoneNumber: '+48 534 531 513',
+                email: 'zapytania@gonera-transport.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'OMIDA VLS',
+        slug: 'omida-vls',
+        category: 'transport',
+        plDesc: 'Transport Polska ↔ Ukraina: usługi TSL (FTL/LTL), organizacja transportu drogowego i spedycji na kierunku Ukraina.',
+        ukDesc: 'Перевезення Польща ↔ Україна: TSL (FTL/LTL), організація автоперевезень та експедиції на українському напрямку.',
+        webpage: 'https://omida.pl/transport-polska-ukraina/',
+        image: 'omida.png',
+        tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl'],
+        locations: [
+            {
+                city: 'Gdańsk',
+                street: 'Aleja Grunwaldzka 472C',
+                voivodeship: 'pomorskie',
+                latitude: 54.402948,
+                longitude: 18.571977,
+                phoneNumber: '+48 58 741 88 14',
+                email: 'bok@omida-vls.com',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'TTE (TRADE & TRANS EXPERT)',
+        slug: 'tte',
+        category: 'transport',
+        plDesc: 'Transport na Ukrainę: spedycja i transport międzynarodowy (organizacja przewozów drogowych oraz obsługa logistyczna).',
+        ukDesc: 'Перевезення в Україну: міжнародна експедиція та транспорт (організація автоперевезень і логістичний супровід).',
+        webpage: 'https://tte.pl/transport-na-ukraine/',
+        image: 'tte.png',
+        tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ukraine'],
+        locations: [
+            {
+                city: 'Sławków',
+                street: 'ul. Dębowa Góra 29',
+                voivodeship: 'slaskie',
+                latitude: 50.28,
+                longitude: 19.361944,
+                phoneNumber: '+48 32 719 61 84',
+                email: 'biuro@tte.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'BIAL-MICH',
+        slug: 'bial-mich',
+        category: 'transport',
+        plDesc: 'Transport Polska ↔ Ukraina oraz spedycja międzynarodowa: kompleksowa organizacja przewozu towarów z naciskiem na terminowość i bezpieczeństwo.',
+        ukDesc: 'Перевезення Польща ↔ Україна та міжнародна експедиція: комплексна організація доставки вантажів з акцентом на безпеку і своєчасність.',
+        webpage: 'https://bialmich.com/nasze-uslugi/spedycja-miedzynarodowa/transport-ukraina/',
+        image: 'bialmich.png',
+        tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'customs'],
+        locations: [
+            {
+                city: 'Biała Podlaska',
+                street: 'Sławacinek Nowy 5ab',
+                voivodeship: 'lubelskie',
+                latitude: 52.0343873788573,
+                longitude: 23.1287264910183,
+                phoneNumber: '+48 83 343 27 30',
+                email: 'biuro@bialmich.pl',
+                isMainLocation: true,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
 
     console.log('✅ Seed zakończony z tagami!');
 }

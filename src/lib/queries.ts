@@ -19,7 +19,7 @@ export async function getServices(locale: string = 'en') {
         .select({
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
-            slug: servicesTable.slug,
+            slug: serviceLocationsTable.slug,
 
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',
@@ -37,11 +37,11 @@ export async function getServices(locale: string = 'en') {
             openingHours: serviceLocationsTable.openingHours,
             phoneNumber: serviceLocationsTable.phoneNumber,
             email: serviceLocationsTable.email,
-            webpage: servicesTable.webpage,
+            webpage: serviceLocationsTable.webpage,
             image: servicesTable.image,
             languages: servicesTable.languages,
-            socials: servicesTable.socials,
-            whatsappNumber: servicesTable.whatsappNumber,
+            socials: serviceLocationsTable.socials,
+            whatsappNumber: serviceLocationsTable.whatsappNumber,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
@@ -111,7 +111,7 @@ export async function getMostPopular(locale: string) {
         .select({
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
-            slug: servicesTable.slug,
+            slug: serviceLocationsTable.slug,
 
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',
@@ -129,11 +129,11 @@ export async function getMostPopular(locale: string) {
             openingHours: serviceLocationsTable.openingHours,
             phoneNumber: serviceLocationsTable.phoneNumber,
             email: serviceLocationsTable.email,
-            webpage: servicesTable.webpage,
+            webpage: serviceLocationsTable.webpage,
             image: servicesTable.image,
             languages: servicesTable.languages,
-            socials: servicesTable.socials,
-            whatsappNumber: servicesTable.whatsappNumber,
+            socials: serviceLocationsTable.socials,
+            whatsappNumber: serviceLocationsTable.whatsappNumber,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
