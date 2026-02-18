@@ -272,6 +272,7 @@ async function mainSeed() {
         ukDesc: 'Найбільша у світі мережа бʼюті-барів родом з України. Комплексні послуги: від манікюру до професійного макіяжу та укладок у винятковій атмосфері.',
         tags: ['beauty', 'nails', 'haircare', 'atmosphere'],
         webpage: 'https://gbar.pl/pl',
+        image: 'gbar.png',
         locations: [
 
             { city: 'Warszawa', street: 'ul. Przyokopowa 26', voivodeship: 'mazowieckie', latitude: 52.2302,  longitude: 20.9811, openingHours: standardShopHours, isMainLocation: true },
@@ -290,6 +291,7 @@ async function mainSeed() {
         plDesc: 'Innowacyjny koncept z Ukrainy oferujący zestawy usług wykonywanych jednocześnie (np. manicure, pedicure i koloryzacja w 90 minut).',
         ukDesc: 'Інноваційна концепція з України, що пропонує сети послуг, які виконуються одночасно (наприклад, манікюр, педикюр та фарбування за 90 хвилин).',
         tags: ['beauty', 'nails', 'haircare', 'modern'],
+        image: 'fast-line-studio.png',
         webpage: 'https://fastlinestudio.pl/',
         locations: [
             { city: 'Warszawa', street: 'ul. Jana Kazimierza 27', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 20.9385, openingHours: standardShopHours, isMainLocation: true },
@@ -912,6 +914,7 @@ async function mainSeed() {
         plDesc: 'Kancelaria prawna z 25-letnim doświadczeniem oferująca kompleksową obsługę prawną dla osób i firm z Ukrainy prowadzących działalność w Polsce. Pomoc w zakładaniu biznesu, prawie pracy i relacjach z administracją publiczną.',
         ukDesc: 'Юридична фірма з 25-річним досвідом, що надає комплексний правовий супровід для осіб та компаній з України, які ведуть бізнес у Польщі. Допомога у відкритті бізнесу, трудовому праві та відносинах з державними органами.',
         webpage: 'https://www.traple.pl/ukrainian-desk-tkp/',
+        image: 'ukrainian-desk-traple-konarski-podrecki.png',
         tags: ['legal', 'documents'],
         locations: [
             {
@@ -1104,7 +1107,7 @@ async function mainSeed() {
         plDesc: 'Transport na Ukrainę: spedycja i transport międzynarodowy (organizacja przewozów drogowych oraz obsługa logistyczna).',
         ukDesc: 'Перевезення в Україну: міжнародна експедиція та транспорт (організація автоперевезень і логістичний супровід).',
         webpage: 'https://tte.pl/transport-na-ukraine/',
-        image: 'tte.png',
+        image: 'tte-trade-and-trans-expert.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ukraine'],
         locations: [
             {
