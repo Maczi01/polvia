@@ -3,12 +3,13 @@
  * Generates type-safe URLs with slug-based paths and query parameters
  */
 
-import { getSlugFromCategory, normalizeCountySlug, isValidCountySlug } from './slug-mappings';
+import { getSlugFromCategory, normalizeCountySlug, isValidCountySlug, normalizeCitySlug, isValidCitySlug } from './slug-mappings';
 import type { Locale } from '@/i18n/config';
 
 export type MapUrlParams = {
     category?: string | null;
     county?: string | null;
+    city?: string | null;
     query?: string | null;
     slug?: string | null;
     view?: 'map' | 'list' | null;
@@ -37,7 +38,7 @@ export type MapUrl = {
  * @returns URL object with pathname and optional query params
  */
 export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
-    const { category, county, query, slug, view } = params;
+    const { category, county, city, query, slug, view } = params;
 
     // Base pathname
     const basePath = '/map';
@@ -57,6 +58,11 @@ export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
         const countySlug = normalizeCountySlug(county);
         if (isValidCountySlug(countySlug)) {
             slugParts.push(countySlug);
+        }
+    } else if (city) {
+        const citySlug = normalizeCitySlug(city);
+        if (isValidCitySlug(citySlug)) {
+            slugParts.push(citySlug);
         }
     }
 

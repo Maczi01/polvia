@@ -197,31 +197,57 @@ async function mainSeed() {
         tags: ['grocery', 'imported', 'alcohol', 'seafood'],
         image: 'best-market.png',
         webpage: 'https://best-market.pl/lokalizacje/',
+        socials: { facebook: 'https://www.facebook.com/bestmarketpl/', instagram: 'https://www.instagram.com/bestmarket_pl/', tiktok: 'https://www.tiktok.com/@bestmarket__pl/' },
         locations: [
-            // WARSZAWA & OKOLICE
-            { city: 'Warszawa', street: 'Al. Jerozolimskie 179 (Blue City)', voivodeship: 'mazowieckie', latitude: 52.2117, longitude: 20.9525, openingHours: standardShopHours, isMainLocation: true },
-            { city: 'Warszawa', street: 'ul. Tamka 40', voivodeship: 'mazowieckie', latitude: 52.2371, longitude: 21.0264, openingHours: standardShopHours },
-            { city: 'Warszawa', street: 'ul. Jana Pawła II 52/54', voivodeship: 'mazowieckie', latitude: 52.2425, longitude: 20.9936, openingHours: standardShopHours },
-            { city: 'Warszawa', street: 'ul. Grójecka 78', voivodeship: 'mazowieckie', latitude: 52.2155, longitude: 20.9785, openingHours: standardShopHours },
-            { city: 'Warszawa', street: 'ul. Światowida 17 (Galeria Północna)', voivodeship: 'mazowieckie', latitude: 52.3185, longitude: 20.9522, openingHours: standardShopHours },
-            { city: 'Piaseczno', street: 'ul. Puławska 42E', voivodeship: 'mazowieckie', latitude: 52.0915, longitude: 21.0112, openingHours: standardShopHours },
+            // WARSZAWA
+            { city: 'Warszawa', street: 'al. Jana Pawła II 52/54', voivodeship: 'mazowieckie', latitude: 52.2425, longitude: 20.9936, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 797 509 986', email: 'kontakt@best-market.pl' },
+            { city: 'Warszawa', street: 'al. KEN 52', voivodeship: 'mazowieckie', latitude: 52.1565, longitude: 21.0435, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Jana Kazimierza 53A', voivodeship: 'mazowieckie', latitude: 52.2285, longitude: 20.9415, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Jana Kowalczyka 9', voivodeship: 'mazowieckie', latitude: 52.2835, longitude: 21.0285, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Męcińska 30 paw 22/24', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0825, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Stefana Okrzei 27', voivodeship: 'mazowieckie', latitude: 52.2525, longitude: 21.0455, openingHours: standardShopHours },
+            { city: 'Warszawa', street: 'ul. Zygmunta Hübnera 1', voivodeship: 'mazowieckie', latitude: 52.2195, longitude: 20.9685, openingHours: standardShopHours },
+
+            // OKOLICE WARSZAWY
+            { city: 'Piaseczno', street: 'ul. Puławska 30A', voivodeship: 'mazowieckie', latitude: 52.0725, longitude: 21.0245, openingHours: standardShopHours },
+            { city: 'Pruszków', street: 'ul. Tadeusza Kościuszki 52', voivodeship: 'mazowieckie', latitude: 52.1705, longitude: 20.8015, openingHours: standardShopHours },
 
             // KRAKÓW
-            { city: 'Kraków', street: 'ul. Szlak 77 (Galeria Krakowska)', voivodeship: 'malopolskie', latitude: 50.0682, longitude: 19.9465, openingHours: standardShopHours },
-            { city: 'Kraków', street: 'ul. Na Zjeździe 8', voivodeship: 'malopolskie', latitude: 50.0465, longitude: 19.9565, openingHours: standardShopHours },
-            { city: 'Kraków', street: 'ul. Mogilska 120', voivodeship: 'malopolskie', latitude: 50.0691, longitude: 19.9791, openingHours: standardShopHours },
+            { city: 'Kraków', street: 'ul. Solna 1', voivodeship: 'malopolskie', latitude: 50.0475, longitude: 19.9585, openingHours: standardShopHours },
+            { city: 'Kraków', street: 'al. 29 Listopada 57', voivodeship: 'malopolskie', latitude: 50.0835, longitude: 19.9445, openingHours: standardShopHours },
+            { city: 'Kraków', street: 'ul. Bronowicka 5', voivodeship: 'malopolskie', latitude: 50.0665, longitude: 19.9115, openingHours: standardShopHours },
 
             // WROCŁAW
-            { city: 'Wrocław', street: 'ul. Sieradzka 7', voivodeship: 'dolnoslaskie', latitude: 51.0915, longitude: 17.0392, openingHours: standardShopHours },
-            { city: 'Wrocław', street: 'ul. Legnicka 58', voivodeship: 'dolnoslaskie', latitude: 51.1182, longitude: 16.9925, openingHours: standardShopHours },
+            { city: 'Wrocław', street: 'ul. Krawiecka 3B', voivodeship: 'dolnoslaskie', latitude: 51.1085, longitude: 17.0325, openingHours: standardShopHours },
+            { city: 'Wrocław', street: 'ul. Legnicka 59', voivodeship: 'dolnoslaskie', latitude: 51.1182, longitude: 16.9925, openingHours: standardShopHours },
+            { city: 'Wrocław', street: 'ul. Szewska 6/7', voivodeship: 'dolnoslaskie', latitude: 51.1125, longitude: 17.0275, openingHours: standardShopHours },
+
+            // ŁÓDŹ
+            { city: 'Łódź', street: 'ul. Piotrkowska 190', voivodeship: 'lodzkie', latitude: 51.7525, longitude: 19.4565, openingHours: standardShopHours },
+            { city: 'Łódź', street: 'ul. Łagiewnicka 27A', voivodeship: 'lodzkie', latitude: 51.7985, longitude: 19.4585, openingHours: standardShopHours },
+            { city: 'Łódź', street: 'ul. Rydzowa 10', voivodeship: 'lodzkie', latitude: 51.7855, longitude: 19.4215, openingHours: standardShopHours },
+
+            // POZNAŃ
+            { city: 'Poznań', street: 'os. Piastowskie 17', voivodeship: 'wielkopolskie', latitude: 52.4215, longitude: 16.9565, openingHours: standardShopHours },
+            { city: 'Poznań', street: 'ul. Szymańskiego 10', voivodeship: 'wielkopolskie', latitude: 52.4085, longitude: 16.9345, openingHours: standardShopHours },
+
+            // GDAŃSK
+            { city: 'Gdańsk', street: 'ul. Kołobrzeska 16A', voivodeship: 'pomorskie', latitude: 54.3965, longitude: 18.5885, openingHours: standardShopHours },
+            { city: 'Gdańsk', street: 'al. Grunwaldzka 40', voivodeship: 'pomorskie', latitude: 54.3785, longitude: 18.6125, openingHours: standardShopHours },
+
+            // ŚLĄSK
+            { city: 'Katowice', street: 'ul. 3 Maja 23', voivodeship: 'slaskie', latitude: 50.2585, longitude: 19.0215, openingHours: standardShopHours },
+            { city: 'Tychy', street: 'ul. Grota-Roweckiego 45', voivodeship: 'slaskie', latitude: 50.1185, longitude: 18.9855, openingHours: standardShopHours },
+            { city: 'Tychy', street: 'ul. Grota-Roweckiego 47', voivodeship: 'slaskie', latitude: 50.1185, longitude: 18.9865, openingHours: standardShopHours },
+            { city: 'Knurów', street: 'ul. 1 Maja 72A', voivodeship: 'slaskie', latitude: 50.2185, longitude: 18.6785, openingHours: standardShopHours },
+            { city: 'Częstochowa', street: 'al. Tadeusza Kościuszki 1', voivodeship: 'slaskie', latitude: 50.8115, longitude: 19.1205, openingHours: standardShopHours },
 
             // POZOSTAŁE MIASTA
-            { city: 'Poznań', street: 'ul. Półwiejska 42 (Stary Browar)', voivodeship: 'wielkopolskie', latitude: 52.4015, longitude: 16.9265, openingHours: standardShopHours },
-            { city: 'Łódź', street: 'ul. Tuwima 14', voivodeship: 'lodzkie', latitude: 51.7658, longitude: 19.4608, openingHours: standardShopHours },
-            { city: 'Gdańsk', street: 'ul. Rajska 10 (Madison)', voivodeship: 'pomorskie', latitude: 54.3551, longitude: 18.6472, openingHours: standardShopHours },
-            { city: 'Gdynia', street: 'ul. Świętojańska 58', voivodeship: 'pomorskie', latitude: 54.5165, longitude: 18.5412, openingHours: standardShopHours },
-            { city: 'Katowice', street: 'ul. Mickiewicza 4', voivodeship: 'slaskie', latitude: 50.2598, longitude: 19.0195, openingHours: standardShopHours },
-            { city: 'Tychy', street: 'ul. Towarowa 2 (Gemini Park)', voivodeship: 'slaskie', latitude: 50.0965, longitude: 18.9912, openingHours: standardShopHours }
+            { city: 'Kielce', street: 'ul. Henryka Sienkiewicza 78A', voivodeship: 'swietokrzyskie', latitude: 50.8685, longitude: 20.6385, openingHours: standardShopHours },
+            { city: 'Koszalin', street: 'ul. Zwycięstwa 28', voivodeship: 'zachodniopomorskie', latitude: 54.1915, longitude: 16.1815, openingHours: standardShopHours },
+            { city: 'Szczecin', street: 'al. Wyzwolenia 21', voivodeship: 'zachodniopomorskie', latitude: 53.4325, longitude: 14.5535, openingHours: standardShopHours },
+            { city: 'Toruń', street: 'ul. Królowej Jadwigi 16', voivodeship: 'kujawsko-pomorskie', latitude: 53.0105, longitude: 18.6045, openingHours: standardShopHours },
+            { city: 'Radom', street: 'ul. Szewska 28', voivodeship: 'mazowieckie', latitude: 51.4025, longitude: 21.1475, openingHours: standardShopHours }
         ]
     });
 
@@ -281,6 +307,7 @@ async function mainSeed() {
         tags: ['grocery', 'imported', 'frozen', 'tradition'],
         image: 'odessa-market.png',
         webpage: 'https://odessamarket.pl/',
+        socials: { facebook: 'https://www.facebook.com/profile.php?id=100057526956152', instagram: 'https://www.instagram.com/odessa__market/' },
         locations: [
             {
                 city: 'Warszawa',
@@ -289,7 +316,9 @@ async function mainSeed() {
                 latitude: 52.2215,
                 longitude: 20.9388,
                 openingHours: standardShopHours,
-                isMainLocation: true
+                isMainLocation: true,
+                phoneNumber: '+48 532 319 532',
+                email: 'info@odessamarket.pl'
             },
             {
                 city: 'Wrocław',
@@ -373,10 +402,14 @@ async function mainSeed() {
         ukDesc: 'Магазин заморожених напівфабрикатів ручної роботи.',
         tags: ['frozen', 'handmade'],
         image: 'multicook.png',
+        webpage: 'https://multicook.com.pl/',
+        socials: { facebook: 'https://www.facebook.com/multicookpolska/', instagram: 'https://www.instagram.com/multicook_polska/' },
+        whatsappNumber: '+48 574 183 404',
         locations: [
             {
                 city: 'Warszawa', street: 'ul. Jugosłowiańska 13', voivodeship: 'mazowieckie',
-                latitude: 52.2285, longitude: 21.0965, openingHours: standardShopHours, isMainLocation: true
+                latitude: 52.2285, longitude: 21.0965, openingHours: standardShopHours, isMainLocation: true,
+                phoneNumber: '+48 574 183 404'
             },
             {
                 city: 'Warszawa', street: 'ul. Modlińska 8', voivodeship: 'mazowieckie',
@@ -629,9 +662,10 @@ async function mainSeed() {
         tags: ['grocery', 'imported', 'alcohol', 'seafood'],
         image: 'ukrainooczka.png',
         webpage: 'https://ukrainoczka.pl/nasze-lokalizacje/',
+        socials: { facebook: 'https://www.facebook.com/Ukrainoczka', instagram: 'https://www.instagram.com/ukrainoczka_sklep/' },
         locations: [
             // WARSZAWA
-            { city: 'Warszawa', street: 'ul. Posag 7 Panien 11', voivodeship: 'mazowieckie', latitude: 52.2035, longitude: 20.8955, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: 'ul. Posag 7 Panien 11', voivodeship: 'mazowieckie', latitude: 52.2035, longitude: 20.8955, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 786 943 768', email: 'sklep@ukrainoczka.pl' },
             { city: 'Warszawa', street: 'ul. Lindleya 16', voivodeship: 'mazowieckie', latitude: 52.2245, longitude: 21.0015, openingHours: standardShopHours },
 
             // POZNAŃ & OKOLICE
@@ -663,6 +697,7 @@ async function mainSeed() {
             // POZOSTAŁE MIASTA
             { city: 'Gdańsk', street: 'ul. Romana Dmowskiego 11F', voivodeship: 'pomorskie', latitude: 54.3815, longitude: 18.6055, openingHours: standardShopHours },
             { city: 'Bydgoszcz', street: 'ul. Dworcowa 23', voivodeship: 'kujawsko-pomorskie', latitude: 53.1285, longitude: 18.0015, openingHours: standardShopHours },
+            { city: 'Kalisz', street: 'ul. Zamkowa 14', voivodeship: 'wielkopolskie', latitude: 51.7615, longitude: 18.0915, openingHours: standardShopHours },
             { city: 'Lublin', street: 'ul. Krakowskie Przedmieście 51', voivodeship: 'lubelskie', latitude: 51.2485, longitude: 22.5615, openingHours: standardShopHours },
             { city: 'Kielce', street: 'ul. Sienkiewicza 31', voivodeship: 'swietokrzyskie', latitude: 50.8715, longitude: 20.6315, openingHours: standardShopHours },
             { city: 'Kraków', street: 'os. J. Strusia 1', voivodeship: 'malopolskie', latitude: 50.0885, longitude: 20.0215, openingHours: standardShopHours },
@@ -1108,6 +1143,25 @@ async function mainSeed() {
                 openingHours: standardShopHours,
             },
         ],
+    });
+
+    // WixMart (Delikatesy Świata)
+    await seedService({
+        name: 'WixMart',
+        slug: 'wixmart',
+        category: 'grocery',
+        plDesc: 'Sieć sklepów z ukraińskimi i litewskimi produktami spożywczymi. Specjalizuje się w rybach, owocach morza i delikatesach ze Wschodu.',
+        ukDesc: 'Мережа магазинів з українськими та литовськими продуктами. Спеціалізується на рибі, морепродуктах та делікатесах зі Сходу.',
+        tags: ['grocery', 'imported', 'seafood'],
+        webpage: 'https://wixmart.pl/',
+        socials: { instagram: 'https://www.instagram.com/wixmart.pl/' },
+        locations: [
+            { city: 'Warszawa', street: 'ul. Pory 55', voivodeship: 'mazowieckie', latitude: 52.1925, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 887 156 737', email: 'info@wixmart.pl' },
+            { city: 'Pruszków', street: 'ul. Kraszewskiego 44', voivodeship: 'mazowieckie', latitude: 52.1685, longitude: 20.8035, openingHours: standardShopHours },
+            { city: 'Sochaczew', street: 'ul. Płocka 40A', voivodeship: 'mazowieckie', latitude: 52.2315, longitude: 20.2385, openingHours: standardShopHours },
+            { city: 'Błonie', street: 'ul. Warszawska 8', voivodeship: 'mazowieckie', latitude: 52.1985, longitude: 20.6175, openingHours: standardShopHours },
+            { city: 'Płock', street: 'ul. Tumska 15', voivodeship: 'mazowieckie', latitude: 52.5465, longitude: 19.7065, openingHours: standardShopHours }
+        ]
     });
 
     console.log('✅ Seed zakończony z tagami!');

@@ -14,7 +14,7 @@ const badgeVariants = cva(
                 destructive:
                     'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
                 outline: 'text-foreground',
-                red: 'bg-[#FDE8EC] border-[#F9C4CE] dark:bg-[#F86187]/20 dark:border-[#F86187]/40',
+                red: 'bg-[#FFF0F0] border-[#F5D0D0] dark:bg-[#E87676]/20 dark:border-[#E87676]/40',
                 green: 'bg-[#E6F7EF] border-[#B8E6CC] dark:bg-[#00AA66]/20 dark:border-[#00AA66]/40',
                 orange: 'bg-[#FFF3E0] border-[#FFD9A8] dark:bg-[#FB6D13]/20 dark:border-[#FB6D13]/40',
                 blue: 'bg-[#E8F0FE] border-[#C4D9F9] dark:bg-[#298EED]/20 dark:border-[#298EED]/40',
@@ -45,7 +45,7 @@ const variantTextColors: Record<string, string> = {
     secondary: 'text-secondary-foreground',
     destructive: 'text-destructive-foreground dark:text-white',
     outline: 'text-foreground dark:text-white',
-    red: 'text-[#C62828] dark:text-[#F86187]',
+    red: 'text-[#C45656] dark:text-[#E87676]',
     green: 'text-[#2E7D32] dark:text-[#49C55E]',
     orange: 'text-[#E65100] dark:text-[#FF9D00]',
     blue: 'text-[#1565C0] dark:text-[#78BCFD]',

@@ -13,8 +13,12 @@ import {
     getCategoryFromSlug,
     isValidCountySlug,
     normalizeCountySlug,
+    isValidCitySlug,
+    normalizeCitySlug,
+    getCityNameFromSlug,
     type CategoryKey,
     type CountySlug,
+    type CitySlug,
 } from './slug-mappings';
 import type { Locale } from '@/i18n/config';
 
@@ -110,6 +114,15 @@ function parseSingleSegment(
         };
     }
 
+    // Try city
+    const normalizedCity = normalizeCitySlug(segment);
+    if (isValidCitySlug(normalizedCity)) {
+        return {
+            success: true,
+            filters: { category: null, county: null, city: getCityNameFromSlug(normalizedCity) },
+        };
+    }
+
     // Invalid slug
     return {
         success: false,
@@ -119,8 +132,8 @@ function parseSingleSegment(
 
 /**
  * Parse two slug segments
- * Format: [category, county]
- * First segment MUST be a valid category, second MUST be a valid county
+ * Format: [category, county|city]
+ * First segment MUST be a valid category, second MUST be a valid county or city
  */
 function parseTwoSegments(
     first: string,
@@ -137,18 +150,26 @@ function parseTwoSegments(
         };
     }
 
-    // Second segment: must be a county
+    // Second segment: try county first, then city
     const normalizedCounty = normalizeCountySlug(second);
-    if (!isValidCountySlug(normalizedCounty)) {
+    if (isValidCountySlug(normalizedCounty)) {
         return {
-            success: false,
-            redirectTo: basePath,
+            success: true,
+            filters: { category, county: normalizedCounty, city: null },
+        };
+    }
+
+    const normalizedCity = normalizeCitySlug(second);
+    if (isValidCitySlug(normalizedCity)) {
+        return {
+            success: true,
+            filters: { category, county: null, city: getCityNameFromSlug(normalizedCity) },
         };
     }
 
     return {
-        success: true,
-        filters: { category, county: normalizedCounty, city: null },
+        success: false,
+        redirectTo: basePath,
     };
 }
 

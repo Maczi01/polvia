@@ -71,7 +71,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
             onFiltersChange?.({ category: category as any, county: county as any, city });
 
             // Build the new URL path (localized for browser URL bar)
-            const url = buildMapUrl({ category, county }, locale);
+            const url = buildMapUrl({ category, county, city }, locale);
             const localizedPath = localizeMapPath(url.pathname, locale);
             const basePath = locale === 'pl' ? '' : '/en';
             const fullPath = `${basePath}${localizedPath}`;

@@ -6,7 +6,9 @@
       "Bash(npm run build:*)",
       "Bash(taskkill:*)",
       "Bash(node:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "WebFetch(domain:wixmart.pl)",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,

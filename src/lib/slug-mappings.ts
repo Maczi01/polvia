@@ -85,43 +85,41 @@ export const CATEGORY_SLUGS = {
 
 // County slugs (same across all locales, kebab-case)
 export const COUNTY_SLUGS = [
-    // Northern Ireland
-    'antrim',
-    'armagh',
-    'derry',
-    'down',
-    'fermanagh',
-    'tyrone',
-    // Republic of Ireland
-    'carlow',
-    'cavan',
-    'clare',
-    'cork',
-    'donegal',
-    'dublin',
-    'galway',
-    'kerry',
-    'kildare',
-    'kilkenny',
-    'laois',
-    'leitrim',
-    'limerick',
-    'longford',
-    'louth',
-    'mayo',
-    'meath',
-    'monaghan',
-    'offaly',
-    'roscommon',
-    'sligo',
-    'tipperary',
-    'waterford',
-    'westmeath',
-    'wexford',
-    'wicklow',
+    'dolnoslaskie',
+    'kujawsko-pomorskie',
+    'lubelskie',
+    'lubuskie',
+    'lodzkie',
+    'malopolskie',
+    'mazowieckie',
+    'opolskie',
+    'podkarpackie',
+    'podlaskie',
+    'pomorskie',
+    'slaskie',
+    'swietokrzyskie',
+    'warminsko-mazurskie',
+    'wielkopolskie',
+    'zachodniopomorskie',
 ] as const;
 
 export type CountySlug = (typeof COUNTY_SLUGS)[number];
+
+// City slug → display name (with diacritics) mapping
+export const CITY_SLUG_TO_NAME: Record<string, string> = {
+    'warszawa': 'warszawa',
+    'krakow': 'kraków',
+    'lodz': 'łódź',
+    'wroclaw': 'wrocław',
+    'poznan': 'poznań',
+    'gdansk': 'gdańsk',
+    'szczecin': 'szczecin',
+};
+
+// City slugs (ASCII, no diacritics)
+export const CITY_SLUGS = Object.keys(CITY_SLUG_TO_NAME) as unknown as readonly CitySlug[];
+
+export type CitySlug = 'warszawa' | 'krakow' | 'lodz' | 'wroclaw' | 'poznan' | 'gdansk' | 'szczecin';
 
 // Reverse lookup maps (built at runtime for performance)
 const reverseCategoryMaps = {
@@ -178,11 +176,17 @@ export function isValidCountySlug(slug: string): slug is CountySlug {
 
 /**
  * Normalize a county name to its slug format
- * @param county - County name (e.g., "Down", "Dublin")
- * @returns Normalized slug (lowercase)
+ * Strips Polish diacritics and converts to lowercase kebab-case
+ * @param county - County name (e.g., "Dolnośląskie", "Kujawsko-Pomorskie")
+ * @returns Normalized slug (e.g., "dolnoslaskie", "kujawsko-pomorskie")
  */
 export function normalizeCountySlug(county: string): string {
-    return county.toLowerCase().trim();
+    return county
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\u0142/g, 'l'); // ł → l (not covered by NFD decomposition)
 }
 
 /**
@@ -209,4 +213,45 @@ export function getAllCategorySlugs(locale: Locale): string[] {
  */
 export function getAllCountySlugs(): readonly CountySlug[] {
     return COUNTY_SLUGS;
+}
+
+/**
+ * Validate if a string is a valid city slug
+ * @param slug - Potential city slug
+ * @returns True if valid city slug
+ */
+export function isValidCitySlug(slug: string): slug is CitySlug {
+    return CITY_SLUGS.includes(slug.toLowerCase() as CitySlug);
+}
+
+/**
+ * Normalize a city name to its slug format
+ * Strips Polish diacritics and converts to lowercase
+ * @param city - City name (e.g., "Kraków", "Łódź")
+ * @returns Normalized slug (e.g., "krakow", "lodz")
+ */
+export function normalizeCitySlug(city: string): string {
+    return city
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\u0142/g, 'l'); // ł → l (not covered by NFD decomposition)
+}
+
+/**
+ * Get all valid city slugs
+ * @returns Array of all city slugs
+ */
+export function getAllCitySlugs(): readonly CitySlug[] {
+    return CITY_SLUGS;
+}
+
+/**
+ * Get the original city name (with diacritics) from a slug
+ * @param slug - City slug (e.g., "krakow")
+ * @returns City name with diacritics (e.g., "kraków") or null if invalid
+ */
+export function getCityNameFromSlug(slug: string): string | null {
+    return CITY_SLUG_TO_NAME[slug.toLowerCase()] || null;
 }
