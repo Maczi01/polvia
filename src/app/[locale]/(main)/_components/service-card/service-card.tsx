@@ -86,15 +86,20 @@ const getTodayHours = (
 const SocialLink = ({
     href,
     children,
+    className,
 }: {
     href: string;
     children: React.ReactNode;
+    className?: string;
 }) => (
     <Link
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex size-9 items-center justify-center rounded-full border border-gray-300 text-gray-600 transition-colors hover:border-gray-400 hover:text-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:border-gray-500 dark:hover:text-gray-200"
+        className={cn(
+            'flex size-9 items-center justify-center rounded-full text-white transition-opacity hover:opacity-80',
+            className,
+        )}
         onClick={e => e.stopPropagation()}
     >
         {children}
@@ -445,98 +450,100 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     onClick={e => e.stopPropagation()}
                 >
                     <div className="space-y-4 px-1 pb-1 md:px-0 md:pb-0">
-                        {/* Detail rows */}
-                        <div className="flex flex-col gap-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-                            {/* Address */}
-                            {address && (
-                                <div className="flex items-start gap-2.5 text-sm">
-                                    <MapPin
-                                        size={16}
-                                        className="mt-0.5 shrink-0 text-gray-400"
-                                    />
-                                    <span className="text-gray-700 dark:text-gray-300">
-                                        {address}
-                                    </span>
-                                </div>
-                            )}
-
-                            {/* Today's hours */}
-                            {todayHours && (
-                                <div className="flex items-center gap-2.5 text-sm">
-                                    <Clock
-                                        size={16}
-                                        className="shrink-0 text-gray-400"
-                                    />
-                                    <span className="text-gray-700 dark:text-gray-300">
-                                        {t('today')}:{' '}
-                                        <span className="font-semibold">
-                                            {todayHours.open} – {todayHours.close}
+                        {/* Detail rows + Languages */}
+                        <div className="flex gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+                            <div className="flex min-w-0 flex-1 flex-col gap-3">
+                                {/* Address */}
+                                {address && (
+                                    <div className="flex items-start gap-2.5 text-sm">
+                                        <MapPin
+                                            size={16}
+                                            className="mt-0.5 shrink-0 text-gray-400"
+                                        />
+                                        <span className="text-gray-700 dark:text-gray-300">
+                                            {address}
                                         </span>
+                                    </div>
+                                )}
+
+                                {/* Today's hours */}
+                                {todayHours && (
+                                    <div className="flex items-center gap-2.5 text-sm">
+                                        <Clock
+                                            size={16}
+                                            className="shrink-0 text-gray-400"
+                                        />
+                                        <span className="text-gray-700 dark:text-gray-300">
+                                            {t('today')}:{' '}
+                                            <span className="font-semibold">
+                                                {todayHours.open} – {todayHours.close}
+                                            </span>
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Phone */}
+                                {phoneNumber && (
+                                    <a
+                                        href={`tel:${phoneNumber}`}
+                                        className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        <Phone
+                                            size={16}
+                                            className="shrink-0 text-gray-400"
+                                        />
+                                        <span className="text-gray-700 dark:text-gray-300">
+                                            {phoneNumber}
+                                        </span>
+                                    </a>
+                                )}
+
+                                {/* Website */}
+                                {webpage && (
+                                    <Link
+                                        href={webpageHref}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2.5 text-sm"
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        <Globe
+                                            size={16}
+                                            className="shrink-0 text-gray-400"
+                                        />
+                                        <span className="text-blue-600 hover:underline dark:text-blue-400">
+                                            {domain}
+                                        </span>
+                                    </Link>
+                                )}
+                            </div>
+
+                            {/* Languages - top right */}
+                            {languages && languages.length > 0 && (
+                                <div className="flex shrink-0 flex-col items-end">
+                                    <span className="text-xs font-semibold tracking-wider text-gray-400 dark:text-gray-500">
+                                        {t('languages')}
                                     </span>
+                                    <div className="mt-1.5 flex gap-1.5">
+                                        {languages.map(lang => {
+                                            const flag = LANGUAGE_FLAGS[lang];
+                                            if (!flag) return null;
+                                            return (
+                                                <Image
+                                                    key={lang}
+                                                    src={flag.src}
+                                                    alt={flag.alt}
+                                                    width={28}
+                                                    height={20}
+                                                    className="rounded-sm"
+                                                />
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            )}
-
-                            {/* Phone */}
-                            {phoneNumber && (
-                                <a
-                                    href={`tel:${phoneNumber}`}
-                                    className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
-                                    onClick={e => e.stopPropagation()}
-                                >
-                                    <Phone
-                                        size={16}
-                                        className="shrink-0 text-gray-400"
-                                    />
-                                    <span className="text-gray-700 dark:text-gray-300">
-                                        {phoneNumber}
-                                    </span>
-                                </a>
-                            )}
-
-                            {/* Website */}
-                            {webpage && (
-                                <Link
-                                    href={webpageHref}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-2.5 text-sm"
-                                    onClick={e => e.stopPropagation()}
-                                >
-                                    <Globe
-                                        size={16}
-                                        className="shrink-0 text-gray-400"
-                                    />
-                                    <span className="text-blue-600 hover:underline dark:text-blue-400">
-                                        {domain}
-                                    </span>
-                                </Link>
                             )}
                         </div>
-
-                        {/* Languages */}
-                        {languages && languages.length > 0 && (
-                            <div>
-                                <span className="text-xs font-semibold tracking-wider text-gray-400 dark:text-gray-500">
-                                    {t('languages')}
-                                </span>
-                                <div className="mt-1.5 flex gap-2">
-                                    {languages.map(lang => {
-                                        const flag = LANGUAGE_FLAGS[lang];
-                                        if (!flag) return null;
-                                        return (
-                                            <Image
-                                                key={lang}
-                                                src={flag.src}
-                                                alt={flag.alt}
-                                                width={28}
-                                                height={20}
-                                                className="rounded-sm"
-                                            />
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
 
                         {/* Tags */}
                         {tags && tags.length > 0 && (
@@ -556,23 +563,23 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         {hasSocials && (
                             <div className="flex gap-3">
                                 {socials.facebook && (
-                                    <SocialLink href={socials.facebook}>
+                                    <SocialLink href={socials.facebook} className="bg-[#1877F2]">
                                         <FacebookIcon />
                                     </SocialLink>
                                 )}
                                 {socials.instagram && (
-                                    <SocialLink href={socials.instagram}>
-                                        <InstagramIcon />
+                                    <SocialLink href={socials.instagram} className="bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]">
+                                        <InstagramIcon className="text-white" />
                                     </SocialLink>
                                 )}
                                 {socials.tiktok && (
-                                    <SocialLink href={socials.tiktok}>
+                                    <SocialLink href={socials.tiktok} className="bg-black dark:bg-gray-900">
                                         <TikTokIcon />
                                     </SocialLink>
                                 )}
                                 {socials?.linkedin && (
-                                    <SocialLink href={socials.linkedin}>
-                                        <FacebookIcon />
+                                    <SocialLink href={socials.linkedin} className="bg-[#0A66C2]">
+                                        <LinkedInIcon />
                                     </SocialLink>
                                 )}
                             </div>
@@ -632,7 +639,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             >
                                 <button
                                     type="button"
-                                    className="flex w-full flex-col items-center gap-1 rounded-xl border border-gray-200 px-2 py-3 text-xs font-medium text-green-600 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-green-400 dark:hover:bg-gray-700"
+                                    className="flex w-full flex-col items-center gap-1 rounded-xl border border-blue-500 bg-blue-50 px-2 py-3 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
                                 >
                                     <Navigation size={18} />
                                     {t('navigate')}

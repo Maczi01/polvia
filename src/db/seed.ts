@@ -1349,6 +1349,104 @@ async function mainSeed() {
         ]
     });
 
+    // --- Booksy: beauty / nails (manual pick) ---
+
+    await seedService({
+        name: 'Manièra face bar + nail',
+        slug: 'maniera-face-bar-nail',
+        category: 'beauty',
+        plDesc: 'Salon beauty (nails + pielęgnacja) dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Б’юті-салон (нігті та догляд), доступний для запису в Booksy.',
+        enDesc: 'Beauty salon (nails + care) bookable on Booksy.',
+        ruDesc: 'Бьюти-салон (ногти + уход), доступен для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/106267_maniera-face-bar-nail_salon-kosmetyczny_3_warszawa',
+        image: 'booksy-maniera.png',
+        locations: [
+            {
+                city: 'Warszawa',
+                street: 'Mokotowska 39',
+                voivodeship: 'mazowieckie',
+                latitude: 52.22261,
+                longitude: 21.0195,
+                openingHours: standardShopHours,
+                isMainLocation: true,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'WeroNAILka',
+        slug: 'weronailka',
+        category: 'beauty',
+        plDesc: 'Studio paznokci (manicure/pedicure) dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів (манікюр/педикюр), доступна для запису в Booksy.',
+        enDesc: 'Nail studio (manicure/pedicure) bookable on Booksy.',
+        ruDesc: 'Студия ногтей (маникюр/педикюр), доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/250481_weronailka_paznokcie_3_warszawa',
+        image: 'booksy-weronailka.png',
+        locations: [
+            {
+                city: 'Warszawa',
+                street: 'Podskarbińska 34/u2',
+                voivodeship: 'mazowieckie',
+                latitude: 52.255,
+                longitude: 21.0741,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'manicure & pedicure',
+        slug: 'manicure-and-pedicure-krakow',
+        category: 'beauty',
+        plDesc: 'Salon paznokci w Krakowie dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Салон нігтів у Кракові, доступний для запису в Booksy.',
+        enDesc: 'Nail salon in Kraków bookable on Booksy.',
+        ruDesc: 'Салон ногтей в Кракове, доступен для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        image: "manicure-and-pedicure.png",
+        webpage: 'https://booksy.com/pl-pl/243436_manicure-pedicure_paznokcie_8820_krakow',
+        image: 'booksy-manicure-pedicure-krakow.png',
+        locations: [
+            {
+                city: 'Kraków',
+                street: 'Starowiślna 19',
+                voivodeship: 'malopolskie',
+                latitude: 50.057,
+                longitude: 19.944,
+                openingHours: standardShopHours,
+                isMainLocation: true,
+            },
+        ],
+    });
+
+    await seedService({
+        name: 'MANIPEDI',
+        slug: 'manipedi-krakow',
+        category: 'beauty',
+        plDesc: 'Salon manicure/pedicure w Galerii Krakowskiej – rezerwacje na Booksy.',
+        ukDesc: 'Салон манікюру/педикюру в Galeria Krakowska — запис у Booksy.',
+        enDesc: 'Manicure/pedicure salon in Galeria Krakowska – bookable on Booksy.',
+        ruDesc: 'Салон маникюра/педикюра в Galeria Krakowska — запись в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/303134_manipedi_salon-kosmetyczny_8820_krakow',
+        image: 'manipedi.png',
+        locations: [
+            {
+                city: 'Kraków',
+                street: 'Pawia 5, Galeria Krakowska',
+                voivodeship: 'malopolskie',
+                latitude: 50.0664,
+                longitude: 19.946,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+
     console.log('✅ Seed zakończony z tagami!');
 }
 
