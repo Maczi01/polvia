@@ -26,6 +26,12 @@ const FacebookIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+const LinkedInIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+    </svg>
+)
+
 const InstagramIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
@@ -325,11 +331,9 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
         const whatsappLink = whatsappNumber
             ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`
-            : socials?.whatsapp
-              ? socials.whatsapp
-              : phoneNumber
+            : socials?.whatsapp ?? (phoneNumber
                 ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`
-                : null;
+                : null);
 
         const navigateLink = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
@@ -564,6 +568,11 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 {socials.tiktok && (
                                     <SocialLink href={socials.tiktok}>
                                         <TikTokIcon />
+                                    </SocialLink>
+                                )}
+                                {socials?.linkedin && (
+                                    <SocialLink href={socials.linkedin}>
+                                        <FacebookIcon />
                                     </SocialLink>
                                 )}
                             </div>

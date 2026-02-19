@@ -50,6 +50,8 @@ export type Socials = {
     youtube?: string;
     viber?: string;
     whatsapp?: string;
+    tripadvisor?: string;
+    linkedin?: string;
 };
 
 export type Service = {

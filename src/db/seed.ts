@@ -50,61 +50,63 @@ async function mainSeed() {
     const tagMap: Record<string, string> = {};
 
     const tagsToCreate = [
-        { key: 'bakery', pl: 'Piekarnia', uk: 'Пекарня' },
-        { key: 'coffee', pl: 'Kawa', uk: 'Кава' },
-        { key: 'grocery', pl: 'Spożywczy', uk: 'Продукти' },
-        { key: 'imported', pl: 'Importowane', uk: 'Імпорт' },
-        { key: 'alcohol', pl: 'Alkohol', uk: 'Алкоголь' },
-        { key: 'atmosphere', pl: 'Atmosfera', uk: 'Атмосфера' },
-        { key: 'beauty', pl: 'Uroda', uk: 'Краса' },
-        { key: 'nails', pl: 'Paznokcie', uk: 'Манікюр' },
-        { key: 'cider', pl: 'Cydr', uk: 'Сидр' },
-        { key: 'streetfood', pl: 'Street Food', uk: 'Вулична їża' },
-        { key: 'frozen', pl: 'Mrożonki', uk: 'Заморозка' },
-        { key: 'handmade', pl: 'Ręczna robota', uk: 'Ручна робота' },
-        { key: 'delivery', pl: 'Dostawa', uk: 'Доставка' },
-        { key: 'logistics', pl: 'Logistyka', uk: 'Логістика' },
-        { key: 'grill', pl: 'Grill', uk: 'Гриль' },
-        { key: 'desserts', pl: 'Desery', uk: 'Десерти' },
-        { key: 'barber', pl: 'Barber', uk: 'Барбер' },
-        { key: 'haircare', pl: 'Włosy', uk: 'Волосся' },
-        { key: 'health', pl: 'Zdrowie', uk: 'Здоров’я' },
-        { key: 'doctor', pl: 'Lekarz', uk: 'Лікар' },
-        { key: 'sushi', pl: 'Sushi', uk: 'Суші' },
-        { key: 'seafood', pl: 'Owoce morza', uk: 'Морепродукти' },
-        { key: 'chocolate', pl: 'Czekolada', uk: 'Шоколад' },
-        { key: 'tradition', pl: 'Tradycja', uk: 'Традиції' },
-        { key: 'home', pl: 'Domowe', uk: 'Домашнє' },
-        { key: 'lunch', pl: 'Lunch', uk: 'Ланч' },
-        { key: 'dumplings', pl: 'Pierogi', uk: 'Вареники' },
-        { key: 'culture', pl: 'Kultura', uk: 'Культура' },
-        { key: 'modern', pl: 'Nowoczesne', uk: 'Сучасне' },
-        { key: 'legal', pl: 'Prawo', uk: 'Право' },
-        { key: 'documents', pl: 'Dokumenty', uk: 'Документи' },
-        { key: 'mechanic', pl: 'Mechanik', uk: 'Механік' },
-        { key: 'repair', pl: 'Naprawa', uk: 'Ремонт' },
-        { key: 'cargo', pl: 'Ładunki', uk: 'Вантажі' },
-        { key: 'dentist', pl: 'Dentysta', uk: 'Стоматолог' },
-        { key: 'ngo', pl: 'Organizacja pozarządowa', uk: 'Громадська організація' },
-        { key: 'pediatrician', pl: 'Pediatra', uk: 'Педіатр' },
-        { key: 'polish-courses', pl: 'Kursy polskiego', uk: 'Курси польської' },
-        { key: 'freight', pl: 'Fracht', uk: 'Вантаж' },
-        { key: 'road-transport', pl: 'Transport drogowy', uk: 'Автоперевезення' },
-        { key: 'spedycja', pl: 'Spedycja', uk: 'Експедиція' },
-        { key: 'poland-ukraine', pl: 'Polska-Ukraina', uk: 'Польща-Україна' },
-        { key: 'international', pl: 'Międzynarodowy', uk: 'Міжнародний' },
-        { key: 'ftl', pl: 'FTL', uk: 'FTL' },
-        { key: 'ltl', pl: 'LTL', uk: 'LTL' },
-        { key: 'oversize', pl: 'Ponadgabarytowy', uk: 'Негабаритний' },
-        { key: 'ukraine', pl: 'Ukraina', uk: 'Україна' },
-        { key: 'customs', pl: 'Odprawa celna', uk: 'Митне оформлення' },
+        { key: 'bakery', pl: 'Piekarnia', uk: 'Пекарня', en: 'Bakery', ru: 'Пекарня' },
+        { key: 'coffee', pl: 'Kawa', uk: 'Кава', en: 'Coffee', ru: 'Кофе' },
+        { key: 'grocery', pl: 'Spożywczy', uk: 'Продукти', en: 'Grocery', ru: 'Продукты' },
+        { key: 'imported', pl: 'Importowane', uk: 'Імпорт', en: 'Imported', ru: 'Импорт' },
+        { key: 'alcohol', pl: 'Alkohol', uk: 'Алкоголь', en: 'Alcohol', ru: 'Алкоголь' },
+        { key: 'atmosphere', pl: 'Atmosfera', uk: 'Атмосфера', en: 'Atmosphere', ru: 'Атмосфера' },
+        { key: 'beauty', pl: 'Uroda', uk: 'Краса', en: 'Beauty', ru: 'Красота' },
+        { key: 'nails', pl: 'Paznokcie', uk: 'Манікюр', en: 'Nails', ru: 'Маникюр' },
+        { key: 'cider', pl: 'Cydr', uk: 'Сидр', en: 'Cider', ru: 'Сидр' },
+        { key: 'streetfood', pl: 'Street Food', uk: 'Вулична їжа', en: 'Street Food', ru: 'Стрит-фуд' },
+        { key: 'frozen', pl: 'Mrożonki', uk: 'Заморозка', en: 'Frozen', ru: 'Заморозка' },
+        { key: 'handmade', pl: 'Ręczna robota', uk: 'Ручна робота', en: 'Handmade', ru: 'Ручная работа' },
+        { key: 'delivery', pl: 'Dostawa', uk: 'Доставка', en: 'Delivery', ru: 'Доставка' },
+        { key: 'logistics', pl: 'Logistyka', uk: 'Логістика', en: 'Logistics', ru: 'Логистика' },
+        { key: 'grill', pl: 'Grill', uk: 'Гриль', en: 'Grill', ru: 'Гриль' },
+        { key: 'desserts', pl: 'Desery', uk: 'Десерти', en: 'Desserts', ru: 'Десерты' },
+        { key: 'barber', pl: 'Barber', uk: 'Барбер', en: 'Barber', ru: 'Барбер' },
+        { key: 'haircare', pl: 'Włosy', uk: 'Волосся', en: 'Hair Care', ru: 'Волосы' },
+        { key: 'health', pl: 'Zdrowie', uk: 'Здоров\'я', en: 'Health', ru: 'Здоровье' },
+        { key: 'doctor', pl: 'Lekarz', uk: 'Лікар', en: 'Doctor', ru: 'Врач' },
+        { key: 'sushi', pl: 'Sushi', uk: 'Суші', en: 'Sushi', ru: 'Суши' },
+        { key: 'seafood', pl: 'Owoce morza', uk: 'Морепродукти', en: 'Seafood', ru: 'Морепродукты' },
+        { key: 'chocolate', pl: 'Czekolada', uk: 'Шоколад', en: 'Chocolate', ru: 'Шоколад' },
+        { key: 'tradition', pl: 'Tradycja', uk: 'Традиції', en: 'Tradition', ru: 'Традиции' },
+        { key: 'home', pl: 'Domowe', uk: 'Домашнє', en: 'Homemade', ru: 'Домашнее' },
+        { key: 'lunch', pl: 'Lunch', uk: 'Ланч', en: 'Lunch', ru: 'Ланч' },
+        { key: 'dumplings', pl: 'Pierogi', uk: 'Вареники', en: 'Dumplings', ru: 'Вареники' },
+        { key: 'culture', pl: 'Kultura', uk: 'Культура', en: 'Culture', ru: 'Культура' },
+        { key: 'modern', pl: 'Nowoczesne', uk: 'Сучасне', en: 'Modern', ru: 'Современное' },
+        { key: 'legal', pl: 'Prawo', uk: 'Право', en: 'Legal', ru: 'Право' },
+        { key: 'documents', pl: 'Dokumenty', uk: 'Документи', en: 'Documents', ru: 'Документы' },
+        { key: 'mechanic', pl: 'Mechanik', uk: 'Механік', en: 'Mechanic', ru: 'Механик' },
+        { key: 'repair', pl: 'Naprawa', uk: 'Ремонт', en: 'Repair', ru: 'Ремонт' },
+        { key: 'cargo', pl: 'Ładunki', uk: 'Вантажі', en: 'Cargo', ru: 'Грузы' },
+        { key: 'dentist', pl: 'Dentysta', uk: 'Стоматолог', en: 'Dentist', ru: 'Стоматолог' },
+        { key: 'ngo', pl: 'Organizacja pozarządowa', uk: 'Громадська організація', en: 'NGO', ru: 'Общественная организация' },
+        { key: 'pediatrician', pl: 'Pediatra', uk: 'Педіатр', en: 'Pediatrician', ru: 'Педиатр' },
+        { key: 'polish-courses', pl: 'Kursy polskiego', uk: 'Курси польської', en: 'Polish Courses', ru: 'Курсы польского' },
+        { key: 'freight', pl: 'Fracht', uk: 'Вантаж', en: 'Freight', ru: 'Груз' },
+        { key: 'road-transport', pl: 'Transport drogowy', uk: 'Автоперевезення', en: 'Road Transport', ru: 'Автоперевозки' },
+        { key: 'spedycja', pl: 'Spedycja', uk: 'Експедиція', en: 'Forwarding', ru: 'Экспедиция' },
+        { key: 'poland-ukraine', pl: 'Polska-Ukraina', uk: 'Польща-Україна', en: 'Poland-Ukraine', ru: 'Польша-Украина' },
+        { key: 'international', pl: 'Międzynarodowy', uk: 'Міжнародний', en: 'International', ru: 'Международный' },
+        { key: 'ftl', pl: 'FTL', uk: 'FTL', en: 'FTL', ru: 'FTL' },
+        { key: 'ltl', pl: 'LTL', uk: 'LTL', en: 'LTL', ru: 'LTL' },
+        { key: 'oversize', pl: 'Ponadgabarytowy', uk: 'Негабаритний', en: 'Oversize', ru: 'Негабаритный' },
+        { key: 'ukraine', pl: 'Ukraina', uk: 'Україна', en: 'Ukraine', ru: 'Украина' },
+        { key: 'customs', pl: 'Odprawa celna', uk: 'Митне оформлення', en: 'Customs', ru: 'Таможенное оформление' },
     ];
 
     for (const t of tagsToCreate) {
         const [tag] = await db.insert(tagsTable).values({}).returning();
         await db.insert(tagsTranslationsTable).values([
             { tagId: tag.id, languageCode: 'pl', name: t.pl },
-            { tagId: tag.id, languageCode: 'uk', name: t.uk }
+            { tagId: tag.id, languageCode: 'uk', name: t.uk },
+            { tagId: tag.id, languageCode: 'en', name: t.en },
+            { tagId: tag.id, languageCode: 'ru', name: t.ru },
         ]);
         tagMap[t.key] = tag.id;
     }
@@ -114,7 +116,7 @@ async function mainSeed() {
     async function seedService(data: {
         name: string, slug: string, category: any, webpage?: string,
         image?: string,
-        plDesc: string, ukDesc: string,
+        plDesc: string, ukDesc: string, enDesc: string, ruDesc: string,
         locations: any[],
         tags: string[],
         languages?: string[],
@@ -126,13 +128,15 @@ async function mainSeed() {
             name: data.name,
             category: data.category,
             image: data.image,
-            languages: data.languages || ['pl', 'uk'],
+            languages: data.languages || ['pl', 'uk', 'en', 'ru'],
             status: 'active'
         }).returning();
 
         await db.insert(servicesTranslationsTable).values([
             { serviceId: service.id, languageCode: 'pl', name: data.name, description: data.plDesc },
-            { serviceId: service.id, languageCode: 'uk', name: data.name, description: data.ukDesc }
+            { serviceId: service.id, languageCode: 'uk', name: data.name, description: data.ukDesc },
+            { serviceId: service.id, languageCode: 'en', name: data.name, description: data.enDesc },
+            { serviceId: service.id, languageCode: 'ru', name: data.name, description: data.ruDesc },
         ]);
 
         // Count locations per city for slug generation
@@ -177,6 +181,8 @@ async function mainSeed() {
         name: 'Lviv Croissants', slug: 'lviv-croissants', category: 'gastronomy',
         plDesc: 'Legendarna ukraińska sieć piekarni. Croissanty wypiekane na miejscu.',
         ukDesc: 'Легендарна українська мережа пекарень. Свіжоспечені круасани.',
+        enDesc: 'Legendary Ukrainian bakery chain. Freshly baked croissants on site.',
+        ruDesc: 'Легендарная украинская сеть пекарен. Круассаны, выпеченные на месте.',
         tags: ['bakery', 'coffee'],
         image: 'lviv-croissants.png',
         webpage: 'https://lvivcroissants.com/',
@@ -194,6 +200,8 @@ async function mainSeed() {
         category: 'grocery',
         plDesc: 'Największa w Polsce sieć sklepów z autentycznymi produktami z Ukrainy, Gruzji, Mołdawii i innych krajów wschodnich. Słynie z szerokiego wyboru ryb suszonych, kawioru i rzemieślniczych produktów.',
         ukDesc: 'Найбільша в Польщі мережа магазинів з автентичними продуктами з України, Грузії, Молдови та інших східних країн. Славиться широким вибором сушеної риби, ікри та крафтових виробів.',
+        enDesc: 'The largest chain of stores in Poland with authentic products from Ukraine, Georgia, Moldova and other Eastern countries. Known for its wide selection of dried fish, caviar and artisan products.',
+        ruDesc: 'Крупнейшая в Польше сеть магазинов с аутентичными продуктами из Украины, Грузии, Молдовы и других восточных стран. Славится широким выбором сушёной рыбы, икры и крафтовых изделий.',
         tags: ['grocery', 'imported', 'alcohol', 'seafood'],
         image: 'best-market.png',
         webpage: 'https://best-market.pl/lokalizacje/',
@@ -256,6 +264,8 @@ async function mainSeed() {
         name: 'Piana Vyshnia', slug: 'piana-vyshnia', category: 'gastronomy',
         plDesc: 'Słynna lwowskia nalewka wiśniowa podawana w wyjątkowej atmosferze.',
         ukDesc: 'Знаменита львівська настоянка в унікальній атмосфері.',
+        enDesc: 'Famous Lviv cherry liqueur served in a unique atmosphere.',
+        ruDesc: 'Знаменитая львовская вишнёвая настойка в уникальной атмосфере.',
         image: 'pijana-visnia.png',
         webpage: 'https://pianavyshnia.com/',
         socials: { instagram: 'https://www.instagram.com/pianavyshnia/', facebook: 'https://www.facebook.com/PianaVyshnia', tiktok: 'https://www.tiktok.com/@pianavyshnia' },
@@ -270,6 +280,8 @@ async function mainSeed() {
         category: 'beauty',
         plDesc: 'Największa na świecie sieć barów beauty pochodząca z Ukrainy. Kompleksowe usługi: od manicure po profesjonalne makijaże i stylizacje włosów w wyjątkowej atmosferze.',
         ukDesc: 'Найбільша у світі мережа бʼюті-барів родом з України. Комплексні послуги: від манікюру до професійного макіяжу та укладок у винятковій атмосфері.',
+        enDesc: 'The world\'s largest beauty bar chain from Ukraine. Comprehensive services: from manicure to professional makeup and hair styling in a unique atmosphere.',
+        ruDesc: 'Крупнейшая в мире сеть бьюти-баров родом из Украины. Комплексные услуги: от маникюра до профессионального макияжа и укладок в уникальной атмосфере.',
         tags: ['beauty', 'nails', 'haircare', 'atmosphere'],
         webpage: 'https://gbar.pl/pl',
         image: 'gbar.png',
@@ -290,6 +302,8 @@ async function mainSeed() {
         category: 'beauty',
         plDesc: 'Innowacyjny koncept z Ukrainy oferujący zestawy usług wykonywanych jednocześnie (np. manicure, pedicure i koloryzacja w 90 minut).',
         ukDesc: 'Інноваційна концепція з України, що пропонує сети послуг, які виконуються одночасно (наприклад, манікюр, педикюр та фарбування за 90 хвилин).',
+        enDesc: 'Innovative concept from Ukraine offering service sets performed simultaneously (e.g., manicure, pedicure and coloring in 90 minutes).',
+        ruDesc: 'Инновационная концепция из Украины, предлагающая наборы услуг, выполняемых одновременно (например, маникюр, педикюр и окрашивание за 90 минут).',
         tags: ['beauty', 'nails', 'haircare', 'modern'],
         image: 'fast-line-studio.png',
         webpage: 'https://fastlinestudio.pl/',
@@ -306,6 +320,8 @@ async function mainSeed() {
         category: 'grocery',
         plDesc: 'Sieć sklepów oferująca autentyczne produkty i smaki Wschodu – od Ukrainy po Gruzję i Armenię.',
         ukDesc: 'Мережа магазинів, що пропонує автентичні продукти та смаки Сходу – від України до Грузії та Вірменії.',
+        enDesc: 'A chain of stores offering authentic Eastern products and flavors – from Ukraine to Georgia and Armenia.',
+        ruDesc: 'Сеть магазинов, предлагающая аутентичные продукты и вкусы Востока – от Украины до Грузии и Армении.',
         tags: ['grocery', 'imported', 'frozen', 'tradition'],
         image: 'odessa-market.png',
         webpage: 'https://odessamarket.pl/',
@@ -402,6 +418,8 @@ async function mainSeed() {
         name: 'Multi Cook', slug: 'multi-cook-warszawa', category: 'grocery',
         plDesc: 'Sklep z rzemieślniczymi mrożonkami.',
         ukDesc: 'Магазин заморожених напівфабрикатів ручної роботи.',
+        enDesc: 'Shop with artisan frozen foods.',
+        ruDesc: 'Магазин замороженных полуфабрикатов ручной работы.',
         tags: ['frozen', 'handmade'],
         image: 'multicook.png',
         webpage: 'https://multicook.com.pl/',
@@ -431,7 +449,9 @@ async function mainSeed() {
         slug: 'nova-post',
         category: 'transport',
         plDesc: 'Europejski oddział ukraińskiego lidera logistyki. Oferuje błyskawiczne przesyłki kurierskie, transport ładunków oraz dokumentów między Polską a Ukrainą.',
-        ukDesc: 'Європейське відділення лідера української логістики. Пропонує швидку кур’єрську доставку, перевезення вантажів та документів між Польщею та Україною.',
+        ukDesc: 'Європейське відділення лідера української логістики. Пропонує швидку кур\'єрську доставку, перевезення вантажів та документів між Польщею та Україною.',
+        enDesc: 'European branch of Ukraine\'s logistics leader. Offers fast courier delivery, cargo and document transport between Poland and Ukraine.',
+        ruDesc: 'Европейское отделение лидера украинской логистики. Предлагает быструю курьерскую доставку, перевозку грузов и документов между Польшей и Украиной.',
         tags: ['logistics', 'delivery', 'documents'],
         image: 'nova-post.png',
         webpage: 'https://novapost.com/pl-pl/departments',
@@ -475,6 +495,8 @@ async function mainSeed() {
         name: 'Czarnomorka', slug: 'czarnomorka', category: 'gastronomy',
         plDesc: 'Restauracja rybna znana ze świeżych owoców morza.',
         ukDesc: 'Рибний ресторан, відомий свіжими морепродуктами.',
+        enDesc: 'Fish restaurant known for fresh seafood.',
+        ruDesc: 'Рыбный ресторан, известный свежими морепродуктами.',
         tags: ['seafood', 'tradition'],
         image: 'czarnomorka.png',
         webpage: 'https://czarnomorka.pl/',
@@ -494,6 +516,8 @@ async function mainSeed() {
         name: 'Restauracja U sióstr', slug: 'u-siostr', category: 'gastronomy',
         plDesc: 'Tradycyjna kuchnia ukraińska w sercu Warszawy.',
         ukDesc: 'Традиційна українська кухня в центрі Варшави.',
+        enDesc: 'Traditional Ukrainian cuisine in the heart of Warsaw.',
+        ruDesc: 'Традиционная украинская кухня в центре Варшавы.',
         webpage: 'https://usiostr.choiceqr.com/',
         image: 'usiostr.png',
         socials: { facebook: 'https://www.facebook.com/usester/?ref=page_internal' },
@@ -506,6 +530,8 @@ async function mainSeed() {
         name: 'Kresowe Smaki Valentyny', slug: 'kresowe-smaki-valentyny', category: 'gastronomy',
         plDesc: 'Domowe smaki Kresów i Ukrainy.',
         ukDesc: 'Домашні страви за традиційними рецептами.',
+        enDesc: 'Homemade flavors of Kresy and Ukraine.',
+        ruDesc: 'Домашние вкусы Кресов и Украины.',
         image: 'smaki-valentyny.png',
         webpage: 'https://kresowe-smaki-valentyny-sienna89.eatbu.com/',
         socials: { facebook: 'https://www.facebook.com/pages/Kresowe-Smaki-Walentyny/157643074689529', tripadvisor: 'https://www.tripadvisor.com/Restaurant_Review-g274856-d12005947-Reviews-Kresowe_Smaki_Walentyny-Warsaw_Mazovia_Province_Central_Poland.html' },
@@ -520,6 +546,8 @@ async function mainSeed() {
         name: 'Kamanda Lwowska', slug: 'kamanda-lwowska', category: 'gastronomy',
         plDesc: 'Restauracja nawiązująca do przedwojennego klimatu Lwowa.',
         ukDesc: 'Ресторан, що відтворює атмосферу довоєнного Львова.',
+        enDesc: 'Restaurant evoking the pre-war atmosphere of Lviv.',
+        ruDesc: 'Ресторан, воссоздающий атмосферу довоенного Львова.',
         webpage: 'https://kamandalwowska.pl/',
         image: 'kamanda-lwowa.png',
         socials: { facebook: 'https://www.facebook.com/profile.php?id=61556365557030', instagram: 'https://www.facebook.com/profile.php?id=61556365557030' },
@@ -532,6 +560,8 @@ async function mainSeed() {
         name: 'Kozaczok', slug: 'kozaczok', category: 'gastronomy',
         plDesc: 'Ukraiński punkt gastronomiczny.',
         ukDesc: 'Українська кухня у торговому центрі.',
+        enDesc: 'Ukrainian food point.',
+        ruDesc: 'Украинская кухня в торговом центре.',
         image: 'kozaczok.png',
         webpage: 'https://kozaczok.eatbu.com/',
         socials: { facebook: 'https://www.facebook.com/Kozaczok-165814574084653/' },
@@ -547,6 +577,8 @@ async function mainSeed() {
         name: 'Bistro Kozacka Chatka', slug: 'bistro-kozacka-chatka', category: 'gastronomy',
         plDesc: 'Kultowe miejsce we Wrocławiu.',
         ukDesc: 'Культове місце у Вроцлаві.',
+        enDesc: 'Iconic place in Wrocław.',
+        ruDesc: 'Культовое место во Вроцлаве.',
         webpage: 'https://kozackachatka.pl/',
         image: 'kozacka-chatka.png',
         socials: { facebook: 'https://www.facebook.com/KozackaChatka', instagram: 'https://www.instagram.com/kozackachatka/', tripadvisor: 'https://www.tripadvisor.com/Restaurant_Review-g274812-d12173535-Reviews-Kozacka_Chatka-Wroclaw_Lower_Silesia_Province_Southern_Poland.html?m=69573' },
@@ -559,6 +591,8 @@ async function mainSeed() {
         name: 'Smak Ukraiński', slug: 'smak-ukrainski-krakow', category: 'gastronomy',
         plDesc: 'Klasyki kuchni ukraińskiej.',
         ukDesc: 'Класичні українські страви.',
+        enDesc: 'Classics of Ukrainian cuisine.',
+        ruDesc: 'Классические украинские блюда.',
         webpage: 'https://ukrainska.pl/',
         image: 'smak-ukraini.png',
         tags: ['tradition', 'lunch'],
@@ -570,6 +604,8 @@ async function mainSeed() {
         name: 'Pan Kotowski', slug: 'pan-kotowski-gdansk', category: 'gastronomy',
         plDesc: 'Kawiarnia i pierogarnia w Gdańsku.',
         ukDesc: 'Кафе та варенична у Гданську.',
+        enDesc: 'Cafe and dumpling house in Gdańsk.',
+        ruDesc: 'Кафе и вареничная в Гданьске.',
         image: 'pan-kotowski.png',
         webpage: 'https://pan-kotowski-kuchnia-ukrainska.eatbu.com/',
         socials: { instagram: 'https://instagram.com/pankotowski_restaurant?igshid=s9xu5cl4h96r', facebook: 'https://www.facebook.com/KotowskiPan', tiktok: 'https://www.tiktok.com/@pankotowski.gdansk?_t=ZN-8tRdv0b4jxe&_r=1' },
@@ -582,6 +618,8 @@ async function mainSeed() {
         name: 'Ukraineczka', slug: 'ukraineczka-szczecin', category: 'gastronomy',
         plDesc: 'Szczecińska restauracja z bogatym menu.',
         ukDesc: 'Ресторан у Щецині з багатим меню.',
+        enDesc: 'Szczecin restaurant with a rich menu.',
+        ruDesc: 'Ресторан в Щецине с богатым меню.',
         webpage: 'https://www.ukraineczka.com.pl/',
         image: 'ukraineczka.png',
         socials: { facebook: 'https://www.facebook.com/ukraineczkaszczecin/', instagram: 'https://www.instagram.com/restauracja_ukraineczka/' },
@@ -594,6 +632,8 @@ async function mainSeed() {
         name: 'Restauracja Dumka', slug: 'restauracja-dumka-kielce', category: 'gastronomy',
         plDesc: 'Miejsce spotkań z ukraińską kulturą.',
         ukDesc: 'Місце зустрічі з українською культурою.',
+        enDesc: 'A meeting place with Ukrainian culture.',
+        ruDesc: 'Место встречи с украинской культурой.',
         webpage: 'https://www.dumkarest.pl/',
         image: 'dumka.png',
         socials: { instagram: 'https://www.instagram.com/dumka_restauracja_/' },
@@ -606,6 +646,8 @@ async function mainSeed() {
         name: 'Kulinarna Ukraina', slug: 'kulinarna-ukraina-gdynia', category: 'gastronomy',
         plDesc: 'Prawdziwe smaki Ukrainy nad morzem.',
         ukDesc: 'Справжні смаки України над морем.',
+        enDesc: 'True flavors of Ukraine by the sea.',
+        ruDesc: 'Настоящие вкусы Украины у моря.',
         webpage: 'https://kulinarnaukraina.eatbu.com/',
         image: 'kulinarnaukraina.png',
         socials: { facebook: 'https://www.facebook.com/kulinarnaukrainarestaurant/', instagram: 'https://www.instagram.com/kulinarnaukraina/' },
@@ -622,6 +664,8 @@ async function mainSeed() {
         name: 'Willa Biała', slug: 'willa-biala-warszawa', category: 'gastronomy',
         plDesc: 'Elegancka restauracja w zabytkowej willi.',
         ukDesc: 'Елегантний ресторан у старій віллі.',
+        enDesc: 'Elegant restaurant in a historic villa.',
+        ruDesc: 'Элегантный ресторан в старинной вилле.',
         webpage: 'https://willabiala.pl/',
         image: 'willa-biala.png',
         socials: { instagram: 'https://www.instagram.com/willa_biala/', facebook: 'https://www.facebook.com/WillaBiala' },
@@ -634,6 +678,8 @@ async function mainSeed() {
         name: 'Serwis UA', slug: 'auto-serwis-ua', category: 'mechanics',
         plDesc: 'Profesjonalny serwis samochodowy.',
         ukDesc: 'Професійне обслуговування авто.',
+        enDesc: 'Professional car service.',
+        ruDesc: 'Профессиональное обслуживание автомобилей.',
         tags: ['mechanic', 'repair'],
         image: 'serwisua.png',
         locations: [{ city: 'Rybnica', street: 'Rybnica 2B', voivodeship: 'dolnoslaskie', latitude: 51.0592, longitude: 16.8586, isMainLocation: true, openingHours: standardShopHours }],
@@ -647,6 +693,8 @@ async function mainSeed() {
         category: 'law',
         plDesc: 'Bezpłatna pomoc prawna, psychologiczna i kursy języka polskiego dla uchodźców i migrantów.',
         ukDesc: 'Безкоштовна юридична, психологічна допомога та курси польської мови для біженців та мігрантів.',
+        enDesc: 'Free legal, psychological assistance and Polish language courses for refugees and migrants.',
+        ruDesc: 'Бесплатная юридическая, психологическая помощь и курсы польского языка для беженцев и мигрантов.',
         tags: ['legal', 'culture', 'health'],
         webpage: 'https://ocalenie.org.pl/',
         locations: [
@@ -660,7 +708,9 @@ async function mainSeed() {
         slug: 'ukrainoczka',
         category: 'grocery',
         plDesc: 'Sieć sklepów oferująca tradycyjne smaki ze Wschodu. Specjalizuje się w autentycznych wędlinach, rybach, słodyczach oraz produktach garmażeryjnych z Ukrainy, Litwy i Gruzji.',
-        ukDesc: 'Мережа магазинів, що пропонує традиційні смаки зі Сходу. Спеціалізується на автентичних м’ясних виробах, рибі, солодощах та делікатесах з України, Литви та Грузії.',
+        ukDesc: 'Мережа магазинів, що пропонує традиційні смаки зі Сходу. Спеціалізується на автентичних м\'ясних виробах, рибі, солодощах та делікатесах з України, Литви та Грузії.',
+        enDesc: 'A chain of stores offering traditional Eastern flavors. Specializes in authentic cured meats, fish, sweets and delicacies from Ukraine, Lithuania and Georgia.',
+        ruDesc: 'Сеть магазинов, предлагающая традиционные вкусы Востока. Специализируется на аутентичных мясных изделиях, рыбе, сладостях и деликатесах из Украины, Литвы и Грузии.',
         tags: ['grocery', 'imported', 'alcohol', 'seafood'],
         image: 'ukrainooczka.png',
         webpage: 'https://ukrainoczka.pl/nasze-lokalizacje/',
@@ -719,6 +769,8 @@ async function mainSeed() {
         category: 'education',
         plDesc: 'Szkoła językowa na Śląsku z bogatą ofertą kursów języka polskiego dla osób zza wschodniej granicy, w tym kursy biznesowe.',
         ukDesc: 'Мовна школа на Сілезії з багатою пропозицією курсів польської мови для осіб зі східного кордону, включаючи бізнес-курси.',
+        enDesc: 'Language school in Silesia with a rich offer of Polish language courses for people from the eastern border, including business courses.',
+        ruDesc: 'Языковая школа в Силезии с богатым предложением курсов польского языка для лиц из-за восточной границы, включая бизнес-курсы.',
         tags: ['polish-courses', 'modern'],
         locations: [
             { city: 'Gliwice', street: 'ul. Zwycięstwa 12', voivodeship: 'slaskie', latitude: 50.2942, longitude: 18.6675, openingHours: standardShopHours, isMainLocation: true },
@@ -733,6 +785,8 @@ async function mainSeed() {
         category: 'education',
         plDesc: 'Bezpłatne kursy języka polskiego dla uchodźców i migrantów, prowadzone przez doświadczonych lektorów i wolontariuszy.',
         ukDesc: 'Безкоштовні курси польської мови для біженців та мігрантів, які проводять досвідчені лектори та волонтери.',
+        enDesc: 'Free Polish language courses for refugees and migrants, led by experienced teachers and volunteers.',
+        ruDesc: 'Бесплатные курсы польского языка для беженцев и мигрантов, проводимые опытными преподавателями и волонтёрами.',
         tags: ['polish-courses', 'ngo'],
         webpage: 'https://ocalenie.org.pl/polski-dla-cudzoziemcow',
         locations: [
@@ -744,16 +798,115 @@ async function mainSeed() {
 
 
     // Twój Lekarz w Warszawie (Przychodnia ukraińska)
+    const twojLekarzHours = {
+        monday: { open: "08:00", close: "21:00" },
+        tuesday: { open: "08:00", close: "21:00" },
+        wednesday: { open: "08:00", close: "21:00" },
+        thursday: { open: "08:00", close: "21:00" },
+        friday: { open: "08:00", close: "21:00" },
+        saturday: { open: "08:00", close: "21:00" },
+        sunday: { open: "08:00", close: "21:00" }
+    };
+    const twojLekarzMokotowHours = {
+        monday: { open: "09:00", close: "21:00" },
+        tuesday: { open: "08:00", close: "21:00" },
+        wednesday: { open: "08:00", close: "21:00" },
+        thursday: { open: "08:00", close: "21:00" },
+        friday: { open: "08:00", close: "21:00" },
+        saturday: { open: "08:00", close: "21:00" },
+        sunday: { open: "08:00", close: "21:00" }
+    };
     await seedService({
         name: 'Twój Lekarz w Warszawie',
         slug: 'twoj-lekarz-warszawa',
         category: 'health',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевta до гінеколога.',
+        enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
+        ruDesc: 'Частная медицинская клиника, созданная для украиноязычных пациентов. Комплексная помощь: от терапевта до гинеколога.',
         tags: ['health', 'doctor', 'pediatrician'],
-        webpage: 'https://twojlekarzwwarszawie.pl/',
+        webpage: 'https://twojlekarz-wawa.pl/',
+        image: 'twoj-lekarz-w-warszawie.png',
+        socials: { instagram: 'https://www.instagram.com/doctor.wawa/', facebook: 'https://www.facebook.com/doctor.warszawa/', viber: 'viber://chat?number=+48789809717', telegram: 'https://t.me/Twojlekarz', whatsapp: 'https://wa.me/48600232284' },
         locations: [
-            { city: 'Warszawa', street: 'ul. Jana Kazimierza 21A', voivodeship: 'mazowieckie', latitude: 52.2235, longitude: 20.9395, openingHours: standardShopHours, isMainLocation: true }
+            { city: 'Warszawa', street: 'ul. Płosa 3', voivodeship: 'mazowieckie', latitude: 52.2760, longitude: 21.0540, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Arabska 5', voivodeship: 'mazowieckie', latitude: 52.2260, longitude: 21.0830, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Batalionu AK "Parasol" 5/7', voivodeship: 'mazowieckie', latitude: 52.2310, longitude: 20.9510, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Czerniakowska 139', voivodeship: 'mazowieckie', latitude: 52.2090, longitude: 21.0530, openingHours: twojLekarzMokotowHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' }
+        ]
+    });
+
+    // Twój Lekarz w Poznaniu (Przychodnia ukraińska)
+    await seedService({
+        name: 'Twój Lekarz w Poznaniu',
+        slug: 'twoj-lekarz-poznan',
+        category: 'health',
+        plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
+        ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
+        enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
+        ruDesc: 'Частная медицинская клиника, созданная для украиноязычных пациентов. Комплексная помощь: от терапевта до гинеколога.',
+        tags: ['health', 'doctor', 'pediatrician'],
+        webpage: 'https://twojlekarz-wawa.pl/poznan',
+        image: 'twoj-lekarz-w-warszawie.png',
+        socials: { instagram: 'https://www.instagram.com/doctor.poznan/', facebook: 'https://www.facebook.com/doctor.poznan/', viber: 'viber://chat?number=+48789809717', telegram: 'https://t.me/doctorpoznan', whatsapp: 'https://wa.me/48510533353' },
+        locations: [
+            { city: 'Poznań', street: 'ul. Święty Marcin 46/50', voivodeship: 'wielkopolskie', latitude: 52.4065, longitude: 16.9305, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 510 313 232', email: 'sekretariat@twojlekarz-wawa.pl' }
+        ]
+    });
+
+    // Twój Lekarz w Krakowie (Przychodnia ukraińska)
+    await seedService({
+        name: 'Twój Lekarz w Krakowie',
+        slug: 'twoj-lekarz-krakow',
+        category: 'health',
+        plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
+        ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
+        enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
+        ruDesc: 'Частная медицинская клиника, созданная для украиноязычных пациентов. Комплексная помощь: от терапевта до гинеколога.',
+        tags: ['health', 'doctor', 'pediatrician'],
+        webpage: 'https://twojlekarz-wawa.pl/krakow',
+        image: 'twoj-lekarz-w-warszawie.png',
+        socials: { instagram: 'https://www.instagram.com/doctor.krakow/', facebook: 'https://www.facebook.com/twojlekarz.krakow/', viber: 'viber://chat?number=+48500639363', telegram: 'https://t.me/doctorkrakow', whatsapp: 'https://wa.me/48500639363' },
+        locations: [
+            { city: 'Kraków', street: 'ul. Mogilska 65', voivodeship: 'malopolskie', latitude: 50.0645, longitude: 19.9685, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 736 407 192', email: 'sekretariat@twojlekarz-wawa.pl' }
+        ]
+    });
+
+    // Twój Lekarz w Trójmieście (Przychodnia ukraińska)
+    await seedService({
+        name: 'Twój Lekarz w Trójmieście',
+        slug: 'twoj-lekarz-trojmiasto',
+        category: 'health',
+        plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
+        ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
+        enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
+        ruDesc: 'Частная медицинская клиника, созданная для украиноязычных пациентов. Комплексная помощь: от терапевта до гинеколога.',
+        tags: ['health', 'doctor', 'pediatrician'],
+        webpage: 'https://twojlekarz-wawa.pl/trojmiasto',
+        image: 'twoj-lekarz-w-warszawie.png',
+        socials: { instagram: 'https://www.instagram.com/doctor.trojmiasto/', facebook: 'https://www.facebook.com/doctor.trojmiasto/', viber: 'viber://chat?number=+48789809717', telegram: 'https://t.me/joinchat/AAAAAFH9jgxlHtx11_BrTQ', whatsapp: 'https://wa.me/48536426220' },
+        locations: [
+            { city: 'Gdańsk', street: 'ul. Uphagena 27', voivodeship: 'pomorskie', latitude: 54.3755, longitude: 18.6185, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 536 426 220', email: 'sekretariat@twojlekarz-wawa.pl' }
+        ]
+    });
+
+    // Twój Lekarz we Wrocławiu (Przychodnia ukraińska)
+    await seedService({
+        name: 'Twój Lekarz we Wrocławiu',
+        slug: 'twoj-lekarz-wroclaw',
+        category: 'health',
+        plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
+        ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
+        enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
+        ruDesc: 'Частная медицинская клиника, созданная для украиноязычных пациентов. Комплексная помощь: от терапевта до гинеколога.',
+        tags: ['health', 'doctor', 'pediatrician'],
+        webpage: 'https://twojlekarz-wawa.pl/wroclaw',
+        image: 'twoj-lekarz-w-warszawie.png',
+        socials: { instagram: 'https://www.instagram.com/doctor.wroclaw/', facebook: 'https://www.facebook.com/doctor.wroclaw/', viber: 'viber://chat?number=+48786600160', telegram: 'https://t.me/doctorwroclaw', whatsapp: 'https://wa.me/48786600160' },
+        locations: [
+            { city: 'Wrocław', street: 'ul. Bezpieczna 2', voivodeship: 'dolnoslaskie', latitude: 51.1385, longitude: 17.0565, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 510 551 855', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Wrocław', street: 'ul. Ślężna 102', voivodeship: 'dolnoslaskie', latitude: 51.0905, longitude: 17.0245, openingHours: twojLekarzHours, phoneNumber: '+48 510 551 855', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Wrocław', street: 'ul. Świętego Mikołaja 18/20', voivodeship: 'dolnoslaskie', latitude: 51.1105, longitude: 17.0305, openingHours: twojLekarzHours, phoneNumber: '+48 510 551 855', email: 'sekretariat@twojlekarz-wawa.pl' }
         ]
     });
 
@@ -764,6 +917,8 @@ async function mainSeed() {
         category: 'financial',
         plDesc: 'Biuro rachunkowe specjalizujące się w obsłudze ukraińskiego biznesu w Polsce. Doradztwo podatkowe, optymalizacja i zakładanie spółek.',
         ukDesc: 'Бухгалтерія, що спеціалізується на обслуговуванні українського бізнесу в Польщі. Податкові консультації, оптимізація та реєстрація компаній.',
+        enDesc: 'Accounting office specializing in serving Ukrainian businesses in Poland. Tax consulting, optimization and company registration.',
+        ruDesc: 'Бухгалтерия, специализирующаяся на обслуживании украинского бизнеса в Польше. Налоговые консультации, оптимизация и регистрация компаний.',
         tags: ['legal', 'documents'],
         webpage: 'https://progressholding.pl/',
         locations: [
@@ -777,6 +932,8 @@ async function mainSeed() {
         category: 'financial',
         plDesc: 'Organizacja wspierająca współpracę gospodarczą. Doradztwo w zakresie inwestycji, pozyskiwania finansowania i networkingu biznesowego.',
         ukDesc: 'Організація, що підтримує економічну співпрацю. Консультування з питань інвестицій, залучення фінансування та ділового нетворкінгу.',
+        enDesc: 'Organization supporting economic cooperation. Consulting on investments, fundraising and business networking.',
+        ruDesc: 'Организация, поддерживающая экономическое сотрудничество. Консультирование по вопросам инвестиций, привлечения финансирования и делового нетворкинга.',
         tags: ['ngo', 'legal', 'modern'],
         webpage: 'https://pol-ukr.com/',
         locations: [
@@ -790,6 +947,8 @@ async function mainSeed() {
         category: 'entertainment',
         plDesc: 'Jedyny teatr w Polsce z regularnym repertuarem w języku ukraińskim. Tworzony przez profesjonalnych aktorów, łączy tradycję z nowoczesną formą sceniczną.',
         ukDesc: 'Єдиний театр у Польщі з регулярним репертуаром українською мовою. Створений професійними акторами, він поєднує традиції з сучасною сценічною формою.',
+        enDesc: 'The only theater in Poland with a regular repertoire in Ukrainian. Created by professional actors, it combines tradition with modern stage form.',
+        ruDesc: 'Единственный театр в Польше с регулярным репертуаром на украинском языке. Создан профессиональными актёрами, сочетает традиции с современной сценической формой.',
         tags: ['ngo', 'culture', 'atmosphere'],
         webpage: 'https://www.facebook.com/teatrnavpaky/',
         locations: [
@@ -913,6 +1072,8 @@ async function mainSeed() {
         category: 'law',
         plDesc: 'Kancelaria prawna z 25-letnim doświadczeniem oferująca kompleksową obsługę prawną dla osób i firm z Ukrainy prowadzących działalność w Polsce. Pomoc w zakładaniu biznesu, prawie pracy i relacjach z administracją publiczną.',
         ukDesc: 'Юридична фірма з 25-річним досвідом, що надає комплексний правовий супровід для осіб та компаній з України, які ведуть бізнес у Польщі. Допомога у відкритті бізнесу, трудовому праві та відносинах з державними органами.',
+        enDesc: 'Law firm with 25 years of experience offering comprehensive legal services for individuals and companies from Ukraine doing business in Poland. Assistance with starting a business, labor law and relations with public administration.',
+        ruDesc: 'Юридическая фирма с 25-летним опытом, предоставляющая комплексное правовое сопровождение для лиц и компаний из Украины, ведущих бизнес в Польше. Помощь в открытии бизнеса, трудовом праве и отношениях с государственными органами.',
         webpage: 'https://www.traple.pl/ukrainian-desk-tkp/',
         image: 'ukrainian-desk-traple-konarski-podrecki.png',
         tags: ['legal', 'documents'],
@@ -947,7 +1108,10 @@ async function mainSeed() {
         category: 'law',
         plDesc: 'Kompleksowe usługi prawne dla przedsiębiorców i klientów indywidualnych w językach polskim, ukraińskim i rosyjskim. Specjalizacja: prawo handlowe, cywilne, karne, administracyjne, obsługa cudzoziemców oraz prawo podatkowe.',
         ukDesc: 'Комплексні юридичні послуги для підприємців та приватних клієнтів польською, українською та російською мовами. Спеціалізація: комерційне, цивільне, кримінальне, адміністративне право, обслуговування іноземців та податкове право.',
+        enDesc: 'Comprehensive legal services for entrepreneurs and individual clients in Polish, Ukrainian and Russian. Specialization: commercial, civil, criminal, administrative law, foreigners\' services and tax law.',
+        ruDesc: 'Комплексные юридические услуги для предпринимателей и частных клиентов на польском, украинском и русском языках. Специализация: коммерческое, гражданское, уголовное, административное право, обслуживание иностранцев и налоговое право.',
         webpage: 'https://www.adwokatpiatkowska.pl/',
+        image: 'kancelaria-adwokacka-adwokat-oxana-piatkowska.png',
         tags: ['legal', 'documents'],
         locations: [
             {
@@ -977,16 +1141,18 @@ async function mainSeed() {
         category: 'law',
         plDesc: 'Kancelaria specjalizująca się w prawie wschodnioeuropejskim (Ukraina, Rosja, Białoruś, Kazachstan) z 20-letnim doświadczeniem. Rejestracja firm, legalizacja pracowników, obsługa celna, reprezentacja przed sądami i urzędami.',
         ukDesc: 'Юридична фірма, що спеціалізується на східноєвропейському праві (Україна, Росія, Білорусь, Казахстан) з 20-річним досвідом. Реєстрація компаній, легалізація працівників, митне оформлення, представництво в судах та органах влади.',
+        enDesc: 'Law firm specializing in Eastern European law (Ukraine, Russia, Belarus, Kazakhstan) with 20 years of experience. Company registration, employee legalization, customs handling, representation in courts and offices.',
+        ruDesc: 'Юридическая фирма, специализирующаяся на восточноевропейском праве (Украина, Россия, Беларусь, Казахстан) с 20-летним опытом. Регистрация компаний, легализация работников, таможенное оформление, представительство в судах и органах власти.',
         webpage: 'https://dugilolga.pl/pl',
-        socials: { facebook: 'https://www.facebook.com/dugilolga.eu/' },
+        socials: { facebook: 'https://www.facebook.com/dugilolga.eu/', linkedin: 'https://www.linkedin.com/in/olga-dugil/' },
         tags: ['legal', 'documents'],
         locations: [
             {
                 city: 'Warszawa',
                 street: 'ul. Krakowskie Przedmieście',
                 voivodeship: 'mazowieckie',
-                latitude: 52.2440,
-                longitude: 21.0140,
+                latitude: 52.244,
+                longitude: 21.014,
                 phoneNumber: '+48 608 115 622',
                 whatsappNumber: '+48 608 115 622',
                 email: 'office@dugilolga.pl',
@@ -1002,7 +1168,10 @@ async function mainSeed() {
         category: 'law',
         plDesc: 'Kancelaria radcy prawnego specjalizująca się w pomocy prawnej dla obywateli Ukrainy. Legalizacja pobytu, zezwolenia na pracę, pobyt tymczasowy, zakładanie firm oraz konsultacje z zakresu prawa administracyjnego.',
         ukDesc: 'Юридична фірма, що спеціалізується на правовій допомозі громадянам України. Легалізація перебування, дозволи на роботу, тимчасове проживання, реєстрація фірм та консультації з адміністративного права.',
+        enDesc: 'Legal counsel office specializing in legal assistance for Ukrainian citizens. Legalization of stay, work permits, temporary residence, company registration and administrative law consultations.',
+        ruDesc: 'Юридическая фирма, специализирующаяся на правовой помощи гражданам Украины. Легализация пребывания, разрешения на работу, временное проживание, регистрация фирм и консультации по административному праву.',
         webpage: 'https://kancelariakamler.pl/pomoc-prawna-dla-obywateli-ukrainy',
+        image: 'kancelaria-radcy-prawnego-piotr-kamler.png',
         socials: { facebook: 'https://www.facebook.com/kancelaria.radcy.prawnego.piotr.kamler' },
         tags: ['legal', 'documents'],
         locations: [
@@ -1034,6 +1203,8 @@ async function mainSeed() {
         category: 'transport',
         plDesc: 'Międzynarodowa spedycja i transport drogowy na kierunku Ukraina ↔ Polska/UE; obsługa m.in. FTL/LTL oraz wsparcie organizacyjne przy przewozach.',
         ukDesc: 'Міжнародна експедиція та автоперевезення напрямком Україна ↔ Польща/ЄС; зокрема FTL/LTL та організаційний супровід перевезень.',
+        enDesc: 'International forwarding and road transport on the Ukraine ↔ Poland/EU route; including FTL/LTL and organizational support for shipments.',
+        ruDesc: 'Международная экспедиция и автоперевозки по направлению Украина ↔ Польша/ЕС; включая FTL/LTL и организационное сопровождение перевозок.',
         webpage: 'https://inter-logistic.pl/zasieg-dzialania-2/transport-ukraina/',
         image: 'inter-logistic.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl'],
@@ -1058,8 +1229,10 @@ async function mainSeed() {
         category: 'transport',
         plDesc: 'Transport Polska ↔ Ukraina: kompleksowe usługi przewozowe (m.in. niskopodwoziowy, FTL/LTL, kontenery, maszyny) z obsługą formalną i logistyczną.',
         ukDesc: 'Перевезення Польща ↔ Україна: комплексні транспортні послуги (зокрема низькорамні, FTL/LTL, контейнери, техніка) з логістичним та документальним супроводом.',
+        enDesc: 'Transport Poland ↔ Ukraine: comprehensive transport services (including low-bed, FTL/LTL, containers, machinery) with formal and logistics support.',
+        ruDesc: 'Перевозки Польша ↔ Украина: комплексные транспортные услуги (включая низкорамные, FTL/LTL, контейнеры, техника) с логистическим и документальным сопровождением.',
         webpage: 'https://gonera-transport.pl/transport-polska-ukraina/',
-        image: 'gonera.png',
+        image: 'gonera-transport-i-spedycja.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl', 'oversize'],
         locations: [
             {
@@ -1082,6 +1255,8 @@ async function mainSeed() {
         category: 'transport',
         plDesc: 'Transport Polska ↔ Ukraina: usługi TSL (FTL/LTL), organizacja transportu drogowego i spedycji na kierunku Ukraina.',
         ukDesc: 'Перевезення Польща ↔ Україна: TSL (FTL/LTL), організація автоперевезень та експедиції на українському напрямку.',
+        enDesc: 'Transport Poland ↔ Ukraine: TSL services (FTL/LTL), road transport and forwarding organization on the Ukraine route.',
+        ruDesc: 'Перевозки Польша ↔ Украина: услуги TSL (FTL/LTL), организация автоперевозок и экспедиции на украинском направлении.',
         webpage: 'https://omida.pl/transport-polska-ukraina/',
         image: 'omida.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ftl', 'ltl'],
@@ -1106,6 +1281,8 @@ async function mainSeed() {
         category: 'transport',
         plDesc: 'Transport na Ukrainę: spedycja i transport międzynarodowy (organizacja przewozów drogowych oraz obsługa logistyczna).',
         ukDesc: 'Перевезення в Україну: міжнародна експедиція та транспорт (організація автоперевезень і логістичний супровід).',
+        enDesc: 'Transport to Ukraine: international forwarding and transport (road transport organization and logistics support).',
+        ruDesc: 'Перевозки в Украину: международная экспедиция и транспорт (организация автоперевозок и логистическое сопровождение).',
         webpage: 'https://tte.pl/transport-na-ukraine/',
         image: 'tte-trade-and-trans-expert.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'ukraine'],
@@ -1130,6 +1307,8 @@ async function mainSeed() {
         category: 'transport',
         plDesc: 'Transport Polska ↔ Ukraina oraz spedycja międzynarodowa: kompleksowa organizacja przewozu towarów z naciskiem na terminowość i bezpieczeństwo.',
         ukDesc: 'Перевезення Польща ↔ Україна та міжнародна експедиція: комплексна організація доставки вантажів з акцентом на безпеку і своєчасність.',
+        enDesc: 'Transport Poland ↔ Ukraine and international forwarding: comprehensive cargo transport organization with focus on timeliness and safety.',
+        ruDesc: 'Перевозки Польша ↔ Украина и международная экспедиция: комплексная организация доставки грузов с акцентом на безопасность и своевременность.',
         webpage: 'https://bialmich.com/nasze-uslugi/spedycja-miedzynarodowa/transport-ukraina/',
         image: 'bialmich.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'customs'],
@@ -1155,8 +1334,11 @@ async function mainSeed() {
         category: 'grocery',
         plDesc: 'Sieć sklepów z ukraińskimi i litewskimi produktami spożywczymi. Specjalizuje się w rybach, owocach morza i delikatesach ze Wschodu.',
         ukDesc: 'Мережа магазинів з українськими та литовськими продуктами. Спеціалізується на рибі, морепродуктах та делікатесах зі Сходу.',
+        enDesc: 'Chain of stores with Ukrainian and Lithuanian food products. Specializes in fish, seafood and Eastern delicacies.',
+        ruDesc: 'Сеть магазинов с украинскими и литовскими продуктами. Специализируется на рыбе, морепродуктах и деликатесах с Востока.',
         tags: ['grocery', 'imported', 'seafood'],
         webpage: 'https://wixmart.pl/',
+        image: 'wixmart.png',
         socials: { instagram: 'https://www.instagram.com/wixmart.pl/' },
         locations: [
             { city: 'Warszawa', street: 'ul. Pory 55', voivodeship: 'mazowieckie', latitude: 52.1925, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 887 156 737', email: 'info@wixmart.pl' },
@@ -1169,6 +1351,7 @@ async function mainSeed() {
 
     console.log('✅ Seed zakończony z tagami!');
 }
+
 
 mainSeed()
     .catch((err) => {

@@ -8,7 +8,11 @@
       "Bash(node:*)",
       "Bash(npx tsc:*)",
       "WebFetch(domain:wixmart.pl)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:twojlekarz-poznan.pl)",
+      "WebFetch(domain:poznan.twojlekarz-wawa.pl)",
+      "WebFetch(domain:www.kliniki.pl)",
+      "WebFetch(domain:twojlekarz-wawa.pl)"
     ]
   },
   "enableAllProjectMcpServers": true,
