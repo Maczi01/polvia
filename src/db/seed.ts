@@ -98,6 +98,17 @@ async function mainSeed() {
         { key: 'oversize', pl: 'Ponadgabarytowy', uk: 'Негабаритний', en: 'Oversize', ru: 'Негабаритный' },
         { key: 'ukraine', pl: 'Ukraina', uk: 'Україна', en: 'Ukraine', ru: 'Украина' },
         { key: 'customs', pl: 'Odprawa celna', uk: 'Митне оформлення', en: 'Customs', ru: 'Таможенное оформление' },
+        { key: 'car-service', pl: 'Serwis samochodowy', uk: 'Автосервіс', en: 'Car Service', ru: 'Автосервис' },
+        { key: 'oil-change', pl: 'Wymiana oleju', uk: 'Заміна масла', en: 'Oil Change', ru: 'Замена масла' },
+        { key: 'brakes', pl: 'Hamulce', uk: 'Гальма', en: 'Brakes', ru: 'Тормоза' },
+        { key: 'diagnostics', pl: 'Diagnostyka', uk: 'Діагностика', en: 'Diagnostics', ru: 'Диагностика' },
+        { key: 'fast-repair', pl: 'Szybka naprawa', uk: 'Швидкий ремонт', en: 'Fast Repair', ru: 'Быстрый ремонт' },
+        { key: 'engine', pl: 'Silnik', uk: 'Двигун', en: 'Engine', ru: 'Двигатель' },
+        { key: 'suspension', pl: 'Zawieszenie', uk: 'Підвіска', en: 'Suspension', ru: 'Подвеска' },
+        { key: 'ac', pl: 'Klimatyzacja', uk: 'Кондиціонер', en: 'Air Conditioning', ru: 'Кондиционер' },
+        { key: 'sto', pl: 'STO', uk: 'СТО', en: 'STO', ru: 'СТО' },
+        { key: 'car-repair', pl: 'Naprawa samochodów', uk: 'Ремонт авто', en: 'Car Repair', ru: 'Ремонт авто' },
+        { key: 'quick-repair', pl: 'Szybki serwis', uk: 'Швидкий сервіс', en: 'Quick Repair', ru: 'Быстрый сервис' },
     ];
 
     for (const t of tagsToCreate) {
@@ -172,6 +183,7 @@ async function mainSeed() {
                 data.tags.map(tKey => ({ serviceId: service.id, tagId: tagMap[tKey] }))
             );
         }
+        console.log(`Added ${data.name} (${data.slug}) with ${data.locations.length} locations.`);
     }
 
     // --- START SEEDING BRANDS ---
@@ -1144,6 +1156,7 @@ async function mainSeed() {
         enDesc: 'Law firm specializing in Eastern European law (Ukraine, Russia, Belarus, Kazakhstan) with 20 years of experience. Company registration, employee legalization, customs handling, representation in courts and offices.',
         ruDesc: 'Юридическая фирма, специализирующаяся на восточноевропейском праве (Украина, Россия, Беларусь, Казахстан) с 20-летним опытом. Регистрация компаний, легализация работников, таможенное оформление, представительство в судах и органах власти.',
         webpage: 'https://dugilolga.pl/pl',
+        image: 'kancelaria-wschodnia-adwokat-olga-dugil.png',
         socials: { facebook: 'https://www.facebook.com/dugilolga.eu/', linkedin: 'https://www.linkedin.com/in/olga-dugil/' },
         tags: ['legal', 'documents'],
         locations: [
@@ -1310,7 +1323,7 @@ async function mainSeed() {
         enDesc: 'Transport Poland ↔ Ukraine and international forwarding: comprehensive cargo transport organization with focus on timeliness and safety.',
         ruDesc: 'Перевозки Польша ↔ Украина и международная экспедиция: комплексная организация доставки грузов с акцентом на безопасность и своевременность.',
         webpage: 'https://bialmich.com/nasze-uslugi/spedycja-miedzynarodowa/transport-ukraina/',
-        image: 'bialmich.png',
+        image: 'bial-mich.png',
         tags: ['freight', 'road-transport', 'spedycja', 'poland-ukraine', 'international', 'customs'],
         locations: [
             {
@@ -1361,6 +1374,7 @@ async function mainSeed() {
         ruDesc: 'Бьюти-салон (ногти + уход), доступен для записи в Booksy.',
         tags: ['beauty', 'nails'],
         webpage: 'https://booksy.com/pl-pl/106267_maniera-face-bar-nail_salon-kosmetyczny_3_warszawa',
+        socials: { facebook: 'https://www.facebook.com/manieranailbar/' },
         image: 'booksy-maniera.png',
         locations: [
             {
@@ -1385,6 +1399,7 @@ async function mainSeed() {
         ruDesc: 'Студия ногтей (маникюр/педикюр), доступна для записи в Booksy.',
         tags: ['beauty', 'nails'],
         webpage: 'https://booksy.com/pl-pl/250481_weronailka_paznokcie_3_warszawa',
+        socials: { instagram: 'https://www.instagram.com/weronailka/' },
         image: 'booksy-weronailka.png',
         locations: [
             {
@@ -1407,8 +1422,8 @@ async function mainSeed() {
         enDesc: 'Nail salon in Kraków bookable on Booksy.',
         ruDesc: 'Салон ногтей в Кракове, доступен для записи в Booksy.',
         tags: ['beauty', 'nails'],
-        image: "manicure-and-pedicure.png",
         webpage: 'https://booksy.com/pl-pl/243436_manicure-pedicure_paznokcie_8820_krakow',
+        socials: { instagram: 'https://www.instagram.com/nastia_manicure.krakow/', facebook: 'https://www.facebook.com/profile.php?id=100080597851371' },
         image: 'booksy-manicure-pedicure-krakow.png',
         locations: [
             {
@@ -1446,6 +1461,843 @@ async function mainSeed() {
         ],
     });
 
+    const wroclawLat = 51.1079;
+    const wroclawLon = 17.0385;
+
+    // 1) PRACOWNIA FRYZUR & KOSMETYKA
+    await seedService({
+        name: 'PRACOWNIA FRYZUR & KOSMETYKA',
+        slug: 'pracownia-fryzur-kosmetyka',
+        category: 'beauty',
+        plDesc: 'Salon beauty (włosy + usługi kosmetyczne) dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-салон (волосся + косметологія), доступний для запису в Booksy.',
+        enDesc: 'Beauty salon (hair + beauty services) bookable on Booksy.',
+        ruDesc: 'Бьюти-салон (волосы + косметические услуги), доступный для записи в Booksy.',
+        tags: ['beauty', 'haircare'],
+        webpage: 'https://booksy.com/pl-pl/155064_pracownia-fryzur-kosmetyka_fryzjer_13750_wroclaw',
+        image: 'booksy-pracownia-fryzur-kosmetyka.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Rynek 35',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 2) Beauty Space Wroclaw
+    await seedService({
+        name: 'Beauty Space Wroclaw',
+        slug: 'beauty-space-wroclaw',
+        category: 'beauty',
+        plDesc: 'Salon beauty dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-салон, доступний для запису в Booksy.',
+        enDesc: 'Beauty salon bookable on Booksy.',
+        ruDesc: 'Бьюти-салон, доступный для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/106927_beauty-space-wroclaw_salon-kosmetyczny_13750_wroclaw',
+        image: 'booksy-beauty-space-wroclaw.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Powstańców Śląskich 7/15',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 3) Indigo Beauty Studio
+    await seedService({
+        name: 'Indigo Beauty Studio',
+        slug: 'indigo-beauty-studio',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/111742_indigo-beauty-studio_paznokcie_13750_wroclaw',
+        image: 'booksy-indigo-beauty-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Legnicka 55C',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 4) Pinky Studio
+    await seedService({
+        name: 'Pinky Studio',
+        slug: 'pinky-studio',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/153258_pinky-studio_salon-kosmetyczny_13750_wroclaw',
+        image: 'booksy-pinky-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Jedności Narodowej 205B/1',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 5) AIS SCHOOL AND STUDIO
+    await seedService({
+        name: 'AIS SCHOOL AND STUDIO',
+        slug: 'ais-school-and-studio',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/181666_ais-school-and-studio_salon-kosmetyczny_13750_wroclaw',
+        image: 'booksy-ais-school-and-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Białowieska 20B',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 6) Angel Room
+    await seedService({
+        name: 'Angel Room',
+        slug: 'angel-room',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/173508_angel-room_salon-kosmetyczny_13750_wroclaw',
+        image: 'booksy-angel-room.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Świętego Mikołaja 14',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 7) Dastyle Beauty Room
+    await seedService({
+        name: 'Dastyle Beauty Room',
+        slug: 'dastyle-beauty-room',
+        category: 'beauty',
+        plDesc: 'Salon beauty dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-салон, доступний для запису в Booksy.',
+        enDesc: 'Beauty salon bookable on Booksy.',
+        ruDesc: 'Бьюти-салон, доступный для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/124709_dastyle-beauty-room_salon-kosmetyczny_13750_wroclaw',
+        image: 'booksy-dastyle-beauty-room.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Komandorska 118/120',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 8) Lashes.nataliapietrzak
+    await seedService({
+        name: 'Lashes.nataliapietrzak',
+        slug: 'lashes-nataliapietrzak',
+        category: 'beauty',
+        plDesc: 'Stylizacja rzęs dostępna do rezerwacji na Booksy.',
+        ukDesc: 'Лашмейкер (вії), доступно для запису в Booksy.',
+        enDesc: 'Lash services bookable on Booksy.',
+        ruDesc: 'Услуги по ресницам, доступно для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/98811_lashes-nataliapietrzak_brwi-i-rzesy_13750_wroclaw',
+        image: 'booksy-lashes-nataliapietrzak.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Wita Stwosza 8',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 9) La Brune Studio
+    await seedService({
+        name: 'La Brune Studio',
+        slug: 'la-brune-studio',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/151330_la-brune-studio_brwi-i-rzesy_13750_wroclaw',
+        image: 'booksy-la-brune-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Legnicka 55 C, lokal 4',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 10) Re.fresh.beauty
+    await seedService({
+        name: 'Re.fresh.beauty',
+        slug: 're-fresh-beauty',
+        category: 'beauty',
+        plDesc: 'Studio beauty dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Бʼюті-студія, доступна для запису в Booksy.',
+        enDesc: 'Beauty studio bookable on Booksy.',
+        ruDesc: 'Бьюти-студия, доступная для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/148298_re-fresh-beauty_brwi-i-rzesy_13750_wroclaw',
+        image: 'booksy-re-fresh-beauty.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Stefana Żeromskiego 79',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 11) Makijaż Permanentny Aleksandra Gadowicz
+    await seedService({
+        name: 'Makijaż Permanentny Aleksandra Gadowicz',
+        slug: 'makijaz-permanentny-aleksandra-gadowicz',
+        category: 'beauty',
+        plDesc: 'Makijaż permanentny dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Перманентний макіяж, доступний для запису в Booksy.',
+        enDesc: 'Permanent makeup bookable on Booksy.',
+        ruDesc: 'Перманентный макияж, доступный для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/95943_makijaz-permanentny-aleksandra-gadowicz_makijaz_13750_wroclaw',
+        image: 'booksy-makijaz-permanentny-aleksandra-gadowicz.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Sokolnicza 9/5',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 12) Alina Nails Art
+    await seedService({
+        name: 'Alina Nails Art',
+        slug: 'alina-nails-art',
+        category: 'beauty',
+        plDesc: 'Studio paznokci (manicure/pedicure) dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів (манікюр/педикюр), доступна для запису в Booksy.',
+        enDesc: 'Nail studio (manicure/pedicure) bookable on Booksy.',
+        ruDesc: 'Студия ногтей (маникюр/педикюр), доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/259300_alina-nails-art_paznokcie_13750_wroclaw',
+        image: 'booksy-alina-nails-art.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'plac Legionów 14',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 13) Alinails.wro
+    await seedService({
+        name: 'Alinails.wro',
+        slug: 'alinails-wro',
+        category: 'beauty',
+        plDesc: 'Studio paznokci dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів, доступна для запису в Booksy.',
+        enDesc: 'Nail studio bookable on Booksy.',
+        ruDesc: 'Студия ногтей, доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/299076_alinails-wro_paznokcie_13750_wroclaw',
+        image: 'booksy-alinails-wro.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Nowowiejska 45, 1B (lokal po lewej stronie od bramy 45)',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 14) LUMES Beauty Studio
+    await seedService({
+        name: 'LUMES Beauty Studio',
+        slug: 'lumes-beauty-studio',
+        category: 'beauty',
+        plDesc: 'Studio paznokci dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів, доступна для запису в Booksy.',
+        enDesc: 'Nail studio bookable on Booksy.',
+        ruDesc: 'Студия ногтей, доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/333100_lumes-beauty-studio_paznokcie_13750_wroclaw',
+        image: 'booksy-lumes-beauty-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Sterowcowa 14',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 15) Adore Nail Studio
+    await seedService({
+        name: 'Adore Nail Studio',
+        slug: 'adore-nail-studio',
+        category: 'beauty',
+        plDesc: 'Studio paznokci (manicure/pedicure) dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів (манікюр/педикюр), доступна для запису в Booksy.',
+        enDesc: 'Nail studio (manicure/pedicure) bookable on Booksy.',
+        ruDesc: 'Студия ногтей (маникюр/педикюр), доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/137081_adore-nail-studio_paznokcie_13750_wroclaw',
+        image: 'booksy-adore-nail-studio.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Legnicka 59D',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 16) MVK
+    await seedService({
+        name: 'MVK',
+        slug: 'mvk',
+        category: 'beauty',
+        plDesc: 'Studio paznokci dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Студія нігтів, доступна для запису в Booksy.',
+        enDesc: 'Nail studio bookable on Booksy.',
+        ruDesc: 'Студия ногтей, доступна для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/272053_mvk_paznokcie_13750_wroclaw',
+        image: 'booksy-mvk.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Generała Romualda Traugutta 9/19',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 17) Świat Rzęs i Paznokci
+    await seedService({
+        name: 'Świat Rzęs i Paznokci',
+        slug: 'swiat-rzes-i-paznokci',
+        category: 'beauty',
+        plDesc: 'Salon rzęs i paznokci dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Салон вій та нігтів, доступний для запису в Booksy.',
+        enDesc: 'Lashes & nails salon bookable on Booksy.',
+        ruDesc: 'Салон ресниц и ногтей, доступный для записи в Booksy.',
+        tags: ['beauty', 'nails'],
+        webpage: 'https://booksy.com/pl-pl/6420_swiat-rzes-i-paznokci_brwi-i-rzesy_13750_wroclaw',
+        image: 'booksy-swiat-rzes-i-paznokci.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Prądzyńskiego 13/1A',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 18) iBrow
+    await seedService({
+        name: 'iBrow',
+        slug: 'ibrow',
+        category: 'beauty',
+        plDesc: 'Brwi/rzęsy dostępne do rezerwacji na Booksy.',
+        ukDesc: 'Брови/вії, доступно для запису в Booksy.',
+        enDesc: 'Brows/lashes bookable on Booksy.',
+        ruDesc: 'Брови/ресницы, доступно для записи в Booksy.',
+        tags: ['beauty'],
+        webpage: 'https://booksy.com/pl-pl/246528_ibrow_brwi-i-rzesy_13750_wroclaw',
+        image: 'booksy-ibrow.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Nowowiejska 63',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 19) Atelier Fryzjerskie Kościuszki 101/1U
+    await seedService({
+        name: 'Atelier Fryzjerskie Kościuszki 101/1U',
+        slug: 'atelier-fryzjerskie-kosciuszki-101-1u',
+        category: 'beauty',
+        plDesc: 'Fryzjer dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Перукар, доступний для запису в Booksy.',
+        enDesc: 'Hair salon bookable on Booksy.',
+        ruDesc: 'Парикмахерская, доступная для записи в Booksy.',
+        tags: ['beauty', 'haircare'],
+        webpage: 'https://booksy.com/pl-pl/5947_atelier-fryzjerskie-kosciuszki-101-1u_fryzjer_13750_wroclaw',
+        image: 'booksy-atelier-fryzjerskie-kosciuszki.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Kościuszki 101, 1u',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 20) Belle Image
+    await seedService({
+        name: 'Belle Image',
+        slug: 'belle-image',
+        category: 'beauty',
+        plDesc: 'Salon fryzjerski dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Перукарський салон, доступний для запису в Booksy.',
+        enDesc: 'Hair salon bookable on Booksy.',
+        ruDesc: 'Салон красоты/парикмахерская, доступно для записи в Booksy.',
+        tags: ['beauty', 'haircare'],
+        webpage: 'https://booksy.com/pl-pl/193682_belle-image_fryzjer_13750_wroclaw',
+        image: 'booksy-belle-image.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Wiejska 12',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+// 21) (bonus, jeśli chcesz podmienić któryś) Blade Barbershop
+    await seedService({
+        name: 'Blade Barbershop',
+        slug: 'blade-barbershop',
+        category: 'beauty',
+        plDesc: 'Barber shop dostępny do rezerwacji na Booksy.',
+        ukDesc: 'Барбершоп, доступний для запису в Booksy.',
+        enDesc: 'Barber shop bookable on Booksy.',
+        ruDesc: 'Барбершоп, доступный для записи в Booksy.',
+        tags: ['beauty', 'barber', 'haircare'],
+        webpage: 'https://booksy.com/pl-pl/242828_blade-barbershop_barber-shop_13750_wroclaw',
+        image: 'booksy-blade-barbershop.png',
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'Grabiszyńska 139b',
+                voivodeship: 'dolnoslaskie',
+                latitude: wroclawLat,
+                longitude: wroclawLon,
+                openingHours: standardShopHours,
+            },
+        ],
+    });
+
+
+    // 1. EASY Warsztat Samochodowy (Warszawa)
+    await seedService({
+        name: 'EASY Warsztat Samochodowy | Автосервис',
+        slug: 'easy-warsztat-samochodowy-warszawa',
+        category: 'mechanics',
+        plDesc: 'Profesjonalny warsztat samochodowy oferujący kompleksową mechanikę pojazdową, serwis eksploatacyjny oraz diagnostykę komputerową. Obsługa w języku polskim i ukraińskim.',
+        ukDesc: 'Професійний автосервіс, що пропонує комплексний ремонт автомобілів, технічне обслуговування та комп’ютерну діагностику. Обслуговування польською та українською мовами.',
+        enDesc: 'Professional car workshop offering comprehensive vehicle mechanics, maintenance service, and computer diagnostics. Service available in Polish and Ukrainian.',
+        ruDesc: 'Профессиональный автосервис, предлагающий комплексный ремонт автомобилей, техническое обслуживание и компьютерную диагностику. Обслуживание на польском и украинском языках.',
+        webpage: 'https://www.facebook.com/easywarsztat/',
+        image: 'easy-warsztat-samochodowy-or-avtoservis.png',
+        tags: ['mechanic', 'repair', 'car-service'],
+        locations: [
+            {
+                city: 'Warszawa',
+                street: 'ul. Stanisława Bodycha 39',
+                voivodeship: 'mazowieckie',
+                latitude: 52.191244,
+                longitude: 20.879556,
+                phoneNumber: '+48 797 967 777',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '09:00', close: '18:00' },
+                    tuesday: { open: '09:00', close: '18:00' },
+                    wednesday: { open: '09:00', close: '18:00' },
+                    thursday: { open: '09:00', close: '18:00' },
+                    friday: { open: '09:00', close: '18:00' },
+                    saturday: { open: '09:00', close: '14:00' },
+                },
+            },
+        ],
+    });
+
+// 2. Auto Service Auto Dyskusja (Kraków)
+    await seedService({
+        name: 'Auto Service Auto Dyskusja',
+        slug: 'auto-service-auto-dyskusja-krakow',
+        category: 'mechanics',
+        plDesc: 'Serwis samochodowy specjalizujący się w naprawach bieżących, serwisie olejowym oraz układach hamulcowych. Przyjazna atmosfera i transparentne koszty naprawy.',
+        ukDesc: 'Автосервіс, що спеціалізується на поточному ремонті, заміні масла та гальмівних системах. Дружня атмосфера та прозорі ціни на ремонт.',
+        enDesc: 'Car service specializing in routine repairs, oil changes, and braking systems. Friendly atmosphere and transparent repair costs.',
+        ruDesc: 'Автосервис, специализирующийся на текущем ремонте, замене масла и тормозных системах. Дружелюбная атмосфера и прозрачная стоимость ремонта.',
+        webpage: 'https://www.autodyskusja.pl/',
+        image: 'auto-service-auto-dyskusja.png',
+        tags: ['mechanic', 'oil-change', 'brakes'],
+        locations: [
+            {
+                city: 'Kraków',
+                street: 'ul. Michała Korpala 3',
+                voivodeship: 'malopolskie',
+                latitude: 50.015622,
+                longitude: 19.893822,
+                phoneNumber: '+48 786 212 776',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:00', close: '17:00' },
+                    tuesday: { open: '08:00', close: '17:00' },
+                    wednesday: { open: '08:00', close: '17:00' },
+                    thursday: { open: '08:00', close: '17:00' },
+                    friday: { open: '08:00', close: '17:00' },
+                },
+            },
+        ],
+    });
+
+// 3. R-MAX Auto (Wrocław)
+    await seedService({
+        name: 'R-MAX Auto Wrocław',
+        slug: 'r-max-auto-wroclaw',
+        category: 'mechanics',
+        plDesc: 'Nowoczesny warsztat oferujący szeroki zakres usług mechanicznych. Specjalizacja w diagnostyce i szybkich naprawach serwisowych. Komunikacja w języku ukraińskim.',
+        ukDesc: 'Сучасна майстерня, що пропонує широкий спектр механічних послуг. Спеціалізація на діагностиці та швидкому сервісному ремонті. Спілкування українською мовою.',
+        enDesc: 'Modern workshop offering a wide range of mechanical services. Specializing in diagnostics and quick service repairs. Communication in Ukrainian.',
+        ruDesc: 'Современная мастерская, предлагающая широкий спектр механических услуг. Специализация на диагностике и быстром сервисном ремонте. Общение на украинском языке.',
+        webpage: 'https://dobrymechanik.pl/mechanicy/wroclaw/r-max-auto.html',
+        image: 'rmax-auto-wroclaw.png',
+        tags: ['mechanic', 'diagnostics', 'fast-repair'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'ul. Paprotna 8',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.144444,
+                longitude: 17.025556,
+                phoneNumber: '+48 886 494 643',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:30', close: '17:30' },
+                    tuesday: { open: '08:30', close: '17:30' },
+                    wednesday: { open: '08:30', close: '17:30' },
+                    thursday: { open: '08:30', close: '17:30' },
+                    friday: { open: '08:30', close: '17:30' },
+                },
+            },
+        ],
+    });
+
+// 4. Serwis Group UA PL (Poznań)
+    await seedService({
+        name: 'Serwis Group UA PL Poznań',
+        slug: 'serwis-group-ua-pl-poznan',
+        category: 'mechanics',
+        plDesc: 'Polsko-ukraiński zespół mechaników zapewniający rzetelne naprawy silników, zawieszenia oraz serwis klimatyzacji. Szybkie terminy i fachowe doradztwo.',
+        ukDesc: 'Польсько-українська команда механіків, що забезпечує надійний ремонт двигунів, підвіски та обслуговування кондиціонерів. Швидкі терміни та професійні поради.',
+        enDesc: 'Polish-Ukrainian team of mechanics providing reliable engine repairs, suspension work, and AC service. Fast turnaround and professional advice.',
+        ruDesc: 'Польско-украинская команда механиков, обеспечивающая надежный ремонт двигателей, подвески и обслуживание кондиционеров. Быстрые сроки и профессиональные консультации.',
+        webpage: 'https://dobrymechanik.pl/mechanicy/poznan/auto-serwis-group-ua-pl.html',
+        socials: {facebook: 'https://www.facebook.com/SerwisGroup/'},
+        image: 'serwis-group-ua-pl-poznan.png',
+        tags: ['mechanic', 'engine', 'suspension', 'ac'],
+        locations: [
+            {
+                city: 'Poznań',
+                street: 'ul. Morasko 5',
+                voivodeship: 'wielkopolskie',
+                latitude: 52.478901,
+                longitude: 16.923456,
+                phoneNumber: '+48 573 294 010',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '09:00', close: '18:00' },
+                    tuesday: { open: '09:00', close: '18:00' },
+                    wednesday: { open: '09:00', close: '18:00' },
+                    thursday: { open: '09:00', close: '18:00' },
+                    friday: { open: '09:00', close: '18:00' },
+                    saturday: { open: '09:00', close: '14:00' },
+                },
+            },
+        ],
+    });
+
+
+    // 5. Kraków warsztat samochodowy | СТО Краков
+    await seedService({
+        name: 'Kraków warsztat samochodowy | СТО Краков',
+        slug: 'krakow-warsztat-samochodowy-sto',
+        category: 'mechanics',
+        plDesc: 'Profesjonalny serwis samochodowy (STO) w Krakowie, oferujący pełen zakres napraw mechanicznych, serwis olejowy oraz przeglądy okresowe. Obsługa prowadzona przez doświadczonych mechaników.',
+        ukDesc: 'Професійний автосервіс (СТО) у Кракові, що пропонує повний спектр механічного ремонту, заміну масла та періодичні огляди. Обслуговування проводять досвідчені механіки.',
+        enDesc: 'Professional car service (STO) in Krakow, offering a full range of mechanical repairs, oil service, and periodic inspections. Service provided by experienced mechanics.',
+        ruDesc: 'Профессиональный автосервис (СТО) в Кракове, предлагающий полный спектр механического ремонта, замену масла и периодические осмотры. Обслуживание проводят опытные механики.',
+        webpage: 'https://frontauto.pl/',
+        image: 'krakow-warsztat-samochodowy-or-sto-krakov.png',
+        tags: ['mechanic', 'sto', 'car-repair'],
+        socials: { instagram: 'https://www.instagram.com/sto_krakow/' },
+        locations: [
+            {
+                city: 'Kraków',
+                street: 'ul. Na Zakolu Wisły 14',
+                voivodeship: 'malopolskie',
+                latitude: 50.046522,
+                longitude: 19.967822,
+                phoneNumber: '+48 452 896 921',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:00', close: '18:00' },
+                    tuesday: { open: '08:00', close: '18:00' },
+                    wednesday: { open: '08:00', close: '18:00' },
+                    thursday: { open: '08:00', close: '18:00' },
+                    friday: { open: '08:00', close: '18:00' },
+                    saturday: { open: '09:00', close: '15:00' },
+                },
+            },
+        ],
+    });
+
+// 7. Ukraine servis Z.G / warsztat samochodowy (Zielona Góra)
+    await seedService({
+        name: 'Ukraine servis Z.G / warsztat samochodowy',
+        slug: 'ukraine-servis-zg-zielona-gora',
+        category: 'mechanics',
+        plDesc: 'Serwis samochodowy w Zielonej Górze oferujący szybkie naprawy bieżące, wymianę płynów eksploatacyjnych oraz pomoc w drobnych usterkach mechanicznych.',
+        ukDesc: 'Автосервіс у Зеленій Гурі, що пропонує швидкий поточний ремонт, заміну робочих рідин та допомогу при незначних механічних несправностях.',
+        enDesc: 'Car service in Zielona Gora offering fast routine repairs, replacement of operating fluids, and assistance with minor mechanical faults.',
+        ruDesc: 'Автосервис в Зелёна-Гуре, предлагающий быстрый текущий ремонт, замену рабочих жидкостей и помощь при незначительных механических неисправностях.',
+        webpage: '',
+        image: 'ukraine-servis-zg.png',
+        tags: ['mechanic', 'quick-repair', 'car-service'],
+        locations: [
+            {
+                city: 'Zielona Góra',
+                street: 'Zawada-Zielonogórska 85',
+                voivodeship: 'lubuskie',
+                latitude: 51.983333,
+                longitude: 15.566667,
+                phoneNumber: '+48 791 131 876',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:30', close: '17:30' },
+                    tuesday: { open: '08:30', close: '17:30' },
+                    wednesday: { open: '08:30', close: '17:30' },
+                    thursday: { open: '08:30', close: '17:30' },
+                    friday: { open: '08:30', close: '17:30' },
+                    saturday: { open: '09:00', close: '14:00' },
+                },
+            },
+        ],
+    });
+
+    // 1. Serwis Samochodowy STO%
+    await seedService({
+        name: 'Serwis Samochodowy STO%',
+        slug: 'serwis-samochodowy-sto-procent-wroclaw',
+        category: 'mechanics',
+        plDesc: 'Profesjonalny warsztat STO na Stabłowicach. Oferujemy pełen zakres mechaniki pojazdowej, diagnostykę silnika oraz naprawy zawieszenia. Wysoka jakość obsługi w języku polskim i ukraińskim.',
+        ukDesc: 'Професійний автосервіс СТО на Стабловіцах. Ми пропонуємо повний спектр автомеханіки, діагностику двигуна та ремонт підвіски. Висока якість обслуговування польською та українською мовами.',
+        enDesc: 'Professional STO car service in Stabłowice. We offer a full range of car mechanics, engine diagnostics, and suspension repairs. High quality service in Polish and Ukrainian.',
+        ruDesc: 'Профессиональный автосервис СТО на Стабловицах. Мы предлагаем полный спектр автомеханики, диагностику двигателя и ремонт подвески. Высокое качество обслуживания на польском и украинском языках.',
+        webpage: 'https://warsztat-sto.pl/',
+        image: 'sto-procent-wroclaw.png',
+        tags: ['mechanic', 'sto', 'diagnostics'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'ul. Północna 11',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.144189,
+                longitude: 16.918945,
+                phoneNumber: '+48 729 695 607',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '09:00', close: '19:00' },
+                    tuesday: { open: '09:00', close: '19:00' },
+                    wednesday: { open: '09:00', close: '19:00' },
+                    thursday: { open: '09:00', close: '19:00' },
+                    friday: { open: '09:00', close: '19:00' },
+                    saturday: { open: '09:00', close: '15:00' },
+                },
+            },
+        ],
+    });
+
+// 2. AUTOSERWIS UKR (Długosza)
+    await seedService({
+        name: 'AUTOSERWIS UKR',
+        slug: 'autoserwis-ukr-wroclaw',
+        category: 'mechanics',
+        plDesc: 'Uznany serwis samochodowy z ukraińską kadrą specjalistów. Kompleksowa naprawa aut osobowych i dostawczych. Specjalizacja: układy hamulcowe i kierownicze.',
+        ukDesc: 'Визнаний автосервіс з українським штатом спеціалістів. Комплексний ремонт легкових та вантажних автомобілів. Спеціалізація: гальмівні та рульові системи.',
+        enDesc: 'Recognized car service with Ukrainian specialist staff. Comprehensive repair of passenger cars and vans. Specialization: brake and steering systems.',
+        ruDesc: 'Признанный автосервис с украинским штатом специалистов. Комплексный ремонт легковых и грузовых автомобилей. Специализация: тормозные и рулевые системы.',
+        webpage: '',
+        image: 'autoserwis-ukr-wroclaw.png',
+        tags: ['mechanic', 'car-repair', 'brakes'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'ul. Jana Długosza 34',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.131556,
+                longitude: 17.062111,
+                phoneNumber: '+48 733 008 812',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:00', close: '18:00' },
+                    tuesday: { open: '08:00', close: '18:00' },
+                    wednesday: { open: '08:00', close: '18:00' },
+                    thursday: { open: '08:00', close: '18:00' },
+                    friday: { open: '08:00', close: '18:00' },
+                    saturday: { open: '09:00', close: '14:00' },
+                },
+            },
+        ],
+    });
+
+// 3. Autosewis Sergey Goregliad
+    await seedService({
+        name: 'Autoserwis Sergey Goregliad',
+        slug: 'autoserwis-sergey-goregliad-wroclaw',
+        category: 'mechanics',
+        plDesc: 'Serwis prowadzony przez doświadczonego mechanika, oferujący rzetelną pomoc przy naprawach silników oraz bieżącej eksploatacji pojazdów w centrum Wrocławia.',
+        ukDesc: 'Сервіс під керівництвом досвідченого механіка, що пропонує надійну допомогу в ремонті двигунів та поточному обслуговуванні автомобілів у центрі Вроцлава.',
+        enDesc: 'Service run by an experienced mechanic, offering reliable help with engine repairs and routine vehicle maintenance in the center of Wroclaw.',
+        ruDesc: 'Сервис под руководством опытного механика, предлагающий надежную помощь в ремонте двигателей и текущем обслуживании автомобилей в центре Вроцлава.',
+        webpage: '',
+        image: 'sergey-goregliad-serwis.png',
+        tags: ['mechanic', 'engine', 'car-service'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'ul. Tęczowa 67',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.102889,
+                longitude: 17.013556,
+                phoneNumber: '+48 576 211 405',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '09:00', close: '18:00' },
+                    tuesday: { open: '09:00', close: '18:00' },
+                    wednesday: { open: '09:00', close: '18:00' },
+                    thursday: { open: '09:00', close: '18:00' },
+                    friday: { open: '09:00', close: '18:00' },
+                },
+            },
+        ],
+    });
+
+
+// 5. Auto Serwis KOMI
+    await seedService({
+        name: 'Auto Serwis KOMI',
+        slug: 'auto-serwis-komi-wroclaw',
+        category: 'mechanics',
+        plDesc: 'Profesjonalny warsztat oferujący szeroki zakres usług mechanicznych i elektromechanicznych. Zespół znany z rzetelności i dobrego kontaktu z klientem obcojęzycznym.',
+        ukDesc: 'Професійна майстерня, що пропонує широкий спектр механічних та електромеханічних послуг. Команда відома своєю надійністю та хорошим контактом з іноземними клієнтами.',
+        enDesc: 'Professional workshop offering a wide range of mechanical and electromechanical services. Team known for reliability and good contact with foreign clients.',
+        ruDesc: 'Профессиональная мастерская, предлагающая широкий спектр механических и электромеханических услуг. Команда известна своей надежностью и хорошим контактом с иностранными клиентами.',
+        webpage: 'https://warsztaty.yanosik.pl/warsztat/wroclaw/auto-serwis-komi/23962',
+        image: 'auto-serwis-komi.png',
+        tags: ['mechanic', 'car-service', 'repair'],
+        locations: [
+            {
+                city: 'Wrocław',
+                street: 'ul. Kwidzyńska 2',
+                voivodeship: 'dolnoslaskie',
+                latitude: 51.132222,
+                longitude: 17.085556,
+                phoneNumber: '+48 517 353 303',
+                isMainLocation: true,
+                openingHours: {
+                    monday: { open: '08:00', close: '17:00' },
+                    tuesday: { open: '08:00', close: '17:00' },
+                    wednesday: { open: '08:00', close: '17:00' },
+                    thursday: { open: '08:00', close: '17:00' },
+                    friday: { open: '08:00', close: '17:00' },
+                },
+            },
+        ],
+    });
 
     console.log('✅ Seed zakończony z tagami!');
 }

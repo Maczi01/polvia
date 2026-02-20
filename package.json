@@ -13,6 +13,8 @@
     "db:drop": "node --require dotenv/config --import tsx src/db/drop.ts",
     "drizzle:push": "drizzle-kit push",
     "db:seed": "node --require dotenv/config --import tsx src/db/seed.ts",
+    "db:reset": "npm run db:drop && npm run drizzle:push && npm run db:seed",
+    "drop-migrate-seed": "npm run db:drop && npm run drizzle:generate && npm run db:seed",
     "embeddings:generate-ts": "tsx src/lib/scripts.ts"
   },
   "dependencies": {
