@@ -320,7 +320,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                             </div>
                         </div>
 
-                        <div className="flex w-3/4 min-w-0 items-center">
+                        <div className="flex w-3/4 min-w-0 items-center gap-x-4">
                             {isScrollable && (
                                 <button
                                     className="flex-none rounded-full border border-gray-200 bg-white p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -339,20 +339,20 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                 </button>
                             )}
 
+                            <ButtonCategory
+                                image={'/icons/remove.svg'}
+                                text={t('Categories.RemoveFilter')}
+                                variant={hasActiveFilters ? 'removeFilter' : 'default'}
+                                isSelected={false}
+                                onClick={resetAllFilters}
+                                className="flex-none"
+                                disabled={!hasActiveFilters}
+                            />
+
                             <div
                                 ref={categoryReference}
-                                className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden px-4"
+                                className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden pr-4"
                             >
-                                <ButtonCategory
-                                    image={'/icons/remove.svg'}
-                                    text={t('Categories.RemoveFilter')}
-                                    variant={hasActiveFilters ? 'removeFilter' : 'default'}
-                                    isSelected={false}
-                                    onClick={resetAllFilters}
-                                    className="flex-none"
-                                    disabled={!hasActiveFilters}
-                                />
-
                                 {categories.map(({ text, image, variant }) => (
                                     <ButtonCategory
                                         key={text}
