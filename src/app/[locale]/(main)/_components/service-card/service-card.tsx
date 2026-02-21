@@ -449,7 +449,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     }}
                     onClick={e => e.stopPropagation()}
                 >
-                    <div className="space-y-4 px-1 pb-1 md:px-0 md:pb-0">
+                    <div className="mt-2 space-y-4 px-1 pb-1 md:px-0 md:pb-0">
                         {/* Detail rows + Languages */}
                         <div className="flex gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
                             <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -604,9 +604,9 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 >
                                     <button
                                         type="button"
-                                        className="flex w-full flex-col items-center gap-1 rounded-xl border border-gray-200 px-2 py-3 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        className="flex w-full items-center justify-center gap-2 rounded-full border border-[#f97316] bg-[#fff7ed] px-3 py-2.5 text-sm font-medium text-[#c2410c] transition-colors hover:bg-[#ffedd5] dark:border-[#ea580c] dark:bg-[#431407]/20 dark:text-[#fb923c] dark:hover:bg-[#431407]/40"
                                     >
-                                        <Phone size={18} className="text-gray-500 dark:text-gray-400" />
+                                        <Phone size={18} />
                                         {t('call')}
                                     </button>
                                 </a>
@@ -622,7 +622,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 >
                                     <button
                                         type="button"
-                                        className="flex w-full flex-col items-center gap-1 rounded-xl border border-green-500 bg-green-50 px-2 py-3 text-xs font-medium text-green-700 transition-colors hover:bg-green-100 dark:border-green-600 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
+                                        className="flex w-full items-center justify-center gap-2 rounded-full border border-[#22c55e] bg-[#f0fdf4] px-3 py-2.5 text-sm font-medium text-[#15803d] transition-colors hover:bg-[#dcfce7] dark:border-[#16a34a] dark:bg-[#052e16]/20 dark:text-[#4ade80] dark:hover:bg-[#052e16]/40"
                                     >
                                         <MessageCircle size={18} />
                                         {t('whatsapp')}
@@ -639,7 +639,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             >
                                 <button
                                     type="button"
-                                    className="flex w-full flex-col items-center gap-1 rounded-xl border border-blue-500 bg-blue-50 px-2 py-3 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                    className="flex w-full items-center justify-center gap-2 rounded-full border border-[#3b82f6] bg-[#eff6ff] px-3 py-2.5 text-sm font-medium text-[#1d4ed8] transition-colors hover:bg-[#dbeafe] dark:border-[#2563eb] dark:bg-[#172554]/20 dark:text-[#60a5fa] dark:hover:bg-[#172554]/40"
                                 >
                                     <Navigation size={18} />
                                     {t('navigate')}
