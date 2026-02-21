@@ -78,6 +78,7 @@ export type Service = {
     languages: string[];
     socials: Socials | null;
     whatsappNumber: string | null;
+    verified: boolean;
     priority: number;
     clicks: number;
 };

@@ -156,6 +156,7 @@ export async function GET(request: NextRequest) {
                 languages: servicesTable.languages,
                 socials: serviceLocationsTable.socials,
                 whatsappNumber: serviceLocationsTable.whatsappNumber,
+                verified: servicesTable.verified,
                 priority: sql<number>`COALESCE(${activePromotions.priority}, 0)`.as('priority'),
                 clicks: sql<number>`COALESCE(${totalClicks.clicks}, 0)`.as('clicks'),
                 relevanceScore: sql<number>`1 - (${serviceLocationsTable.embedding} <=> ${embeddingVector}::vector)`.as('relevanceScore')
@@ -230,6 +231,7 @@ export async function GET(request: NextRequest) {
                     languages: service.languages,
                     socials: service.socials,
                     whatsappNumber: service.whatsappNumber,
+                    verified: service.verified,
                     description: preferredTranslation?.description || null,
                     tags: serviceTags,
                     relevanceScore: service.relevanceScore,

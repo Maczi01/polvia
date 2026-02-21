@@ -23,6 +23,7 @@ type CategoryPreviewClientProps = {
             | 'darkviolet'
             | 'starfall'
             | 'overworld'
+            | 'oversky'
             | 'mojito'
             | 'removeFilter'
             | null

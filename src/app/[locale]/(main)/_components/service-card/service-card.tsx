@@ -12,6 +12,7 @@ import { mapCategoryToBadgeColor } from '@/lib/consts';
 import { Clock, Globe, MapPin, Phone, MessageCircle, Navigation } from 'lucide-react';
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
+import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
 
 const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     pl: { src: '/icons/pl.svg', alt: 'Polish' },
@@ -130,6 +131,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             languages,
             socials,
             whatsappNumber,
+            verified,
             handleFlyTo,
             resetMap,
             handleHoverPlace,
@@ -382,14 +384,17 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         </div>
 
                         <div className="min-w-0 flex-1 pr-10">
-                            <h3
-                                className={cn(
-                                    'text-base font-bold text-gray-900 dark:text-gray-100 md:text-lg',
-                                    expanded ? 'break-words' : 'truncate',
-                                )}
-                            >
-                                {name}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                                <h3
+                                    className={cn(
+                                        'text-base font-bold text-gray-900 dark:text-gray-100 md:text-lg',
+                                        expanded ? 'break-words' : 'truncate',
+                                    )}
+                                >
+                                    {name}
+                                </h3>
+                                {verified && <VerifiedBadge className="shrink-0" />}
+                            </div>
                             <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                                 {expanded
                                     ? description || `${city}${voivodeship ? `, ${voivodeship}` : ''}`

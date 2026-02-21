@@ -65,6 +65,7 @@ export const servicesTable = pgTable('services', {
     status: statusEnum('status').notNull().default('active'),
     image: varchar('image', { length: 255 }),
     languages: varchar('languages', { length: 5 }).array().notNull().default(sql`ARRAY['pl']::varchar[]`),
+    verified: boolean('verified').notNull().default(false),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 

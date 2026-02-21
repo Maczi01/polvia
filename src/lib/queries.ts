@@ -42,6 +42,7 @@ export async function getServices(locale: string = 'en') {
             languages: servicesTable.languages,
             socials: serviceLocationsTable.socials,
             whatsappNumber: serviceLocationsTable.whatsappNumber,
+            verified: servicesTable.verified,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
@@ -134,6 +135,7 @@ export async function getMostPopular(locale: string) {
             languages: servicesTable.languages,
             socials: serviceLocationsTable.socials,
             whatsappNumber: serviceLocationsTable.whatsappNumber,
+            verified: servicesTable.verified,
 
             priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
             clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),

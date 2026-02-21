@@ -33,6 +33,7 @@ const categoryCardVariants = cva(
                 darkviolet: 'bg-gradient-to-br from-[#6441A5] to-[#2a0845] text-white hover:from-[#6441A5]/90 hover:to-[#2a0845]/90',
                 starfall: 'bg-gradient-to-br from-[#4b1248] to-[#cc9e54] text-white hover:from-[#4b1248]/90 hover:to-[#cc9e54]/90',
                 overworld: 'bg-gradient-to-br from-[#4776e6] to-[#8e54e9] text-white hover:from-[#4776e6]/90 hover:to-[#8e54e9]/90',
+                oversky: 'bg-gradient-to-br from-[#3D0DAF] to-[#0998A2] text-white hover:from-[#3D0DAF]/90 hover:to-[#0998A2]/90',
                 mojito: 'bg-gradient-to-br from-[#eb3349] to-[#f45c43] text-white hover:from-[#eb3349]/90 hover:to-[#f45c43]/90',
                 removeFilter: 'bg-red-500 text-white hover:bg-red-600',
             },
