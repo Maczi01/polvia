@@ -1825,7 +1825,7 @@ async function mainSeed() {
         enDesc: 'Professional VIP transport from Rzeszów. Private passenger rides in an exclusive fleet (including Mercedes V-Class) across Poland, the EU, and Ukraine. Airport, station, and hotel transfers 24/7 with guaranteed discretion and safety.',
         ruDesc: 'Профессиональный VIP-транспорт из Жешува. Частные пассажирские перевозки эксклюзивным автопарком (включая Mercedes V-Class) по Польше, ЕС и Украине. Трансферы в аэропорты, на вокзалы и в отели 24/7 с гарантией конфиденциальности и безопасности.',
         webpage: 'https://ju-transport-vip.com/',
-        image: 'ju-transport-vip.png',
+        image: 'ju-transport-vip-service.png',
         tags: ['poland-ukraine', 'international'],
         socials: { facebook: 'https://www.facebook.com/people/JU-Transport-VIP-Service/61573495686434/' },
         languages: ['pl', 'uk', 'en'],

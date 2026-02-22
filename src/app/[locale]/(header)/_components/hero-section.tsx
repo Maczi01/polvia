@@ -1,6 +1,5 @@
 'use client';
 
-import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { HeroSearch } from '@/app/[locale]/(header)/_components/hero-search';
 
@@ -61,14 +60,12 @@ export default function HeroSection() {
                         <h3 id="hero-image-description" className="sr-only">
                             {t('MapDescription')}
                         </h3>
-                        <Image
-                            src={'/logo/hero.svg'}
-                            alt={t('mapDesc')}
-                            fill
-                            className="object-contain dark:brightness-90 dark:contrast-110"
-                            sizes="(min-width: 1280px) 50vw, (min-width: 768px) 50vw, 100vw"
-                            priority
-                            fetchPriority="high"
+                        {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                        <object
+                            type="image/svg+xml"
+                            data="/logo/hero.svg"
+                            aria-label={t('mapDesc')}
+                            className="h-full w-full object-contain dark:brightness-90 dark:contrast-110"
                         />
                     </div>
                 </div>
