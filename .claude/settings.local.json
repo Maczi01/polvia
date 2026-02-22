@@ -13,7 +13,9 @@
       "WebFetch(domain:poznan.twojlekarz-wawa.pl)",
       "WebFetch(domain:www.kliniki.pl)",
       "WebFetch(domain:twojlekarz-wawa.pl)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(head:*)",
+      "mcp__chrome-devtools__take_screenshot"
     ]
   },
   "enableAllProjectMcpServers": true,

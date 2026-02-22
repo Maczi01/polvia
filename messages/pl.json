@@ -471,6 +471,11 @@
     "searching_recommendations": "Szukam rekomendacji...",
     "finding_more_results": "Szukam więcej wyników..."
   },
+  "HeroMap": {
+    "places": "{count} miejsc",
+    "viewOnMap": "Zobacz na mapie",
+    "exampleCities": "np. {cities}"
+  },
   "Pricing": {
     "choosePlan": "Wybierz plan dla swojej firmy",
     "simple": "Prosty cennik, bez ukrytych opłat. Możliwość anulowania w każdej chwili",

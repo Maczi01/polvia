@@ -471,6 +471,11 @@
     "searching_recommendations": "Searching for recommendations...",
     "finding_more_results": "Finding More Results..."
   },
+  "HeroMap": {
+    "places": "{count} places",
+    "viewOnMap": "View on map",
+    "exampleCities": "e.g. {cities}"
+  },
   "Pricing": {
     "choosePlan": "Choose a plan that fits your company",
     "simple": "Simple pricing, no hidden fees",

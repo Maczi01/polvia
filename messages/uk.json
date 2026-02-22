@@ -470,6 +470,11 @@
     "searching_recommendations": "Шукаємо рекомендації...",
     "finding_more_results": "Шукаємо більше результатів..."
   },
+  "HeroMap": {
+    "places": "{count} місць",
+    "viewOnMap": "Дивитися на карті",
+    "exampleCities": "напр. {cities}"
+  },
   "Pricing": {
     "choosePlan": "Оберіть план для вашої компанії",
     "simple": "Прості ціни, без прихованих платежів",

@@ -470,6 +470,11 @@
     "searching_recommendations": "Ищем рекомендации...",
     "finding_more_results": "Ищем ещё результаты..."
   },
+  "HeroMap": {
+    "places": "{count} мест",
+    "viewOnMap": "Смотреть на карте",
+    "exampleCities": "напр. {cities}"
+  },
   "Pricing": {
     "choosePlan": "Выберите план для вашей компании",
     "simple": "Простые цены, без скрытых платежей",

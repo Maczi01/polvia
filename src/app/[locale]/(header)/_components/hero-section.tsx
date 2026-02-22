@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { HeroSearch } from '@/app/[locale]/(header)/_components/hero-search';
+import { HeroMapInteractive } from '@/app/[locale]/(header)/_components/hero-map-interactive';
 
 export default function HeroSection() {
     const t = useTranslations('Main');
@@ -60,13 +61,7 @@ export default function HeroSection() {
                         <h3 id="hero-image-description" className="sr-only">
                             {t('MapDescription')}
                         </h3>
-                        {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                        <object
-                            type="image/svg+xml"
-                            data="/logo/hero.svg"
-                            aria-label={t('mapDesc')}
-                            className="h-full w-full object-contain dark:brightness-90 dark:contrast-110"
-                        />
+                        <HeroMapInteractive ariaLabel={t('mapDesc')} />
                     </div>
                 </div>
             </div>

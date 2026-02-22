@@ -8,6 +8,7 @@ import type { Locale } from '@/i18n/config';
 // Category name constants (normalized keys used internally)
 export const CATEGORY_KEYS = [
     'grocery',
+    'gastronomy',
     'transport',
     'financial',
     'renovation',
@@ -27,6 +28,7 @@ export type CategoryKey = (typeof CATEGORY_KEYS)[number];
 export const CATEGORY_SLUGS = {
     pl: {
         grocery: 'spozywcze',
+        gastronomy: 'gastronomia',
         transport: 'transport',
         financial: 'finansowe',
         renovation: 'remonty',
@@ -41,6 +43,7 @@ export const CATEGORY_SLUGS = {
     },
     en: {
         grocery: 'grocery',
+        gastronomy: 'gastronomy',
         transport: 'transport',
         financial: 'financial',
         renovation: 'renovation',
@@ -55,6 +58,7 @@ export const CATEGORY_SLUGS = {
     },
     ru: {
         grocery: 'produkty',
+        gastronomy: 'gastronomiya',
         transport: 'transport',
         financial: 'finansovye',
         renovation: 'remont',
@@ -69,6 +73,7 @@ export const CATEGORY_SLUGS = {
     },
     uk: {
         grocery: 'produkty',
+        gastronomy: 'gastronomiya',
         transport: 'transport',
         financial: 'finansovi',
         renovation: 'remont',
