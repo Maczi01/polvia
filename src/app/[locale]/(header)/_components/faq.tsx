@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { ArrowRight, ChevronDown, ChevronUp, Mail, MapPin, Plus } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
@@ -77,7 +77,25 @@ export const Faq = () => {
         { question: 'question16', answer: 'answer16' },
     ];
 
+    const faqSchema = useMemo(() => JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+            '@type': 'Question',
+            name: t(faq.question),
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: t(faq.answer),
+            },
+        })),
+    }), [t]);
+
     return (
+        <>
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: faqSchema }}
+        />
         <section
             className="bg-gray-50 dark:bg-gray-800 py-16 md:py-24"
             aria-labelledby="faq-heading"
@@ -267,5 +285,6 @@ export const Faq = () => {
                 }
             `}</style>
         </section>
+    </>
     );
 };

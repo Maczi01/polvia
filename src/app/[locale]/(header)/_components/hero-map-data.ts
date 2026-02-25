@@ -140,6 +140,36 @@ export const HERO_PINS: HeroPin[] = [
         exampleCities: ['Rzeszów', 'Przemyśl'],
         exampleCompanies: [],
     },
+    {
+        svgLabel: 'Technology',
+        categoryKey: 'technology',
+        icon: '/icons/others.svg',
+        variant: 'cyan',
+        position: { x: 310, y: 465 },
+        placesCount: 6,
+        exampleCities: ['Opole', 'Nysa'],
+        exampleCompanies: ['TechHub', 'CodeWorks'],
+    },
+    {
+        svgLabel: 'Construction',
+        categoryKey: 'construction',
+        icon: '/icons/others.svg',
+        variant: 'pink',
+        position: { x: 370, y: 498 },
+        placesCount: 9,
+        exampleCities: ['Katowice', 'Gliwice'],
+        exampleCompanies: ['BudMaster', 'RemontyPL'],
+    },
+    {
+        svgLabel: 'Pets',
+        categoryKey: 'pets',
+        icon: '/icons/others.svg',
+        variant: 'amber',
+        position: { x: 508, y: 442 },
+        placesCount: 5,
+        exampleCities: ['Kielce', 'Ostrowiec'],
+        exampleCompanies: ['PetCare', 'ZooVet'],
+    },
 ];
 
 export const HERO_PIN_MAP = new Map<string, HeroPin>(

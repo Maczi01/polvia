@@ -2,11 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-is-mobile';
-import { HERO_PIN_MAP, type HeroPin } from './hero-map-data';
+import { HERO_PINS, HERO_PIN_MAP, type HeroPin } from './hero-map-data';
 import { HeroMapTooltip } from './hero-map-tooltip';
 
 const SHOW_DELAY = 120;
 const HIDE_DELAY = 120;
+
+const AUTO_BOUNCE_LEAD_MS = 0; // show tooltip immediately with bounce
+const AUTO_TOOLTIP_MS = 1400; // tooltip visible before fade-out starts
+const AUTO_FADE_MS = 600; // fade-out duration (syncs with 2s bounce cycle end)
+const AUTO_BREAK_MS = 600; // pause between pins
+const AUTO_START_MS = 4200; // after pin fade-in animations finish
 
 type Props = {
     ariaLabel: string;
@@ -20,6 +26,12 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
     const svgInjectedRef = useRef(false);
     const showTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Auto-cycle refs
+    const autoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const lastAutoIndexRef = useRef(-1);
+    const userHoveringRef = useRef(false);
+    const autoShowingRef = useRef(false);
 
     const [svgLoaded, setSvgLoaded] = useState(false);
     const [activePin, setActivePin] = useState<HeroPin | null>(null);
@@ -64,7 +76,7 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
             const screenPt = pt.matrixTransform(ctm);
             const containerRect = container.getBoundingClientRect();
 
-            // The pin graphic is ~51 SVG units tall above its anchor point.
+            // The pin graphic is ~50 SVG units tall above its anchor point.
             // Convert that to screen pixels using the current scale factor.
             const pinHeightSvg = 58;
             const pinHeightPx = pinHeightSvg * ctm.a; // ctm.a = horizontal scale ≈ vertical for uniform scaling
@@ -86,20 +98,43 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
         [],
     );
 
+    // Toggle bounce class on the active pin's SVG element
+    const setActivePinBounce = useCallback((category: string | null) => {
+        const wrapper = svgWrapperRef.current;
+        if (!wrapper) return;
+        wrapper.querySelectorAll('.jm-active').forEach((el) => {
+            // Skip removal if this element already belongs to the target category
+            const parentMw = el.closest('.mw');
+            if (category && parentMw?.getAttribute('data-category') === category) return;
+            el.classList.remove('jm-active');
+            (el as SVGElement).style.animationDelay = '';
+        });
+        if (category) {
+            const jm = wrapper.querySelector(`.mw[data-category="${category}"] .jm`) as SVGElement | null;
+            if (jm && !jm.classList.contains('jm-active')) {
+                jm.style.animationDelay = '0s';
+                jm.classList.add('jm-active');
+            }
+        }
+    }, []);
+
     // Show a pin's tooltip
     const showPin = useCallback(
         (pin: HeroPin) => {
             setActivePin(pin);
             setTooltipStyle(computeTooltipPosition(pin));
             setVisible(true);
+            setActivePinBounce(pin.svgLabel);
         },
-        [computeTooltipPosition],
+        [computeTooltipPosition, setActivePinBounce],
     );
 
     // Hide tooltip
     const hideTooltip = useCallback(() => {
         setVisible(false);
-    }, []);
+        userHoveringRef.current = false;
+        setActivePinBounce(null);
+    }, [setActivePinBounce]);
 
     // Clear all timers
     const clearTimers = useCallback(() => {
@@ -112,6 +147,66 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
             hideTimerRef.current = null;
         }
     }, []);
+
+    // ── Auto-cycle: reuse the full HeroMapTooltip ───────────────────
+    useEffect(() => {
+        if (!svgLoaded || isMobile) return;
+
+        const showNext = () => {
+            if (userHoveringRef.current) {
+                autoTimerRef.current = setTimeout(showNext, AUTO_BREAK_MS);
+                return;
+            }
+
+            let idx: number;
+            do {
+                idx = Math.floor(Math.random() * HERO_PINS.length);
+            } while (idx === lastAutoIndexRef.current && HERO_PINS.length > 1);
+            lastAutoIndexRef.current = idx;
+
+            const pin = HERO_PINS[idx];
+            autoShowingRef.current = true;
+
+            // Step 1: Start bounce only
+            setActivePinBounce(pin.svgLabel);
+
+            // Step 2: After lead time, show tooltip
+            autoTimerRef.current = setTimeout(() => {
+                if (!autoShowingRef.current || userHoveringRef.current) {
+                    autoTimerRef.current = setTimeout(showNext, AUTO_BREAK_MS);
+                    return;
+                }
+                showPin(pin);
+
+                // Step 3: Keep tooltip visible, then hide
+                autoTimerRef.current = setTimeout(() => {
+                    if (autoShowingRef.current && !userHoveringRef.current) {
+                        setVisible(false); // fade out tooltip (CSS transition)
+                    }
+
+                    // Step 4: Wait for fade-out animation, then stop bounce
+                    autoTimerRef.current = setTimeout(() => {
+                        if (autoShowingRef.current && !userHoveringRef.current) {
+                            setActivePinBounce(null);
+                            userHoveringRef.current = false;
+                        }
+
+                        // Step 5: Break, then next pin
+                        autoTimerRef.current = setTimeout(showNext, AUTO_BREAK_MS);
+                    }, AUTO_FADE_MS);
+                }, AUTO_TOOLTIP_MS);
+            }, AUTO_BOUNCE_LEAD_MS);
+        };
+
+        autoTimerRef.current = setTimeout(showNext, AUTO_START_MS);
+
+        return () => {
+            if (autoTimerRef.current) {
+                clearTimeout(autoTimerRef.current);
+                autoTimerRef.current = null;
+            }
+        };
+    }, [svgLoaded, isMobile, computeTooltipPosition, showPin, hideTooltip, setActivePinBounce]);
 
     // Event delegation: mouseover on SVG container
     const handleMouseOver = useCallback(
@@ -127,6 +222,10 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
 
             const pin = HERO_PIN_MAP.get(category);
             if (!pin) return;
+
+            // User takes over from auto-cycle
+            userHoveringRef.current = true;
+            autoShowingRef.current = false;
 
             if (hideTimerRef.current) {
                 clearTimeout(hideTimerRef.current);
@@ -179,6 +278,8 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
 
     // Card hover: keep visible
     const handleCardEnter = useCallback(() => {
+        userHoveringRef.current = true;
+        autoShowingRef.current = false;
         if (hideTimerRef.current) {
             clearTimeout(hideTimerRef.current);
             hideTimerRef.current = null;
@@ -229,7 +330,7 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
                 </div>
             )}
 
-            {/* Tooltip overlay */}
+            {/* Tooltip overlay — shared by auto-cycle and hover */}
             {activePin && !isMobile && (
                 <HeroMapTooltip
                     pin={activePin}

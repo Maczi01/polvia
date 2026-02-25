@@ -16,7 +16,7 @@ export default async function HomePage({ params }: { params: any }) {
             <CategoryPreviewServer />
             <PopularServices params={params} />
             <StatsBar />
-            {/*<Faq />*/}
+            <Faq />
             {/*<BlogSection params={params} />*/}
             <ScrollToTopButton />
         </div>

@@ -271,23 +271,26 @@ export const Header = () => {
                         />
 
                         {/* Map link - third */}
-                        {mapLinks.map(({ href, title }) => (
-                            <li key={href} className="flex items-center">
-                                <Button
-                                    asChild
-                                    className="min-w-36"
-                                    variant={pathname === href ? 'active' : 'outline'}
-                                >
-                                    <Link
-                                        href={href}
-                                        prefetch={true}
-                                        aria-current={pathname === href ? 'page' : undefined}
+                        {mapLinks.map(({ href, title }) => {
+                            const isMapActive = pathname === href || pathname.startsWith(href + '/');
+                            return (
+                                <li key={href} className="flex items-center">
+                                    <Button
+                                        asChild
+                                        className="min-w-36"
+                                        variant={isMapActive ? 'active' : 'outline'}
                                     >
-                                        {title}
-                                    </Link>
-                                </Button>
-                            </li>
-                        ))}
+                                        <Link
+                                            href={href}
+                                            prefetch={true}
+                                            aria-current={isMapActive ? 'page' : undefined}
+                                        >
+                                            {title}
+                                        </Link>
+                                    </Button>
+                                </li>
+                            );
+                        })}
 
                         {/* Other navigation items - after map */}
                         {otherLinks.map(({ href, title }) => (

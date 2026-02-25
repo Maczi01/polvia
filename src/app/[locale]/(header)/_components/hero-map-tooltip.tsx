@@ -37,10 +37,12 @@ export function HeroMapTooltip({ pin, style, visible, onMouseEnter, onMouseLeave
     return (
         <div
             className={cn(
-                'pointer-events-auto absolute z-50 w-[260px] rounded-xl border border-gray-200 bg-white p-3 shadow-lg',
+                'pointer-events-auto absolute z-50 w-[260px] origin-bottom rounded-xl border border-gray-200 bg-white p-3 shadow-lg',
                 'dark:border-gray-700 dark:bg-gray-800',
-                'motion-safe:transition-opacity motion-safe:duration-[120ms] motion-safe:ease-out',
-                visible ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                'motion-safe:transition-[opacity,transform] motion-safe:duration-[600ms] motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)]',
+                visible
+                    ? 'opacity-100 translate-y-0 scale-100'
+                    : 'opacity-0 translate-y-2 scale-95 pointer-events-none',
             )}
             style={style}
             onMouseEnter={onMouseEnter}

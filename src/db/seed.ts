@@ -1590,30 +1590,6 @@ async function mainSeed() {
         ],
     });
 
-// 18) iBrow
-    await seedService({
-        name: 'iBrow',
-        slug: 'ibrow',
-        category: 'beauty',
-        plDesc: 'Brwi/rzęsy dostępne do rezerwacji na Booksy.',
-        ukDesc: 'Брови/вії, доступно для запису в Booksy.',
-        enDesc: 'Brows/lashes bookable on Booksy.',
-        ruDesc: 'Брови/ресницы, доступно для записи в Booksy.',
-        tags: ['beauty'],
-        webpage: 'https://booksy.com/pl-pl/246528_ibrow_brwi-i-rzesy_13750_wroclaw',
-        image: 'booksy-ibrow.png',
-        locations: [
-            {
-                city: 'Wrocław',
-                street: 'Nowowiejska 63',
-                voivodeship: 'dolnoslaskie',
-                latitude: wroclawLat,
-                longitude: wroclawLon,
-                openingHours: standardShopHours,
-            },
-        ],
-    });
-
     // 1. EASY Warsztat Samochodowy (Warszawa)
     await seedService({
         name: 'EASY Warsztat Samochodowy | Автосервис',
@@ -1921,7 +1897,6 @@ async function mainSeed() {
             },
         ],
     });
-
 
     console.log('✅ Seed zakończony z tagami!');
 }
