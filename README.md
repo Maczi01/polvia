@@ -2,6 +2,7 @@ chmod +x setup-db.sh
 
 ./setup-db.sh
 
+pk.eyJ1IjoiaGlqaWFuZ3RhbyIsImEiOiJjampxcjFnb3E2NTB5M3BvM253ZHV5YjhjIn0.WneUon5qFigfJRJ3oaZ3Ow
 
 
 docker-compose down
