@@ -415,12 +415,12 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     initialViewState={initialViewState}
                     ref={mapRef}
                     style={{ width: '100%', height: '100%', overflow: 'visible'  }}
-                    mapboxAccessToken=""
+                    // mapboxAccessToken=env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN
                     // mapStyle={mapTheme}
                     mapStyle="mapbox://styles/mapbox/streets-v12"
                     // mapStyle="mapbox://styles/mapbox/standard"
                     // mapStyle="mapbox://styles/mapbox/light-v11"
-                    // mapStyle="mapbox://styles/mapbox/outdoors-v12"
+                    // mapStyle="mapbox://styles/mapbox/outdoors-v12"2eeeeee
                     dragRotate={false}
                     touchZoomRotate={isMobile ? { 
                         around: 'center',
