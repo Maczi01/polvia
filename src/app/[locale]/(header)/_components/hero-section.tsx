@@ -3,8 +3,13 @@
 import { useTranslations } from 'next-intl';
 import { HeroSearch } from '@/app/[locale]/(header)/_components/hero-search';
 import { HeroMapInteractive } from '@/app/[locale]/(header)/_components/hero-map-interactive';
+import type { VoivodeshipStats } from '@/lib/queries';
 
-export default function HeroSection() {
+type Props = {
+    voivodeshipStats: VoivodeshipStats[];
+};
+
+export default function HeroSection({ voivodeshipStats }: Props) {
     const t = useTranslations('Main');
 
     return (
@@ -61,7 +66,7 @@ export default function HeroSection() {
                         <h3 id="hero-image-description" className="sr-only">
                             {t('MapDescription')}
                         </h3>
-                        <HeroMapInteractive ariaLabel={t('mapDesc')} />
+                        <HeroMapInteractive ariaLabel={t('mapDesc')} voivodeshipStats={voivodeshipStats} />
                     </div>
                 </div>
             </div>

@@ -7,11 +7,14 @@ import { StatsBar } from './_components/stats-bar';
 import { HowItWorks } from '@/app/[locale]/(header)/_components/how-it-works';
 import ScrollToTopButton from '@/app/[locale]/(header)/_components/scroll-to-top-button';
 import { BlogSection } from './_components/blog-section';
+import { getVoivodeshipStats } from '@/lib/queries';
 
 export default async function HomePage({ params }: { params: any }) {
+    const voivodeshipStats = await getVoivodeshipStats();
+
     return (
         <div className="flex flex-col">
-            <HeroSection />
+            <HeroSection voivodeshipStats={voivodeshipStats} />
             <HowItWorks />
             <CategoryPreviewServer />
             <PopularServices params={params} />

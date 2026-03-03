@@ -48,7 +48,7 @@ export const HowItWorks = async () => {
                                             alt={t('logo')}
                                             width={72}
                                             height={72}
-                                            className="hidden dark:block dark:brightness-0 dark:invert"
+                                            className="hidden dark:block dark:brightness-0 dark:invert p-1"
                                         />
                                         <Image
                                             src="/logo/only-dark.svg"
@@ -144,27 +144,27 @@ export const HowItWorks = async () => {
                                         <div className="flex items-start justify-between">
                                             <div className="flex flex-1 items-start gap-3">
                                                 <div
-                                                    className="flex size-10 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white"
+                                                    className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-xs font-bold text-white"
                                                     aria-hidden="true"
                                                 >
-                                                    O
+                                                    LC
                                                 </div>
                                                 <div className="flex-1">
                                                     <h4
                                                         id="business-1-name"
                                                         className="mb-1 text-sm font-semibold text-[#26364d]"
                                                     >
-                                                        Orlik Naas
+                                                        Lviv Croissants
                                                     </h4>
                                                     <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
                                                         <span aria-label={t("location")}>📍</span>
-                                                        <span>Naas</span>
+                                                        <span>Kraków</span>
                                                     </div>
                                                     <span
-                                                        className="inline-block rounded-full bg-pink-100 px-2 py-1 text-xs font-medium text-pink-700"
+                                                        className="inline-block rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-700"
                                                         aria-label={t("category")}
                                                     >
-                                                        {t("grocery")}
+                                                        {t("gastronomy")}
                                                     </span>
                                                 </div>
                                             </div>
@@ -193,28 +193,28 @@ export const HowItWorks = async () => {
                                         <div className="flex items-start justify-between">
                                             <div className="flex flex-1 items-start gap-3">
                                                 <div
-                                                    className="flex size-10 items-center justify-center rounded-xl bg-gray-800 text-xs font-bold text-white"
+                                                    className="flex size-10 items-center justify-center rounded-xl bg-red-500 text-xs font-bold text-white"
                                                     aria-hidden="true"
                                                 >
-                                                    JK
+                                                    NP
                                                 </div>
                                                 <div className="flex-1">
                                                     <h4
                                                         id="business-2-name"
                                                         className="mb-1 text-sm font-semibold text-[#26364d]"
                                                     >
-                                                        JK Detailing Studio
+                                                        Nova Post
                                                     </h4>
                                                     <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
                                                         <span aria-label={t("location")}>📍</span>
-                                                        <span>Kilrea</span>
+                                                        <span>Poznań</span>
                                                     </div>
                                                     <div className="flex gap-1" aria-label={t("category")}>
-                                                        <span className="inline-block rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-                                                            {t("mechanics")}
+                                                        <span className="inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                            {t("transport")}
                                                         </span>
-                                                        <span className="inline-block rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700">
-                                                            {t("carCleaning")}
+                                                        <span className="inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700">
+                                                            {t("logistics")}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -244,27 +244,27 @@ export const HowItWorks = async () => {
                                         <div className="flex items-start justify-between">
                                             <div className="flex flex-1 items-start gap-3">
                                                 <div
-                                                    className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-red-500 text-xs font-bold text-white"
+                                                    className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-r from-blue-500 to-yellow-400 text-xs font-bold text-white"
                                                     aria-hidden="true"
                                                 >
-                                                    P
+                                                    U
                                                 </div>
                                                 <div className="flex-1">
                                                     <h4
                                                         id="business-3-name"
                                                         className="mb-1 text-sm font-semibold text-[#26364d]"
                                                     >
-                                                        Planeta Radom
+                                                        Ukrainoczka
                                                     </h4>
                                                     <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
                                                         <span aria-label={t("location")}>📍</span>
-                                                        <span>Dublin</span>
+                                                        <span>Wrocław</span>
                                                     </div>
                                                     <span
-                                                        className="inline-block rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-700"
+                                                        className="inline-block rounded-full bg-pink-100 px-2 py-1 text-xs font-medium text-pink-700"
                                                         aria-label={t("category")}
                                                     >
-                                                        {t("transport")}
+                                                        {t("grocery")}
                                                     </span>
                                                 </div>
                                             </div>

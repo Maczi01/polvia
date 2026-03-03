@@ -232,7 +232,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                 curve: isMobile ? 1.2 : 0.8, // More curved path on mobile for smoother feeling
                 easing: (t: number) => {
                     // Smoother easing function for mobile
-                    return isMobile 
+                    return isMobile
                         ? t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
                         : t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
                 },
@@ -255,7 +255,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     if (items && items.length > 0) {
                         const categories = items.map((item: any) => item.category);
                         const uniqueCategories = [...new Set(categories)];
-                        
+
                         // If all items share the same category, use that category's icon
                         if (uniqueCategories.length === 1) {
                             clusterCategory = uniqueCategories[0] as string;
@@ -376,7 +376,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
             const next = Math.min(20, current + step);
 
             map.stop(); // cancel any ongoing animation
-            map.zoomTo(next, { 
+            map.zoomTo(next, {
                 duration: isMobile ? 300 : 200, // Slightly longer animation on mobile
                 easing: (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 // Smooth easing
             });
@@ -391,7 +391,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
             const next = Math.max(1, current - step);
 
             map.stop(); // cancel any ongoing animation
-            map.zoomTo(next, { 
+            map.zoomTo(next, {
                 duration: isMobile ? 300 : 200, // Slightly longer animation on mobile
                 easing: (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2 // Smooth easing
             });
@@ -414,6 +414,8 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     reuseMaps
                     initialViewState={initialViewState}
                     ref={mapRef}
+                    mapboxAccessToken="pk.eyJ1IjoiaGlqaWFuZ3RhbyIsImEiOiJjampxcjFnb3E2NTB5M3BvM253ZHV5YjhjIn0.WneUon5qFigfJRJ3oaZ3Ow
+"
                     style={{ width: '100%', height: '100%', overflow: 'visible'  }}
                     // mapStyle={mapTheme}
                     mapStyle="mapbox://styles/mapbox/streets-v12"
@@ -421,14 +423,14 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     // mapStyle="mapbox://styles/mapbox/light-v11"
                     // mapStyle="mapbox://styles/mapbox/outdoors-v12"2eeeeee
                     dragRotate={false}
-                    touchZoomRotate={isMobile ? { 
+                    touchZoomRotate={isMobile ? {
                         around: 'center',
                         // enableRotation: false // Disable rotation on mobile for cleaner experience
                     } : { around: 'center' }}
                     touchPitch={false} // Disable pitch gestures for simpler mobile interaction
                     attributionControl={false}
                     doubleClickZoom={true} // Enable double-tap to zoom
-                    scrollZoom={isMobile ? { 
+                    scrollZoom={isMobile ? {
                         around: 'center',
                         // smooth: true
                     } : true}

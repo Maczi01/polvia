@@ -11,6 +11,7 @@ import {
 } from '@/db/schema';
 import { servicesTranslationsAlias } from '@/db/aliases';
 import { and, desc, eq, gt, sql } from 'drizzle-orm';
+import { isNotNull } from 'drizzle-orm';
 import 'server-only';
 import { Service } from '@/types';
 
@@ -87,6 +88,28 @@ export async function getServices(locale: string = 'en') {
         );
 
     return results as Service[];
+}
+
+export type VoivodeshipStats = {
+    voivodeship: string;
+    companiesCount: number;
+    categoriesCount: number;
+};
+
+export async function getVoivodeshipStats(): Promise<VoivodeshipStats[]> {
+    return db
+        .select({
+            voivodeship: serviceLocationsTable.voivodeship,
+            companiesCount: sql<number>`COUNT(DISTINCT ${servicesTable.id})`.as('companies_count'),
+            categoriesCount: sql<number>`COUNT(DISTINCT ${servicesTable.category})`.as('categories_count'),
+        })
+        .from(serviceLocationsTable)
+        .innerJoin(servicesTable, and(
+            eq(serviceLocationsTable.serviceId, servicesTable.id),
+            eq(servicesTable.status, 'active'),
+        ))
+        .where(isNotNull(serviceLocationsTable.voivodeship))
+        .groupBy(serviceLocationsTable.voivodeship) as unknown as VoivodeshipStats[];
 }
 
 export async function addEmailToNewsletter(email: string) {

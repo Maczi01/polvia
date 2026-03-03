@@ -1,9 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { HERO_PINS, HERO_PIN_MAP, type HeroPin } from './hero-map-data';
 import { HeroMapTooltip } from './hero-map-tooltip';
+import type { VoivodeshipStats } from '@/lib/queries';
 
 const SHOW_DELAY = 120;
 const HIDE_DELAY = 120;
@@ -16,10 +17,30 @@ const AUTO_START_MS = 4200; // after pin fade-in animations finish
 
 type Props = {
     ariaLabel: string;
+    voivodeshipStats: VoivodeshipStats[];
 };
 
-export function HeroMapInteractive({ ariaLabel }: Props) {
+export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
     const isMobile = useIsMobile({ breakpoint: 768 });
+
+    // Merge DB stats into static pin data
+    const enrichedPinMap = useMemo(() => {
+        const statsMap = new Map(voivodeshipStats.map((s) => [s.voivodeship, s]));
+        const map = new Map<string, HeroPin>();
+        for (const pin of HERO_PINS) {
+            const stats = statsMap.get(pin.voivodeshipKey);
+            map.set(pin.svgLabel, stats
+                ? { ...pin, placesCount: stats.companiesCount, categoriesCount: stats.categoriesCount }
+                : pin,
+            );
+        }
+        return map;
+    }, [voivodeshipStats]);
+
+    const enrichedPins = useMemo(
+        () => HERO_PINS.map((p) => enrichedPinMap.get(p.svgLabel) ?? p),
+        [enrichedPinMap],
+    );
 
     const containerRef = useRef<HTMLDivElement>(null);
     const svgWrapperRef = useRef<HTMLDivElement>(null);
@@ -160,11 +181,11 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
 
             let idx: number;
             do {
-                idx = Math.floor(Math.random() * HERO_PINS.length);
-            } while (idx === lastAutoIndexRef.current && HERO_PINS.length > 1);
+                idx = Math.floor(Math.random() * enrichedPins.length);
+            } while (idx === lastAutoIndexRef.current && enrichedPins.length > 1);
             lastAutoIndexRef.current = idx;
 
-            const pin = HERO_PINS[idx];
+            const pin = enrichedPins[idx];
             autoShowingRef.current = true;
 
             // Step 1: Start bounce only
@@ -206,7 +227,7 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
                 autoTimerRef.current = null;
             }
         };
-    }, [svgLoaded, isMobile, computeTooltipPosition, showPin, hideTooltip, setActivePinBounce]);
+    }, [svgLoaded, isMobile, computeTooltipPosition, showPin, hideTooltip, setActivePinBounce, enrichedPins]);
 
     // Event delegation: mouseover on SVG container
     const handleMouseOver = useCallback(
@@ -220,7 +241,7 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
             const category = mwGroup.getAttribute('data-category');
             if (!category) return;
 
-            const pin = HERO_PIN_MAP.get(category);
+            const pin = enrichedPinMap.get(category);
             if (!pin) return;
 
             // User takes over from auto-cycle
@@ -251,7 +272,7 @@ export function HeroMapInteractive({ ariaLabel }: Props) {
                 }, SHOW_DELAY);
             }
         },
-        [isMobile, activePin, visible, showPin],
+        [isMobile, activePin, visible, showPin, enrichedPinMap],
     );
 
     // Event delegation: mouseout on SVG container

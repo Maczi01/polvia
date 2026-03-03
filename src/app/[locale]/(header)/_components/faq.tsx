@@ -72,9 +72,9 @@ export const Faq = () => {
         { question: 'question11', answer: 'answer11' },
         { question: 'question12', answer: 'answer12' },
         { question: 'question13', answer: 'answer13' },
-        { question: 'question14', answer: 'answer14' },
-        { question: 'question15', answer: 'answer15' },
-        { question: 'question16', answer: 'answer16' },
+        // { question: 'question14', answer: 'answer14' },
+        // { question: 'question15', answer: 'answer15' },
+        // { question: 'question16', answer: 'answer16' },
     ];
 
     const faqSchema = useMemo(() => JSON.stringify({
