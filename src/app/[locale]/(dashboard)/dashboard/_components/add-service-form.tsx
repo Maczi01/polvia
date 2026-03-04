@@ -16,7 +16,7 @@ import { createService, createTag, type ActionResult, type Tag } from '../_actio
 
 const categories = [
     'others', 'education', 'renovation', 'financial', 'beauty', 'gastronomy',
-    'grocery', 'transport', 'law', 'mechanics', 'health', 'entertainment',
+    'grocery', 'transport', 'law', 'mechanics', 'health', 'real_estate', 'help_support',
 ] as const;
 
 const statuses = ['active', 'inactive', 'pending'] as const;

@@ -28,7 +28,8 @@ const CATEGORY_CONTEXTS = {
     government: "government services, public administration, civic services, municipal, local government, public sector",
     health: "healthcare, medical, wellness, fitness, pharmacy, therapy, mental health, dental",
     mechanics: "automotive repair, machinery, technical services, maintenance, engineering",
-    entertainment: "entertainment, leisure, events, activities, arts, culture, music, cinema, sports",
+    real_estate: "real estate, property, housing, apartments, rental, buying, selling, mortgage, nieruchomości",
+    help_support: "help, support, assistance, aid, charity, social services, counseling, pomoc, wsparcie",
     education: "education, learning, training, courses, schools, tutoring, skills development",
     others: "general services, miscellaneous, various, other categories"
 } as const;

@@ -23,8 +23,10 @@ export const categoryImage = (category: string) => {
             return '/markers/renovation.svg';
         case 'gov':
             return '/markers/gov.svg';
-        case 'entertainment':
-            return '/markers/entertainment.svg';
+        case 'real_estate':
+            return '/markers/real-estate.svg';
+        case 'help_support':
+            return '/markers/help-support.svg';
         case 'others':
             return '/markers/others.svg';
         case 'cluster':

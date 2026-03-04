@@ -956,7 +956,7 @@ async function mainSeed() {
     await seedService({
         name: 'Teatr Navpaky',
         slug: 'teatr-navpaky',
-        category: 'entertainment',
+        category: 'help_support',
         plDesc: 'Jedyny teatr w Polsce z regularnym repertuarem w języku ukraińskim. Tworzony przez profesjonalnych aktorów, łączy tradycję z nowoczesną formą sceniczną.',
         ukDesc: 'Єдиний театр у Польщі з регулярним репертуаром українською мовою. Створений професійними акторами, він поєднує традиції з сучасною сценічною формою.',
         enDesc: 'The only theater in Poland with a regular repertoire in Ukrainian. Created by professional actors, it combines tradition with modern stage form.',

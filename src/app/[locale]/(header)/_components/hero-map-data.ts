@@ -40,9 +40,9 @@ export const HERO_PINS: HeroPin[] = [
         exampleCompanies: ['EduCenter', 'Lingua Plus'],
     },
     {
-        svgLabel: 'Entertainment',
-        categoryKey: 'entertainment',
-        icon: '/icons/entertainment.svg',
+        svgLabel: 'RealEstate',
+        categoryKey: 'real_estate',
+        icon: '/icons/real-estate.svg',
         variant: 'starfall',
         position: { x: 488, y: 145 },
         placesCount: 8,
@@ -50,7 +50,7 @@ export const HERO_PINS: HeroPin[] = [
         voivodeship: 'Warmińsko-Mazurskie',
         voivodeshipKey: 'warminsko-mazurskie',
         exampleCities: ['Olsztyn', 'Ełk'],
-        exampleCompanies: ['FunPark', 'CineMax'],
+        exampleCompanies: ['DomExpert', 'NieruchomościPL'],
     },
     {
         svgLabel: 'Financial',

@@ -28,7 +28,8 @@ export const categoryEnum = pgEnum('category', [
     'law',
     'mechanics',
     'health',
-    'entertainment',
+    'real_estate',
+    'help_support',
 ]);
 
 export const voivodeshipEnum = pgEnum('voivodeship', [

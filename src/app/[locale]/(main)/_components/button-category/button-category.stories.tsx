@@ -87,11 +87,18 @@ export const Mechanics: Story = {
         variant: 'darkviolet',
     },
 };
-export const Entertainment: Story = {
+export const RealEstate: Story = {
     args: {
-        text: 'Entertainment',
-        image: '/icons/entertainment.svg',
+        text: 'RealEstate',
+        image: '/icons/real-estate.svg',
         variant: 'starfall',
+    },
+};
+export const HelpSupport: Story = {
+    args: {
+        text: 'HelpSupport',
+        image: '/icons/help-support.svg',
+        variant: 'coral',
     },
 };
 export const Education: Story = {
