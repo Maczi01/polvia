@@ -1898,6 +1898,115 @@ async function mainSeed() {
         ],
     });
 
+    // --- 1. DODAJ NOWE TAGI DO tagsToCreate ---
+    const realEstateAgencyTags = [
+        { key: 'real-estate-agency', pl: 'Biuro nieruchomości', uk: 'Агентство нерухомості', en: 'Real estate agency', ru: 'Агентство недвижимости' },
+        { key: 'ua-speaking', pl: 'Obsługa po ukraińsku', uk: 'Обслуговування українською', en: 'Ukrainian speaking service', ru: 'Обслуживание на украинском' },
+        { key: 'relocation', pl: 'Relokacja', uk: 'Релокація', en: 'Relocation', ru: 'Релокация' },
+        { key: 'verified-offers', pl: 'Sprawdzone oferty', uk: 'Перевірені пропозиції', en: 'Verified offers', ru: 'Проверенные предложения' },
+    ];
+
+    for (const t of realEstateAgencyTags) {
+        const [tag] = await db.insert(tagsTable).values({}).returning();
+        await db.insert(tagsTranslationsTable).values([
+            { tagId: tag.id, languageCode: 'pl', name: t.pl },
+            { tagId: tag.id, languageCode: 'uk', name: t.uk },
+            { tagId: tag.id, languageCode: 'en', name: t.en },
+            { tagId: tag.id, languageCode: 'ru', name: t.ru },
+        ]);
+        tagMap[t.key] = tag.id;
+    }
+
+// --- 2. DODAJ USŁUGI (SERVICES) ---
+
+// 1. Hamilton May
+    await seedService({
+        name: 'Hamilton May',
+        slug: 'hamilton-may',
+        category: 'real_estate',
+        plDesc: 'Wiodące biuro nieruchomości specjalizujące się w najmie długoterminowym dla obcokrajowców. Posiadają wielojęzyczny zespół i pomagają w bezpiecznym procesie najmu okazjonalnego.',
+        ukDesc: 'Провідне агентство нерухомості, що спеціалізується на довгостроковій оренді для іноземців. Мають багатомовну команду та допомагають у безпечному процесі оренди.',
+        enDesc: 'Leading real estate agency specializing in long-term rentals for foreigners. They have a multilingual team and assist in a secure rental process.',
+        ruDesc: 'Ведущее агентство недвижимости, специализирующееся на долгосрочной аренде для иностранцев. Команда говорит на многих языках и помогает в безопасном процессе аренды.',
+        tags: ['real-estate-agency', 'ua-speaking', 'relocation'],
+        image: 'hamilton-may.png',
+        webpage: 'https://www.hamiltonmay.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Cybulskiego 3', voivodeship: 'mazowieckie', latitude: 52.2135, longitude: 21.0215, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 428 16 15' },
+            { city: 'Kraków', street: 'ul. św. Gertrudy 10', voivodeship: 'malopolskie', latitude: 50.0572, longitude: 19.9412, openingHours: standardShopHours },
+            { city: 'Wrocław', street: 'ul. św. Antoniego 2/4', voivodeship: 'dolnoslaskie', latitude: 51.1095, longitude: 17.0264, openingHours: standardShopHours },
+        ],
+    });
+
+// 2. Metrohouse
+    await seedService({
+        name: 'Metrohouse',
+        slug: 'metrohouse-network',
+        category: 'real_estate',
+        plDesc: 'Największa w Polsce sieć biur nieruchomości. Wiele oddziałów posiada dedykowanych doradców dla obywateli Ukrainy, oferując wsparcie w negocjacjach i tłumaczeniu umów.',
+        ukDesc: 'Найбільша мережа агентств нерухомості в Польщі. Багато відділень мають спеціальних консультантів для громадян України, пропонуючи підтримку в переговорах та перекладі договорів.',
+        enDesc: 'The largest real estate agency network in Poland. Many branches have dedicated advisors for Ukrainian citizens, offering support in negotiations and contract translation.',
+        ruDesc: 'Крупнейшая сеть агентств недвижимости в Польше. Многие филиалы имеют специальных консультантов для граждан Украины, предлагая поддержку в переговорах и переводе договоров.',
+        tags: ['real-estate-agency', 'ua-speaking', 'verified-offers'],
+        image: 'metrohouse.png',
+        webpage: 'https://metrohouse.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Świętokrzyska 30', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0045, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 101 01 01' },
+            { city: 'Gdańsk', street: 'ul. Grunwaldzka 102', voivodeship: 'pomorskie', latitude: 54.3795, longitude: 18.6045, openingHours: standardShopHours },
+        ],
+    });
+
+// 3. Freedom Nieruchomości
+    await seedService({
+        name: 'Freedom Nieruchomości',
+        slug: 'freedom-nieruchomosci',
+        category: 'real_estate',
+        plDesc: 'Ogólnopolska sieć biur nieruchomości. Oferują kompleksową pomoc w poszukiwaniu mieszkań i domów, w tym asystę prawną przy zawieraniu umów najmu długoterminowego.',
+        ukDesc: 'Загальнопольська мережа агентств нерухомості. Пропонують комплексну допомогу в пошуку квартир та будинків, включаючи юридичну підтримку при укладанні договорів оренди.',
+        enDesc: 'A nationwide real estate agency network. They offer comprehensive assistance in searching for apartments and houses, including legal support for long-term rental agreements.',
+        ruDesc: 'Общенациональная сеть агентств недвижимости. Предлагают комплексную помощь в поиске квартир и домов, включая юридическую поддержку при заключении договоров аренды.',
+        tags: ['real-estate-agency', 'verified-offers', 'relocation'],
+        image: 'freedom-nieruchomosci.png',
+        webpage: 'https://www.freedom.pl/',
+        locations: [
+            { city: 'Poznań', street: 'ul. Matejki 12', voivodeship: 'wielkopolskie', latitude: 52.4045, longitude: 16.9085, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 61 227 86 11' },
+        ],
+    });
+
+// 4. Lion's Estate
+    await seedService({
+        name: 'Lion\'s Estate',
+        slug: 'lions-estate',
+        category: 'real_estate',
+        plDesc: 'Specjaliści od relokacji i najmu w dużych miastach. Firma posiada zespół ekspertów posługujących się językiem ukraińskim, pomagający w znalezieniu lokalu spełniającego wymogi wizowe.',
+        ukDesc: 'Фахівці з релокації та оренди у великих містах. Компанія має команду експертів, які розмовляють українською мовою, допомагаючи знайти житло, що відповідає візовим вимогам.',
+        enDesc: 'Specialists in relocation and rental in large cities. The company has a team of experts fluent in Ukrainian, helping to find premises that meet visa requirements.',
+        ruDesc: 'Специалисты по релокации и аренде в крупных городах. Компания располагает командой экспертов, говорящих на украинском языке, помогающих найти жилье, соответствующее визовым требованиям.',
+        tags: ['real-estate-agency', 'ua-speaking', 'relocation'],
+        image: 'lions-estate.png',
+        webpage: 'https://www.lionsestate.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Wiejska 11', voivodeship: 'mazowieckie', latitude: 52.2272, longitude: 21.0268, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 826 66 66' },
+        ],
+    });
+
+// 5. Partners International
+    await seedService({
+        name: 'Partners International',
+        slug: 'partners-international',
+        category: 'real_estate',
+        plDesc: 'Eksperci w obsłudze klientów zagranicznych. Oferują pełną obsługę transakcji najmu, weryfikację stanu prawnego lokali oraz wsparcie w języku ukraińskim i angielskim.',
+        ukDesc: 'Експерти з обслуговування іноземних клієнтів. Пропонують повний супровід орендних операцій, перевірку юридичного стану приміщень та підтримку українською та англійською мовами.',
+        enDesc: 'Experts in serving foreign clients. They offer full service of rental transactions, verification of the legal status of premises, and support in Ukrainian and English.',
+        ruDesc: 'Эксперты по обслуживанию иностранных клиентов. Предлагают полное сопровождение сделок по аренде, проверку юридического статуса помещений и поддержку на украинском и английском языках.',
+        tags: ['real-estate-agency', 'ua-speaking', 'relocation'],
+        image: 'partners-international.png',
+        webpage: 'https://www.partnersinternational.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Mokotowska 33', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.0210, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 258 40 18' },
+        ],
+    });
+
     console.log('✅ Seed zakończony z tagami!');
 }
 

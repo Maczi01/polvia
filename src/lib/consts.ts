@@ -7,20 +7,20 @@ export function formatDate(date: string) {
 }import { z } from 'zod';
 
 export const categories = [
-    { text: 'Grocery', image: '/icons/grocery.svg', variant: 'red' as const },
-    { text: 'Gastronomy', image: '/icons/gastronomy.svg', variant: 'oversky' as const },
-    { text: 'Transport', image: '/icons/transport.svg', variant: 'green' as const },
-    { text: 'Financial', image: '/icons/financial.svg', variant: 'orange' as const },
-    { text: 'Renovation', image: '/icons/renovation.svg', variant: 'blue' as const },
-    { text: 'Law', image: '/icons/law.svg', variant: 'gold' as const },
-    { text: 'Beauty', image: '/icons/beauty.svg', variant: 'violet' as const },
-    { text: 'Government', image: '/icons/gov.svg', variant: 'aqua' as const },
-    { text: 'Health', image: '/icons/health.svg', variant: 'lightblue' as const },
-    { text: 'Mechanics', image: '/icons/mechanic.svg', variant: 'darkviolet' as const },
-    { text: 'RealEstate', image: '/icons/real-estate.svg', variant: 'starfall' as const },
-    { text: 'HelpSupport', image: '/icons/help-support.svg', variant: 'coral' as const },
-    { text: 'Education', image: '/icons/education.svg', variant: 'overworld' as const },
-    { text: 'Others', image: '/icons/others.svg', variant: 'mojito' as const },
+    { text: 'Grocery', key: 'grocery', image: '/icons/grocery.svg', variant: 'red' as const },
+    { text: 'Gastronomy', key: 'gastronomy', image: '/icons/gastronomy.svg', variant: 'oversky' as const },
+    { text: 'Transport', key: 'transport', image: '/icons/transport.svg', variant: 'green' as const },
+    { text: 'Financial', key: 'financial', image: '/icons/financial.svg', variant: 'orange' as const },
+    { text: 'Renovation', key: 'renovation', image: '/icons/renovation.svg', variant: 'blue' as const },
+    { text: 'Law', key: 'law', image: '/icons/law.svg', variant: 'gold' as const },
+    { text: 'Beauty', key: 'beauty', image: '/icons/beauty.svg', variant: 'violet' as const },
+    { text: 'Government', key: 'government', image: '/icons/gov.svg', variant: 'aqua' as const },
+    { text: 'Health', key: 'health', image: '/icons/health.svg', variant: 'lightblue' as const },
+    { text: 'Mechanics', key: 'mechanics', image: '/icons/mechanic.svg', variant: 'darkviolet' as const },
+    { text: 'RealEstate', key: 'real_estate', image: '/icons/real-estate.svg', variant: 'starfall' as const },
+    { text: 'HelpSupport', key: 'help_support', image: '/icons/help-support.svg', variant: 'coral' as const },
+    { text: 'Education', key: 'education', image: '/icons/education.svg', variant: 'overworld' as const },
+    { text: 'Others', key: 'others', image: '/icons/others.svg', variant: 'mojito' as const },
 ];
 
 export const counties = {

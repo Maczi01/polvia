@@ -2,9 +2,7 @@ chmod +x setup-db.sh
 
 ./setup-db.sh
 
-
-
-docker-compose down
+ docker-compose down
 docker volume rm abroad-services_postgres_data
 
 docker-compose up -d

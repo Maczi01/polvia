@@ -50,6 +50,9 @@ const buttonVariants = cva(
                 oversky: 'bg-gradient-to-r from-[#3D0DAF] to-[#0998A2] text-white ' +
                     'dark:from-[#5887F7] dark:to-[#9F65FA] dark:shadow-lg',
 
+                coral: 'bg-gradient-to-r from-[#2563EB] to-[#FACC15] text-white ' +
+                    'dark:from-[#3B73FB] dark:to-[#FFDC26] dark:shadow-lg',
+
                 mojito: 'bg-gradient-to-r from-[#1488CC] to-[#2B32B2] text-white ' +
                     'dark:from-[#1488CC] dark:to-[#2B32B2] dark:shadow-lg',
 

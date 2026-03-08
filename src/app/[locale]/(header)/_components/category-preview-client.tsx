@@ -9,6 +9,7 @@ import type { Locale } from '@/i18n/config';
 type CategoryPreviewClientProps = {
     categories: {
         text: string;
+        key: string;
         image: string;
         variant:
             | 'default'
@@ -24,6 +25,7 @@ type CategoryPreviewClientProps = {
             | 'starfall'
             | 'overworld'
             | 'oversky'
+            | 'coral'
             | 'mojito'
             | 'removeFilter'
             | null
@@ -94,7 +96,7 @@ export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps
                     >
                         {categories.map((category, index) => {
                             // Build slug-based URL for category
-                            const categoryUrl = buildMapUrl({ category: category.text.toLowerCase() }, locale);
+                            const categoryUrl = buildMapUrl({ category: category.key }, locale);
                             return (
                                 <CategoryCard
                                     key={`${category.text}-${index}`}

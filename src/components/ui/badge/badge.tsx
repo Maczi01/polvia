@@ -30,6 +30,7 @@ const badgeVariants = cva(
                 pinkred: 'bg-[#FCE4EC] border-[#F8BBD0] dark:bg-[#DD81FF]/20 dark:border-[#DD81FF]/40',
                 sapphire: 'bg-[#EDE7F6] border-[#D1C4E9] dark:bg-[#4776e6]/20 dark:border-[#4776e6]/40',
                 antricot: 'bg-[#E0F7FA] border-[#B2EBF2] dark:bg-[#0989A2]/20 dark:border-[#0989A2]/40',
+                coral: 'bg-[#EFF6FF] border-[#BFDBFE] dark:bg-[#2563EB]/20 dark:border-[#2563EB]/40',
                 others: 'bg-[#E3F2FD] border-[#BBDEFB] dark:bg-[#1488CC]/20 dark:border-[#1488CC]/40',
             },
         },
@@ -61,6 +62,7 @@ const variantTextColors: Record<string, string> = {
     pinkred: 'text-[#AD1457] dark:text-[#F48FB1]',
     sapphire: 'text-[#4A148C] dark:text-[#B39DDB]',
     antricot: 'text-[#00695C] dark:text-[#4DB6AC]',
+    coral: 'text-[#1D4ED8] dark:text-[#93C5FD]',
     others: 'text-[#1565C0] dark:text-[#78BCFD]',
 };
 

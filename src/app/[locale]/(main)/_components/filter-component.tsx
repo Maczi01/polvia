@@ -353,14 +353,14 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                 ref={categoryReference}
                                 className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden pr-4"
                             >
-                                {categories.map(({ text, image, variant }) => (
+                                {categories.map(({ text, key, image, variant }) => (
                                     <ButtonCategory
                                         key={text}
                                         image={image}
                                         text={t(`Categories.${text}`)}
                                         variant={
                                             selectedCategory
-                                                ? text.toLowerCase() ===
+                                                ? key ===
                                                 selectedCategory.toLowerCase()
                                                     ? variant
                                                     : 'default'
@@ -368,9 +368,9 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                         }
                                         isSelected={
                                             !!selectedCategory &&
-                                            text.toLowerCase() === selectedCategory.toLowerCase()
+                                            key === selectedCategory.toLowerCase()
                                         }
-                                        onClick={() => handleCategoryClick(text.toLowerCase())}
+                                        onClick={() => handleCategoryClick(key)}
                                         className="flex-none"
                                     />
                                 ))}

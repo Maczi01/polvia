@@ -149,23 +149,23 @@ export const Filter = memo(
                                 disabled={!hasActiveFilters}
                             />
 
-                            {categories.map(({ text, image, variant }) => (
+                            {categories.map(({ text, key, image, variant }) => (
                                 <ButtonCategory
                                     key={text}
                                     image={image}
                                     text={t(`Categories.${text}`)}
                                     variant={
                                         selectedCategory
-                                            ? (text.toLowerCase() === selectedCategory.toLowerCase()
+                                            ? (key === selectedCategory.toLowerCase()
                                                 ? variant
                                                 : 'default')
                                             : variant
                                     }
                                     isSelected={
                                         !!selectedCategory &&
-                                        text.toLowerCase() === selectedCategory.toLowerCase()
+                                        key === selectedCategory.toLowerCase()
                                     }
-                                    onClick={() => handleCategoryClick(text.toLowerCase())}
+                                    onClick={() => handleCategoryClick(key)}
                                     className="flex-none"
                                 />
                             ))}
