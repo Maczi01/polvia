@@ -454,6 +454,10 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                         }
                     }}
                     onLoad={(event) => {
+                        event.target.fitBounds(
+                            [[14.07, 49.0], [24.15, 54.84]],
+                            { duration: 0, padding: 0 },
+                        );
                         const startBounds = event.target?.getBounds()?.toArray()?.flat();
                         if (startBounds) {
                             setBounds(startBounds as BBox);

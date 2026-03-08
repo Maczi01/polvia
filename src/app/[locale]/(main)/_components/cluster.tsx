@@ -107,8 +107,8 @@ export const Cluster = ({
                 {counter && (
                     <div style={counterStyle}>
                         <div
-                            className="absolute -top-4 left-6 size-6 rounded-full 
-                        border-2 border-gray-300 bg-black px-0 
+                            className="absolute -top-4 left-6 size-6 rounded-full
+                        border-2 border-gray-300 bg-black px-0
                         text-center font-bold text-white"
                         >
                             {counter}

@@ -10,8 +10,8 @@ const SHOW_DELAY = 120;
 const HIDE_DELAY = 120;
 
 const AUTO_BOUNCE_LEAD_MS = 0; // show tooltip immediately with bounce
-const AUTO_TOOLTIP_MS = 1400; // tooltip visible before fade-out starts
-const AUTO_FADE_MS = 600; // fade-out duration (syncs with 2s bounce cycle end)
+const AUTO_BOUNCE_MS = 2400; // 2 full bounces at 1.2s each
+const AUTO_FADE_MS = 500; // fade-out duration after bounce stops
 const AUTO_BREAK_MS = 600; // pause between pins
 const AUTO_START_MS = 4200; // after pin fade-in animations finish
 
@@ -76,6 +76,72 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
             })
             .catch(() => {});
     }, []);
+
+    // Inject / update service-count badges on each pin marker
+    useEffect(() => {
+        if (!svgLoaded) return;
+        const wrapper = svgWrapperRef.current;
+        if (!wrapper) return;
+
+        const NS = 'http://www.w3.org/2000/svg';
+
+        for (const pin of enrichedPins) {
+            const mw = wrapper.querySelector(`.mw[data-category="${pin.svgLabel}"]`);
+            if (!mw) continue;
+
+            const count = pin.placesCount;
+            if (!count) continue;
+
+            // Badge position: top-right of the pin in .mw local coords
+            // The pin shape spans roughly (-19.4, -50) to (19.4, 0)
+            const bx = 16;
+            const by = -42;
+            const r = 12;
+
+            const jm = mw.querySelector('.jm');
+            if (!jm) continue;
+
+            let badge = jm.querySelector('.pin-badge') as SVGGElement | null;
+            if (badge) {
+                const text = badge.querySelector('text');
+                if (text) text.textContent = String(count);
+            } else {
+                badge = document.createElementNS(NS, 'g') as SVGGElement;
+                badge.setAttribute('class', 'pin-badge');
+
+                // White border ring
+                const border = document.createElementNS(NS, 'circle');
+                border.setAttribute('cx', String(bx));
+                border.setAttribute('cy', String(by));
+                border.setAttribute('r', String(r + 2));
+                border.setAttribute('fill', 'white');
+
+                // Dark filled circle
+                const circle = document.createElementNS(NS, 'circle');
+                circle.setAttribute('cx', String(bx));
+                circle.setAttribute('cy', String(by));
+                circle.setAttribute('r', String(r));
+                circle.setAttribute('fill', '#1e293b');
+
+                // Count text — use dy for vertical centering (more reliable than dominant-baseline)
+                const text = document.createElementNS(NS, 'text');
+                text.setAttribute('x', String(bx));
+                text.setAttribute('y', String(by));
+                text.setAttribute('dy', '0.35em');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', 'white');
+                text.setAttribute('font-size', '12');
+                text.setAttribute('font-weight', '700');
+                text.setAttribute('font-family', 'system-ui, sans-serif');
+                text.textContent = String(count);
+
+                badge.append(border);
+                badge.append(circle);
+                badge.append(text);
+                jm.append(badge);
+            }
+        }
+    }, [svgLoaded, enrichedPins]);
 
     // Compute tooltip position from SVG viewBox coords
     const computeTooltipPosition = useCallback(
@@ -191,7 +257,7 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
             // Step 1: Start bounce only
             setActivePinBounce(pin.svgLabel);
 
-            // Step 2: After lead time, show tooltip
+            // Step 2: After lead time, show tooltip + start bounce together
             autoTimerRef.current = setTimeout(() => {
                 if (!autoShowingRef.current || userHoveringRef.current) {
                     autoTimerRef.current = setTimeout(showNext, AUTO_BREAK_MS);
@@ -199,23 +265,23 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
                 }
                 showPin(pin);
 
-                // Step 3: Keep tooltip visible, then hide
+                // Step 3: Wait for 2 full bounces, then stop bounce
                 autoTimerRef.current = setTimeout(() => {
                     if (autoShowingRef.current && !userHoveringRef.current) {
-                        setVisible(false); // fade out tooltip (CSS transition)
+                        setActivePinBounce(null);
                     }
 
-                    // Step 4: Wait for fade-out animation, then stop bounce
+                    // Step 4: Fade out tooltip after bounce stops
                     autoTimerRef.current = setTimeout(() => {
                         if (autoShowingRef.current && !userHoveringRef.current) {
-                            setActivePinBounce(null);
+                            setVisible(false);
                             userHoveringRef.current = false;
                         }
 
                         // Step 5: Break, then next pin
                         autoTimerRef.current = setTimeout(showNext, AUTO_BREAK_MS);
                     }, AUTO_FADE_MS);
-                }, AUTO_TOOLTIP_MS);
+                }, AUTO_BOUNCE_MS);
             }, AUTO_BOUNCE_LEAD_MS);
         };
 
