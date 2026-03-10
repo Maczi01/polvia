@@ -114,11 +114,11 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
                 {
                     label: (
                         <div className="flex items-center">
-                            <Image src="/icons/gb.svg" alt="English flag" width={16} height={16} />
-                            <span className="ml-2 text-gray-900 dark:text-gray-100">English</span>
+                            <Image src="/icons/ua.svg" alt="Ukrainian flag" width={16} height={16} />
+                            <span className="ml-2 text-gray-900 dark:text-gray-100">Українська</span>
                         </div>
                     ),
-                    value: 'en',
+                    value: 'uk',
                 },
                 {
                     label: (
@@ -132,20 +132,20 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
                 {
                     label: (
                         <div className="flex items-center">
+                            <Image src="/icons/gb.svg" alt="English flag" width={16} height={16} />
+                            <span className="ml-2 text-gray-900 dark:text-gray-100">English</span>
+                        </div>
+                    ),
+                    value: 'en',
+                },
+                {
+                    label: (
+                        <div className="flex items-center">
                             <Image src="/icons/ru.svg" alt="Russian flag" width={16} height={16} />
                             <span className="ml-2 text-gray-900 dark:text-gray-100">Русский</span>
                         </div>
                     ),
                     value: 'ru',
-                },
-                {
-                    label: (
-                        <div className="flex items-center">
-                            <Image src="/icons/ua.svg" alt="Ukrainian flag" width={16} height={16} />
-                            <span className="ml-2 text-gray-900 dark:text-gray-100">Українська</span>
-                        </div>
-                    ),
-                    value: 'uk',
                 },
             ]}
             placeholder="Select language"
