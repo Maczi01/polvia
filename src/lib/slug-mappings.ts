@@ -204,9 +204,9 @@ export function normalizeCountySlug(county: string): string {
  * @param category - Potential category key
  * @returns True if valid category key
  */
-export function isValidCategoryKey(category: string): category is CategoryKey {
-    return CATEGORY_KEYS.includes(category.toLowerCase() as CategoryKey);
-}
+// export function isValidCategoryKey(category: string): category is CategoryKey {
+//     return CATEGORY_KEYS.includes(category.toLowerCase() as CategoryKey);
+// }
 
 /**
  * Get all valid category slugs for a locale
@@ -221,9 +221,9 @@ export function getAllCategorySlugs(locale: Locale): string[] {
  * Get all valid county slugs
  * @returns Array of all county slugs
  */
-export function getAllCountySlugs(): readonly CountySlug[] {
-    return COUNTY_SLUGS;
-}
+// export function getAllCountySlugs(): readonly CountySlug[] {
+//     return COUNTY_SLUGS;
+// }
 
 /**
  * Validate if a string is a valid city slug
@@ -253,9 +253,9 @@ export function normalizeCitySlug(city: string): string {
  * Get all valid city slugs
  * @returns Array of all city slugs
  */
-export function getAllCitySlugs(): readonly CitySlug[] {
-    return CITY_SLUGS;
-}
+// export function getAllCitySlugs(): readonly CitySlug[] {
+//     return CITY_SLUGS;
+// }
 
 /**
  * Get the original city name (with diacritics) from a slug

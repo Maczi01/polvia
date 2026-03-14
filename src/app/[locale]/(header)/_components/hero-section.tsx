@@ -14,7 +14,7 @@ export default function HeroSection({ voivodeshipStats }: Props) {
 
     return (
         <section
-            className="flex min-h-[90vh] items-start py-6 md:items-center md:py-8 lg:py-8"
+            className="flex items-start py-6 md:min-h-[90vh] md:items-center md:py-8 lg:py-8"
             aria-labelledby="hero-heading"
         >
             <div className="container mx-auto w-full px-4 md:px-8 lg:px-16 xl:px-24">
@@ -59,7 +59,7 @@ export default function HeroSection({ voivodeshipStats }: Props) {
 
                     {/* Image Column */}
                     <div
-                        className="relative order-1 h-96 w-full sm:h-80 md:order-2 md:h-96 lg:h-[450px] xl:h-[550px]"
+                        className="relative order-1 h-[80vw] w-full md:order-2 md:h-96 lg:h-[450px] xl:h-[550px]"
                         role="img"
                         aria-labelledby="hero-image-description"
                     >

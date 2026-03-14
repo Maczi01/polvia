@@ -77,6 +77,14 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
             .catch(() => {});
     }, []);
 
+    // On mobile, crop the SVG viewBox to remove dead space and make the map bigger
+    useEffect(() => {
+        if (!svgLoaded) return;
+        const svg = svgWrapperRef.current?.querySelector('svg');
+        if (!svg) return;
+        svg.setAttribute('viewBox', isMobile ? '0 20 680 560' : '0 0 800 600');
+    }, [svgLoaded, isMobile]);
+
     // Inject / update service-count badges on each pin marker
     useEffect(() => {
         if (!svgLoaded) return;
