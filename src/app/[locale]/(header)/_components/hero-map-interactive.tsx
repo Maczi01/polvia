@@ -200,7 +200,7 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
         wrapper.querySelectorAll('.jm-active').forEach((el) => {
             // Skip removal if this element already belongs to the target category
             const parentMw = el.closest('.mw');
-            if (category && parentMw?.dataset.category === category) return;
+            if (category && (parentMw as HTMLElement | null)?.dataset.category === category) return;
             el.classList.remove('jm-active');
             (el as SVGElement).style.animationDelay = '';
         });
@@ -312,7 +312,7 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
             const mwGroup = target.closest('.mw');
             if (!mwGroup) return;
 
-            const category = mwGroup.dataset.category;
+            const category = (mwGroup as HTMLElement).dataset.category;
             if (!category) return;
 
             const pin = enrichedPinMap.get(category);
