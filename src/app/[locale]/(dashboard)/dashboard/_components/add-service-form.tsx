@@ -233,15 +233,7 @@ export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
                         </div>
                     )}
 
-                    {!showNewTag ? (
-                        <button
-                            type="button"
-                            onClick={() => setShowNewTag(true)}
-                            className="text-sm text-green hover:underline"
-                        >
-                            + Add new tag
-                        </button>
-                    ) : (
+                    {showNewTag ? (
                         <div className="rounded-md border p-3 space-y-3 bg-muted/20">
                             <p className="text-sm font-medium">New tag translations</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -302,6 +294,14 @@ export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
                                 </Button>
                             </div>
                         </div>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setShowNewTag(true)}
+                            className="text-sm text-green hover:underline"
+                        >
+                            + Add new tag
+                        </button>
                     )}
                 </div>
             </section>
@@ -362,9 +362,9 @@ export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
                                 const value = e.target.value;
                                 const parts = value.split(',').map((s) => s.trim());
                                 if (parts.length === 2) {
-                                    const lat = parseFloat(parts[0]);
-                                    const lon = parseFloat(parts[1]);
-                                    if (!isNaN(lat) && !isNaN(lon)) {
+                                    const lat = Number.parseFloat(parts[0]);
+                                    const lon = Number.parseFloat(parts[1]);
+                                    if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
                                         if (latRef.current) {
                                             const nativeSet = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;
                                             nativeSet.call(latRef.current, String(lat));
