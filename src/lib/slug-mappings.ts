@@ -195,7 +195,7 @@ export function normalizeCountySlug(county: string): string {
         .toLowerCase()
         .trim()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[\u0300-\u036F]/g, '')
         .replace(/\u0142/g, 'l'); // ł → l (not covered by NFD decomposition)
 }
 
@@ -245,7 +245,7 @@ export function normalizeCitySlug(city: string): string {
         .toLowerCase()
         .trim()
         .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[\u0300-\u036F]/g, '')
         .replace(/\u0142/g, 'l'); // ł → l (not covered by NFD decomposition)
 }
 
