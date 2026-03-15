@@ -25,7 +25,11 @@
       "Bash(npx eslint src/db/seed.ts --rule '{\"unicorn/numeric-separators-style\": [\"error\", {\"onlyIfContainsSeparator\": false, \"number\": {\"minimumDigits\": 0, \"groupLength\": 3}}]}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && m.ruleId.includes\\('numeric'\\)\\); console.log\\('Messages:', msgs.length\\); msgs.slice\\(0,10\\).forEach\\(m => console.log\\(m.line, m.column, m.ruleId, m.message\\)\\);\")",
       "Bash(npx eslint src/db/seed.ts --rule '{\"unicorn/numeric-separators-style\": [\"error\", {\"onlyIfContainsSeparator\": true, \"number\": {\"minimumDigits\": 0, \"groupLength\": 3}}]}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && m.ruleId.includes\\('numeric'\\)\\); console.log\\('Numeric separator messages:', msgs.length\\); msgs.slice\\(0,5\\).forEach\\(m => console.log\\(m.line, m.column, m.message\\)\\);\")",
       "Bash(npx eslint src/db/seed.ts 2>&1)",
-      "Bash(npx eslint src/db/seed.ts 2>&1; echo \"EXIT: $?\")"
+      "Bash(npx eslint src/db/seed.ts 2>&1; echo \"EXIT: $?\")",
+      "Bash(npx eslint \"src/app/[locale]/\\(main\\)/_components/services-client-component.tsx\" --rule '{\"unicorn/no-zero-fractions\": \"error\"}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId === 'unicorn/no-zero-fractions'\\); msgs.forEach\\(m => console.log\\('Line', m.line, 'Col', m.column, m.message\\)\\);\")",
+      "Bash(npx eslint \"src/app/[locale]/\\(main\\)/_components/services-client-component.tsx\" 2>&1 | head -30)",
+      "Bash(npx eslint \"src/app/[locale]/\\(main\\)/_components/overview-map/overview-map.tsx\" 2>&1 | head -20)",
+      "Bash(npx eslint \"src/app/[locale]/\\(dashboard\\)/dashboard/_actions.ts\" 2>&1 | head -20)"
     ]
   },
   "enableAllProjectMcpServers": true,
