@@ -1,8 +1,7 @@
-import { env } from 'env';
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = env.NEXT_PUBLIC_SITE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://polvia.com';
 
     return {
         rules: {

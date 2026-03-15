@@ -1,11 +1,10 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
-import { env } from '../../env';
 import { getPosts } from '@/lib/posts';
 import { CATEGORY_SLUGS, COUNTY_SLUGS } from '@/lib/slug-mappings';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = env.NEXT_PUBLIC_SITE_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://polvia.com';
     const currentDate = new Date().toISOString();
 
     // -------------------------------------------------------
