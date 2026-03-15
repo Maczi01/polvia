@@ -24,6 +24,8 @@ const config = [
             'next.config.js',
             'postcss.config.js',
             'tailwind.config.js',
+            'src/db/seed.ts',
+            'src/db/drop.ts',
         ],
     },
     { files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'] },
