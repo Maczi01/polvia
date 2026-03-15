@@ -106,7 +106,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
                     {posts.length > 0 ? (
                         <PostsWithSearch posts={posts} locale={locale} translations={translations} />
                     ) : (
-                        <div className="text-center py-12">
+                        <div className="py-12 text-center">
                             <p className="text-muted-foreground">{t('noPostsFound')}</p>
                         </div>
                     )}
@@ -124,7 +124,7 @@ export default async function BlogPage({ params }: BlogPageProps) {
                         <p className="text-muted-foreground">{t('subtitle')}</p>
                     </header>
 
-                    <div className="text-center py-12">
+                    <div className="py-12 text-center">
                         <p className="text-muted-foreground">
                             {t('errorLoadingPosts') || 'Error loading posts. Please try again later.'}
                         </p>

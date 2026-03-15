@@ -25,7 +25,7 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
     return (
         <>
             {/* Filter Component */}
-            <div className="top-0 bg-white dark:bg-gray-900 shadow-md md:shadow-none">
+            <div className="top-0 bg-white shadow-md dark:bg-gray-900 md:shadow-none">
                 <FilterComponent
                     initialFilters={initialFilters}
                     onFiltersChange={setCurrentFilters}
@@ -33,7 +33,7 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 min-h-0 px-2">
+            <div className="min-h-0 flex-1 px-2">
                 <ServicesClientComponent
                     services={services}
                     initialFilters={currentFilters}

@@ -186,7 +186,7 @@ export default async function Post({ params }: PostPageProps) {
                 <article className="min-h-screen">
                     {/* Hero Section */}
                     <div className="relative overflow-hidden pb-2 pt-4 sm:pb-16 sm:pt-24">
-                        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+                        <div className="bg-grid-pattern absolute inset-0 opacity-5" />
 
                         <div className="container relative mx-auto max-w-4xl px-4 sm:px-6">
                             {/* Navigation */}
@@ -224,7 +224,7 @@ export default async function Post({ params }: PostPageProps) {
                             </div>
 
                             {/* Article Header */}
-                            <header className="space-y-4 text-center sm:space-y-6 pb-2">
+                            <header className="space-y-4 pb-2 text-center sm:space-y-6">
                                 <div className="space-y-3 sm:space-y-4">
                                     <h1 className="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-5xl xl:text-6xl">
                                         {title}
@@ -305,7 +305,7 @@ export default async function Post({ params }: PostPageProps) {
 
                     {/* Content */}
                     <div className="container mx-auto max-w-4xl px-4 pb-16 sm:px-6 sm:pb-24">
-                        <div className="prose prose-base mx-auto max-w-none dark:prose-invert sm:prose-lg prose-headings:font-bold prose-headings:tracking-tight prose-headings:mb-4 prose-headings:mt-8 prose-p:leading-7 prose-p:mb-4 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-primary prose-blockquote:bg-muted/50 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:my-6 prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-ul:space-y-2 prose-ol:space-y-2 prose-li:my-1">
+                        <div className="prose prose-base mx-auto max-w-none dark:prose-invert sm:prose-lg prose-headings:mb-4 prose-headings:mt-8 prose-headings:font-bold prose-headings:tracking-tight prose-p:mb-4 prose-p:leading-7 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:my-6 prose-blockquote:border-l-primary prose-blockquote:bg-muted/50 prose-blockquote:px-4 prose-blockquote:py-3 prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-pre:overflow-x-auto prose-pre:rounded-lg prose-pre:bg-muted prose-pre:p-4 prose-ol:space-y-2 prose-ul:space-y-2 prose-li:my-1">
                             <MDXContent source={content} />
                         </div>
 

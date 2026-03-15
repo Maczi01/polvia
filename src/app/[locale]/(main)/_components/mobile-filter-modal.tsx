@@ -69,19 +69,19 @@ export const MobileFilterModal = ({
                  // eslint-disable-next-line tailwindcss/no-contradicting-classname
                 className={`
           relative mx-auto my-4 w-11/12 max-w-md rounded-lg
-          bg-white dark:bg-gray-800 shadow-lg dark:shadow-gray-900/50
-          transition-transform transition-opacity duration-300
+          bg-white shadow-lg transition-opacity transition-transform
+          duration-300 dark:bg-gray-800 dark:shadow-gray-900/50
           ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
         `}
                 style={{ maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
             >
                 {/* Header */}
-                <div className="flex-none items-center gap-3 border-b border-slate-200 dark:border-gray-600 p-4">
+                <div className="flex-none items-center gap-3 border-b border-slate-200 p-4 dark:border-gray-600">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onClose}
                             aria-label="Go Back"
-                            className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                            className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
                         >
                             <ArrowLeft size={20} />
                         </button>
@@ -92,7 +92,7 @@ export const MobileFilterModal = ({
                 </div>
 
                 {/* Body */}
-                <div className="flex-grow overflow-y-auto p-4">
+                <div className="grow overflow-y-auto p-4">
                     {/* (Optional) insert search and county selects here */}
 
                     <div className="mt-2 flex flex-col gap-y-1.5">

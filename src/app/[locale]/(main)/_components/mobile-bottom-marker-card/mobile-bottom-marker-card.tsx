@@ -50,7 +50,7 @@ export const MobileBottomMarkerCard = ({
             {/* Main content with header */}
             <div className="flex items-start gap-3">
                 {/* Service image - smaller */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <Image
                         src={image}
                         alt={`${selectedService.name} image`}
@@ -67,14 +67,14 @@ export const MobileBottomMarkerCard = ({
                 {/* Service details */}
                 <div className="flex min-w-0 flex-1 flex-col">
                     {/* Header with title and close button */}
-                    <div className="flex items-center justify-between mb-1">
-                        <h3 className="truncate text-lg font-semibold text-gray-900 dark:text-gray-100 pr-2">
+                    <div className="mb-1 flex items-center justify-between">
+                        <h3 className="truncate pr-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
                             {selectedService.name}
                         </h3>
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="rounded-full w-7 h-7 p-0 flex items-center justify-center bg-white/95 text-gray-700 hover:bg-red-500 hover:text-white transition-all duration-200 flex-shrink-0 shadow-[0_4px_8px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_12px_rgba(239,68,68,0.4),0_3px_6px_rgba(239,68,68,0.2)] hover:scale-110 active:scale-95 dark:bg-gray-800/95"
+                            className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/95 p-0 text-gray-700 shadow-[0_4px_8px_rgba(0,0,0,0.15),0_2px_4px_rgba(0,0,0,0.1)] transition-all duration-200 hover:scale-110 hover:bg-red-500 hover:text-white hover:shadow-[0_6px_12px_rgba(239,68,68,0.4),0_3px_6px_rgba(239,68,68,0.2)] active:scale-95 dark:bg-gray-800/95"
                             onClick={handleClose}
                             aria-label={t('close', { fallback: 'Close' })}
                         >
@@ -89,15 +89,15 @@ export const MobileBottomMarkerCard = ({
                     </div>
 
                     {/* Address */}
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="mb-3 flex items-center gap-2">
                         <Image
                             src="/icons/location.svg"
                             alt=""
                             width={16}
                             height={16}
-                            className="flex-shrink-0 dark:brightness-0 dark:invert"
+                            className="shrink-0 dark:brightness-0 dark:invert"
                         />
-                        <span className="text-sm text-muted-foreground dark:text-gray-400 leading-tight">
+                        <span className="text-sm leading-tight text-muted-foreground dark:text-gray-400">
                             {address}
                         </span>
                     </div>
@@ -121,7 +121,7 @@ export const MobileBottomMarkerCard = ({
                             >
                                 <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
                             </svg>
-                            <span className="font-medium text-[#49C55E] dark:text-green-400 text-sm">
+                            <span className="text-sm font-medium text-[#49C55E] dark:text-green-400">
                                 {t('list', { fallback: 'Lista' })}
                             </span>
                         </Button>
@@ -130,7 +130,7 @@ export const MobileBottomMarkerCard = ({
                         <Button
                             variant="explore"
                             size="sm"
-                            className="flex-1 bg-[#5db3f0] rounded-full"
+                            className="flex-1 rounded-full bg-[#5db3f0]"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
@@ -142,11 +142,11 @@ export const MobileBottomMarkerCard = ({
                                 height="14"
                                 viewBox="0 0 24 24"
                                 fill="currentColor"
-                                className="mr-1.5 text-white dark:white"
+                                className="dark:white mr-1.5 text-white"
                             >
                                 <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/>
                             </svg>
-                            <span className="font-medium text-white dark:white text-sm">
+                            <span className="dark:white text-sm font-medium text-white">
                                 {t('navigate', { fallback: 'Dojazd' })}
                             </span>
                         </Button>

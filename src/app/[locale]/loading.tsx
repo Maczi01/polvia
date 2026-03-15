@@ -12,15 +12,15 @@ export default async function LoadingPage() {
             aria-busy="true"
             aria-label={t("loading")}
         >
-            <div className="flex flex-col items-center max-w-xs px-4">
+            <div className="flex max-w-xs flex-col items-center px-4">
                 {/* Centered Logo Container */}
-                <div className="mb-8 w-full flex justify-center" aria-hidden="true">
+                <div className="mb-8 flex w-full justify-center" aria-hidden="true">
                     <LoadingLogo />
                 </div>
 
                 <div className="w-full">
                     <div
-                        className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-green-500 dark:border-gray-700 dark:border-t-green-400"
+                        className="mx-auto mb-4 size-12 animate-spin rounded-full border-4 border-gray-200 border-t-green-500 dark:border-gray-700 dark:border-t-green-400"
                         aria-hidden="true"
                     ></div>
 
@@ -31,18 +31,18 @@ export default async function LoadingPage() {
                         {[0, 150, 300].map(delay => (
                             <div
                                 key={delay}
-                                className="h-2 w-2 animate-pulse rounded-full bg-green-500 dark:bg-green-400"
+                                className="size-2 animate-pulse rounded-full bg-green-500 dark:bg-green-400"
                                 style={{ animationDelay: `${delay}ms` }}
                             ></div>
                         ))}
                     </div>
                 </div>
 
-                <div className="text-sm font-medium text-gray-600 dark:text-gray-300 text-center">
+                <div className="text-center text-sm font-medium text-gray-600 dark:text-gray-300">
                     {t("loading")}
                 </div>
 
-                <div className="text-gray-400 dark:text-gray-500 text-xs mt-2 text-center">
+                <div className="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">
                     {t("loadingDescription")}
                 </div>
             </div>

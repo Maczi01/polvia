@@ -8,7 +8,7 @@ interface BadgeProps {
 }
 
 const Badge = ({ children }: BadgeProps) => (
-    <span className="font-sans inline-block bg-green text-white dark:bg-green dark:text-white text-xs font-semibold px-2 py-1 rounded-md">{children}</span>
+    <span className="inline-block rounded-md bg-green px-2 py-1 font-sans text-xs font-semibold text-white dark:bg-green dark:text-white">{children}</span>
 );
 
 interface PriceCardProps {
@@ -24,15 +24,15 @@ interface PriceCardProps {
 const PriceCard = ({ title, subtitle, price, per, features, cta, recommended }: PriceCardProps) => {
     const t = useTranslations('Pricing');
     return (
-        <div className={`flex-1 min-w-0 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm p-8 ${recommended ? "ring-2 ring-green dark:ring-green" : ""}`}>
+        <div className={`min-w-0 flex-1 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800 ${recommended ? "ring-2 ring-green dark:ring-green" : ""}`}>
             <div className="flex items-start justify-between">
                 <div>
-                    <h3 className="font-sans text-sm text-gray-600 dark:text-gray-400 font-medium">{title}</h3>
+                    <h3 className="font-sans text-sm font-medium text-gray-600 dark:text-gray-400">{title}</h3>
                     <div className="mt-4 flex items-baseline gap-2">
                         <span className="font-sans text-5xl font-extrabold text-[#26364d] dark:text-white">{price}</span>
                         <span className="font-sans text-lg text-gray-500 dark:text-gray-400">{per}</span>
                     </div>
-                    {subtitle && <p className="font-sans mt-2 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
+                    {subtitle && <p className="mt-2 font-sans text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
                 </div>
                 {recommended && (
                     <div className="text-right">
@@ -42,9 +42,9 @@ const PriceCard = ({ title, subtitle, price, per, features, cta, recommended }: 
             </div>
 
             <div className="mt-6">
-                <button className={`font-sans inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium shadow-sm ${recommended ? 'bg-green text-white dark:bg-green dark:text-white' : 'bg-[#26364d] text-white dark:bg-gray-700 dark:text-white'}`}>
+                <button className={`inline-flex items-center gap-2 rounded-full px-6 py-3 font-sans font-medium shadow-sm ${recommended ? 'bg-green text-white dark:bg-green dark:text-white' : 'bg-[#26364d] text-white dark:bg-gray-700 dark:text-white'}`}>
                     {cta}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </button>
@@ -55,7 +55,7 @@ const PriceCard = ({ title, subtitle, price, per, features, cta, recommended }: 
                 <ul className="mt-3 space-y-3 text-sm text-gray-600 dark:text-gray-400">
                     {features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-start gap-3">
-                            <svg className="mt-1 h-4 w-4 flex-shrink-0 text-green dark:text-green" viewBox="0 0 20 20" fill="currentColor">
+                            <svg className="mt-1 size-4 shrink-0 text-green dark:text-green" viewBox="0 0 20 20" fill="currentColor">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 4.293 10.879a1 1 0 011.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                             <span className="font-sans">{feature}</span>
@@ -149,34 +149,34 @@ export default function PricingPage(): JSX.Element {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-16 px-6">
-            <div className="max-w-6xl mx-auto">
-                <header className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="min-h-screen bg-gray-50 px-6 py-16 dark:bg-gray-900">
+            <div className="mx-auto max-w-6xl">
+                <header className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="font-sans text-4xl md:text-5xl font-extrabold text-[#26364d] dark:text-white leading-tight">
+                        <h1 className="font-sans text-4xl font-extrabold leading-tight text-[#26364d] dark:text-white md:text-5xl">
                             {t('choosePlan')}
                         </h1>
-                        <p className="font-sans mt-4 text-gray-600 dark:text-gray-400 max-w-2xl">
+                        <p className="mt-4 max-w-2xl font-sans text-gray-600 dark:text-gray-400">
                             {t('simple')}
                         </p>
                     </div>
                     <div className="flex gap-4">
                         <button
                             onClick={() => setBillingPeriod('monthly')}
-                            className={`font-sans rounded-full border px-4 py-2 text-sm transition-colors ${
+                            className={`rounded-full border px-4 py-2 font-sans text-sm transition-colors ${
                                 billingPeriod === 'monthly'
                                     ? 'border-transparent bg-green text-white dark:bg-green dark:text-white'
-                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                    : 'border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
                             }`}
                         >
                             {t('monthly')}
                         </button>
                         <button
                             onClick={() => setBillingPeriod('annual')}
-                            className={`font-sans rounded-full border px-4 py-2 text-sm transition-colors ${
+                            className={`rounded-full border px-4 py-2 font-sans text-sm transition-colors ${
                                 billingPeriod === 'annual'
                                     ? 'border-transparent bg-green text-white dark:bg-green dark:text-white'
-                                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                                    : 'border-gray-200 bg-white text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300'
                             }`}
                         >
                             {t('annual')}
@@ -185,15 +185,15 @@ export default function PricingPage(): JSX.Element {
                 </header>
 
                 <main>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-1">
+                    <div className="my-1 grid grid-cols-1 gap-6 md:grid-cols-3">
                         {cards.map((card: PricingCard, idx: number) => (
                             <PriceCard key={idx} {...card} />
                         ))}
                     </div>
                 </main>
 
-                <footer className="font-sans mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
-                    {t('questions')} <a href="#" className="text-emerald-600 dark:text-emerald-400 font-medium">{t('contactSales')}</a>
+                <footer className="mt-12 text-center font-sans text-sm text-gray-500 dark:text-gray-400">
+                    {t('questions')} <a href="#" className="font-medium text-emerald-600 dark:text-emerald-400">{t('contactSales')}</a>
                 </footer>
             </div>
         </div>

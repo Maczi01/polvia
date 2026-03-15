@@ -24,15 +24,15 @@ function StatusBadge({ status, className = "" }: { status: string; className?: s
 
     if (isActive) {
         return (
-            <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border border-green-200 dark:border-green-700 ${className}`}>
-        <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-1.5"></span>
+            <span className={`inline-flex items-center rounded-full border border-green-200 bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:border-green-700 dark:bg-green-900/30 dark:text-green-400 ${className}`}>
+        <span className="mr-1.5 size-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>
                 {status}
       </span>
         );
     } else {
         return (
-            <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border border-red-200 dark:border-red-700 ${className}`}>
-        <span className="w-1.5 h-1.5 bg-red-500 dark:bg-red-400 rounded-full mr-1.5"></span>
+            <span className={`inline-flex items-center rounded-full border border-red-200 bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:border-red-700 dark:bg-red-900/30 dark:text-red-400 ${className}`}>
+        <span className="mr-1.5 size-1.5 rounded-full bg-red-500 dark:bg-red-400"></span>
                 {status}
       </span>
         );
@@ -54,12 +54,12 @@ function ContactLink({ contact }: { contact: string }): JSX.Element {
                     href={website?.startsWith('http') ? website : `https://${website}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline font-medium text-sm break-all"
+                    className="break-all text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     {website}
                 </a>
                 {restInfo && (
-                    <div className="text-gray-600 dark:text-gray-400 text-xs">
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
                         {restInfo}
                     </div>
                 )}
@@ -68,7 +68,7 @@ function ContactLink({ contact }: { contact: string }): JSX.Element {
     }
 
     return (
-        <span className="text-gray-900 dark:text-gray-100 text-sm">
+        <span className="text-sm text-gray-900 dark:text-gray-100">
       {contact}
     </span>
     );
@@ -82,9 +82,9 @@ function MediaCard({ item, isPolish }: { item: PolishMediaItem | EnglishMediaIte
     const characteristicsField = isPolish ? (data as PolishMediaItem).charakterystyka : (data as EnglishMediaItem).characteristics;
 
     return (
-        <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 space-y-3">
+        <div className="space-y-3 rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900">
             <div className="flex flex-col space-y-2">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 text-lg">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {data.medium}
                 </h3>
                 <div className="flex items-center justify-between">
@@ -97,7 +97,7 @@ function MediaCard({ item, isPolish }: { item: PolishMediaItem | EnglishMediaIte
 
             <div className="space-y-2">
                 <div>
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
             {isPolish ? 'Kontakt' : 'Contact'}
           </span>
                     <div className="mt-1">
@@ -106,10 +106,10 @@ function MediaCard({ item, isPolish }: { item: PolishMediaItem | EnglishMediaIte
                 </div>
 
                 <div>
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <span className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
             {isPolish ? 'Charakterystyka' : 'Characteristics'}
           </span>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1 leading-relaxed">
+                    <p className="mt-1 text-sm leading-relaxed text-gray-700 dark:text-gray-300">
                         {characteristicsField}
                     </p>
                 </div>
@@ -124,7 +124,7 @@ function ResponsiveTable({ children, className = "" }: { children: React.ReactNo
         <div className={`my-6 ${className}`}>
             {/* Desktop Table */}
             <div className="hidden lg:block">
-                <div className="rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm dark:shadow-gray-900/20 overflow-hidden">
+                <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700 dark:shadow-gray-900/20">
                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         {children}
                     </table>
@@ -144,7 +144,7 @@ function TableHeader({ children, className = "" }: { children: React.ReactNode; 
 
 function TableBody({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
     return (
-        <tbody className={`bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700 ${className}`}>
+        <tbody className={`divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900 ${className}`}>
         {children}
         </tbody>
     );
@@ -152,7 +152,7 @@ function TableBody({ children, className = "" }: { children: React.ReactNode; cl
 
 function TableRow({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
     return (
-        <tr className={`hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ml-2 duration-200 ${className}`}>
+        <tr className={`ml-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 ${className}`}>
             {children}
         </tr>
     );
@@ -160,7 +160,7 @@ function TableRow({ children, className = "" }: { children: React.ReactNode; cla
 
 function TableHead({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
     return (
-        <th className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider ${className}`}>
+        <th className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600 dark:text-gray-300 ${className}`}>
             {children}
         </th>
     );
@@ -168,7 +168,7 @@ function TableHead({ children, className = "" }: { children: React.ReactNode; cl
 
 function TableCell({ children, className = "" }: { children: React.ReactNode; className?: string }): JSX.Element {
     return (
-        <td className={`px-4 py-3 ml-2 text-sm ${className}`}>
+        <td className={`ml-2 px-4 py-3 text-sm ${className}`}>
             {children}
         </td>
     );
@@ -338,7 +338,7 @@ export function PolishMediaTable(): JSX.Element {
                             <TableCell>
                                 <ContactLink contact={item.kontakt} />
                             </TableCell>
-                            <TableCell className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            <TableCell className="leading-relaxed text-gray-700 dark:text-gray-300">
                                 {item.charakterystyka}
                             </TableCell>
                         </TableRow>
@@ -347,7 +347,7 @@ export function PolishMediaTable(): JSX.Element {
             </ResponsiveTable>
 
             {/* Mobile Cards */}
-            <div className="lg:hidden space-y-4 my-6">
+            <div className="my-6 space-y-4 lg:hidden">
                 {polishMediaData.map((item: PolishMediaItem, index: number) => (
                     <MediaCard key={index} item={item} isPolish={true} />
                 ))}
@@ -386,7 +386,7 @@ export function EnglishMediaTable(): JSX.Element {
                             <TableCell>
                                 <ContactLink contact={item.contact} />
                             </TableCell>
-                            <TableCell className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                            <TableCell className="leading-relaxed text-gray-700 dark:text-gray-300">
                                 {item.characteristics}
                             </TableCell>
                         </TableRow>
@@ -395,7 +395,7 @@ export function EnglishMediaTable(): JSX.Element {
             </ResponsiveTable>
 
             {/* Mobile Cards */}
-            <div className="lg:hidden space-y-4 my-6">
+            <div className="my-6 space-y-4 lg:hidden">
                 {englishMediaData.map((item: EnglishMediaItem, index: number) => (
                     <MediaCard key={index} item={item} isPolish={false} />
                 ))}

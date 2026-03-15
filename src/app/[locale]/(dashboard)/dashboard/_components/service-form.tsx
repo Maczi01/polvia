@@ -91,12 +91,12 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
             {state.message && (
                 <div className={`rounded-lg p-4 text-sm ${
                     state.success
-                        ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-950 dark:text-green-300 dark:border-green-800'
-                        : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800'
+                        ? 'border border-green-200 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-300'
+                        : 'border border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-300'
                 }`}>
                     <p className="font-medium">{state.message}</p>
                     {state.errors && Object.keys(state.errors).length > 0 && (
-                        <ul className="mt-2 list-disc list-inside space-y-1">
+                        <ul className="mt-2 list-inside list-disc space-y-1">
                             {Object.entries(state.errors).map(([field, messages]) => (
                                 <li key={field}><span className="font-medium">{field}:</span> {messages.join(', ')}</li>
                             ))}
@@ -107,8 +107,8 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
             {/* Basic Info */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="border-b pb-2 text-lg font-semibold">Basic Information</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="name">Name *</Label>
                         <Input id="name" name="name" required placeholder="Service name" defaultValue={d?.name} />
@@ -175,7 +175,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             name="image"
                             type="file"
                             accept="image/png,image/jpeg,image/webp"
-                            className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium"
+                            className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium dark:bg-gray-800"
                             onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) {
@@ -189,13 +189,13 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             <img
                                 src={imagePreview}
                                 alt="Preview"
-                                className="mt-2 h-24 w-24 rounded-md object-cover border"
+                                className="mt-2 size-24 rounded-md border object-cover"
                             />
                         ) : d?.image ? (
                             <img
                                 src={`/services/${d.image}`}
                                 alt="Current image"
-                                className="mt-2 h-24 w-24 rounded-md object-cover border"
+                                className="mt-2 size-24 rounded-md border object-cover"
                             />
                         ) : null}
                         {state.errors?.image && (
@@ -216,13 +216,13 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     <Label>Languages</Label>
                     <div className="flex flex-wrap gap-3">
                         {languages.map((lang) => (
-                            <label key={lang.value} className="flex items-center gap-2 cursor-pointer">
+                            <label key={lang.value} className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="checkbox"
                                     name="languages"
                                     value={lang.value}
                                     defaultChecked={d ? d.languages.includes(lang.value) : lang.value === 'pl'}
-                                    className="h-4 w-4 rounded border-gray-300"
+                                    className="size-4 rounded border-gray-300"
                                 />
                                 <span className="text-sm">{lang.label}</span>
                             </label>
@@ -235,13 +235,13 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     {allTags.length > 0 && (
                         <div className="flex flex-wrap gap-3">
                             {allTags.map((tag) => (
-                                <label key={tag.id} className="flex items-center gap-2 cursor-pointer">
+                                <label key={tag.id} className="flex cursor-pointer items-center gap-2">
                                     <input
                                         type="checkbox"
                                         name="tags"
                                         value={tag.id}
                                         defaultChecked={d?.tags.includes(tag.id)}
-                                        className="h-4 w-4 rounded border-gray-300"
+                                        className="size-4 rounded border-gray-300"
                                     />
                                     <span className="text-sm">
                                         {tag.names.en || tag.names.pl || Object.values(tag.names)[0]}
@@ -257,9 +257,9 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     )}
 
                     {showNewTag ? (
-                        <div className="rounded-md border p-3 space-y-3 bg-muted/20">
+                        <div className="space-y-3 rounded-md border bg-muted/20 p-3">
                             <p className="text-sm font-medium">New tag translations</p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                                 <div className="space-y-1">
                                     <Label className="text-xs">Polish</Label>
                                     <Input
@@ -299,7 +299,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                                     size="sm"
                                     disabled={creatingTag || !Object.values(newTagNames).some((v) => v.trim())}
                                     onClick={handleCreateTag}
-                                    className="rounded-md bg-green hover:bg-green/90 text-white"
+                                    className="rounded-md bg-green text-white hover:bg-green/90"
                                 >
                                     {creatingTag ? 'Creating...' : 'Create Tag'}
                                 </Button>
@@ -331,8 +331,8 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
             {/* Location */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Location</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="border-b pb-2 text-lg font-semibold">Location</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="city">City</Label>
                         <Input id="city" name="city" placeholder="Warsaw" defaultValue={d?.city} />
@@ -415,7 +415,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             required
                             placeholder="52.2297"
                             defaultValue={d?.latitude}
-                            className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-base text-gray-900 dark:text-white shadow-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                            className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-gray-900 shadow-sm transition-colors placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-300 md:text-sm"
                         />
                         {state.errors?.latitude && (
                             <p className="text-sm text-destructive">{state.errors.latitude[0]}</p>
@@ -433,7 +433,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                             required
                             placeholder="21.0122"
                             defaultValue={d?.longitude}
-                            className="flex h-9 w-full rounded-md border border-input bg-white dark:bg-gray-800 px-3 py-1 text-base text-gray-900 dark:text-white shadow-sm transition-colors placeholder:text-gray-500 dark:placeholder:text-gray-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                            className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-gray-900 shadow-sm transition-colors placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-300 md:text-sm"
                         />
                         {state.errors?.longitude && (
                             <p className="text-sm text-destructive">{state.errors.longitude[0]}</p>
@@ -460,8 +460,8 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
             {/* Socials */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Social Media</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="border-b pb-2 text-lg font-semibold">Social Media</h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                         <Label htmlFor="socials.facebook">Facebook</Label>
                         <Input id="socials.facebook" name="socials.facebook" placeholder="https://facebook.com/..." defaultValue={d?.socials?.facebook} />
@@ -495,12 +495,12 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
             {/* Translations */}
             <section className="space-y-4">
-                <h3 className="text-lg font-semibold border-b pb-2">Translations</h3>
+                <h3 className="border-b pb-2 text-lg font-semibold">Translations</h3>
 
                 <div className="space-y-6">
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-muted-foreground">Polish</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="namePl">Name (Polish)</Label>
                                 <Input id="namePl" name="namePl" placeholder="Nazwa usługi" defaultValue={d?.namePl} />
@@ -514,7 +514,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-muted-foreground">English</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="nameEn">Name (English)</Label>
                                 <Input id="nameEn" name="nameEn" placeholder="Service name" defaultValue={d?.nameEn} />
@@ -528,7 +528,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-muted-foreground">Ukrainian</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="nameUk">Name (Ukrainian)</Label>
                                 <Input id="nameUk" name="nameUk" placeholder="Назва послуги" defaultValue={d?.nameUk} />
@@ -542,7 +542,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
 
                     <div className="space-y-3">
                         <h4 className="text-sm font-medium text-muted-foreground">Russian</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div className="space-y-2">
                                 <Label htmlFor="nameRu">Name (Russian)</Label>
                                 <Input id="nameRu" name="nameRu" placeholder="Название услуги" defaultValue={d?.nameRu} />
@@ -556,14 +556,14 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 </div>
             </section>
 
-            <div className="flex justify-end gap-3 pt-4 border-t">
+            <div className="flex justify-end gap-3 border-t pt-4">
                 <Button type="reset" variant="outline" className="rounded-md">
                     Reset
                 </Button>
                 <Button
                     type="submit"
                     disabled={isPending}
-                    className="rounded-md bg-green hover:bg-green/90 text-white px-6"
+                    className="rounded-md bg-green px-6 text-white hover:bg-green/90"
                 >
                     {isPending
                         ? (mode === 'edit' ? 'Saving...' : 'Creating...')

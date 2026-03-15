@@ -367,7 +367,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         if (ref.current) {
             ref.current.fitBounds(
                 [
-                    [14.07, 49.0],
+                    [14.07, 49],
                     [24.15, 54.84],
                 ],
                 { duration: 1000, padding: 0 },
@@ -489,7 +489,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             // Show whole Poland when no services in selected location
             mapRef.current.fitBounds(
                 [
-                    [14.07, 49.0], // Southwest of Poland
+                    [14.07, 49], // Southwest of Poland
                     [24.15, 54.84], // Northeast of Poland
                 ],
                 {
@@ -585,7 +585,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         <div className={`flex size-full ${currentView === 'map' ? 'map-view' : ''}`}>
             {process.env.NODE_ENV === 'development' &&
                 (searchInput || embeddingResults.length > 0) && (
-                    <div className="absolute top-0 right-0 z-50 bg-black text-white p-2 text-xs">
+                    <div className="absolute right-0 top-0 z-50 bg-black p-2 text-xs text-white">
                         <div>Frontend: {frontendFilteredServices.length}</div>
                         {embeddingResults.length > 0 && (
                             <div>Embedding: {embeddingResults.length}</div>
@@ -613,7 +613,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 }}
             >
                 <div
-                    className="h-full overflow-y-auto safari-only-pt-16"
+                    className="safari-only-pt-16 h-full overflow-y-auto"
                     style={{
                         height: isMobile && currentView === 'list' ? '100%' : undefined,
                     }}

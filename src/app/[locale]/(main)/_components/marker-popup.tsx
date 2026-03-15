@@ -61,7 +61,7 @@ export const MarkerPopup = ({
                         />
 
                         <div className="flex grow flex-col justify-center px-3">
-                            <div className="text-lg font-semibold pr-3">{selectedService.name}</div>
+                            <div className="pr-3 text-lg font-semibold">{selectedService.name}</div>
                             <div className="mt-2 flex items-start">
                                 <Image
                                     src="/icons/location.svg"

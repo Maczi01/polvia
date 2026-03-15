@@ -15,7 +15,17 @@
       "WebFetch(domain:twojlekarz-wawa.pl)",
       "Bash(python3:*)",
       "Bash(head:*)",
-      "mcp__chrome-devtools__take_screenshot"
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(npx next lint 2>&1 | grep \"Error:\" | head -80)",
+      "Bash(npx next lint 2>&1 | grep -B1 \"Error:\" | grep \"^\\\\./src\" | sort -u)",
+      "Bash(npx next lint 2>&1 | grep -E \"^\\\\./\" | sort -u)",
+      "Bash(npx next lint --fix 2>&1 | grep \"Error:\" | head -40)",
+      "Bash(npx eslint src/db/seed.ts --fix-dry-run --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && \\(m.ruleId.includes\\('numeric'\\) || m.ruleId.includes\\('zero'\\)\\)\\); console.log\\('Messages:', msgs.length\\); msgs.forEach\\(m => console.log\\(m.line, m.column, m.ruleId, m.message\\)\\);\")",
+      "Bash(npx eslint src/db/seed.ts --rule '{\"unicorn/numeric-separators-style\": [\"error\", {\"onlyIfContainsSeparator\": true, \"number\": {\"minimumDigits\": 0, \"groupLength\": 3}}]}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && \\(m.ruleId.includes\\('numeric'\\) || m.ruleId.includes\\('zero'\\)\\)\\); console.log\\('Messages:', msgs.length\\); msgs.forEach\\(m => console.log\\(m.line, m.column, m.ruleId, m.message\\)\\);\")",
+      "Bash(npx eslint src/db/seed.ts --rule '{\"unicorn/numeric-separators-style\": [\"error\", {\"onlyIfContainsSeparator\": false, \"number\": {\"minimumDigits\": 0, \"groupLength\": 3}}]}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && m.ruleId.includes\\('numeric'\\)\\); console.log\\('Messages:', msgs.length\\); msgs.slice\\(0,10\\).forEach\\(m => console.log\\(m.line, m.column, m.ruleId, m.message\\)\\);\")",
+      "Bash(npx eslint src/db/seed.ts --rule '{\"unicorn/numeric-separators-style\": [\"error\", {\"onlyIfContainsSeparator\": true, \"number\": {\"minimumDigits\": 0, \"groupLength\": 3}}]}' --format json > eslint-output.json 2>&1; node -e \"const json = JSON.parse\\(require\\('fs'\\).readFileSync\\('eslint-output.json','utf8'\\)\\); const msgs = json[0].messages.filter\\(m => m.ruleId && m.ruleId.includes\\('numeric'\\)\\); console.log\\('Numeric separator messages:', msgs.length\\); msgs.slice\\(0,5\\).forEach\\(m => console.log\\(m.line, m.column, m.message\\)\\);\")",
+      "Bash(npx eslint src/db/seed.ts 2>&1)",
+      "Bash(npx eslint src/db/seed.ts 2>&1; echo \"EXIT: $?\")"
     ]
   },
   "enableAllProjectMcpServers": true,

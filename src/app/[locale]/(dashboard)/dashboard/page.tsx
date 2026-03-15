@@ -25,14 +25,14 @@ export default async function DashboardPage() {
                 </div>
                 <Link
                     href="/dashboard/services/new"
-                    className="inline-flex items-center gap-2 rounded-md bg-green px-4 py-2 text-sm font-medium text-white hover:bg-green/90 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-md bg-green px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green/90"
                 >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="size-4" />
                     Add Service
                 </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {stats.map((stat) => (
                     <div
                         key={stat.label}
@@ -40,7 +40,7 @@ export default async function DashboardPage() {
                     >
                         <div className="flex items-center justify-between">
                             <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-                            <stat.icon className="h-4 w-4 text-muted-foreground" />
+                            <stat.icon className="size-4 text-muted-foreground" />
                         </div>
                         <p className="mt-2 text-3xl font-bold">{stat.value}</p>
                     </div>
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
             </div>
 
             <div className="rounded-lg border bg-card p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4 flex items-center justify-between">
                     <h2 className="text-lg font-semibold">Recent Services</h2>
                     <Link
                         href="/dashboard/services"
@@ -58,7 +58,7 @@ export default async function DashboardPage() {
                     </Link>
                 </div>
                 {services.length === 0 ? (
-                    <p className="text-muted-foreground text-sm py-4">No services yet.</p>
+                    <p className="py-4 text-sm text-muted-foreground">No services yet.</p>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">

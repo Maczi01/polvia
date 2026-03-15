@@ -8,7 +8,7 @@ export const HowItWorks = async () => {
 
     return (
         <section
-            className="flex min-h-screen items-center py-6 md:py-8 lg:py-8 pointer-events: none"
+            className="pointer-events: none flex min-h-screen items-center py-6 md:py-8 lg:py-8"
             aria-labelledby="how-it-works-heading"
         >
             <div className="container mx-auto w-full px-4 md:px-8 lg:px-16 xl:px-24">
@@ -28,7 +28,7 @@ export const HowItWorks = async () => {
                             <div className="phone-mockup relative mx-auto max-w-sm cursor-pointer transition-transform duration-300 hover:scale-105">
                             {/* Step indicator */}
                             <div
-                                className="step-indicator absolute md:-right-4 md:-top-4 right-5 top-1 z-10 flex size-12 animate-pulse items-center justify-center rounded-full bg-green text-lg font-bold text-white shadow-lg"
+                                className="step-indicator absolute right-5 top-1 z-10 flex size-12 animate-pulse items-center justify-center rounded-full bg-green text-lg font-bold text-white shadow-lg md:-right-4 md:-top-4"
                                 aria-label={t('firstStep')}
                                 role="img"
                             >
@@ -48,7 +48,7 @@ export const HowItWorks = async () => {
                                             alt={t('logo')}
                                             width={72}
                                             height={72}
-                                            className="hidden dark:block dark:brightness-0 dark:invert p-1"
+                                            className="hidden p-1 dark:block dark:brightness-0 dark:invert"
                                         />
                                         <Image
                                             src="/logo/only-dark.svg"
@@ -76,13 +76,13 @@ export const HowItWorks = async () => {
                                         readOnly
                                         tabIndex={-1}
                                         aria-describedby="demo-search-description"
-                                        className="w-full rounded-xl border-2 border-green bg-gray-50 p-3 font-medium text-gray-700 cursor-default"
+                                        className="w-full cursor-default rounded-xl border-2 border-green bg-gray-50 p-3 font-medium text-gray-700"
                                     />
                                     <div id="demo-search-description" className="sr-only">
                                         {t("exampleSearchMechanic")}
                                     </div>
                                     <div
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 cursor-auto"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 cursor-auto text-gray-400"
                                         aria-hidden="true"
                                     >
                                         🔍
@@ -96,7 +96,7 @@ export const HowItWorks = async () => {
                                     aria-label={t('results')}
                                 >
                                     <button
-                                        className="flex-1 rounded-lg bg-green px-4 py-2 text-sm font-medium text-white cursor-auto"
+                                        className="flex-1 cursor-auto rounded-lg bg-green px-4 py-2 text-sm font-medium text-white"
                                         role="tab"
                                         aria-selected="true"
                                         aria-controls="demo-list-panel"
@@ -106,7 +106,7 @@ export const HowItWorks = async () => {
                                         {t('list')}
                                     </button>
                                     <button
-                                        className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 cursor-auto"
+                                        className="flex-1 cursor-auto px-4 py-2 text-sm font-medium text-gray-600"
                                         role="tab"
                                         aria-selected="false"
                                         aria-controls="demo-map-panel"
@@ -116,7 +116,7 @@ export const HowItWorks = async () => {
                                         {t('map')}
                                     </button>
                                     <button
-                                        className="flex-1 rounded-lg bg-[#26364d] px-4 py-2 text-sm font-medium text-white cursor-auto"
+                                        className="flex-1 cursor-auto rounded-lg bg-[#26364d] px-4 py-2 text-sm font-medium text-white"
                                         role="tab"
                                         aria-selected="false"
                                         aria-controls="demo-filters-panel"
@@ -169,7 +169,7 @@ export const HowItWorks = async () => {
                                                 </div>
                                             </div>
                                             <div
-                                                className="flex size-8 items-center justify-center rounded-full bg-green bg-opacity-10 cursor-auto"
+                                                className="flex size-8 cursor-auto items-center justify-center rounded-full bg-green bg-opacity-10"
                                                 aria-label={t("goToDetails")}
                                                 role="button"
                                                 tabIndex={-1}
@@ -220,7 +220,7 @@ export const HowItWorks = async () => {
                                                 </div>
                                             </div>
                                             <div
-                                                className="flex size-8 items-center justify-center rounded-full bg-green bg-opacity-10 cursor-auto"
+                                                className="flex size-8 cursor-auto items-center justify-center rounded-full bg-green bg-opacity-10"
                                                 aria-label={t("goToDetails")}
                                                 role="button"
                                                 tabIndex={-1}
@@ -269,7 +269,7 @@ export const HowItWorks = async () => {
                                                 </div>
                                             </div>
                                             <div
-                                                className="flex size-8 items-center justify-center rounded-full bg-green bg-opacity-10 cursor-auto"
+                                                className="flex size-8 cursor-auto items-center justify-center rounded-full bg-green bg-opacity-10"
                                                 aria-label={t("goToDetails")}
                                                 role="button"
                                                 tabIndex={-1}

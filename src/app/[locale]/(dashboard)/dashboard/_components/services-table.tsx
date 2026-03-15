@@ -37,8 +37,8 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-4">
-                <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <div className="relative max-w-sm flex-1">
+                    <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Search services..."
                         value={search}
@@ -77,7 +77,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                 </tr>
                             ) : (
                                 filtered.map((service) => (
-                                    <tr key={service.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
+                                    <tr key={service.id} className="border-b transition-colors last:border-0 hover:bg-muted/30">
                                         <td className="px-4 py-3 text-muted-foreground">{service.slug}</td>
                                         <td className="px-4 py-3 font-medium">{service.name}</td>
                                         <td className="px-4 py-3">
@@ -99,7 +99,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center gap-1 text-blue-600 hover:underline dark:text-blue-400"
                                                 >
-                                                    <ExternalLink className="h-3 w-3" />
+                                                    <ExternalLink className="size-3" />
                                                     Link
                                                 </a>
                                             ) : '-'}
@@ -113,9 +113,9 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                        className="size-8 p-0 text-muted-foreground hover:bg-muted hover:text-foreground"
                                                     >
-                                                        <Pencil className="h-4 w-4" />
+                                                        <Pencil className="size-4" />
                                                     </Button>
                                                 </Link>
                                                 <Button
@@ -123,9 +123,9 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                                     size="sm"
                                                     disabled={isPending}
                                                     onClick={() => handleDelete(service.id, service.name)}
-                                                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    className="size-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                                 >
-                                                    <Trash2 className="h-4 w-4" />
+                                                    <Trash2 className="size-4" />
                                                 </Button>
                                             </div>
                                         </td>

@@ -77,8 +77,8 @@ export const ThemeToggle = () => {
     if (!mounted) {
         return (
             <div className={containerClass}>
-                <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse" />
-                <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full animate-pulse ml-1" />
+                <div className="size-8 animate-pulse rounded-full bg-gray-300 dark:bg-gray-600" />
+                <div className="ml-1 size-8 animate-pulse rounded-full bg-gray-300 dark:bg-gray-600" />
             </div>
         );
     }
@@ -89,12 +89,12 @@ export const ThemeToggle = () => {
         <div className="animate-fadeIn">
             <style>{fadeInKeyframes}</style>
             {/* FIX: Removed transition-colors to avoid non-composited animations */}
-            <div className={`${containerClass} hover:shadow-md will-change-[box-shadow] contain-layout`}>
+            <div className={`${containerClass} will-change-[box-shadow] contain-layout hover:shadow-md`}>
                 <button
                     onClick={() => setTheme('light')}
-                    className={`group theme-button light ${currentTheme === 'light' ? 'active' : ''} 
-                        flex items-center justify-center w-8 h-8 rounded-full 
-                        will-change-[opacity] relative z-10
+                    className={`theme-button light group ${currentTheme === 'light' ? 'active' : ''} 
+                        relative z-10 flex size-8 items-center justify-center 
+                        rounded-full will-change-[opacity]
                         ${currentTheme === 'light'
                         ? 'text-white shadow-lg'
                         : 'text-gray-600 dark:text-gray-400'
@@ -104,14 +104,14 @@ export const ThemeToggle = () => {
                 >
                     <Sun
                         size={16}
-                        className="transition-transform duration-300 group-hover:rotate-12 group-active:scale-90 relative z-20"
+                        className="relative z-20 transition-transform duration-300 group-hover:rotate-12 group-active:scale-90"
                     />
                 </button>
                 <button
                     onClick={() => setTheme('dark')}
-                    className={`group theme-button dark ${currentTheme === 'dark' ? 'active' : ''} 
-                        flex items-center justify-center w-8 h-8 rounded-full 
-                        will-change-[opacity] relative z-10
+                    className={`theme-button dark group ${currentTheme === 'dark' ? 'active' : ''} 
+                        relative z-10 flex size-8 items-center justify-center 
+                        rounded-full will-change-[opacity]
                         ${currentTheme === 'dark'
                         ? 'text-white shadow-lg'
                         : 'text-gray-600 dark:text-gray-400'
@@ -121,7 +121,7 @@ export const ThemeToggle = () => {
                 >
                     <Moon
                         size={16}
-                        className="transition-transform duration-300 group-hover:rotate-12 group-active:scale-90 relative z-20"
+                        className="relative z-20 transition-transform duration-300 group-hover:rotate-12 group-active:scale-90"
                     />
                 </button>
             </div>

@@ -64,32 +64,32 @@ const PopularServiceCard = ({
     const content = (
         <>
             {/* Subtle background gradient on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 dark:from-green-900/10 dark:to-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 to-blue-50/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:from-green-900/10 dark:to-blue-900/10" />
 
-            <div className="relative z-10 mb-3 sm:mb-4 size-20 sm:size-28 flex items-center justify-center rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 shadow-inner group-hover:shadow-lg transition-shadow duration-300">
+            <div className="relative z-10 mb-3 flex size-20 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 shadow-inner transition-shadow duration-300 group-hover:shadow-lg dark:from-gray-700 dark:to-gray-800 sm:mb-4 sm:size-28 sm:rounded-2xl">
                 {icon ? (
                     <Image
                         src={icon}
                         alt={`${name} - ${t('serviceWrapper')} ${t(category)}`}
                         width={70}
                         height={70}
-                        className="sm:w-[100px] sm:h-[100px] object-contain rounded-xl sm:rounded-2xl transition-transform duration-300 group-hover:scale-110"
+                        className="rounded-xl object-contain transition-transform duration-300 group-hover:scale-110 sm:size-[100px] sm:rounded-2xl"
                     />
                 ) : (
                     <div
-                        className="size-8 sm:size-12 rounded-full bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-500"
+                        className="size-8 rounded-full bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-600 dark:to-gray-500 sm:size-12"
                         aria-hidden="true"
                     />
                 )}
             </div>
 
-            <span className="relative z-10 text-center font-bold text-sm sm:text-lg text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 group-hover:text-green-700 dark:group-hover:text-green-300 transition-colors duration-300 leading-tight px-1">
+            <span className="relative z-10 mb-2 px-1 text-center text-sm font-bold leading-tight text-gray-900 transition-colors duration-300 group-hover:text-green-700 dark:text-gray-100 dark:group-hover:text-green-300 sm:mb-3 sm:text-lg">
                 {name}
             </span>
 
             <Badge
                 variant={badgeColor}
-                className="relative z-10 shadow-sm group-hover:shadow-md transition-shadow duration-300"
+                className="relative z-10 shadow-sm transition-shadow duration-300 group-hover:shadow-md"
                 label={t(`${category}`)}
             />
         </>
@@ -133,14 +133,14 @@ export function PopularServicesGridClient({ services }: PopularServicesGridClien
                 <div className="mb-8">
                     <h2
                         id="popular-companies-heading"
-                        className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-left"
+                        className="text-left text-2xl font-bold text-gray-900 dark:text-gray-100"
                     >
                         {t('popularCompanies')}
                     </h2>
                 </div>
 
                 {/* Grid Layout - Responsive */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-8 lg:gap-6">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-6 xl:grid-cols-5">
                     {topServices.map((service, index) => (
                         <PopularServiceCard
                             key={service.id}
@@ -156,14 +156,14 @@ export function PopularServicesGridClient({ services }: PopularServicesGridClien
                 </div>
 
                 {/* Optional: Add a "View All Services" link */}
-                <div className="text-center mt-12">
+                <div className="mt-12 text-center">
                     <Link
                         href="/map"
-                        className="inline-flex items-center px-6 py-3 bg-green hover:bg-green-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-500/30"
+                        className="inline-flex items-center rounded-xl bg-green px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-green-700 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-500/30"
                     >
                         {t('Categories.viewAll')}
                         <svg
-                            className="ml-2 w-5 h-5"
+                            className="ml-2 size-5"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

@@ -57,12 +57,12 @@ const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void })
 
     return (
         <div
-            className="absolute top-full left-0 w-[600px] max-w-[90vw] bg-white dark:bg-gray-800 shadow-2xl rounded-2xl border border-gray-100 dark:border-gray-700 z-50 animate-megaMenuFadeIn"
+            className="animate-megaMenuFadeIn absolute left-0 top-full z-50 w-[600px] max-w-[90vw] rounded-2xl border border-gray-100 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800"
             role="menu"
             aria-label="Menu kategorii firm"
         >
             <div className="p-8">
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 text-center mb-6">
+                <h3 className="mb-6 text-center text-xl font-semibold text-gray-900 dark:text-gray-100">
                     {t('AllCategories')}
                 </h3>
 
@@ -77,7 +77,7 @@ const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void })
                                     pathname: categoryUrl.pathname as AppPathnames,
                                     query: categoryUrl.query
                                 }}
-                                className="block px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-green-600 dark:hover:text-green-400 transition-all duration-200 hover:translate-x-1"
+                                className="block rounded-lg px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:translate-x-1 hover:bg-gray-50 hover:text-green-600 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-green-400"
                                 role="menuitem"
                                 onClick={onClose}
                             >
@@ -128,12 +128,12 @@ const BusinessMenuItem = ({ pathname, title }: { pathname: string; title: string
 
     return (
         <li
-            className="flex items-center relative"
+            className="relative flex items-center"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <Button
-                className="min-w-36 group"
+                className="group min-w-36"
                 variant={isBusinessActive ? 'active' : 'outline'}
                 aria-expanded={megaMenuOpen}
                 aria-haspopup="true"
@@ -141,7 +141,7 @@ const BusinessMenuItem = ({ pathname, title }: { pathname: string; title: string
                 <span className="flex items-center gap-2">
                     {title}
                     <svg
-                        className={`w-4 h-4 transition-transform duration-200 ${megaMenuOpen ? 'rotate-180' : ''}`}
+                        className={`size-4 transition-transform duration-200 ${megaMenuOpen ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -216,13 +216,13 @@ export const Header = () => {
             <div className="sr-only focus-within:not-sr-only">
                 <a
                     href="#main-content"
-                    className="fixed left-2 top-2 rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300 z-[9999]"
+                    className="fixed left-2 top-2 z-[9999] rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
                     Przejdź do głównej treści
                 </a>
                 <a
                     href="#mobile-navigation"
-                    className="fixed left-40 top-2 rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300 z-[9999]"
+                    className="fixed left-40 top-2 z-[9999] rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
                     Przejdź do nawigacji
                 </a>
@@ -230,7 +230,7 @@ export const Header = () => {
 
             <header
                 ref={headerRef}
-                className="sticky top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-3 sm:px-9 md:mb-3 bg-[#F6F6F7] dark:bg-[#111827]"
+                className="sticky inset-x-0 top-0 z-50 flex h-20 items-center justify-between bg-[#F6F6F7] px-3 dark:bg-[#111827] sm:px-9 md:mb-3"
                 role="banner"
             >
                 <Logo />

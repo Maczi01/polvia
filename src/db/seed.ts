@@ -35,10 +35,10 @@ async function mainSeed() {
 
     const cityCoords = {
         Warszawa: { lat: 52.2297, lon: 21.0122 },
-        Kraków: { lat: 50.0647, lon: 19.9450 },
+        Kraków: { lat: 50.0647, lon: 19.945 },
         Wrocław: { lat: 51.1079, lon: 17.0385 },
         Poznań: { lat: 52.4064, lon: 16.9252 },
-        Gdańsk: { lat: 54.3520, lon: 18.6466 },
+        Gdańsk: { lat: 54.352, lon: 18.6466 },
         Szczecin: { lat: 53.4285, lon: 14.5528 },
         Kielce: { lat: 50.8661, lon: 20.6286 },
         Gdynia: { lat: 54.5189, lon: 18.5305 },
@@ -291,7 +291,7 @@ async function mainSeed() {
         webpage: 'https://pianavyshnia.com/',
         socials: { instagram: 'https://www.instagram.com/pianavyshnia/', facebook: 'https://www.facebook.com/PianaVyshnia', tiktok: 'https://www.tiktok.com/@pianavyshnia' },
         tags: ['alcohol', 'atmosphere'],
-        locations: [{ city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.2330, longitude: 21.0176, email: 'pianavyshnia.info@fest.foundation', isMainLocation: true, openingHours: standardGastroHours }]
+        locations: [{ city: 'Warszawa', street: 'Nowy Świat 37', voivodeship: 'mazowieckie', latitude: 52.233, longitude: 21.0176, email: 'pianavyshnia.info@fest.foundation', isMainLocation: true, openingHours: standardGastroHours }]
     });
 
     // 4
@@ -838,10 +838,10 @@ async function mainSeed() {
         image: 'twoj-lekarz-w-warszawie.png',
         socials: { instagram: 'https://www.instagram.com/doctor.wawa/', facebook: 'https://www.facebook.com/doctor.warszawa/', viber: 'viber://chat?number=+48789809717', telegram: 'https://t.me/Twojlekarz', whatsapp: 'https://wa.me/48600232284' },
         locations: [
-            { city: 'Warszawa', street: 'ul. Płosa 3', voivodeship: 'mazowieckie', latitude: 52.2760, longitude: 21.0540, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
-            { city: 'Warszawa', street: 'ul. Arabska 5', voivodeship: 'mazowieckie', latitude: 52.2260, longitude: 21.0830, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
-            { city: 'Warszawa', street: 'ul. Batalionu AK "Parasol" 5/7', voivodeship: 'mazowieckie', latitude: 52.2310, longitude: 20.9510, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
-            { city: 'Warszawa', street: 'ul. Czerniakowska 139', voivodeship: 'mazowieckie', latitude: 52.2090, longitude: 21.0530, openingHours: twojLekarzMokotowHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' }
+            { city: 'Warszawa', street: 'ul. Płosa 3', voivodeship: 'mazowieckie', latitude: 52.276, longitude: 21.054, openingHours: twojLekarzHours, isMainLocation: true, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Arabska 5', voivodeship: 'mazowieckie', latitude: 52.226, longitude: 21.083, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Batalionu AK "Parasol" 5/7', voivodeship: 'mazowieckie', latitude: 52.231, longitude: 20.951, openingHours: twojLekarzHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' },
+            { city: 'Warszawa', street: 'ul. Czerniakowska 139', voivodeship: 'mazowieckie', latitude: 52.209, longitude: 21.053, openingHours: twojLekarzMokotowHours, phoneNumber: '+48 500 863 535', email: 'sekretariat@twojlekarz-wawa.pl' }
         ]
     });
 
@@ -1193,8 +1193,8 @@ async function mainSeed() {
                 city: 'Wrocław',
                 street: 'al. Armii Krajowej 12B/3',
                 voivodeship: 'dolnoslaskie',
-                latitude: 51.1100,
-                longitude: 16.9930,
+                latitude: 51.11,
+                longitude: 16.993,
                 phoneNumber: '+48 608 882 171',
                 email: 'biuro@kancelariakamler.pl',
                 isMainLocation: true,
@@ -1279,8 +1279,8 @@ async function mainSeed() {
                 city: 'Gdańsk',
                 street: 'Aleja Grunwaldzka 472C',
                 voivodeship: 'pomorskie',
-                latitude: 54.402948,
-                longitude: 18.571977,
+                latitude: 54.402_948,
+                longitude: 18.571_977,
                 phoneNumber: '+48 58 741 88 14',
                 email: 'bok@omida-vls.com',
                 isMainLocation: true,
@@ -1306,7 +1306,7 @@ async function mainSeed() {
                 street: 'ul. Dębowa Góra 29',
                 voivodeship: 'slaskie',
                 latitude: 50.28,
-                longitude: 19.361944,
+                longitude: 19.361_944,
                 phoneNumber: '+48 32 719 61 84',
                 email: 'biuro@tte.pl',
                 isMainLocation: true,
@@ -1607,8 +1607,8 @@ async function mainSeed() {
                 city: 'Warszawa',
                 street: 'ul. Stanisława Bodycha 39',
                 voivodeship: 'mazowieckie',
-                latitude: 52.191244,
-                longitude: 20.879556,
+                latitude: 52.191_244,
+                longitude: 20.879_556,
                 phoneNumber: '+48 797 967 777',
                 isMainLocation: true,
                 openingHours: {
@@ -1640,8 +1640,8 @@ async function mainSeed() {
                 city: 'Kraków',
                 street: 'ul. Michała Korpala 3',
                 voivodeship: 'malopolskie',
-                latitude: 50.015622,
-                longitude: 19.893822,
+                latitude: 50.015_622,
+                longitude: 19.893_822,
                 phoneNumber: '+48 786 212 776',
                 isMainLocation: true,
                 openingHours: {
@@ -1672,8 +1672,8 @@ async function mainSeed() {
                 city: 'Wrocław',
                 street: 'ul. Paprotna 8',
                 voivodeship: 'dolnoslaskie',
-                latitude: 51.144444,
-                longitude: 17.025556,
+                latitude: 51.144_444,
+                longitude: 17.025_556,
                 phoneNumber: '+48 886 494 643',
                 isMainLocation: true,
                 openingHours: {
@@ -1705,8 +1705,8 @@ async function mainSeed() {
                 city: 'Poznań',
                 street: 'ul. Morasko 5',
                 voivodeship: 'wielkopolskie',
-                latitude: 52.478901,
-                longitude: 16.923456,
+                latitude: 52.478_901,
+                longitude: 16.923_456,
                 phoneNumber: '+48 573 294 010',
                 isMainLocation: true,
                 openingHours: {
@@ -1740,8 +1740,8 @@ async function mainSeed() {
                 city: 'Kraków',
                 street: 'ul. Na Zakolu Wisły 14',
                 voivodeship: 'malopolskie',
-                latitude: 50.046522,
-                longitude: 19.967822,
+                latitude: 50.046_522,
+                longitude: 19.967_822,
                 phoneNumber: '+48 452 896 921',
                 isMainLocation: true,
                 openingHours: {
@@ -1847,8 +1847,8 @@ async function mainSeed() {
                 city: 'Radlin',
                 street: 'ul. Józefa Rymera 119',
                 voivodeship: 'slaskie',
-                latitude: 50.0490,
-                longitude: 18.4710,
+                latitude: 50.049,
+                longitude: 18.471,
                 phoneNumber: '+48 570 50 10 10',
                 email: 'kontakt@foxtrans.pl',
                 isMainLocation: true,
@@ -2003,7 +2003,7 @@ async function mainSeed() {
         image: 'partners-international.png',
         webpage: 'https://www.partnersinternational.pl/',
         locations: [
-            { city: 'Warszawa', street: 'ul. Mokotowska 33', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.0210, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 258 40 18' },
+            { city: 'Warszawa', street: 'ul. Mokotowska 33', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.021, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 258 40 18' },
         ],
     });
 
@@ -2011,11 +2011,9 @@ async function mainSeed() {
 }
 
 
-mainSeed()
-    .catch((err) => {
-        console.error('❌ Błąd:', err);
-        process.exit(1);
-    })
-    .finally(() => {
-        process.exit(0);
-    });
+try {
+    await mainSeed();
+} catch (error) {
+    console.error('❌ Błąd:', error);
+    throw error;
+}

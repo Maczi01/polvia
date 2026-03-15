@@ -218,11 +218,9 @@ async function exampleSeed() {
     console.log('✅ Example seed finished!');
 }
 
-exampleSeed()
-    .catch((err) => {
-        console.error('❌ Error:', err);
-        process.exit(1);
-    })
-    .finally(() => {
-        process.exit(0);
-    });
+try {
+    await exampleSeed();
+} catch (error) {
+    console.error('❌ Error:', error);
+    throw error;
+}

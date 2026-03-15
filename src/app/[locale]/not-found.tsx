@@ -9,37 +9,37 @@ export default function NotFound() {
 
         {/* Main Content */}
         <main className="min-h-screen">
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
                 <div className="text-center">
                     {/* 404 Illustration */}
                     <div className="mb-8">
-                        <div className="inline-flex items-center justify-center w-32 h-32 bg-green-100 rounded-full mb-6">
-                            <MapPin className="w-16 h-16 text-green-500" />
+                        <div className="mb-6 inline-flex size-32 items-center justify-center rounded-full bg-green-100">
+                            <MapPin className="size-16 text-green-500" />
                         </div>
-                        <h1 className="text-6xl font-bold text-gray-900 mb-4">404</h1>
-                        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                        <h1 className="mb-4 text-6xl font-bold text-gray-900">404</h1>
+                        <h2 className="mb-4 text-2xl font-semibold text-gray-800">
                             Strona nie została znaleziona
                         </h2>
-                        <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+                        <p className="mx-auto mb-8 max-w-md text-lg text-gray-600">
                             Przepraszamy, ale strona której szukasz nie istnieje lub została przeniesiona.
                         </p>
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
                         <Link
                             href="/pl"
-                            className="flex items-center bg-green-500 text-white px-6 py-3 rounded-full font-medium hover:bg-green-600 transition-colors"
+                            className="flex items-center rounded-full bg-green-500 px-6 py-3 font-medium text-white transition-colors hover:bg-green-600"
                         >
-                            <ArrowLeft className="w-5 h-5 mr-2" />
+                            <ArrowLeft className="mr-2 size-5" />
                             Wróć do strony głównej
                         </Link>
 
                         <Link
                             href="/pl/map"
-                            className="flex items-center bg-white text-green-600 px-6 py-3 rounded-full font-medium border-2 border-green-500 hover:bg-green-50 transition-colors"
+                            className="flex items-center rounded-full border-2 border-green-500 bg-white px-6 py-3 font-medium text-green-600 transition-colors hover:bg-green-50"
                         >
-                            <MapPin className="w-5 h-5 mr-2" />
+                            <MapPin className="mr-2 size-5" />
                             Zobacz mapę
                         </Link>
                     </div>
@@ -70,10 +70,10 @@ export default function NotFound() {
 
                     {/* Popular Categories */}
                     <div className="mt-12">
-                        <h4 className="text-lg font-medium text-gray-800 mb-6">
+                        <h4 className="mb-6 text-lg font-medium text-gray-800">
                             Popularne kategorie
                         </h4>
-                        <div className="flex flex-wrap gap-3 justify-center">
+                        <div className="flex flex-wrap justify-center gap-3">
                             {[
                                 { name: 'grocery', color: 'bg-pink-100 text-pink-700' },
                                 { name: 'transport', color: 'bg-green-100 text-green-700' },
@@ -85,7 +85,7 @@ export default function NotFound() {
                                 <Link
                                     key={category.name}
                                     href={`/pl/mapa?category=${category.name.toLowerCase()}`}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium ${category.color} hover:opacity-80 transition-opacity`}
+                                    className={`rounded-full px-4 py-2 text-sm font-medium ${category.color} transition-opacity hover:opacity-80`}
                                 >
                                     {category.name}
                                 </Link>

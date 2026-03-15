@@ -33,12 +33,12 @@ export const ThanksForSubscribing = async () => {
                 </p>
 
                 <div className="mt-2 flex flex-row justify-between gap-3 sm:gap-4 md:mt-4">
-                    <Link href="/" prefetch className="w-full group">
+                    <Link href="/" prefetch className="group w-full">
                         <Button variant="exploreMap" size="hero" className="w-full">
                             {t('main')}
                         </Button>
                     </Link>
-                    <Link href="/map"  prefetch className="w-full group">
+                    <Link href="/map"  prefetch className="group w-full">
                         <Button variant="addBusiness" size="hero" className="w-full">
                             {t('map')}
                         </Button>

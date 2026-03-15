@@ -97,7 +97,7 @@ export const Faq = () => {
             dangerouslySetInnerHTML={{ __html: faqSchema }}
         />
         <section
-            className="bg-gray-50 dark:bg-gray-800 py-16 md:py-24"
+            className="bg-gray-50 py-16 dark:bg-gray-800 md:py-24"
             aria-labelledby="faq-heading"
         >
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -143,30 +143,30 @@ export const Faq = () => {
                         return (
                             <div
                                 key={index}
-                                className="overflow-hidden rounded-xl border border-gray-200 dark:border-transparent bg-white dark:bg-[#111827] shadow-sm dark:shadow-gray-900/20 transition-all hover:shadow-md dark:hover:shadow-gray-900/30"
+                                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-transparent dark:bg-[#111827] dark:shadow-gray-900/20 dark:hover:shadow-gray-900/30"
                             >
                                 <h3>
                                     <button
                                         id={buttonId}
                                         onClick={() => toggleAccordion(index)}
                                         onKeyDown={(e) => handleKeyDown(e, index)}
-                                        className="flex w-full items-center justify-between p-6 text-left focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-offset-2 focus:bg-transparent dark:focus:bg-gray-700/50 transition-colors"
+                                        className="flex w-full items-center justify-between p-6 text-left transition-colors focus:bg-transparent focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-offset-2 dark:focus:bg-gray-700/50"
                                         aria-expanded={isExpanded}
                                         aria-controls={panelId}
                                         aria-describedby={`faq-${index}-hint`}
                                     >
-                                        <span className="text-lg font-semibold text-gray-900 dark:text-gray-100 md:text-xl pr-4">
+                                        <span className="pr-4 text-lg font-semibold text-gray-900 dark:text-gray-100 md:text-xl">
                                             {t(faq.question)}
                                         </span>
 
                                         <span
-                                            className="flex-shrink-0 ml-4"
+                                            className="ml-4 shrink-0"
                                             aria-hidden="true"
                                         >
                                             {isExpanded ? (
-                                                <ChevronUp className="h-5 w-5 text-blue-600 dark:text-blue-400 transition-transform duration-200" />
+                                                <ChevronUp className="size-5 text-blue-600 transition-transform duration-200 dark:text-blue-400" />
                                             ) : (
-                                                <ChevronDown className="h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-200" />
+                                                <ChevronDown className="size-5 text-gray-500 transition-transform duration-200 dark:text-gray-400" />
                                             )}
                                         </span>
                                     </button>
@@ -187,12 +187,12 @@ export const Faq = () => {
                                     className={`transition-all duration-300 ease-in-out ${
                                         isExpanded
                                             ? 'max-h-96 opacity-100'
-                                            : 'max-h-0 opacity-0 overflow-hidden'
+                                            : 'max-h-0 overflow-hidden opacity-0'
                                     }`}
                                     aria-hidden={!isExpanded}
                                 >
                                     <div className="px-6 pb-6 pt-2">
-                                        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                                        <p className="leading-relaxed text-gray-600 dark:text-gray-300">
                                             {t(faq.answer)}
                                         </p>
                                     </div>
@@ -204,19 +204,19 @@ export const Faq = () => {
 
                 {/* Contact Section */}
                 <div
-                    className="mx-auto mt-16 max-w-3xl rounded-xl bg-white dark:bg-[#111827] p-8 text-center shadow-sm dark:shadow-gray-900/20 border border-gray-200 dark:border-gray-600"
+                    className="mx-auto mt-16 max-w-3xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-gray-600 dark:bg-[#111827] dark:shadow-gray-900/20"
                     role="complementary"
                     aria-labelledby="contact-heading"
                 >
                     <div
-                        className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green dark:text-green-400"
+                        className="mx-auto flex size-12 items-center justify-center rounded-full bg-green-100 text-green dark:bg-green-900/30 dark:text-green-400"
                         role="img"
                         aria-labelledby="contact-icon-label"
                     >
                         <span id="contact-icon-label" className="sr-only">
                             {t('icon')}
                         </span>
-                        <Mail className="h-6 w-6" aria-hidden="true" />
+                        <Mail className="size-6" aria-hidden="true" />
                     </div>
 
                     <h3
@@ -234,7 +234,7 @@ export const Faq = () => {
                         <Link
                             href="/contact"
                             prefetch={true}
-                            className="block w-full group"
+                            className="group block w-full"
                             aria-describedby="contact-button-description"
                         >
                             <Button
@@ -244,7 +244,7 @@ export const Faq = () => {
                             >
                                 {t('contact')}
                                 <ArrowRight
-                                    className="size-5 mr-2 transition-transform duration-200 group-hover:scale-110"
+                                    className="mr-2 size-5 transition-transform duration-200 group-hover:scale-110"
                                     aria-hidden="true"
                                 />
                             </Button>

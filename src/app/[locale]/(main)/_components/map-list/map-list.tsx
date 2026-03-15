@@ -56,8 +56,8 @@ const SectionHeader = ({
     // count: number;
     subtitle?: string;
 }) => (
-    <div className="flex items-center gap-2 px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-2 md:mb-4 shadow-sm md:h-[124px]">
-        <Icon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+    <div className="mb-2 flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:mb-4 md:h-[124px]">
+        <Icon className="size-5 text-gray-600 dark:text-gray-400" />
         <div className="flex-1">
             <div className="flex items-center gap-2">
                 <h3 className="font-semibold text-gray-900 dark:text-white">{title}</h3>
@@ -66,7 +66,7 @@ const SectionHeader = ({
                 {/*</span>*/}
             </div>
             {subtitle && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>
             )}
         </div>
     </div>
@@ -335,7 +335,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         // Show empty state when no results at all
         if (frontendFilteredServices.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
             return (
-                <div className="h-full flex items-center justify-center bg-[#F6F6F7] dark:bg-gray-900">
+                <div className="flex h-full items-center justify-center bg-[#F6F6F7] dark:bg-gray-900">
                     <EmptyState
                         message="No services found. Try adjusting your search criteria."
                         icon={Search}
@@ -349,8 +349,8 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                 ref={containerRef}
                 className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800
                 hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500
-                    flex flex-col bg-[#F6F6F7] dark:bg-gray-900
-                    px-2 md:pl-0 md:pr-2 relative scroll-padding"
+                    scroll-padding relative flex flex-col
+                    bg-[#F6F6F7] px-2 dark:bg-gray-900 md:pl-0 md:pr-2"
                 style={{
                     height: '100%',
                     overflowY: 'auto',

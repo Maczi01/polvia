@@ -158,7 +158,7 @@ export default async function MapPage(props: PageProps) {
     }
 
     return (
-        <div className="flex size-full flex-col relative">
+        <div className="relative flex size-full flex-col">
             <Suspense fallback={<ServicesLoadingSkeleton />}>
                 <MapPageClientWrapper params={params} initialFilters={parseResult.filters} />
             </Suspense>

@@ -39,7 +39,7 @@ const categoryCardVariants = cva(
                 removeFilter: 'bg-red-500 text-white hover:bg-red-600',
             },
             isSelected: {
-                true: 'shadow-lg ring-2 ring-white ring-offset-2 scale-105',
+                true: 'scale-105 shadow-lg ring-2 ring-white ring-offset-2',
             },
         },
         defaultVariants: {
@@ -115,19 +115,19 @@ const CategoryCard = React.forwardRef<
         const content = (
             <>
                 {/* Enhanced icon container with better mobile sizing */}
-                <div className="flex items-center justify-center mb-1 sm:mb-2">
+                <div className="mb-1 flex items-center justify-center sm:mb-2">
                     <div className="relative flex items-center justify-center">
                         <Image
                             src={image}
                             alt={tImages(categoryKey || text)}
                             width={32}
                             height={32}
-                            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 transition-all duration-200"
+                            className="size-6 transition-all duration-200 sm:size-7 md:size-8"
                         />
                     </div>
                 </div>
                 {/* Responsive text sizing */}
-                <span className="text-xs sm:text-sm md:text-base font-medium text-center leading-tight px-1">
+                <span className="px-1 text-center text-xs font-medium leading-tight sm:text-sm md:text-base">
                     {text}
                 </span>
             </>

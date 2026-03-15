@@ -68,16 +68,16 @@ export const FooterNewsletter = () => {
                             {t('thanksFooter')}
                         </div>
                     ) : (
-                        <div className="flex w-full rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden transition-all duration-300 focus-within:scale-105 focus-within:shadow-lg focus-within:border-green-400 dark:focus-within:border-green-500">
+                        <div className="flex w-full overflow-hidden rounded-md border border-gray-300 transition-all duration-300 focus-within:scale-105 focus-within:border-green-400 focus-within:shadow-lg dark:border-gray-600 dark:focus-within:border-green-500">
                             <input
                                 {...form.register('email')}
                                 placeholder={t('Your email') || 'Enter your email'}
-                                className="w-full border-none px-4 py-2 focus:outline-none dark:bg-gray-800 dark:text-gray-100 md:w-64 bg-white"
+                                className="w-full border-none bg-white px-4 py-2 focus:outline-none dark:bg-gray-800 dark:text-gray-100 md:w-64"
                                 disabled={form.formState.isSubmitting}
                             />
                             <button
                                 type="submit"
-                                className="flex md:w-32 w-40 items-center justify-center bg-green-500 px-4 py-2 text-white transition-all duration-300 hover:bg-green-600 disabled:opacity-50"
+                                className="flex w-40 items-center justify-center bg-green-500 px-4 py-2 text-white transition-all duration-300 hover:bg-green-600 disabled:opacity-50 md:w-32"
                                 disabled={form.formState.isSubmitting}
                             >
                                 {form.formState.isSubmitting ? (
@@ -96,7 +96,7 @@ export const FooterNewsletter = () => {
 
             {/* Absolutely positioned error messages to avoid layout shifts */}
             {(form.formState.errors.email || (submitStatus?.message && !submitStatus.success)) && (
-                <div className="absolute top-full left-0 right-0 mt-2">
+                <div className="absolute inset-x-0 top-full mt-2">
                     <p className="text-sm text-red-600 dark:text-red-400">
                         {form.formState.errors.email?.message ||
                             (submitStatus?.message && !submitStatus.success ? getErrorMessage(submitStatus.message) : '')}

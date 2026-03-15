@@ -12,21 +12,21 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: 'bg-primary text-primary-foreground shadow hover:bg-g/90',
+                default: 'hover:bg-g/90 bg-primary text-primary-foreground shadow',
                 destructive:
                     'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
                 outline:
-                    'border-input hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-accent-foreground text-md',
+                    'text-md border-input hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-accent-foreground',
                 secondary: 'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80',
                 ghost: 'hover:bg-accent hover:text-accent-foreground',
 
                 link: 'text-primary underline-offset-4 hover:underline',
-                active: 'bg-green text-primary-foreground text-md',
+                active: 'text-md bg-green text-primary-foreground',
                 explore:
-                    'bg-gradient-to-r from-[#00AA66]/10 to-[#49C55E]/20 md:px-4 md:py-2 px-2 py-2 w-9 h-9 rounded-full flex items-center justify-center',
-                green: 'bg-green md:px-2 md:py-2 w-12 h-12 rounded-full flex items-center justify-center',
-                slate: 'bg-slate-800 md:px-2 md:py-2 w-9 h-9 rounded-full flex items-center justify-center',
-                orange: 'bg-gradient-to-r from-[#FB6D13] to-[#FF9D00] md:px-2 md:py-2 w-9 h-9 rounded-full flex items-center justify-center',
+                    'flex size-9 items-center justify-center rounded-full bg-gradient-to-r from-[#00AA66]/10 to-[#49C55E]/20 p-2 md:px-4 md:py-2',
+                green: 'flex size-12 items-center justify-center rounded-full bg-green md:p-2',
+                slate: 'flex size-9 items-center justify-center rounded-full bg-slate-800 md:p-2',
+                orange: 'flex size-9 items-center justify-center rounded-full bg-gradient-to-r from-[#FB6D13] to-[#FF9D00] md:p-2',
                 exploreMap:
                     'border-2 border-green bg-green text-white ' +
                     'hover:bg-green hover:border-green-700 ' +
@@ -46,13 +46,13 @@ const buttonVariants = cva(
             },
             size: {
                 // default: "h-9 md:px-2 px-4 md:py-2 py-4 rounded-full ",
-                default: 'h-9 rounded-full md:px-2 px-0 md:py-2 ',
+                default: 'h-9 rounded-full px-0 md:p-2 ',
                 sm: 'h-8 rounded-md px-0 text-xs',
                 lg: 'h-10 rounded-md px-8',
-                icon: 'h-9 w-9',
-                arrow: 'h-12 w-12',
+                icon: 'size-9',
+                arrow: 'size-12',
                 mobileLink: "text-md",
-                hero: 'px-1 md:px-6 py-2 text-base md:py-3', // Updated for taller mobile buttons
+                hero: 'px-1 py-2 text-base md:px-6 md:py-3', // Updated for taller mobile buttons
                 // hero: 'px-6 py-4 text-lg md:px-8 md:py-5 md:text-xl', // Better mobile/desktop scaling
             },
         },

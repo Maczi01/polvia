@@ -5,13 +5,13 @@ import { getTranslations } from 'next-intl/server';
 
 const ServiceCardSkeleton = () => {
     return (
-        <div className="duration-1500 flex animate-pulse flex-col rounded-lg md:p-0 p-2 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm transition-all ease-in-out md:h-[124px]">
+        <div className="duration-1500 flex animate-pulse flex-col rounded-lg border border-gray-200 bg-white p-2 shadow-sm transition-all ease-in-out dark:border-gray-600 dark:bg-gray-800 md:h-[124px] md:p-0">
             {/* Mobile Layout */}
-            <div className="md:hidden h-full">
-                <div className="flex items-start pb-8 px-3 pt-3 h-24">
+            <div className="h-full md:hidden">
+                <div className="flex h-24 items-start px-3 pb-8 pt-3">
                     {/* Logo/Image Skeleton */}
                     <div className="mr-3 shrink-0 pt-1">
-                        <div className="size-12 overflow-hidden rounded-full border border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
+                        <div className="size-12 overflow-hidden rounded-full border border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-700"></div>
                     </div>
 
                     {/* Name and Location Skeleton */}
@@ -25,7 +25,7 @@ const ServiceCardSkeleton = () => {
                 </div>
 
                 {/* Tags and Arrow Button Skeleton */}
-                <div className="flex items-end justify-between px-3 pb-3 mt-auto">
+                <div className="mt-auto flex items-end justify-between px-3 pb-3">
                     <div className="flex max-w-[80%] flex-wrap gap-1.5">
                         <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-700"></div>
                         <div className="h-6 w-12 rounded bg-gray-200 dark:bg-gray-700"></div>
@@ -36,11 +36,11 @@ const ServiceCardSkeleton = () => {
             </div>
 
             {/* Desktop Layout */}
-            <div className="hidden md:block h-full">
-                <div className="flex shrink-0 flex-row justify-between h-full">
+            <div className="hidden h-full md:block">
+                <div className="flex h-full shrink-0 flex-row justify-between">
                     <div className="flex flex-row items-center gap-x-3 p-4">
                         <div className="shrink-0">
-                            <div className="size-[68px] rounded-full border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
+                            <div className="size-[68px] rounded-full border-2 border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-700"></div>
                         </div>
 
                         <div className="min-w-0 flex-1 flex-col">
@@ -94,7 +94,7 @@ export const ServicesLoadingSkeleton = ({ searchParams }: { searchParams?: { vie
             <main className="relative h-full px-2">
                 <div className="flex size-full gap-0 overflow-y-auto md:gap-x-2">
                     <div className="w-full md:w-7/12">
-                        <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 flex size-full flex-col gap-y-2 overflow-y-auto bg-[#F6F6F7] dark:bg-gray-900 pr-2 md:gap-y-4">
+                        <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 flex size-full flex-col gap-y-2 overflow-y-auto bg-[#F6F6F7] pr-2 dark:bg-gray-900 md:gap-y-4">
                             {Array(10)
                                 .fill(0)
                                 .map((_, i) => (
@@ -124,7 +124,7 @@ export const ServicesLoadingSkeleton = ({ searchParams }: { searchParams?: { vie
                 {/* Desktop: Show both list and map */}
                 <div className="hidden md:flex md:w-full md:gap-x-2">
                     <div className="w-7/12">
-                        <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 flex size-full flex-col gap-y-4 overflow-y-auto bg-[#F6F6F7] dark:bg-gray-900 pr-2">
+                        <div className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800 flex size-full flex-col gap-y-4 overflow-y-auto bg-[#F6F6F7] pr-2 dark:bg-gray-900">
                             {Array(10)
                                 .fill(0)
                                 .map((_, i) => (

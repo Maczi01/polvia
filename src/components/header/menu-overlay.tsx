@@ -114,8 +114,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                 ref={menuRef}
                 id="mobile-navigation"
                 className={`fixed right-0 top-0 flex h-full w-2/3 flex-col
-                gap-y-4 overflow-y-auto rounded-tl-xl rounded-bl-xl border-l-4 border-[#C52289] bg-white py-6 transition-transform duration-200 ease-in-out dark:bg-zinc-900
-                lg:hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                gap-y-4 overflow-y-auto rounded-l-xl border-l-4 border-[#C52289] bg-white py-6 transition-transform duration-200 ease-in-out dark:bg-zinc-900 lg:hidden ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
                 aria-hidden={!isOpen}
                 aria-label="Menu główne"
                 role="navigation"
@@ -124,11 +123,11 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                 <div className="flex justify-end px-4 pb-2">
                     <button
                         onClick={onClose}
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C52289] focus:ring-offset-2 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                        className="flex size-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#C52289] focus:ring-offset-2 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
                         aria-label="Zamknij menu"
                     >
                         <svg
-                            className="h-4 w-4"
+                            className="size-4"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -168,7 +167,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                             <li key={link.href}>
                                 <Button
                                     asChild
-                                    className="min-w-36 h-12"
+                                    className="h-12 min-w-36"
                                     variant={pathname === link.href ? 'active' : 'outline'}
                                     onClick={handleLinkClick}
                                 >
@@ -187,7 +186,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                     <li>
                         <Button
                             asChild
-                            className="min-w-36 h-12"
+                            className="h-12 min-w-36"
                             variant={isListView ? 'active' : 'outline'}
                             onClick={handleLinkClick}
                         >
@@ -206,7 +205,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                     <li>
                         <Button
                             asChild
-                            className="min-w-36 h-12"
+                            className="h-12 min-w-36"
                             variant={isMapView ? 'active' : 'outline'}
                             onClick={handleLinkClick}
                         >
@@ -230,7 +229,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
                             <li key={link.href}>
                                 <Button
                                     asChild
-                                    className="min-w-36 h-12"
+                                    className="h-12 min-w-36"
                                     variant={pathname === link.href ? 'active' : 'outline'}
                                     onClick={handleLinkClick}
                                 >

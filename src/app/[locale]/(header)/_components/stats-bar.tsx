@@ -59,7 +59,7 @@ export const StatsBar = async () => {
             aria-labelledby="stats-heading"
             role="region"
         >
-            <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <h2
                         id="stats-heading"
@@ -73,20 +73,20 @@ export const StatsBar = async () => {
                 </div>
 
                 <div
-                    className="mx-auto flex max-w-[1500px] flex-wrap justify-between py-6 gap-4"
+                    className="mx-auto flex max-w-[1500px] flex-wrap justify-between gap-4 py-6"
                     role="list"
                     aria-label={`${t('statistics')} ${serviceName}`}
                 >
                     {stats.map(({ id, icon: Icon, value, label, description }) => (
                         <div
                             key={id}
-                            className="m-2 flex w-full flex-col items-center rounded-lg border border-gray-100 dark:border-gray-600 bg-white dark:bg-[#111827] p-4 shadow-sm dark:shadow-gray-900/20 transition duration-300 hover:shadow-md dark:hover:shadow-gray-900/30 md:w-48"
+                            className="m-2 flex w-full flex-col items-center rounded-lg border border-gray-100 bg-white p-4 shadow-sm transition duration-300 hover:shadow-md dark:border-gray-600 dark:bg-[#111827] dark:shadow-gray-900/20 dark:hover:shadow-gray-900/30 md:w-48"
                             role="listitem"
                             aria-labelledby={`stat-${id}-label`}
                             aria-describedby={`stat-${id}-description`}
                         >
                             {/* Icon */}
-                            <div className="mb-2 p-2 rounded-full bg-green-50 dark:bg-green-900/20">
+                            <div className="mb-2 rounded-full bg-green-50 p-2 dark:bg-green-900/20">
                                 <Icon
                                     className="text-green-500 dark:text-green-400"
                                     size={36}
@@ -95,14 +95,14 @@ export const StatsBar = async () => {
                             </div>
 
                             {/* Value */}
-                            <div className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">
+                            <div className="mb-1 text-2xl font-bold text-gray-800 dark:text-gray-100">
                                 {value}
                             </div>
 
                             {/* Label */}
                             <div
                                 id={`stat-${id}-label`}
-                                className="text-sm font-semibold text-green-600 dark:text-green-400 text-center mb-1"
+                                className="mb-1 text-center text-sm font-semibold text-green-600 dark:text-green-400"
                             >
                                 {label}
                             </div>
@@ -110,7 +110,7 @@ export const StatsBar = async () => {
                             {/* Description */}
                             <div
                                 id={`stat-${id}-description`}
-                                className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400 leading-relaxed"
+                                className="mt-1 text-center text-xs leading-relaxed text-gray-500 dark:text-gray-400"
                             >
                                 {description}
                             </div>

@@ -24,7 +24,7 @@ const categoryValues = categoryEnum.enumValues;
 const statusValues = statusEnum.enumValues;
 const voivodeshipValues = voivodeshipEnum.enumValues;
 
-const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
+const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const serviceSchema = z.object({
@@ -267,7 +267,7 @@ function parseRawServiceData(formData: FormData) {
 
 function validateImage(imageFile: File | null): ActionResult | null {
     if (imageFile && imageFile.size > 0) {
-        if (!ALLOWED_IMAGE_TYPES.includes(imageFile.type)) {
+        if (!ALLOWED_IMAGE_TYPES.has(imageFile.type)) {
             return {
                 success: false,
                 message: 'Validation failed',
@@ -334,7 +334,7 @@ async function saveImage(imageFile: File, serviceName: string): Promise<string> 
 async function updateSeedImage(serviceName: string, imageFilename: string): Promise<void> {
     try {
         const seedPath = path.join(process.cwd(), 'src', 'db', 'seed.ts');
-        let content = await readFile(seedPath, 'utf-8');
+        let content = await readFile(seedPath, 'utf8');
 
         const escaped = serviceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const namePattern = new RegExp(`name:\\s*['"]${escaped}['"]`);
@@ -345,7 +345,7 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
             return;
         }
 
-        const beforeName = content.substring(0, nameMatch.index);
+        const beforeName = content.slice(0, Math.max(0, nameMatch.index));
         const blockStart = beforeName.lastIndexOf('seedService({');
         if (blockStart === -1) return;
 
@@ -363,7 +363,7 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
         }
         if (blockEnd === -1) return;
 
-        const block = content.substring(blockStart, blockEnd);
+        const block = content.slice(blockStart, blockEnd);
 
         const imageRegex = /image:\s*'[^']*'/;
         let newBlock: string;
@@ -380,11 +380,11 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
             }
         }
 
-        content = content.substring(0, blockStart) + newBlock + content.substring(blockEnd);
-        await writeFile(seedPath, content, 'utf-8');
+        content = content.slice(0, Math.max(0, blockStart)) + newBlock + content.slice(Math.max(0, blockEnd));
+        await writeFile(seedPath, content, 'utf8');
         console.log(`[seed-sync] Updated seed.ts: ${serviceName} → ${imageFilename}`);
-    } catch (err) {
-        console.error('[seed-sync] Failed to update seed.ts:', err);
+    } catch (error) {
+        console.error('[seed-sync] Failed to update seed.ts:', error);
     }
 }
 

@@ -219,7 +219,7 @@ export const MapControls = ({ handleZoomIn, handleZoomOut, handleReset, mapRef }
                         draggable={false}
                         unoptimized
                     />
-                    {!isMobile && <span className="ml-2 font-bold text-white pointer-events-none">Reset</span>}
+                    {!isMobile && <span className="pointer-events-none ml-2 font-bold text-white">Reset</span>}
                 </Button>
 
             {/* Zoom In Button */}

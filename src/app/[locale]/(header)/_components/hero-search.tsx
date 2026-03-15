@@ -109,7 +109,7 @@ export const HeroSearch = () => {
 
                     <div className="relative">
                         <Search
-                            className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-green-500 dark:text-green-400"
+                            className="absolute left-3 top-1/2 size-5 -translate-y-1/2 text-green-500 dark:text-green-400"
                             aria-hidden="true"
                         />
 
@@ -135,12 +135,12 @@ export const HeroSearch = () => {
                     <button
                         type="submit"
                         disabled={isSearching}
-                        className="absolute bottom-1.5 end-2.5 rounded-lg bg-green-500
-                        px-4 py-2 text-sm font-medium text-white hover:bg-green-600
+                        className="absolute bottom-1.5 end-2.5 right-1.5 rounded-lg
+                        bg-green-500 px-4 py-2 text-sm font-medium text-white
+                        transition-colors duration-200 hover:bg-green-600
                         focus:outline-none focus:ring-4 focus:ring-green-300
-                        dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800
-                        disabled:opacity-50 disabled:cursor-not-allowed
-                        transition-colors duration-200 right-1.5"
+                        disabled:cursor-not-allowed disabled:opacity-50
+                        dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800"
                         aria-describedby={searchHelpId}
                     >
                         {isSearching ? (
@@ -149,7 +149,7 @@ export const HeroSearch = () => {
                                     {t('searching')}
                                 </span>
                                 <div className="flex items-center">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                                    <div className="mr-2 size-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                     <span className="hidden sm:inline">Szukam...</span>
                                 </div>
                             </>
@@ -169,10 +169,10 @@ export const HeroSearch = () => {
                     <div
                         id={searchErrorId}
                         role="alert"
-                        className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center"
+                        className="mt-2 flex items-center text-sm text-red-600 dark:text-red-400"
                     >
                         <svg
-                            className="w-4 h-4 mr-1 flex-shrink-0"
+                            className="mr-1 size-4 shrink-0"
                             aria-hidden="true"
                             fill="currentColor"
                             viewBox="0 0 20 20"
@@ -204,9 +204,9 @@ export const HeroSearch = () => {
                     disabled={isSearching}
                     variant="exploreMap"
                     size="hero"
-                    className="w-full group transition-all duration-200
-                    hover:transform hover:scale-[1.02] focus:transform focus:scale-[1.02]
-                    disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="group w-full transition-all duration-200
+                    hover:scale-[1.02] focus:scale-[1.02] disabled:transform-none disabled:cursor-not-allowed
+                    disabled:opacity-50"
                     aria-describedby="map-button-help"
                 >
                     <MapPin
@@ -223,14 +223,14 @@ export const HeroSearch = () => {
                 <Link
                     href="/contact"
                     prefetch
-                    className="w-full group"
+                    className="group w-full"
                     aria-describedby="add-business-help"
                 >
                     <Button
                         variant="addBusiness"
                         size="hero"
                         className="w-full transition-all duration-200
-                        hover:transform hover:scale-[1.02] focus:transform focus:scale-[1.02]"
+                        hover:scale-[1.02] focus:scale-[1.02]"
                     >
                         <Plus
                             className="mr-1 size-5 transition-transform duration-200 group-hover:scale-110"

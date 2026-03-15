@@ -51,7 +51,7 @@ export const ResetButton = ({
                     )}
                 />
                 {!isMobile && (
-                    <span className="font-bold text-white ml-2">Reset</span>
+                    <span className="ml-2 font-bold text-white">Reset</span>
                 )}
             </Button>
         </div>

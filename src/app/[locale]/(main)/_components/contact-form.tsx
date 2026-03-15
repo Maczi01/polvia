@@ -100,7 +100,7 @@ export const ContactForm = () => {
     if (submitStatus?.success) {
         return (
             <div className="flex min-h-[60vh] items-center justify-center p-4">
-                <div className="w-full max-w-md space-y-6 rounded-2xl bg-white/80 dark:bg-gray-800/90 p-8 text-center shadow-2xl">
+                <div className="w-full max-w-md space-y-6 rounded-2xl bg-white/80 p-8 text-center shadow-2xl dark:bg-gray-800/90">
                     <Check className="mx-auto mb-4 size-12 text-green-600 dark:text-green-400" />
                     <h2 className="text-2xl font-semibold text-green-600 dark:text-green-400">{t('thanks')}</h2>
                     <p className="text-gray-700 dark:text-gray-300">{t('success')}</p>
@@ -108,7 +108,7 @@ export const ContactForm = () => {
                         <Button
                             variant="outline"
                             onClick={() => router.push('/')}
-                            className="rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            className="rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                         >
                             {t('goBack')}
                         </Button>
@@ -125,7 +125,7 @@ export const ContactForm = () => {
     }
 
     return (
-        <div className="mx-auto w-full max-w-3xl rounded-xl bg-white/70 dark:bg-gray-800/90 p-6 shadow-2xl ring-1 ring-gray-100 dark:ring-gray-700 backdrop-blur sm:p-8 md:p-12">
+        <div className="mx-auto w-full max-w-3xl rounded-xl bg-white/70 p-6 shadow-2xl ring-1 ring-gray-100 backdrop-blur dark:bg-gray-800/90 dark:ring-gray-700 sm:p-8 md:p-12">
             <div className="mb-10 text-center">
                 <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
                     {t('title')}
@@ -134,7 +134,7 @@ export const ContactForm = () => {
             </div>
 
             {submitStatus?.success === false && (
-                <div className="mb-6 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 px-4 py-3 text-red-700 dark:text-red-300">
+                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">
                     <p>{submitStatus.message}</p>
                 </div>
             )}
@@ -166,7 +166,7 @@ export const ContactForm = () => {
                                             form.formState.errors.email
                                                 ? 'border-red-300 dark:border-red-600'
                                                 : 'border-gray-200 dark:border-gray-600'
-                                        } bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:border-2 focus:border-gray-600 dark:focus:border-gray-400 focus:ring-0 focus-visible:outline-none`}
+                                        } bg-white px-4 py-3 text-gray-900 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-gray-400`}
                                         placeholder={t('yourEmailPlaceholder')}
                                         {...field}
                                     />
@@ -198,7 +198,7 @@ export const ContactForm = () => {
                                             form.formState.errors.topic
                                                 ? 'border-red-300 dark:border-red-600'
                                                 : 'border-gray-200 dark:border-gray-600'
-                                        } bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:border-2 focus:border-gray-600 dark:focus:border-gray-400 focus:ring-0 focus-visible:outline-none`}
+                                        } bg-white px-4 py-3 text-gray-900 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-gray-400`}
                                         placeholder={t('topicPlaceholder')}
                                         {...field}
                                     />
@@ -230,7 +230,7 @@ export const ContactForm = () => {
                                             form.formState.errors.message
                                                 ? 'border-red-300 dark:border-red-600'
                                                 : 'border-gray-200 dark:border-gray-600'
-                                        } bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:border-2 focus:border-gray-600 dark:focus:border-gray-400 focus:ring-0 focus-visible:outline-none`}
+                                        } bg-white px-4 py-3 text-gray-900 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none dark:bg-gray-700 dark:text-gray-100 dark:focus:border-gray-400`}
                                         rows={2}
                                         placeholder={t('messagePlaceholder')}
                                         {...field}

@@ -106,7 +106,7 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
 
     return (
         <section className="w-full bg-gray-50 dark:bg-gray-900">
-            <div className="mx-auto max-w-4xl px-4 py-16 lg:px-8 lg:pt-8 lg:pb-16">
+            <div className="mx-auto max-w-4xl px-4 py-16 lg:px-8 lg:pb-16 lg:pt-8">
                 {/* Section Header */}
                 <div className="mb-12 text-center">
                     <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white lg:text-4xl">
@@ -184,7 +184,7 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
                             {/* Author */}
                             {post.author && (
                                 <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green text-sm font-semibold text-white">
+                                    <div className="flex size-10 items-center justify-center rounded-full bg-green text-sm font-semibold text-white">
                                         {getAuthorInitials(post.author)}
                                     </div>
                                     <div>
@@ -200,7 +200,7 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
 
                             {/* Publication Date */}
                             <div className="flex items-center gap-2">
-                                <CalendarIcon className="h-4 w-4" />
+                                <CalendarIcon className="size-4" />
                                 <span>{formatDate(post.publishedAt)}</span>
                             </div>
 
@@ -222,12 +222,12 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
                                 className="inline-flex items-center gap-2 rounded-lg bg-green px-6 py-3 font-semibold text-white transition-all duration-200 hover:bg-green focus:outline-none focus:ring-2 focus:ring-green focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                             >
                                 {t('readFullArticle')}
-                                <ArrowRightIcon className="h-4 w-4" />
+                                <ArrowRightIcon className="size-4" />
                             </Link>
 
                             <Link
                                 href="/blog"
-                                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-800"
+                                className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-800"
                             >
                                 {t('viewAllArticles')}
                             </Link>

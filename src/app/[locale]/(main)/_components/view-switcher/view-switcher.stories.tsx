@@ -27,7 +27,7 @@ type Story = StoryObj<typeof meta>;
 
 // Primary Story
 export const Primary: Story = {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
     render: (args: any) => (
         <div style={{ width: '400px' }}>
             {' '}

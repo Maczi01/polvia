@@ -400,7 +400,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
         // Don't render until mounted to avoid hydration issues
         if (!mounted) {
             return (
-                <div className="size-full rounded-xl md:rounded-md bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                <div className="size-full animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800 md:rounded-md" />
             );
         }
 
@@ -455,7 +455,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     }}
                     onLoad={(event) => {
                         event.target.fitBounds(
-                            [[14.07, 49.0], [24.15, 54.84]],
+                            [[14.07, 49], [24.15, 54.84]],
                             { duration: 0, padding: 0 },
                         );
                         const startBounds = event.target?.getBounds()?.toArray()?.flat();

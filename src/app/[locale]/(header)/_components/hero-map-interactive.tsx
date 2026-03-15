@@ -406,14 +406,14 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
     return (
         <div
             ref={containerRef}
-            className="relative h-full w-full"
+            className="relative size-full"
             onMouseOver={handleMouseOver}
             onMouseOut={handleMouseOut}
         >
             {/* SVG wrapper — innerHTML set once via ref, React never re-touches it */}
             <div
                 ref={svgWrapperRef}
-                className="h-full w-full [&>svg]:h-full [&>svg]:w-full [&>svg]:object-contain dark:brightness-90 dark:contrast-110"
+                className="dark:contrast-110 size-full dark:brightness-90 [&>svg]:size-full [&>svg]:object-contain"
                 aria-label={ariaLabel}
                 role="img"
             />
@@ -421,7 +421,7 @@ export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
             {/* Skeleton shown until SVG loads */}
             {!svgLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-3/4 w-3/4 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
+                    <div className="size-3/4 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-800" />
                 </div>
             )}
 

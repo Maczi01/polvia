@@ -50,20 +50,20 @@ export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps
                 className="w-full bg-[#F1FAF4] dark:bg-gray-800"
                 aria-labelledby="categories-heading"
             >
-                <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-8">
+                <div className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <h2
                             id="categories-heading"
-                            className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center"
+                            className="text-center text-2xl font-bold text-gray-900 dark:text-gray-100"
                         >
                             {t('categories')}
                         </h2>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
                         {Array.from({ length: categories.length }).map((_, index) => (
                             <div
                                 key={index}
-                                className="w-full h-24 sm:h-28 md:h-32 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"
+                                className="h-24 w-full animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700 sm:h-28 md:h-32"
                             />
                         ))}
                     </div>
@@ -77,11 +77,11 @@ export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps
             className="w-full bg-[#F1FAF4] dark:bg-gray-800"
             aria-labelledby="categories-heading"
         >
-            <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8 py-8">
+            <div className="mx-auto max-w-[1500px] px-4 py-8 sm:px-6 lg:px-8">
                 <div className="mb-6">
                     <h2
                         id="categories-heading"
-                        className="text-2xl font-bold text-gray-900 dark:text-gray-100 md:text-left text-center"
+                        className="text-center text-2xl font-bold text-gray-900 dark:text-gray-100 md:text-left"
                     >
                         {t('categories')}
                     </h2>
@@ -90,7 +90,7 @@ export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps
                 {/* Category Cards Grid */}
                 <div className="relative">
                     <div
-                        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+                        className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
                         role="region"
                         aria-label={`${t('categories')}`}
                     >
@@ -109,7 +109,7 @@ export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps
                                     image={category.image}
                                     variant={category.variant}
                                     alt={t(`categoriesAlt.${category.text}`) || ''}
-                                    className="h-24 sm:h-28 md:h-32 w-full"
+                                    className="h-24 w-full sm:h-28 md:h-32"
                                     aria-label={`${t('browserCompanies')} ${tCategories(category.text)}`}
                                 />
                             );

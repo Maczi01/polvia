@@ -405,7 +405,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         <Button
                             variant="ghost"
                             size="arrow"
-                            className="card-expand-button absolute right-1 top-1 shrink-0 rounded-full bg-green-100 md:right-0 md:top-0 dark:bg-green-900/30"
+                            className="card-expand-button absolute right-1 top-1 shrink-0 rounded-full bg-green-100 dark:bg-green-900/30 md:right-0 md:top-0"
                             onClick={e => {
                                 e.stopPropagation();
                                 handleCardExpand(e);
