@@ -7,6 +7,7 @@ import { StatsBar } from './_components/stats-bar';
 import { HowItWorks } from '@/app/[locale]/(header)/_components/how-it-works';
 import ScrollToTopButton from '@/app/[locale]/(header)/_components/scroll-to-top-button';
 import { BlogSection } from './_components/blog-section';
+import { TrustSection } from '@/app/[locale]/(header)/_components/trust-section';
 import { getVoivodeshipStats } from '@/lib/queries';
 
 export default async function HomePage({ params }: { params: any }) {
@@ -18,6 +19,7 @@ export default async function HomePage({ params }: { params: any }) {
             <HowItWorks />
             <CategoryPreviewServer />
             <PopularServices params={params} />
+            <TrustSection />
             <StatsBar />
             <Faq />
             {/*<BlogSection params={params} />*/}

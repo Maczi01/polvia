@@ -30,7 +30,9 @@
       "Bash(npx eslint \"src/app/[locale]/\\(main\\)/_components/services-client-component.tsx\" 2>&1 | head -30)",
       "Bash(npx eslint \"src/app/[locale]/\\(main\\)/_components/overview-map/overview-map.tsx\" 2>&1 | head -20)",
       "Bash(npx eslint \"src/app/[locale]/\\(dashboard\\)/dashboard/_actions.ts\" 2>&1 | head -20)",
-      "Bash(npx next lint 2>&1 | grep \"Error:\" | wc -l)"
+      "Bash(npx next lint 2>&1 | grep \"Error:\" | wc -l)",
+      "Bash(npx next:*)",
+      "WebFetch(domain:chatgpt.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

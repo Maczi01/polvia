@@ -92,7 +92,7 @@ export const HeroSearch = () => {
         <div role="search" aria-labelledby="search-heading">
             <h2 id="search-heading" className="sr-only">
 
-                Wyszukaj polskie firmy w Irlandii
+                {t('searchHeading')}
             </h2>
 
             {/* Search Form */}
