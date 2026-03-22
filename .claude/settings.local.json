@@ -32,7 +32,8 @@
       "Bash(npx eslint \"src/app/[locale]/\\(dashboard\\)/dashboard/_actions.ts\" 2>&1 | head -20)",
       "Bash(npx next lint 2>&1 | grep \"Error:\" | wc -l)",
       "Bash(npx next:*)",
-      "WebFetch(domain:chatgpt.com)"
+      "WebFetch(domain:chatgpt.com)",
+      "Bash(grep:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

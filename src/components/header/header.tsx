@@ -36,16 +36,18 @@ const fadeInKeyframes = `
 // Categories data - matches your existing translation keys
 const BUSINESS_CATEGORIES = [
     'Grocery',
+    'Gastronomy',
     'Transport',
     'Financial',
     'Renovation',
     'Law',
     'Beauty',
+    'Government',
     'Health',
     'Mechanics',
-    'Entertainment',
+    'RealEstate',
+    'HelpSupport',
     'Education',
-    'Government',
     'Others'
 ];
 
