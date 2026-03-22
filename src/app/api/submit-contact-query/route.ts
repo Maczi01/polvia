@@ -13,7 +13,7 @@ const ContactFormSchema = z.object({
 });
 
 const CONTACT_RATE_LIMIT = {
-    maxMessagesPerIP: 5,
+    maxMessagesPerIP: 50,
     ipWindowSeconds: 24 * 60 * 60, // 24h
     emailCooldownSeconds: 6 * 60 * 60, // 6h
 };
