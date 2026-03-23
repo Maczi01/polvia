@@ -9,6 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from './select';
+import { normalizeCountySlug } from '@/lib/slug-mappings';
 
 interface GroupedOptions {
     [key: string]: {
@@ -113,8 +114,9 @@ export function SelectScrollable({
                             {group.options.map(option => {
                                 const isCity = option.startsWith('city:');
                                 const displayName = isCity ? option.slice(5) : option;
+                                const itemValue = isCity ? option.toLowerCase() : normalizeCountySlug(option);
                                 return (
-                                    <SelectItem key={option} value={option.toLowerCase()}>
+                                    <SelectItem key={option} value={itemValue}>
                                         {translateOption(displayName)}
                                     </SelectItem>
                                 );

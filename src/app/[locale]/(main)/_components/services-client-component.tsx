@@ -32,7 +32,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const locale = useLocale();
     const [searchInput] = useQueryState('query', { defaultValue: '' });
     const [viewParam] = useQueryState('view', { defaultValue: 'map' });
-    const [selectedSlug, setSelectedSlug] = useQueryState('slug', { defaultValue: '' });
+    const [selectedSlug, setSelectedSlug] = useQueryState('place', { defaultValue: '' });
 
     // Use filters from URL slugs (passed as props)
     const selectedCounty = initialFilters?.county || '';

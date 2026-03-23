@@ -14,6 +14,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
 import { buildMapUrl, localizeMapPath } from '@/lib/map-url-builder';
+import { normalizeCountySlug } from '@/lib/slug-mappings';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import type { Locale } from '@/i18n/config';
 
@@ -124,7 +125,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
             const cityName = value.slice(5);
             navigateWithFilters(selectedCategory, null, cityName);
         } else {
-            navigateWithFilters(selectedCategory, value.toLowerCase(), null);
+            navigateWithFilters(selectedCategory, normalizeCountySlug(value), null);
         }
     };
 

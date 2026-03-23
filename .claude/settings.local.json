@@ -34,7 +34,8 @@
       "Bash(npx next:*)",
       "WebFetch(domain:chatgpt.com)",
       "Bash(grep:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "WebFetch(domain:ukrainoczka.pl)"
     ]
   },
   "enableAllProjectMcpServers": true,
