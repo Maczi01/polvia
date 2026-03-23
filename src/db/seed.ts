@@ -1968,7 +1968,7 @@ async function mainSeed() {
         enDesc: 'Specialists in relocation and rental in large cities. The company has a team of experts fluent in Ukrainian, helping to find premises that meet visa requirements.',
         ruDesc: 'Специалисты по релокации и аренде в крупных городах. Компания располагает командой экспертов, говорящих на украинском языке, помогающих найти жилье, соответствующее визовым требованиям.',
         tags: ['real-estate-agency', 'ua-speaking', 'relocation'],
-        image: 'lions-estate.png',
+        image: 'lion-estate.png',
         webpage: 'https://www.lionsestate.pl/',
         locations: [
             { city: 'Warszawa', street: 'ul. Wiejska 11', voivodeship: 'mazowieckie', latitude: 52.2272, longitude: 21.0268, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 826 66 66' },

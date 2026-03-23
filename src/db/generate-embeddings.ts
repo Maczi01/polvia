@@ -101,6 +101,7 @@ async function main() {
 
     if (rows.length === 0) {
         console.log('No service locations found.');
+        // eslint-disable-next-line unicorn/no-process-exit
         process.exit(0);
     }
 
@@ -179,10 +180,13 @@ async function main() {
     }
 
     console.log(`\nDone! Processed: ${processed}, Skipped: ${skipped}, Errors: ${errors}, Total: ${total}`);
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(0);
 }
 
-main().catch((err) => {
-    console.error('Fatal error:', err);
+// eslint-disable-next-line unicorn/prefer-top-level-await
+main().catch((error) => {
+    console.error('Fatal error:', error);
+    // eslint-disable-next-line unicorn/no-process-exit
     process.exit(1);
 });
