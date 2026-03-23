@@ -71,7 +71,8 @@ const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void })
                 <div className="grid grid-cols-3 gap-2 lg:gap-3">
                     {BUSINESS_CATEGORIES.map((categoryKey) => {
                         // Build slug-based URL for category
-                        const categoryUrl = buildMapUrl({ category: categoryKey.toLowerCase() }, locale);
+                        const categorySnake = categoryKey.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+                        const categoryUrl = buildMapUrl({ category: categorySnake }, locale);
                         return (
                             <Link
                                 key={categoryKey}

@@ -33,7 +33,8 @@
       "Bash(npx next lint 2>&1 | grep \"Error:\" | wc -l)",
       "Bash(npx next:*)",
       "WebFetch(domain:chatgpt.com)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(wc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
