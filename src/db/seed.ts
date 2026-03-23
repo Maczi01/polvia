@@ -1996,9 +1996,9 @@ async function mainSeed() {
 }
 
 
-try {
-    await mainSeed();
-} catch (error) {
-    console.error('❌ Błąd:', error);
-    throw error;
-}
+mainSeed()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error('❌ Błąd:', error);
+        process.exit(1);
+    });

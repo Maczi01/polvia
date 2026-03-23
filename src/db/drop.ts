@@ -22,9 +22,9 @@ async function dropAll() {
     console.log('✅ Baza wyczyszczona!');
 }
 
-try {
-    await dropAll();
-} catch (error) {
-    console.error('❌ Błąd czyszczenia:', error);
-    throw error;
-}
+dropAll()
+    .then(() => process.exit(0))
+    .catch((error) => {
+        console.error('❌ Błąd czyszczenia:', error);
+        process.exit(1);
+    });

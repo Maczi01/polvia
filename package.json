@@ -15,7 +15,7 @@
     "db:seed": "node --require dotenv/config --import tsx src/db/seed.ts",
     "db:reset": "npm run db:drop && npm run drizzle:push && npm run db:seed",
     "drop-migrate-seed": "npm run db:drop && npm run drizzle:generate && npm run db:seed",
-    "embeddings:generate-ts": "tsx src/lib/scripts.ts"
+    "db:embeddings": "node --require dotenv/config --import tsx src/db/generate-embeddings.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
