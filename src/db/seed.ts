@@ -1939,39 +1939,24 @@ async function mainSeed() {
     });
 
 // 2. Metrohouse
-    await seedService({
-        name: 'Metrohouse',
-        slug: 'metrohouse-network',
-        category: 'real_estate',
-        plDesc: 'Największa w Polsce sieć biur nieruchomości. Wiele oddziałów posiada dedykowanych doradców dla obywateli Ukrainy, oferując wsparcie w negocjacjach i tłumaczeniu umów.',
-        ukDesc: 'Найбільша мережа агентств нерухомості в Польщі. Багато відділень мають спеціальних консультантів для громадян України, пропонуючи підтримку в переговорах та перекладі договорів.',
-        enDesc: 'The largest real estate agency network in Poland. Many branches have dedicated advisors for Ukrainian citizens, offering support in negotiations and contract translation.',
-        ruDesc: 'Крупнейшая сеть агентств недвижимости в Польше. Многие филиалы имеют специальных консультантов для граждан Украины, предлагая поддержку в переговорах и переводе договоров.',
-        tags: ['real-estate-agency', 'ua-speaking', 'verified-offers'],
-        image: 'metrohouse.png',
-        webpage: 'https://metrohouse.pl/',
-        locations: [
-            { city: 'Warszawa', street: 'ul. Świętokrzyska 30', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0045, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 101 01 01' },
-            { city: 'Gdańsk', street: 'ul. Grunwaldzka 102', voivodeship: 'pomorskie', latitude: 54.3795, longitude: 18.6045, openingHours: standardShopHours },
-        ],
-    });
+//     await seedService({
+//         name: 'Metrohouse',
+//         slug: 'metrohouse-network',
+//         category: 'real_estate',
+//         plDesc: 'Największa w Polsce sieć biur nieruchomości. Wiele oddziałów posiada dedykowanych doradców dla obywateli Ukrainy, oferując wsparcie w negocjacjach i tłumaczeniu umów.',
+//         ukDesc: 'Найбільша мережа агентств нерухомості в Польщі. Багато відділень мають спеціальних консультантів для громадян України, пропонуючи підтримку в переговорах та перекладі договорів.',
+//         enDesc: 'The largest real estate agency network in Poland. Many branches have dedicated advisors for Ukrainian citizens, offering support in negotiations and contract translation.',
+//         ruDesc: 'Крупнейшая сеть агентств недвижимости в Польше. Многие филиалы имеют специальных консультантов для граждан Украины, предлагая поддержку в переговорах и переводе договоров.',
+//         tags: ['real-estate-agency', 'ua-speaking', 'verified-offers'],
+//         image: 'metrohouse.png',
+//         webpage: 'https://metrohouse.pl/',
+//         locations: [
+//             { city: 'Warszawa', street: 'ul. Świętokrzyska 30', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0045, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 101 01 01' },
+//             { city: 'Gdańsk', street: 'ul. Grunwaldzka 102', voivodeship: 'pomorskie', latitude: 54.3795, longitude: 18.6045, openingHours: standardShopHours },
+//         ],
+//     });
 
 // 3. Freedom Nieruchomości
-    await seedService({
-        name: 'Freedom Nieruchomości',
-        slug: 'freedom-nieruchomosci',
-        category: 'real_estate',
-        plDesc: 'Ogólnopolska sieć biur nieruchomości. Oferują kompleksową pomoc w poszukiwaniu mieszkań i domów, w tym asystę prawną przy zawieraniu umów najmu długoterminowego.',
-        ukDesc: 'Загальнопольська мережа агентств нерухомості. Пропонують комплексну допомогу в пошуку квартир та будинків, включаючи юридичну підтримку при укладанні договорів оренди.',
-        enDesc: 'A nationwide real estate agency network. They offer comprehensive assistance in searching for apartments and houses, including legal support for long-term rental agreements.',
-        ruDesc: 'Общенациональная сеть агентств недвижимости. Предлагают комплексную помощь в поиске квартир и домов, включая юридическую поддержку при заключении договоров аренды.',
-        tags: ['real-estate-agency', 'verified-offers', 'relocation'],
-        image: 'freedom-nieruchomosci.png',
-        webpage: 'https://www.freedom.pl/',
-        locations: [
-            { city: 'Poznań', street: 'ul. Matejki 12', voivodeship: 'wielkopolskie', latitude: 52.4045, longitude: 16.9085, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 61 227 86 11' },
-        ],
-    });
 
 // 4. Lion's Estate
     await seedService({
