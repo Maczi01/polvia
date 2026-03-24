@@ -1529,7 +1529,7 @@ async function mainSeed() {
         tags: ['beauty', 'nails'],
         webpage: 'https://booksy.com/pl-pl/333100_lumes-beauty-studio_paznokcie_13750_wroclaw',
         socials: { instagram: 'https://www.instagram.com/Lumespoland/' },
-        image: 'booksy-lumes-beauty-studio.png',
+        image: 'lumes.png',
         locations: [
             {
                 city: 'Wrocław',
@@ -1991,6 +1991,80 @@ async function mainSeed() {
         webpage: 'https://www.partnersinternational.pl/',
         locations: [
             { city: 'Warszawa', street: 'ul. Mokotowska 33', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.021, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 258 40 18' },
+        ],
+    });
+
+    // --- RENOVATION ---
+
+    // 1. IURII DZIALA
+    await seedService({
+        name: 'IURII DZIALA',
+        slug: 'iurii-dziala',
+        category: 'renovation',
+        plDesc: 'Specjalista od remontów wykończeniowych z 18-letnim doświadczeniem. Układanie płytek, paneli podłogowych, zabudowa GK, szpachlowanie, malowanie i inne roboty wykończeniowe. Obsługuje region opolski.',
+        ukDesc: 'Спеціаліст з оздоблювальних ремонтів з 18-річним досвідом. Укладання плитки, підлогових панелей, монтаж гіпсокартону, шпаклювання, фарбування та інші оздоблювальні роботи. Обслуговує Опольський регіон.',
+        enDesc: 'Finishing renovation specialist with 18 years of experience. Tile laying, floor panels, drywall installation, plastering, painting and other finishing works. Serves the Opole region.',
+        ruDesc: 'Специалист по отделочным ремонтам с 18-летним опытом. Укладка плитки, напольных панелей, монтаж гипсокартона, шпаклёвка, покраска и другие отделочные работы. Обслуживает Опольский регион.',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing'],
+        languages: ['pl', 'uk'],
+        image: 'remont1.png',
+        webpage: 'https://fixly.pl/profil/wnlouqwq',
+        locations: [
+            { city: 'Chróścice', street: null, voivodeship: 'opolskie', latitude: 50.6763, longitude: 17.8875, openingHours: standardShopHours, isMainLocation: true, email: 'iuriidziala@gmail.com' },
+        ],
+    });
+
+    // 2. UKR BUD
+    await seedService({
+        name: 'UKR BUD',
+        slug: 'ukr-bud',
+        category: 'renovation',
+        plDesc: 'Firma budowlano-remontowa z 9-letnim doświadczeniem. Specjalizacja: budowa domów, prace betonowe, fundamenty, dachy, murarstwo, ciesielstwo i rozbiórki. Obsługuje Wrocław i okolice w promieniu ok. 50 km.',
+        ukDesc: 'Будівельно-ремонтна фірма з 9-річним досвідом. Спеціалізація: будівництво будинків, бетонні роботи, фундаменти, покрівлі, мурування, теслярство та демонтаж. Обслуговує Вроцлав та околиці в радіусі близько 50 км.',
+        enDesc: 'Construction and renovation company with 9 years of experience. Specializing in house building, concrete work, foundations, roofing, masonry, carpentry and demolition. Serves Wrocław and surroundings within approx. 50 km radius.',
+        ruDesc: 'Строительно-ремонтная фирма с 9-летним опытом. Специализация: строительство домов, бетонные работы, фундаменты, кровли, кладка, плотницкие работы и демонтаж. Обслуживает Вроцлав и окрестности в радиусе около 50 км.',
+        tags: ['repair', 'finishing'],
+        image: 'remont1.png',
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/sicxc5mb',
+        locations: [
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true, email: 'exdima@op.pl' },
+        ],
+    });
+
+    // 3. REMONT & BUDOWA ROMAN BORDIUH
+    await seedService({
+        name: 'Remont & Budowa Roman Bordiuh',
+        slug: 'remont-budowa-roman-bordiuh',
+        category: 'renovation',
+        plDesc: 'Kompleksowe usługi remontowo-budowlane w Warszawie i okolicach (promień 40 km). Malowanie, zabudowa GK, układanie płytek, sufity podwieszane, panele podłogowe, parkiety, montaż drzwi i okien, instalacje elektryczne oraz montaż mebli.',
+        ukDesc: 'Комплексні ремонтно-будівельні послуги у Варшаві та околицях (радіус 40 км). Фарбування, монтаж гіпсокартону, укладання плитки, підвісні стелі, підлогові панелі, паркет, монтаж дверей і вікон, електричні інсталяції та збирання меблів.',
+        enDesc: 'Comprehensive renovation and construction services in Warsaw and surroundings (40 km radius). Painting, drywall, tile installation, suspended ceilings, floor panels, parquet, door and window installation, electrical work and furniture assembly.',
+        ruDesc: 'Комплексные ремонтно-строительные услуги в Варшаве и окрестностях (радиус 40 км). Покраска, монтаж гипсокартона, укладка плитки, подвесные потолки, напольные панели, паркет, установка дверей и окон, электромонтаж и сборка мебели.',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        image: 'remont1.png',
+        webpage: 'https://fixly.pl/profil/2byjmok5',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'roman.bordug74@gmail.com' },
+        ],
+    });
+
+    // 4. Ukraiński Specjalistu - Oleh Kopytko
+    await seedService({
+        name: 'Ukraiński Specjalistu',
+        slug: 'ukrainski-specjalistu',
+        category: 'renovation',
+        plDesc: 'Ukraiński specjalista remontowo-budowlany z 9-letnim doświadczeniem. Zabudowa GK, malowanie ścian i sufitów, szpachlowanie, układanie paneli, budowa domów, prace złotej rączki i sprzątanie poremontowe. Warszawa i okolice.',
+        ukDesc: 'Український спеціаліст з ремонту та будівництва з 9-річним досвідом. Монтаж гіпсокартону, фарбування стін та стель, шпаклювання, укладання панелей, будівництво будинків, дрібний ремонт та прибирання після ремонту. Варшава та околиці.',
+        enDesc: 'Ukrainian renovation and construction specialist with 9 years of experience. Drywall installation, wall and ceiling painting, plastering, panel laying, house building, handyman services and post-renovation cleaning. Warsaw and surroundings.',
+        ruDesc: 'Украинский специалист по ремонту и строительству с 9-летним опытом. Монтаж гипсокартона, покраска стен и потолков, шпаклёвка, укладка панелей, строительство домов, мелкий ремонт и уборка после ремонта. Варшава и окрестности.',
+        tags: ['drywall', 'painting', 'flooring', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        image: 'remont1.png',
+        webpage: 'https://fixly.pl/profil/3pQiWRTb',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 

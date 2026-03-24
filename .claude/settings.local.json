@@ -35,7 +35,8 @@
       "WebFetch(domain:chatgpt.com)",
       "Bash(grep:*)",
       "Bash(wc:*)",
-      "WebFetch(domain:ukrainoczka.pl)"
+      "WebFetch(domain:ukrainoczka.pl)",
+      "WebFetch(domain:fixly.pl)"
     ]
   },
   "enableAllProjectMcpServers": true,
