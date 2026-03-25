@@ -1994,6 +1994,27 @@ async function mainSeed() {
         ],
     });
 
+    // --- RENOVATION TAGS ---
+    const renovationTags = [
+        { key: 'tiles', pl: 'Płytki', uk: 'Плитка', en: 'Tiles', ru: 'Плитка' },
+        { key: 'flooring', pl: 'Podłogi', uk: 'Підлоги', en: 'Flooring', ru: 'Полы' },
+        { key: 'drywall', pl: 'Zabudowa GK', uk: 'Гіпсокартон', en: 'Drywall', ru: 'Гипсокартон' },
+        { key: 'painting', pl: 'Malowanie', uk: 'Фарбування', en: 'Painting', ru: 'Покраска' },
+        { key: 'finishing', pl: 'Wykończenia', uk: 'Оздоблення', en: 'Finishing', ru: 'Отделка' },
+        { key: 'repair', pl: 'Naprawa', uk: 'Ремонт', en: 'Repair', ru: 'Ремонт' },
+    ];
+
+    for (const t of renovationTags) {
+        const [tag] = await db.insert(tagsTable).values({}).returning();
+        await db.insert(tagsTranslationsTable).values([
+            { tagId: tag.id, languageCode: 'pl', name: t.pl },
+            { tagId: tag.id, languageCode: 'uk', name: t.uk },
+            { tagId: tag.id, languageCode: 'en', name: t.en },
+            { tagId: tag.id, languageCode: 'ru', name: t.ru },
+        ]);
+        tagMap[t.key] = tag.id;
+    }
+
     // --- RENOVATION ---
 
     // 1. IURII DZIALA
@@ -2007,7 +2028,7 @@ async function mainSeed() {
         ruDesc: 'Специалист по отделочным ремонтам с 18-летним опытом. Укладка плитки, напольных панелей, монтаж гипсокартона, шпаклёвка, покраска и другие отделочные работы. Обслуживает Опольский регион.',
         tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing'],
         languages: ['pl', 'uk'],
-        image: 'remont1.png',
+        image: 'remont4.png',
         webpage: 'https://fixly.pl/profil/wnlouqwq',
         locations: [
             { city: 'Chróścice', street: null, voivodeship: 'opolskie', latitude: 50.6763, longitude: 17.8875, openingHours: standardShopHours, isMainLocation: true, email: 'iuriidziala@gmail.com' },
@@ -2043,7 +2064,7 @@ async function mainSeed() {
         ruDesc: 'Комплексные ремонтно-строительные услуги в Варшаве и окрестностях (радиус 40 км). Покраска, монтаж гипсокартона, укладка плитки, подвесные потолки, напольные панели, паркет, установка дверей и окон, электромонтаж и сборка мебели.',
         tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
         languages: ['pl', 'uk'],
-        image: 'remont1.png',
+        image: 'remont2.png',
         webpage: 'https://fixly.pl/profil/2byjmok5',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'roman.bordug74@gmail.com' },
@@ -2061,7 +2082,7 @@ async function mainSeed() {
         ruDesc: 'Украинский специалист по ремонту и строительству с 9-летним опытом. Монтаж гипсокартона, покраска стен и потолков, шпаклёвка, укладка панелей, строительство домов, мелкий ремонт и уборка после ремонта. Варшава и окрестности.',
         tags: ['drywall', 'painting', 'flooring', 'finishing', 'repair'],
         languages: ['pl', 'uk'],
-        image: 'remont1.png',
+        image: 'remont3.png',
         webpage: 'https://fixly.pl/profil/3pQiWRTb',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
