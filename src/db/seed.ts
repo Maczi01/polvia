@@ -2364,9 +2364,9 @@ async function mainSeed() {
         ruDesc: 'Покраска, отделка стен, полы, ремонт ванных комнат и кухонь, машинная штукатурка. Познань и окрестности (49 км).',
         tags: ['painting', 'flooring', 'finishing'],
         languages: ['pl', 'uk'],
-        webpage: 'https://fixly.pl/profil/vjau29kv',
+        webpage: 'https://www.facebook.com/m2remontofficial',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie',phoneNumber: '+380 95 615 8777', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2550,7 +2550,7 @@ async function mainSeed() {
         whatsappNumber: '+48796515066',
         socials: { facebook: 'https://www.facebook.com/igorvonsovic' },
         locations: [
-            { city: 'Wrocław', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', phoneNumber: '+48796515066', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 

@@ -44,7 +44,10 @@
       "mcp__chrome-devtools__list_pages",
       "mcp__chrome-devtools__take_snapshot",
       "mcp__chrome-devtools__navigate_page",
-      "Bash(find /c/Users/mateu/WebstormProjects/polvia/src/app/[locale]/\\\\\\(main\\\\\\) -name \"page.tsx\" -o -name \"layout.tsx\")"
+      "Bash(find /c/Users/mateu/WebstormProjects/polvia/src/app/[locale]/\\\\\\(main\\\\\\) -name \"page.tsx\" -o -name \"layout.tsx\")",
+      "Bash(command -v convert magick npx)",
+      "Bash(magick \"public/logo/only.svg\" -background none -density 256 -resize 256x256 -define icon:auto-resize=256,128,64,48,32,16 \"public/favicon.ico\")",
+      "Bash(magick identify:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
