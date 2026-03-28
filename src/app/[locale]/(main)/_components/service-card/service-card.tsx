@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utilities';
 import { Button } from '@/components/ui/button/button';
-import { mapCategoryToBadgeColor } from '@/lib/consts';
+import { mapCategoryToBadgeColor, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
 import { Clock, Globe, MapPin, Phone, MessageCircle, Navigation } from 'lucide-react';
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
@@ -148,9 +148,16 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const [isHovering, setIsHovering] = useState<boolean>(false);
         const [isExpanding, setIsExpanding] = useState(false);
         const t = useTranslations('MapCard');
+        const tCounties = useTranslations('MapPage.counties');
 
         const COLLAPSE_MS = 300;
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+        const translatedVoivodeship = useMemo(() => {
+            if (!voivodeship) return '';
+            const messageKey = VOIVODESHIP_TO_MESSAGE_KEY[voivodeship];
+            return messageKey ? tCounties(messageKey) : voivodeship;
+        }, [voivodeship, tCounties]);
 
         const todayHours = useMemo(() => getTodayHours(openingHours), [openingHours]);
 
@@ -322,7 +329,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             ],
         );
 
-        const addressParts = [street, city, voivodeship]
+        const addressParts = [street, city, translatedVoivodeship]
             .map(part => part?.trim())
             .filter(Boolean);
         const address = addressParts.join(', ');
@@ -395,8 +402,8 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             </div>
                             <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                                 {expanded
-                                    ? description || `${city}${voivodeship ? `, ${voivodeship}` : ''}`
-                                    : `${city}${voivodeship ? `, ${voivodeship}` : ''}`}
+                                    ? description || `${city}${translatedVoivodeship ? `, ${translatedVoivodeship}` : ''}`
+                                    : `${city}${translatedVoivodeship ? `, ${translatedVoivodeship}` : ''}`}
                             </p>
                         </div>
 

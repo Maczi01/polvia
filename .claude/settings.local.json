@@ -40,7 +40,11 @@
       "Bash(cat:*)",
       "WebFetch(domain:www.facebook.com)",
       "WebFetch(domain:art-home-wro.blogspot.com)",
-      "WebFetch(domain:www.youtube.com)"
+      "WebFetch(domain:www.youtube.com)",
+      "mcp__chrome-devtools__list_pages",
+      "mcp__chrome-devtools__take_snapshot",
+      "mcp__chrome-devtools__navigate_page",
+      "Bash(find /c/Users/mateu/WebstormProjects/polvia/src/app/[locale]/\\\\\\(main\\\\\\) -name \"page.tsx\" -o -name \"layout.tsx\")"
     ]
   },
   "enableAllProjectMcpServers": true,

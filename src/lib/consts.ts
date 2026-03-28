@@ -167,6 +167,29 @@ export function formatAddress({
         .join(', ');
 }
 
+/**
+ * Maps DB voivodeship enum values (ASCII) to the i18n message keys (with diacritics).
+ * Usage: t(`counties.${VOIVODESHIP_TO_MESSAGE_KEY[voivodeship]}`)
+ */
+export const VOIVODESHIP_TO_MESSAGE_KEY: Record<string, string> = {
+    'dolnoslaskie': 'dolnośląskie',
+    'kujawsko-pomorskie': 'kujawsko-pomorskie',
+    'lubelskie': 'lubelskie',
+    'lubuskie': 'lubuskie',
+    'lodzkie': 'łódzkie',
+    'malopolskie': 'małopolskie',
+    'mazowieckie': 'mazowieckie',
+    'opolskie': 'opolskie',
+    'podkarpackie': 'podkarpackie',
+    'podlaskie': 'podlaskie',
+    'pomorskie': 'pomorskie',
+    'slaskie': 'śląskie',
+    'swietokrzyskie': 'świętokrzyskie',
+    'warminsko-mazurskie': 'warmińsko-mazurskie',
+    'wielkopolskie': 'wielkopolskie',
+    'zachodniopomorskie': 'zachodniopomorskie',
+};
+
 export const serviceName = "polvia";
 export const serviceNameFromCapitalLetter = "Polvia";
 

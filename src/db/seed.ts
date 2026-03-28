@@ -136,6 +136,7 @@ async function mainSeed() {
     async function seedService(data: {
         name: string, slug: string, category: any, webpage?: string,
         image?: string,
+        plName?: string, ukName?: string, enName?: string, ruName?: string,
         plDesc: string, ukDesc: string, enDesc: string, ruDesc: string,
         locations: any[],
         tags: string[],
@@ -153,10 +154,10 @@ async function mainSeed() {
         }).returning();
 
         await db.insert(servicesTranslationsTable).values([
-            { serviceId: service.id, languageCode: 'pl', name: data.name, description: data.plDesc },
-            { serviceId: service.id, languageCode: 'uk', name: data.name, description: data.ukDesc },
-            { serviceId: service.id, languageCode: 'en', name: data.name, description: data.enDesc },
-            { serviceId: service.id, languageCode: 'ru', name: data.name, description: data.ruDesc },
+            { serviceId: service.id, languageCode: 'pl', name: data.plName ?? data.name, description: data.plDesc },
+            { serviceId: service.id, languageCode: 'uk', name: data.ukName ?? data.name, description: data.ukDesc },
+            { serviceId: service.id, languageCode: 'en', name: data.enName ?? data.name, description: data.enDesc },
+            { serviceId: service.id, languageCode: 'ru', name: data.ruName ?? data.name, description: data.ruDesc },
         ]);
 
         // Count locations per city for slug generation
@@ -535,6 +536,7 @@ async function mainSeed() {
     // 19
     await seedService({
         name: 'Restauracja U sióstr', slug: 'u-siostr', category: 'gastronomy',
+        ukName: 'Ресторан У сестер', enName: 'Restaurant U Sióstr', ruName: 'Ресторан У сестёр',
         plDesc: 'Tradycyjna kuchnia ukraińska w sercu Warszawy.',
         ukDesc: 'Традиційна українська кухня в центрі Варшави.',
         enDesc: 'Traditional Ukrainian cuisine in the heart of Warsaw.',
@@ -549,6 +551,7 @@ async function mainSeed() {
     // 20
     await seedService({
         name: 'Kresowe Smaki Valentyny', slug: 'kresowe-smaki-valentyny', category: 'gastronomy',
+        ukName: 'Кресові смаки Валентини', enName: 'Kresowe Smaki Valentyny', ruName: 'Кресовые вкусы Валентины',
         plDesc: 'Domowe smaki Kresów i Ukrainy.',
         ukDesc: 'Домашні страви за традиційними рецептами.',
         enDesc: 'Homemade flavors of Kresy and Ukraine.',
@@ -565,6 +568,7 @@ async function mainSeed() {
     // 22
     await seedService({
         name: 'Kamanda Lwowska', slug: 'kamanda-lwowska', category: 'gastronomy',
+        ukName: 'Каманда Львівська', enName: 'Kamanda Lwowska', ruName: 'Каманда Львовская',
         plDesc: 'Restauracja nawiązująca do przedwojennego klimatu Lwowa.',
         ukDesc: 'Ресторан, що відтворює атмосферу довоєнного Львова.',
         enDesc: 'Restaurant evoking the pre-war atmosphere of Lviv.',
@@ -596,6 +600,7 @@ async function mainSeed() {
     // 26
     await seedService({
         name: 'Bistro Kozacka Chatka', slug: 'bistro-kozacka-chatka', category: 'gastronomy',
+        ukName: 'Бістро Козацька Хатка', enName: 'Bistro Kozacka Chatka', ruName: 'Бистро Козацкая Хатка',
         plDesc: 'Kultowe miejsce we Wrocławiu.',
         ukDesc: 'Культове місце у Вроцлаві.',
         enDesc: 'Iconic place in Wrocław.',
@@ -610,6 +615,7 @@ async function mainSeed() {
     // 27
     await seedService({
         name: 'Smak Ukraiński', slug: 'smak-ukrainski-krakow', category: 'gastronomy',
+        ukName: 'Смак Український', enName: 'Ukrainian Flavor', ruName: 'Украинский вкус',
         plDesc: 'Klasyki kuchni ukraińskiej.',
         ukDesc: 'Класичні українські страви.',
         enDesc: 'Classics of Ukrainian cuisine.',
@@ -651,6 +657,7 @@ async function mainSeed() {
     // 30
     await seedService({
         name: 'Restauracja Dumka', slug: 'restauracja-dumka-kielce', category: 'gastronomy',
+        ukName: 'Ресторан Думка', enName: 'Restaurant Dumka', ruName: 'Ресторан Думка',
         plDesc: 'Miejsce spotkań z ukraińską kulturą.',
         ukDesc: 'Місце зустрічі з українською культурою.',
         enDesc: 'A meeting place with Ukrainian culture.',
@@ -665,6 +672,7 @@ async function mainSeed() {
     // 31
     await seedService({
         name: 'Kulinarna Ukraina', slug: 'kulinarna-ukraina-gdynia', category: 'gastronomy',
+        ukName: 'Кулінарна Україна', enName: 'Culinary Ukraine', ruName: 'Кулинарная Украина',
         plDesc: 'Prawdziwe smaki Ukrainy nad morzem.',
         ukDesc: 'Справжні смаки України над морем.',
         enDesc: 'True flavors of Ukraine by the sea.',
@@ -683,6 +691,7 @@ async function mainSeed() {
     // 33
     await seedService({
         name: 'Willa Biała', slug: 'willa-biala-warszawa', category: 'gastronomy',
+        ukName: 'Вілла Біла', enName: 'White Villa', ruName: 'Вилла Белая',
         plDesc: 'Elegancka restauracja w zabytkowej willi.',
         ukDesc: 'Елегантний ресторан у старій віллі.',
         enDesc: 'Elegant restaurant in a historic villa.',
@@ -697,6 +706,7 @@ async function mainSeed() {
     // 36
     await seedService({
         name: 'Serwis UA', slug: 'auto-serwis-ua', category: 'mechanics',
+        ukName: 'Сервіс UA', enName: 'Service UA', ruName: 'Сервис UA',
         plDesc: 'Profesjonalny serwis samochodowy.',
         ukDesc: 'Професійне обслуговування авто.',
         enDesc: 'Professional car service.',
@@ -712,6 +722,7 @@ async function mainSeed() {
         name: 'Fundacja Ocalenie',
         slug: 'fundacja-ocalenie',
         category: 'law',
+        ukName: 'Фундація Оцаленє', enName: 'Ocalenie Foundation', ruName: 'Фонд Оцаление',
         plDesc: 'Bezpłatna pomoc prawna, psychologiczna i kursy języka polskiego dla uchodźców i migrantów.',
         ukDesc: 'Безкоштовна юридична, психологічна допомога та курси польської мови для біженців та мігрантів.',
         enDesc: 'Free legal, psychological assistance and Polish language courses for refugees and migrants.',
@@ -831,6 +842,7 @@ async function mainSeed() {
         name: 'Twój Lekarz w Warszawie',
         slug: 'twoj-lekarz-warszawa',
         category: 'health',
+        ukName: 'Твій лікар у Варшаві', enName: 'Your Doctor in Warsaw', ruName: 'Твой врач в Варшаве',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевta до гінеколога.',
         enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
@@ -852,6 +864,7 @@ async function mainSeed() {
         name: 'Twój Lekarz w Poznaniu',
         slug: 'twoj-lekarz-poznan',
         category: 'health',
+        ukName: 'Твій лікар у Познані', enName: 'Your Doctor in Poznań', ruName: 'Твой врач в Познани',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
         enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
@@ -870,6 +883,7 @@ async function mainSeed() {
         name: 'Twój Lekarz w Krakowie',
         slug: 'twoj-lekarz-krakow',
         category: 'health',
+        ukName: 'Твій лікар у Кракові', enName: 'Your Doctor in Kraków', ruName: 'Твой врач в Кракове',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
         enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
@@ -888,6 +902,7 @@ async function mainSeed() {
         name: 'Twój Lekarz w Trójmieście',
         slug: 'twoj-lekarz-trojmiasto',
         category: 'health',
+        ukName: 'Твій лікар у Тримісті', enName: 'Your Doctor in Tricity', ruName: 'Твой врач в Труймясто',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
         enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
@@ -906,6 +921,7 @@ async function mainSeed() {
         name: 'Twój Lekarz we Wrocławiu',
         slug: 'twoj-lekarz-wroclaw',
         category: 'health',
+        ukName: 'Твій лікар у Вроцлаві', enName: 'Your Doctor in Wrocław', ruName: 'Твой врач во Вроцлаве',
         plDesc: 'Prywatna przychodnia medyczna założona z myślą o pacjentach ukraińskojęzycznych. Kompleksowa opieka: od internisty po ginekologa.',
         ukDesc: 'Приватна медична клініка, створена для україномовних пацієнтів. Комплексна допомога: від терапевта до гінеколога.',
         enDesc: 'Private medical clinic designed for Ukrainian-speaking patients. Comprehensive care: from general practitioner to gynecologist.',
@@ -926,6 +942,7 @@ async function mainSeed() {
         name: 'Progress Holding - Księgowość i Finanse',
         slug: 'progress-holding',
         category: 'financial',
+        ukName: 'Progress Holding - Бухгалтерія та Фінанси', enName: 'Progress Holding - Accounting & Finance', ruName: 'Progress Holding - Бухгалтерия и Финансы',
         plDesc: 'Biuro rachunkowe specjalizujące się w obsłudze ukraińskiego biznesu w Polsce. Doradztwo podatkowe, optymalizacja i zakładanie spółek.',
         ukDesc: 'Бухгалтерія, що спеціалізується на обслуговуванні українського бізнесу в Польщі. Податкові консультації, оптимізація та реєстрація компаній.',
         enDesc: 'Accounting office specializing in serving Ukrainian businesses in Poland. Tax consulting, optimization and company registration.',
@@ -943,6 +960,7 @@ async function mainSeed() {
         name: 'Ukraińsko-Polska Izba Gospodarcza',
         slug: 'upig-biznes',
         category: 'financial',
+        ukName: 'Українсько-Польська Господарча Палата', enName: 'Ukrainian-Polish Chamber of Commerce', ruName: 'Украинско-Польская Торговая Палата',
         plDesc: 'Organizacja wspierająca współpracę gospodarczą. Doradztwo w zakresie inwestycji, pozyskiwania finansowania i networkingu biznesowego.',
         ukDesc: 'Організація, що підтримує економічну співпрацю. Консультування з питань інвестицій, залучення фінансування та ділового нетворкінгу.',
         enDesc: 'Organization supporting economic cooperation. Consulting on investments, fundraising and business networking.',
@@ -959,6 +977,7 @@ async function mainSeed() {
         name: 'Teatr Navpaky',
         slug: 'teatr-navpaky',
         category: 'help_support',
+        ukName: 'Театр Навпаки', enName: 'Navpaky Theatre', ruName: 'Театр Навпаки',
         plDesc: 'Jedyny teatr w Polsce z regularnym repertuarem w języku ukraińskim. Tworzony przez profesjonalnych aktorów, łączy tradycję z nowoczesną formą sceniczną.',
         ukDesc: 'Єдиний театр у Польщі з регулярним репертуаром українською мовою. Створений професійними акторами, він поєднує традиції з сучасною сценічною формою.',
         enDesc: 'The only theater in Poland with a regular repertoire in Ukrainian. Created by professional actors, it combines tradition with modern stage form.',
@@ -1121,6 +1140,7 @@ async function mainSeed() {
         name: 'Kancelaria Adwokacka Adwokat Oxana Piątkowska',
         slug: 'adwokat-piatkowska',
         category: 'law',
+        ukName: 'Адвокатська канцелярія адвокат Оксана П\'ятковська', enName: 'Law Office of Attorney Oxana Piątkowska', ruName: 'Адвокатская канцелярия адвокат Оксана Пятковская',
         plDesc: 'Kompleksowe usługi prawne dla przedsiębiorców i klientów indywidualnych w językach polskim, ukraińskim i rosyjskim. Specjalizacja: prawo handlowe, cywilne, karne, administracyjne, obsługa cudzoziemców oraz prawo podatkowe.',
         ukDesc: 'Комплексні юридичні послуги для підприємців та приватних клієнтів польською, українською та російською мовами. Спеціалізація: комерційне, цивільне, кримінальне, адміністративне право, обслуговування іноземців та податкове право.',
         enDesc: 'Comprehensive legal services for entrepreneurs and individual clients in Polish, Ukrainian and Russian. Specialization: commercial, civil, criminal, administrative law, foreigners\' services and tax law.',
@@ -1154,6 +1174,7 @@ async function mainSeed() {
         name: 'Kancelaria Wschodnia – Adwokat Olga Dugil',
         slug: 'kancelaria-wschodnia-dugil',
         category: 'law',
+        ukName: 'Східна канцелярія – Адвокат Ольга Дугіль', enName: 'Eastern Law Office – Attorney Olga Dugil', ruName: 'Восточная канцелярия – Адвокат Ольга Дугиль',
         plDesc: 'Kancelaria specjalizująca się w prawie wschodnioeuropejskim (Ukraina, Rosja, Białoruś, Kazachstan) z 20-letnim doświadczeniem. Rejestracja firm, legalizacja pracowników, obsługa celna, reprezentacja przed sądami i urzędami.',
         ukDesc: 'Юридична фірма, що спеціалізується на східноєвропейському праві (Україна, Росія, Білорусь, Казахстан) з 20-річним досвідом. Реєстрація компаній, легалізація працівників, митне оформлення, представництво в судах та органах влади.',
         enDesc: 'Law firm specializing in Eastern European law (Ukraine, Russia, Belarus, Kazakhstan) with 20 years of experience. Company registration, employee legalization, customs handling, representation in courts and offices.',
@@ -1182,6 +1203,7 @@ async function mainSeed() {
         name: 'Kancelaria Radcy Prawnego Piotr Kamler',
         slug: 'kancelaria-kamler',
         category: 'law',
+        ukName: 'Канцелярія юрисконсульта Пьотр Камлер', enName: 'Legal Counsel Office Piotr Kamler', ruName: 'Канцелярия юрисконсульта Пётр Камлер',
         plDesc: 'Kancelaria radcy prawnego specjalizująca się w pomocy prawnej dla obywateli Ukrainy. Legalizacja pobytu, zezwolenia na pracę, pobyt tymczasowy, zakładanie firm oraz konsultacje z zakresu prawa administracyjnego.',
         ukDesc: 'Юридична фірма, що спеціалізується на правовій допомозі громадянам України. Легалізація перебування, дозволи на роботу, тимчасове проживання, реєстрація фірм та консультації з адміністративного права.',
         enDesc: 'Legal counsel office specializing in legal assistance for Ukrainian citizens. Legalization of stay, work permits, temporary residence, company registration and administrative law consultations.',
@@ -1597,6 +1619,7 @@ async function mainSeed() {
         name: 'EASY Warsztat Samochodowy | Автосервис',
         slug: 'easy-warsztat-samochodowy-warszawa',
         category: 'mechanics',
+        ukName: 'EASY Автомайстерня | Автосервіс', enName: 'EASY Car Workshop', ruName: 'EASY Автомастерская | Автосервис',
         plDesc: 'Profesjonalny warsztat samochodowy oferujący kompleksową mechanikę pojazdową, serwis eksploatacyjny oraz diagnostykę komputerową. Obsługa w języku polskim i ukraińskim.',
         ukDesc: 'Професійний автосервіс, що пропонує комплексний ремонт автомобілів, технічне обслуговування та комп’ютерну діагностику. Обслуговування польською та українською мовами.',
         enDesc: 'Professional car workshop offering comprehensive vehicle mechanics, maintenance service, and computer diagnostics. Service available in Polish and Ukrainian.',
@@ -1694,6 +1717,7 @@ async function mainSeed() {
         name: 'Serwis Group UA PL Poznań',
         slug: 'serwis-group-ua-pl-poznan',
         category: 'mechanics',
+        ukName: 'Сервіс Груп UA PL Познань', enName: 'Service Group UA PL Poznań', ruName: 'Сервис Груп UA PL Познань',
         plDesc: 'Polsko-ukraiński zespół mechaników zapewniający rzetelne naprawy silników, zawieszenia oraz serwis klimatyzacji. Szybkie terminy i fachowe doradztwo.',
         ukDesc: 'Польсько-українська команда механіків, що забезпечує надійний ремонт двигунів, підвіски та обслуговування кондиціонерів. Швидкі терміни та професійні поради.',
         enDesc: 'Polish-Ukrainian team of mechanics providing reliable engine repairs, suspension work, and AC service. Fast turnaround and professional advice.',
@@ -1729,6 +1753,7 @@ async function mainSeed() {
         name: 'Kraków warsztat samochodowy | СТО Краков',
         slug: 'krakow-warsztat-samochodowy-sto',
         category: 'mechanics',
+        ukName: 'Краків автомайстерня | СТО Краків', enName: 'Kraków Car Workshop | STO', ruName: 'Краков автомастерская | СТО Краков',
         plDesc: 'Profesjonalny serwis samochodowy (STO) w Krakowie, oferujący pełen zakres napraw mechanicznych, serwis olejowy oraz przeglądy okresowe. Obsługa prowadzona przez doświadczonych mechaników.',
         ukDesc: 'Професійний автосервіс (СТО) у Кракові, що пропонує повний спектр механічного ремонту, заміну масла та періодичні огляди. Обслуговування проводять досвідчені механіки.',
         enDesc: 'Professional car service (STO) in Krakow, offering a full range of mechanical repairs, oil service, and periodic inspections. Service provided by experienced mechanics.',
@@ -2022,13 +2047,13 @@ async function mainSeed() {
         name: 'IURII DZIALA',
         slug: 'iurii-dziala',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Specjalista od remontów wykończeniowych z 18-letnim doświadczeniem. Układanie płytek, paneli podłogowych, zabudowa GK, szpachlowanie, malowanie i inne roboty wykończeniowe. Obsługuje region opolski.',
         ukDesc: 'Спеціаліст з оздоблювальних ремонтів з 18-річним досвідом. Укладання плитки, підлогових панелей, монтаж гіпсокартону, шпаклювання, фарбування та інші оздоблювальні роботи. Обслуговує Опольський регіон.',
         enDesc: 'Finishing renovation specialist with 18 years of experience. Tile laying, floor panels, drywall installation, plastering, painting and other finishing works. Serves the Opole region.',
         ruDesc: 'Специалист по отделочным ремонтам с 18-летним опытом. Укладка плитки, напольных панелей, монтаж гипсокартона, шпаклёвка, покраска и другие отделочные работы. Обслуживает Опольский регион.',
         tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing'],
         languages: ['pl', 'uk'],
-        image: 'remont4.png',
         webpage: 'https://fixly.pl/profil/wnlouqwq',
         locations: [
             { city: 'Chróścice', street: null, voivodeship: 'opolskie', latitude: 50.6763, longitude: 17.8875, openingHours: standardShopHours, isMainLocation: true, email: 'iuriidziala@gmail.com' },
@@ -2040,12 +2065,12 @@ async function mainSeed() {
         name: 'UKR BUD',
         slug: 'ukr-bud',
         category: 'renovation',
+        image: 'remont2.png',
         plDesc: 'Firma budowlano-remontowa z 9-letnim doświadczeniem. Specjalizacja: budowa domów, prace betonowe, fundamenty, dachy, murarstwo, ciesielstwo i rozbiórki. Obsługuje Wrocław i okolice w promieniu ok. 50 km.',
         ukDesc: 'Будівельно-ремонтна фірма з 9-річним досвідом. Спеціалізація: будівництво будинків, бетонні роботи, фундаменти, покрівлі, мурування, теслярство та демонтаж. Обслуговує Вроцлав та околиці в радіусі близько 50 км.',
         enDesc: 'Construction and renovation company with 9 years of experience. Specializing in house building, concrete work, foundations, roofing, masonry, carpentry and demolition. Serves Wrocław and surroundings within approx. 50 km radius.',
         ruDesc: 'Строительно-ремонтная фирма с 9-летним опытом. Специализация: строительство домов, бетонные работы, фундаменты, кровли, кладка, плотницкие работы и демонтаж. Обслуживает Вроцлав и окрестности в радиусе около 50 км.',
         tags: ['repair', 'finishing'],
-        image: 'remont1.png',
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/sicxc5mb',
         locations: [
@@ -2058,13 +2083,14 @@ async function mainSeed() {
         name: 'Remont & Budowa Roman Bordiuh',
         slug: 'remont-budowa-roman-bordiuh',
         category: 'renovation',
+        image: 'remont3.png',
+        ukName: 'Ремонт і Будівництво Роман Бордюг', enName: 'Renovation & Construction Roman Bordiuh', ruName: 'Ремонт и Строительство Роман Бордюг',
         plDesc: 'Kompleksowe usługi remontowo-budowlane w Warszawie i okolicach (promień 40 km). Malowanie, zabudowa GK, układanie płytek, sufity podwieszane, panele podłogowe, parkiety, montaż drzwi i okien, instalacje elektryczne oraz montaż mebli.',
         ukDesc: 'Комплексні ремонтно-будівельні послуги у Варшаві та околицях (радіус 40 км). Фарбування, монтаж гіпсокартону, укладання плитки, підвісні стелі, підлогові панелі, паркет, монтаж дверей і вікон, електричні інсталяції та збирання меблів.',
         enDesc: 'Comprehensive renovation and construction services in Warsaw and surroundings (40 km radius). Painting, drywall, tile installation, suspended ceilings, floor panels, parquet, door and window installation, electrical work and furniture assembly.',
         ruDesc: 'Комплексные ремонтно-строительные услуги в Варшаве и окрестностях (радиус 40 км). Покраска, монтаж гипсокартона, укладка плитки, подвесные потолки, напольные панели, паркет, установка дверей и окон, электромонтаж и сборка мебели.',
         tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
         languages: ['pl', 'uk'],
-        image: 'remont2.png',
         webpage: 'https://fixly.pl/profil/2byjmok5',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'roman.bordug74@gmail.com' },
@@ -2076,13 +2102,14 @@ async function mainSeed() {
         name: 'Ukraiński Specjalistu',
         slug: 'ukrainski-specjalistu',
         category: 'renovation',
+        image: 'remont4.png',
+        ukName: 'Український Спеціаліст', enName: 'Ukrainian Specialist', ruName: 'Украинский Специалист',
         plDesc: 'Ukraiński specjalista remontowo-budowlany z 9-letnim doświadczeniem. Zabudowa GK, malowanie ścian i sufitów, szpachlowanie, układanie paneli, budowa domów, prace złotej rączki i sprzątanie poremontowe. Warszawa i okolice.',
         ukDesc: 'Український спеціаліст з ремонту та будівництва з 9-річним досвідом. Монтаж гіпсокартону, фарбування стін та стель, шпаклювання, укладання панелей, будівництво будинків, дрібний ремонт та прибирання після ремонту. Варшава та околиці.',
         enDesc: 'Ukrainian renovation and construction specialist with 9 years of experience. Drywall installation, wall and ceiling painting, plastering, panel laying, house building, handyman services and post-renovation cleaning. Warsaw and surroundings.',
         ruDesc: 'Украинский специалист по ремонту и строительству с 9-летним опытом. Монтаж гипсокартона, покраска стен и потолков, шпаклёвка, укладка панелей, строительство домов, мелкий ремонт и уборка после ремонта. Варшава и окрестности.',
         tags: ['drywall', 'painting', 'flooring', 'finishing', 'repair'],
         languages: ['pl', 'uk'],
-        image: 'remont3.png',
         webpage: 'https://fixly.pl/profil/3pQiWRTb',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
@@ -2094,6 +2121,7 @@ async function mainSeed() {
         name: 'Korzhak Gallen',
         slug: 'korzhak-gallen',
         category: 'renovation',
+        image: 'remont5.png',
         plDesc: 'Firma specjalizująca się w kompleksowych remontach mieszkań, domów oraz lokali biurowych i usługowych. Wykończenia od stanu deweloperskiego pod klucz. 16 lat doświadczenia. Wrocław i okolice.',
         ukDesc: 'Фірма, що спеціалізується на комплексних ремонтах квартир, будинків та офісних і комерційних приміщень. Оздоблення від стану забудовника під ключ. 16 років досвіду. Вроцлав та околиці.',
         enDesc: 'Company specializing in comprehensive renovations of apartments, houses, and office/commercial spaces. Turnkey finishing from developer state. 16 years of experience. Wrocław and surroundings.',
@@ -2111,6 +2139,7 @@ async function mainSeed() {
         name: 'Pinkel Bud',
         slug: 'pinkel-bud',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Wykończenia wysokiego standardu z 16-letnim doświadczeniem. Tynki dekoracyjne, stiuk wenecki, beton architektoniczny, instalacje LED, zabudowa GK, sufity podwieszane, wygłuszanie, adaptacje poddaszy. 558 opinii na Fixly (4.8/5). Warszawa i okolice.',
         ukDesc: 'Оздоблення високого стандарту з 16-річним досвідом. Декоративні штукатурки, венеціанський стук, архітектурний бетон, LED-інсталяції, монтаж гіпсокартону, підвісні стелі, звукоізоляція, адаптація мансард. 558 відгуків на Fixly (4.8/5). Варшава та околиці.',
         enDesc: 'High-standard finishing with 16 years of experience. Decorative plasters, Venetian stucco, architectural concrete, LED installations, drywall, suspended ceilings, soundproofing, attic adaptations. 558 reviews on Fixly (4.8/5). Warsaw and surroundings.',
@@ -2128,6 +2157,7 @@ async function mainSeed() {
         name: 'IRB Groups',
         slug: 'irb-groups',
         category: 'renovation',
+        image: 'remont2.png',
         plDesc: 'Montaż ogrzewania, instalacje wod-kan, elektryka, remonty wykończeniowe, zabudowa GK ścian i sufitów, płytki i gres. 16 lat doświadczenia. Ocena 5.0/5 na Fixly. Warszawa i okolice (40 km).',
         ukDesc: 'Монтаж опалення, водопровідні та каналізаційні інсталяції, електрика, оздоблювальні ремонти, монтаж гіпсокартону стін і стель, плитка та керамограніт. 16 років досвіду. Оцінка 5.0/5 на Fixly. Варшава та околиці (40 км).',
         enDesc: 'Heating installation, plumbing, electrical work, finishing renovations, drywall walls and ceilings, tiles and porcelain stoneware. 16 years of experience. Rated 5.0/5 on Fixly. Warsaw and surroundings (40 km).',
@@ -2145,6 +2175,7 @@ async function mainSeed() {
         name: 'Va-Ro',
         slug: 'va-ro',
         category: 'renovation',
+        image: 'remont3.png',
         plDesc: 'Montaż i serwis klimatyzacji, rekuperacji oraz wentylacji. Czyszczenie, odgrzybianie i naprawa klimatyzacji. 10 lat doświadczenia. Ocena 5.0/5 na Fixly. Oleśnica, Wrocław i okolice (40 km).',
         ukDesc: 'Монтаж та сервіс кондиціонерів, рекуперації та вентиляції. Чистка, дезінфекція та ремонт кондиціонерів. 10 років досвіду. Оцінка 5.0/5 на Fixly. Олесниця, Вроцлав та околиці (40 км).',
         enDesc: 'Air conditioning, recuperation and ventilation installation and service. Cleaning, decontamination and repair of AC systems. 10 years of experience. Rated 5.0/5 on Fixly. Oleśnica, Wrocław and surroundings (40 km).',
@@ -2162,6 +2193,7 @@ async function mainSeed() {
         name: 'Satelit Pl19',
         slug: 'satelit-pl19',
         category: 'renovation',
+        image: 'remont4.png',
         plDesc: 'Pełny zakres usług elektrycznych, instalacje hydrauliczne i wod-kan, instalacje przeciwpożarowe i gazowe. 16 lat doświadczenia. Ocena 5.0/5 na Fixly. Gdańsk, Gdynia, Sopot i okolice (40 km).',
         ukDesc: 'Повний спектр електричних послуг, гідравлічні та водопровідні інсталяції, протипожежні та газові інсталяції. 16 років досвіду. Оцінка 5.0/5 на Fixly. Гданськ, Гдиня, Сопот та околиці (40 км).',
         enDesc: 'Full range of electrical services, hydraulic and plumbing installations, fire protection and gas installations. 16 years of experience. Rated 5.0/5 on Fixly. Gdańsk, Gdynia, Sopot and surroundings (40 km).',
@@ -2179,6 +2211,7 @@ async function mainSeed() {
         name: 'Weekendowo',
         slug: 'weekendowo',
         category: 'renovation',
+        image: 'remont5.png',
         plDesc: 'Usługi hydrauliczne i elektryczne, kompleksowe remonty łazienek, układanie glazury i terakoty, malowanie, zabudowa GK, montaż podłóg. 19 lat doświadczenia. Ocena 5.0/5 na Fixly. Warszawa i okolice (50 km).',
         ukDesc: 'Гідравлічні та електричні послуги, комплексні ремонти ванних кімнат, укладання глазурі та теракоти, фарбування, монтаж гіпсокартону, укладання підлог. 19 років досвіду. Оцінка 5.0/5 на Fixly. Варшава та околиці (50 км).',
         enDesc: 'Plumbing and electrical services, comprehensive bathroom renovations, tile laying, painting, drywall, flooring installation. 19 years of experience. Rated 5.0/5 on Fixly. Warsaw and surroundings (50 km).',
@@ -2196,6 +2229,7 @@ async function mainSeed() {
         name: 'Oleh Honcharuk',
         slug: 'oleh-honcharuk',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Kompleksowe usługi remontowe, instalacyjne, hydrauliczne i elektryczne. Malowanie, prace złotej rączki. 16 lat doświadczenia w branży. Warszawa i okolice (50 km).',
         ukDesc: 'Комплексні ремонтні, монтажні, гідравлічні та електричні послуги. Фарбування, послуги майстра на всі руки. 16 років досвіду в галузі. Варшава та околиці (50 км).',
         enDesc: 'Comprehensive renovation, installation, plumbing and electrical services. Painting, handyman work. 16 years of industry experience. Warsaw and surroundings (50 km).',
@@ -2213,6 +2247,8 @@ async function mainSeed() {
         name: 'DS Remonty i Wykończenia',
         slug: 'ds-remonty-i-wykonczenia',
         category: 'renovation',
+        image: 'remont2.png',
+        ukName: 'DS Ремонти та Оздоблення', enName: 'DS Renovations & Finishing', ruName: 'DS Ремонты и Отделка',
         plDesc: 'Sufity podwieszane, ścianki działowe, malowanie, tynkowanie, szpachlowanie ścian. Gwarancja jakości. 386 usług w tym hydraulika, montaż okien i drzwi, ogrzewanie. 8 lat doświadczenia, ocena 4.8/5 (61 opinii). Kraków i okolice.',
         ukDesc: 'Підвісні стелі, перегородки, фарбування, штукатурення, шпаклювання стін. Гарантія якості. 386 послуг включаючи сантехніку, монтаж вікон і дверей, опалення. 8 років досвіду, оцінка 4.8/5 (61 відгук). Краків та околиці.',
         enDesc: 'Suspended ceilings, partition walls, painting, plastering, wall finishing. Quality guaranteed. 386 services including plumbing, window/door installation, heating. 8 years of experience, rated 4.8/5 (61 reviews). Kraków and surroundings.',
@@ -2230,6 +2266,7 @@ async function mainSeed() {
         name: 'Vasyl Zakharuk',
         slug: 'vasyl-zakharuk',
         category: 'renovation',
+        image: 'remont3.png',
         plDesc: 'Malowanie ścian, zabudowa GK, tapetowanie, wykończenia podłóg, remonty łazienek i kuchni, montaż mebli, prace złotej rączki. 19 lat doświadczenia, ocena 5.0/5 na Fixly. Kraków i okolice (40 km).',
         ukDesc: 'Фарбування стін, монтаж гіпсокартону, шпалерування, оздоблення підлог, ремонти ванних кімнат і кухонь, збирання меблів, послуги майстра. 19 років досвіду, оцінка 5.0/5 на Fixly. Краків та околиці (40 км).',
         enDesc: 'Wall painting, drywall, wallpapering, floor finishing, bathroom and kitchen renovations, furniture assembly, handyman services. 19 years of experience, rated 5.0/5 on Fixly. Kraków and surroundings (40 km).',
@@ -2247,6 +2284,7 @@ async function mainSeed() {
         name: 'STB',
         slug: 'stb-yurkevych',
         category: 'renovation',
+        image: 'remont4.png',
         plDesc: 'Remonty mieszkań o dowolnym stopniu trudności w krótkim terminie. Malowanie, układanie płytek, zabudowa GK, podłogi, sufity podwieszane, ocieplenie poddaszy. 8 lat doświadczenia, ocena 5.0/5 (27 opinii). Warszawa i okolice (20 km).',
         ukDesc: 'Ремонти квартир будь-якої складності в короткі терміни. Фарбування, укладання плитки, монтаж гіпсокартону, підлоги, підвісні стелі, утеплення мансард. 8 років досвіду, оцінка 5.0/5 (27 відгуків). Варшава та околиці (20 км).',
         enDesc: 'Apartment renovations of any difficulty in short timeframes. Painting, tile laying, drywall, flooring, suspended ceilings, attic insulation. 8 years of experience, rated 5.0/5 (27 reviews). Warsaw and surroundings (20 km).',
@@ -2264,6 +2302,7 @@ async function mainSeed() {
         name: 'Volodymyr Lytvynenko',
         slug: 'volodymyr-lytvynenko',
         category: 'renovation',
+        image: 'remont5.png',
         plDesc: 'Układanie płytek, parkietów i paneli, zabudowa GK, szpachlowanie, sufity podwieszane, prace fundamentowe i konstrukcyjne. 16 lat doświadczenia. Kraków i okolice (40 km).',
         ukDesc: 'Укладання плитки, паркету та панелей, монтаж гіпсокартону, шпаклювання, підвісні стелі, фундаментні та конструкційні роботи. 16 років досвіду. Краків та околиці (40 км).',
         enDesc: 'Tile, parquet and panel laying, drywall, plastering, suspended ceilings, foundation and structural work. 16 years of experience. Kraków and surroundings (40 km).',
@@ -2281,6 +2320,7 @@ async function mainSeed() {
         name: 'Dmytro Melnyk',
         slug: 'dmytro-melnyk',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Specjalista od poddaszy — adaptacja, ocieplenie, ocieplenie pianką, remont, zabudowa. Gipsowanie i szpachlowanie ścian. Kraków i okolice.',
         ukDesc: 'Спеціаліст з мансард — адаптація, утеплення, утеплення піною, ремонт, обшивка. Гіпсування та шпаклювання стін. Краків та околиці.',
         enDesc: 'Attic specialist — adaptation, insulation, spray foam insulation, renovation, finishing. Plastering and wall finishing. Kraków and surroundings.',
@@ -2298,6 +2338,7 @@ async function mainSeed() {
         name: 'Dmytro Andriievskyi',
         slug: 'dmytro-andriievskyi',
         category: 'renovation',
+        image: 'remont2.png',
         plDesc: 'Malowanie ścian, układanie płytek, zabudowa GK, podłogi, remonty łazienek, wykończenia wnętrz. Kraków i okolice (40 km).',
         ukDesc: 'Фарбування стін, укладання плитки, монтаж гіпсокартону, підлоги, ремонти ванних кімнат, оздоблення інтер\'єрів. Краків та околиці (40 км).',
         enDesc: 'Wall painting, tile laying, drywall, flooring, bathroom renovations, interior finishing. Kraków and surroundings (40 km).',
@@ -2312,9 +2353,11 @@ async function mainSeed() {
 
     // 18. m2 Firma budowlana - Volodymyr Maksymyk
     await seedService({
-        name: 'm2 Firma Budowlana',
+        name: 'Volodymyr Maksymyk m2 Firma Budowlana',
         slug: 'm2-firma-budowlana',
         category: 'renovation',
+        image: 'remont3.png',
+        ukName: 'm2 Будівельна Фірма', enName: 'm2 Construction Company', ruName: 'm2 Строительная Компания',
         plDesc: 'Malowanie, wykończenia ścian, podłogi, remonty łazienek i kuchni, tynki maszynowe. Poznań i okolice (49 km).',
         ukDesc: 'Фарбування, оздоблення стін, підлоги, ремонти ванних кімнат і кухонь, машинні штукатурки. Познань та околиці (49 км).',
         enDesc: 'Painting, wall finishing, flooring, bathroom and kitchen renovations, machine plastering. Poznań and surroundings (49 km).',
@@ -2332,6 +2375,7 @@ async function mainSeed() {
         name: 'E.M Bud',
         slug: 'em-bud',
         category: 'renovation',
+        image: 'remont4.png',
         plDesc: 'Malowanie, szpachlowanie, ocieplenie, wykończenia wnętrz, montaż listew i naprawy konstrukcyjne. Meble i sprzątanie poremontowe. 4 lata doświadczenia, ocena 4.9/5 (21 opinii). Poznań i okolice (50 km).',
         ukDesc: 'Фарбування, шпаклювання, утеплення, оздоблення інтер\'єрів, монтаж плінтусів та конструкційні ремонти. Меблі та прибирання після ремонту. 4 роки досвіду, оцінка 4.9/5 (21 відгук). Познань та околиці (50 км).',
         enDesc: 'Painting, plastering, insulation, interior finishing, baseboard installation and structural repairs. Furniture and post-renovation cleaning. 4 years of experience, rated 4.9/5 (21 reviews). Poznań and surroundings (50 km).',
@@ -2349,6 +2393,7 @@ async function mainSeed() {
         name: 'IVI BUD',
         slug: 'ivi-bud',
         category: 'renovation',
+        image: 'remont5.png',
         plDesc: 'Firma budowlana — kompleksowe remonty budynków, mieszkań i biur. Malowanie, szpachlowanie, płytki, podłogi, zabudowa GK, instalacje elektryczne, sprzątanie. Ponad 20 lat doświadczenia. Poznań i okolice (15 km).',
         ukDesc: 'Будівельна фірма — комплексні ремонти будівель, квартир та офісів. Фарбування, шпаклювання, плитка, підлоги, монтаж гіпсокартону, електричні інсталяції, прибирання. Понад 20 років досвіду. Познань та околиці (15 км).',
         enDesc: 'Construction company — comprehensive building, apartment and office renovations. Painting, plastering, tiles, flooring, drywall, electrical installations, cleaning. Over 20 years of experience. Poznań and surroundings (15 km).',
@@ -2366,6 +2411,7 @@ async function mainSeed() {
         name: 'Dmytro Akhtyniuk',
         slug: 'dmytro-akhtyniuk',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Malowanie, remonty mieszkań, domów, łazienek i kuchni, zabudowa GK, podłogi, prace złotej rączki. 8 lat doświadczenia, ocena 5.0/5. Poznań i okolice (40 km).',
         ukDesc: 'Фарбування, ремонти квартир, будинків, ванних кімнат і кухонь, монтаж гіпсокартону, підлоги, послуги майстра. 8 років досвіду, оцінка 5.0/5. Познань та околиці (40 км).',
         enDesc: 'Painting, apartment, house, bathroom and kitchen renovations, drywall, flooring, handyman services. 8 years of experience, rated 5.0/5. Poznań and surroundings (40 km).',
@@ -2383,6 +2429,7 @@ async function mainSeed() {
         name: 'Vasyl Tsiupa',
         slug: 'vasyl-tsiupa',
         category: 'renovation',
+        image: 'remont2.png',
         plDesc: 'Remonty, malowanie, instalacje hydrauliczne i elektryczne, stolarstwo, montaż okien, płytki, prace ogrodowe, złota rączka. 13 lat doświadczenia w budownictwie, ocena 4.9/5 (27 opinii). Warszawa i okolice (31 km).',
         ukDesc: 'Ремонти, фарбування, гідравлічні та електричні інсталяції, столярство, монтаж вікон, плитка, садові роботи, майстер на всі руки. 13 років досвіду в будівництві, оцінка 4.9/5 (27 відгуків). Варшава та околиці (31 км).',
         enDesc: 'Renovations, painting, plumbing and electrical installations, carpentry, window installation, tiles, landscaping, handyman services. 13 years of construction experience, rated 4.9/5 (27 reviews). Warsaw and surroundings (31 km).',
@@ -2400,6 +2447,8 @@ async function mainSeed() {
         name: 'Serwis Remont Ihor Sobol',
         slug: 'serwis-remont-ihor-sobol',
         category: 'renovation',
+        image: 'remont3.png',
+        ukName: 'Сервіс Ремонт Ігор Соболь', enName: 'Repair Service Ihor Sobol', ruName: 'Сервис Ремонт Игорь Соболь',
         plDesc: 'Remonty, montaż i naprawy, malowanie, budowa domów, hydraulika i elektryka. Wrocław i okolice (50 km).',
         ukDesc: 'Ремонти, монтаж та ремонти, фарбування, будівництво будинків, сантехніка та електрика. Вроцлав та околиці (50 км).',
         enDesc: 'Renovations, installation and repairs, painting, house building, plumbing and electrical work. Wrocław and surroundings (50 km).',
@@ -2417,6 +2466,7 @@ async function mainSeed() {
         name: 'Oleh Babych',
         slug: 'oleh-babych',
         category: 'renovation',
+        image: 'remont4.png',
         plDesc: 'Specjalista malarz — malowanie ścian, sufitów, drzwi, płytek, tapetowanie, malowanie dekoracyjne, gruntowanie. Ponad 20 lat doświadczenia, ocena 5.0/5. Poznań i okolice (40 km).',
         ukDesc: 'Спеціаліст маляр — фарбування стін, стель, дверей, плитки, шпалерування, декоративне фарбування, ґрунтування. Понад 20 років досвіду, оцінка 5.0/5. Познань та околиці (40 км).',
         enDesc: 'Painting specialist — walls, ceilings, doors, tiles, wallpapering, decorative painting, priming. Over 20 years of experience, rated 5.0/5. Poznań and surroundings (40 km).',
@@ -2434,6 +2484,7 @@ async function mainSeed() {
         name: 'Volodymyr Shafran',
         slug: 'volodymyr-shafran',
         category: 'renovation',
+        image: 'remont5.png',
         plDesc: 'Remonty, montaż i naprawy, malowanie, złota rączka, sprzątanie poremontowe, transport. 133 kategorie usług. Ocena 5.0/5. Poznań i okolice.',
         ukDesc: 'Ремонти, монтаж та ремонти, фарбування, майстер на всі руки, прибирання після ремонту, транспорт. 133 категорії послуг. Оцінка 5.0/5. Познань та околиці.',
         enDesc: 'Renovations, installation and repairs, painting, handyman services, post-renovation cleaning, transport. 133 service categories. Rated 5.0/5. Poznań and surroundings.',
@@ -2451,6 +2502,7 @@ async function mainSeed() {
         name: 'Vasyl Petrytsiuk',
         slug: 'vasyl-petrytsiuk',
         category: 'renovation',
+        image: 'remont1.png',
         plDesc: 'Remonty, montaż i naprawy, malowanie, złota rączka, budowa domów, sprzątanie. 190 kategorii usług. Ocena 5.0/5. Poznań i okolice.',
         ukDesc: 'Ремонти, монтаж та ремонти, фарбування, майстер на всі руки, будівництво будинків, прибирання. 190 категорій послуг. Оцінка 5.0/5. Познань та околиці.',
         enDesc: 'Renovations, installation and repairs, painting, handyman services, house building, cleaning. 190 service categories. Rated 5.0/5. Poznań and surroundings.',
@@ -2468,6 +2520,7 @@ async function mainSeed() {
         name: 'Art Home',
         slug: 'art-home-wroclaw',
         category: 'renovation',
+        image: 'remont2.png',
         plDesc: 'Kompleksowe remonty mieszkań, domów, biur i lokali. Projektowanie wnętrz, meble na zamówienie, montaż mebli. Firma prowadzona przez Oleksandra Savkę. Wrocław.',
         ukDesc: 'Комплексні ремонти квартир, будинків, офісів та приміщень. Дизайн інтер\'єрів, меблі на замовлення, монтаж меблів. Фірма під керівництвом Олександра Савки. Вроцлав.',
         enDesc: 'Comprehensive renovations of apartments, houses, offices and premises. Interior design, custom furniture, furniture installation. Company run by Oleksandr Savka. Wrocław.',
@@ -2478,6 +2531,455 @@ async function mainSeed() {
         socials: { facebook: 'https://www.facebook.com/Art.Home.Wro' },
         locations: [
             { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 28. Igor Vonsovic - Remont mieszkania, domy. Wrocław
+    await seedService({
+        name: 'Igor Vonsovic Remont',
+        slug: 'igor-vonsovic-remont',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Remont mieszkań i domów pod klucz we Wrocławiu. Kompleksowe wykończenia wnętrz. Ul. Obrońców Poczty Gdańskiej, Wrocław.',
+        ukDesc: 'Ремонт квартир та будинків під ключ у Вроцлаві. Комплексне оздоблення інтер\'єрів. Вул. Оборонців Пошти Гданської, Вроцлав.',
+        enDesc: 'Turnkey apartment and house renovation in Wrocław. Comprehensive interior finishing. Obrońców Poczty Gdańskiej street, Wrocław.',
+        ruDesc: 'Ремонт квартир и домов под ключ во Вроцлаве. Комплексная отделка интерьеров. Ул. Оборонцув Почты Гданьской, Вроцлав.',
+        tags: ['finishing', 'painting', 'tiles', 'flooring', 'drywall', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://www.wykonczeniawnetrzwroclaw.pl/',
+        whatsappNumber: '+48796515066',
+        socials: { facebook: 'https://www.facebook.com/igorvonsovic' },
+        locations: [
+            { city: 'Wrocław', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 29. Сергей - Remont квартир Wrocław
+    await seedService({
+        name: 'Serhiy Remont Wrocław',
+        slug: 'serhiy-remont-wroclaw',
+        category: 'renovation',
+        image: 'remont4.png',
+        plDesc: 'Remonty mieszkań we Wrocławiu. Kontakt: Sergiej.',
+        ukDesc: 'Ремонт квартир у Вроцлаві. Контакт: Сергій.',
+        enDesc: 'Apartment renovations in Wrocław. Contact: Serhiy.',
+        ruDesc: 'Ремонт квартир во Вроцлаве. Контакт: Сергей.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk', 'ru'],
+        whatsappNumber: '+48 512 123 579',
+        locations: [
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 512 123 579' },
+        ],
+    });
+
+    // 30. Oleksandr Hlushchenko - Gdańsk
+    await seedService({
+        name: 'Oleksandr Hlushchenko Remont',
+        slug: 'oleksandr-hlushchenko-remont',
+        category: 'renovation',
+        image: 'remont5.png',
+        plDesc: 'Kompleksowe wykonanie robót budowlanych pod klucz. Remonty mieszkań, biur, domów, salonów wystawowych, sklepów. Płytki, hydraulika, elektryka, GK, prace malarskie i stolarskie. Gdańsk i okolice.',
+        ukDesc: 'Комплексне виконання будівельних робіт під ключ. Ремонт квартир, офісів, будинків, виставкових залів, магазинів. Плитка, сантехніка, електрика, гіпсокартон, малярні та столярні роботи. Гданськ та околиці.',
+        enDesc: 'Comprehensive turnkey construction work. Renovation of apartments, offices, houses, showrooms, shops. Tiles, plumbing, electrical, drywall, painting and carpentry. Gdańsk and surroundings.',
+        ruDesc: 'Комплексное выполнение строительных работ под ключ. Ремонт квартир, офисов, домов, выставочных залов, магазинов. Плитка, сантехника, электрика, гипсокартон, малярные и столярные работы. Гданьск и окрестности.',
+        tags: ['tiles', 'drywall', 'painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        whatsappNumber: '+48 575 877 119',
+        locations: [
+            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: 54.352, longitude: 18.6466, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 877 119', email: 'fop_rad@ukr.net' },
+        ],
+    });
+
+    // 31. M2 Remont - ремонт під ключ
+    await seedService({
+        name: 'M2 Remont',
+        slug: 'm2-remont',
+        category: 'renovation',
+        image: 'remont1.png',
+        plDesc: 'Kompleksowe remonty mieszkań pod klucz.',
+        ukDesc: 'Комплексний ремонт квартир під ключ.',
+        enDesc: 'Comprehensive turnkey apartment renovations.',
+        ruDesc: 'Комплексный ремонт квартир под ключ.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://remont-m2.com/',
+        socials: { facebook: 'https://www.facebook.com/m2remontofficial' },
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // --- WARSZAWA (z postów Facebook) ---
+
+    // 32. Ligaremontu - Vladymyr Tishyn
+    await seedService({
+        name: 'Ligaremontu',
+        slug: 'ligaremontu',
+        category: 'renovation',
+        image: 'ligaremontu.png',
+        plDesc: 'Firma remontowa wykonująca remonty pod klucz. Klejenie włókniny szklanej, papier Knauf po wszystkich kątach. Warszawa.',
+        ukDesc: 'Ремонтна фірма, що виконує ремонт під ключ. Поклейка склохолста, папір Кнауф по всіх кутах. Варшава.',
+        enDesc: 'Renovation company performing turnkey renovations. Fiberglass wallpaper, Knauf paper on all corners. Warsaw.',
+        ruDesc: 'Ремонтная фирма, выполняющая ремонт под ключ. Поклейка стеклохолста, бумага Кнауф по всем углам. Варшава.',
+        tags: ['finishing', 'painting', 'drywall', 'repair'],
+        languages: ['pl', 'uk'],
+        whatsappNumber: '+48666668946',
+        socials: { instagram: 'https://www.instagram.com/ligaremontu/' },
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 666 668 946' },
+        ],
+    });
+
+    // 33. Alex Tatsiuk
+    await seedService({
+        name: 'Alex Tatsiuk Remont',
+        slug: 'alex-tatsiuk-remont',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Jakościowe remonty mieszkań w Warszawie.',
+        ukDesc: 'Якісні ремонти квартир у Варшаві.',
+        enDesc: 'Quality apartment renovations in Warsaw.',
+        ruDesc: 'Качественные ремонты квартир в Варшаве.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 213 933', email: 'alvaresandcompany@gmail.com' },
+        ],
+    });
+
+    // 34. Dmytro Moroz - Imperium
+    await seedService({
+        name: 'Imperium DVM',
+        slug: 'imperium-dvm',
+        category: 'renovation',
+        image: 'remont4.png',
+        plDesc: 'Usługi remontowe w Warszawie.',
+        ukDesc: 'Ремонтні послуги у Варшаві.',
+        enDesc: 'Renovation services in Warsaw.',
+        ruDesc: 'Ремонтные услуги в Варшаве.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        whatsappNumber: '+48697142801',
+        socials: { instagram: 'https://www.instagram.com/imperium_dvm_group/', facebook: 'https://www.facebook.com/p/Imperium-DVM-GROUP-100049169688092/' },
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 697 142 801', email: 'imperium.dvm@gmail.com' },
+        ],
+    });
+
+    // 35. Andrij Kolodiazhnyj
+    await seedService({
+        name: 'Andrij Kolodiazhnyj Remont',
+        slug: 'andrij-kolodiazhnyj-remont',
+        category: 'renovation',
+        image: 'remont5.png',
+        plDesc: 'Kompleksowe remonty mieszkań i domów. Elektroinstalacje, hydraulika, tynki, wykończenia, GK, szpachlowanie, malowanie, laminat, płytki, montaż drzwi, demontaż. Warszawa.',
+        ukDesc: 'Комплексний ремонт квартир і будинків. Електромонтажні роботи, сантехніка, штукатурка, оздоблення, гіпсокартон, шпаклювання, фарбування, ламінат, плитка, монтаж дверей, демонтаж. Варшава.',
+        enDesc: 'Comprehensive apartment and house renovations. Electrical, plumbing, plastering, finishing, drywall, painting, laminate, tiles, door installation, demolition. Warsaw.',
+        ruDesc: 'Комплексный ремонт квартир и домов. Электромонтаж, сантехника, штукатурка, отделка, гипсокартон, шпаклёвка, покраска, ламинат, плитка, монтаж дверей, демонтаж. Варшава.',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        whatsappNumber: '+48 577 594 361',
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 577 594 361' },
+        ],
+    });
+
+    // 36. Volodymyr - remont Warszawa
+    await seedService({
+        name: 'Volodymyr Remont Warszawa',
+        slug: 'volodymyr-remont-warszawa',
+        category: 'renovation',
+        image: 'remont1.png',
+        plDesc: 'Profesjonalne usługi remontowe mieszkań, domów, biur, salonów. Od kosmetycznego do kapitalnego remontu. Pomoc w wyborze materiałów. Warszawa i okolice.',
+        ukDesc: 'Професійні послуги з ремонту квартир, будинків, офісів, салонів. Від косметичного до капітального ремонту. Допомога у виборі матеріалів. Варшава та околиці.',
+        enDesc: 'Professional renovation services for apartments, houses, offices, salons. From cosmetic to capital renovation. Help with material selection. Warsaw and surroundings.',
+        ruDesc: 'Профессиональные услуги по ремонту квартир, домов, офисов, салонов. От косметического до капитального ремонта. Помощь в выборе материалов. Варшава и окрестности.',
+        tags: ['finishing', 'painting', 'tiles', 'repair'],
+        whatsappNumber: '+48 886 167 024',
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 167 024' },
+        ],
+    });
+
+    // 37. Vlad Ch - uniwersalny wykończeniowiec
+    await seedService({
+        name: 'Vlad Ch Remont',
+        slug: 'vlad-ch-remont',
+        category: 'renovation',
+        image: 'remont2.png',
+        plDesc: 'Wykończeniowcy-uniwersaliści: płytki, elektryka, hydraulika. Remont mieszkań pod klucz. Warszawa.',
+        ukDesc: 'Внутрішні спеціалісти-універсали: плитка, електрика, гідравліка. Ремонт квартир під ключ. Варшава.',
+        enDesc: 'Universal interior specialists: tiles, electrical, plumbing. Turnkey apartment renovation. Warsaw.',
+        ruDesc: 'Внутренние специалисты-универсалы: плитка, электрика, гидравлика. Ремонт квартир под ключ. Варшава.',
+        tags: ['tiles', 'finishing', 'repair'],
+        whatsappNumber: '+48 575 364 202',
+        languages: ['pl', 'uk', 'ru'],
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 364 202' },
+        ],
+    });
+
+    // 38. Aliaksei Zamyslau - kompleksowy remont
+    await seedService({
+        name: 'Aliaksei Zamyslau Remont',
+        slug: 'aliaksei-zamyslau-remont',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Remont mieszkań, domów, biur. Wykończenia, płytki, GK, parkiet, laminat, elektryka, hydraulika, drzwi, okna, meble, kuchnie, demontaż, wywóz śmieci, transport materiałów, sprzątanie poremontowe. Warszawa i okolice.',
+        ukDesc: 'Ремонт квартир, будинків, офісів. Оздоблення, плитка, ГКЛ, паркет, ламінат, електрика, сантехніка, двері, вікна, меблі, кухні, демонтаж, вивіз сміття, транспорт матеріалів, прибирання після ремонту. Варшава та околиці.',
+        enDesc: 'Renovation of apartments, houses, offices. Finishing, tiles, drywall, parquet, laminate, electrical, plumbing, doors, windows, furniture, kitchens, demolition, waste removal, material transport, post-renovation cleaning. Warsaw and surroundings.',
+        ruDesc: 'Ремонт квартир, домов, офисов. Отделка, плитка, ГКЛ, паркет, ламинат, электрика, сантехника, двери, окна, мебель, кухни, демонтаж, вывоз мусора, транспорт материалов, уборка после ремонта. Варшава и окрестности.',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk', 'ru'],
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 780 002 838' , email: 'zamyslaualiaksei@gmail.com' },
+        ],
+    });
+
+    // 40. Ремонт Варшава і околиці (strona FB)
+    await seedService({
+        name: 'Remonty Warszawa i Okolice',
+        slug: 'remont-warszawa-okolice',
+        category: 'renovation',
+        image: 'remont5.png',
+        plDesc: 'Układanie kafelków, elektryka, malowanie pokojowe. Warszawa. Kontakt też przez Telegram.',
+        ukDesc: 'Укладання кахлів, електрика, фарбування кімнат. Варшава. Контакт також через Telegram.',
+        enDesc: 'Tile laying, electrical work, room painting. Warsaw. Also available via Telegram.',
+        ruDesc: 'Укладка кафеля, электрика, покраска комнат. Варшава. Контакт также через Telegram.',
+        tags: ['tiles', 'painting', 'repair'],
+        languages: ['pl', 'uk'],
+        whatsappNumber: '+48 886 969 813',
+        socials: { facebook: 'https://www.facebook.com/people/Ремонт-Варшава-і-околиці/61557386745645/', telegram: 'https://t.me/warszawa_remont' },
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 969 813' },
+        ],
+    });
+
+    // 41. Vasilii Zubco - Łódź
+    await seedService({
+        name: 'Vasilii Zubco Remont',
+        slug: 'vasilii-zubco-remont',
+        category: 'renovation',
+        image: 'remont1.png',
+        plDesc: 'Remonty mieszkań i biur: tynki, szpachlowanie, malowanie, płytki. Szybko i tanio. Łódź.',
+        ukDesc: 'Ремонт квартир та офісів: штукатурка, шпаклювання, фарбування, плитка. Швидко та недорого. Лодзь.',
+        enDesc: 'Apartment and office renovations: plastering, filling, painting, tiles. Fast and affordable. Łódź.',
+        ruDesc: 'Ремонт квартир и офисов: штукатурка, шпаклёвка, покраска, плитка. Быстро и недорого. Лодзь.',
+        tags: ['painting', 'tiles', 'finishing', 'repair'],
+        languages: ['pl', 'uk', 'ru'],
+        locations: [
+            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 443 237' },
+        ],
+    });
+
+    // 42. Дрібний Ремонт - Łódź
+    await seedService({
+        name: 'Dribnyj Remont',
+        slug: 'dribnyj-remont-lodz',
+        category: 'renovation',
+        image: 'remont2.png',
+        plDesc: 'Remonty mieszkań w Łodzi.',
+        ukDesc: 'Ремонт квартир у Лодзі.',
+        enDesc: 'Apartment renovations in Łódź.',
+        ruDesc: 'Ремонт квартир в Лодзи.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 796 713 544' },
+        ],
+    });
+
+    // 43. Саня Олександр - Katowice
+    await seedService({
+        name: 'Oleksandr Remont Katowice',
+        slug: 'oleksandr-remont-katowice',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Kompleksowe remonty mieszkań: kapitalny, kosmetyczny, euro, pod klucz, biura. Remonty łazienek, kuchni. Wyrównanie ścian, szpachlowanie, malowanie, parkiet, laminat, płytki, kamień dekoracyjny, elektryka, hydraulika. Katowice.',
+        ukDesc: 'Комплексний ремонт квартир: капітальний, косметичний, євро, під ключ, офіси. Ремонт ванної, кухні. Вирівнювання стін, шпаклівка, фарбування, паркет, ламінат, плитка, декоративний камінь, електрика, сантехніка. Катовіце.',
+        enDesc: 'Comprehensive apartment renovations: capital, cosmetic, euro, turnkey, offices. Bathroom and kitchen renovations. Wall leveling, plastering, painting, parquet, laminate, tiles, decorative stone, electrical, plumbing. Katowice.',
+        ruDesc: 'Комплексный ремонт квартир: капитальный, косметический, евро, под ключ, офисы. Ремонт ванной, кухни. Выравнивание стен, шпаклёвка, покраска, паркет, ламинат, плитка, декоративный камень, электрика, сантехника. Катовице.',
+        tags: ['tiles', 'flooring', 'painting', 'drywall', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 125 309' },
+        ],
+    });
+
+    // 44. Katowice Remonty i Wykończenia (Remontiago)
+    await seedService({
+        name: 'Remontiago',
+        slug: 'remontiago-katowice',
+        category: 'renovation',
+        image: 'remont4.png',
+        plDesc: 'Remonty i wykończenia mieszkań w Katowicach. Bezpłatna konsultacja. Instagram: remontiago.',
+        ukDesc: 'Ремонти та оздоблення квартир у Катовіцах. Безкоштовна консультація. Instagram: remontiago.',
+        enDesc: 'Apartment renovations and finishing in Katowice. Free consultation. Instagram: remontiago.',
+        ruDesc: 'Ремонт и отделка квартир в Катовице. Бесплатная консультация. Instagram: remontiago.',
+        tags: ['finishing', 'painting', 'tiles', 'repair'],
+        languages: ['pl', 'uk'],
+        socials: { instagram: 'https://instagram.com/remontiago' },
+        locations: [
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 570 182 180' },
+        ],
+    });
+
+    // 45. KOPA POLSKA - Олег Ковальчук
+    await seedService({
+        name: 'Kopa Polska',
+        slug: 'kopa-polska',
+        category: 'renovation',
+        image: 'remont5.png',
+        plDesc: 'Firma remontowo-budowlana. Remonty mieszkań, prace murarskie, elewacje, prace wykończeniowe. Gwarancja 1 rok. Katowice i okolice.',
+        ukDesc: 'Ремонтно-будівельна фірма. Ремонт квартир, мурарські роботи, фасади, оздоблювальні роботи. Гарантія 1 рік. Катовіце та околиці.',
+        enDesc: 'Construction and renovation company. Apartment renovations, masonry, facades, finishing works. 1 year guarantee. Katowice and surroundings.',
+        ruDesc: 'Ремонтно-строительная фирма. Ремонт квартир, каменные работы, фасады, отделочные работы. Гарантия 1 год. Катовице и окрестности.',
+        tags: ['finishing', 'painting', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://kopapolska.pl/',
+        locations: [
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 727 803 272' },
+        ],
+    });
+
+    // --- SZCZECIN ---
+
+    // 46. Remont mieszkań i biur - Szczecin (881 210 928)
+    await seedService({
+        name: 'Remont Szczecin 881',
+        slug: 'remont-szczecin-881',
+        category: 'renovation',
+        image: 'remont1.png',
+        plDesc: 'Remonty mieszkań i biur, wykończenia wnętrz. Szczecin.',
+        ukDesc: 'Ремонт квартир та офісів, внутрішнє оздоблення. Щецін.',
+        enDesc: 'Apartment and office renovations, interior finishing. Szczecin.',
+        ruDesc: 'Ремонт квартир и офисов, внутренняя отделка. Щецин.',
+        tags: ['finishing', 'painting', 'repair'],
+        languages: ['pl', 'uk', 'ru'],
+        locations: [
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 210 928' },
+        ],
+    });
+
+    // 47. Remonty wszystkiego rodzaju - Szczecin (duo)
+    await seedService({
+        name: 'Remonty Szczecin Duo',
+        slug: 'remonty-szczecin-duo',
+        category: 'renovation',
+        image: 'remont2.png',
+        plDesc: 'Remonty wszystkiego rodzaju. Szczecin. Dwa numery kontaktowe.',
+        ukDesc: 'Ремонти всіх видів. Щецін. Два контактних номери.',
+        enDesc: 'All types of renovations. Szczecin. Two contact numbers.',
+        ruDesc: 'Ремонты всех видов. Щецин. Два контактных номера.',
+        tags: ['finishing', 'painting', 'tiles', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 534 690 296' },
+        ],
+    });
+
+    // 48. Majstry universaly - Szczecin
+    await seedService({
+        name: 'Majstry Universaly Szczecin',
+        slug: 'majstry-universaly-szczecin',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Ekipa remontowa — majstrowie uniwersalni. Szczecin.',
+        ukDesc: 'Ремонтна бригада — майстри універсали. Щецін.',
+        enDesc: 'Renovation crew — universal craftsmen. Szczecin.',
+        ruDesc: 'Ремонтная бригада — мастера универсалы. Щецин.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 49. Remont domów i mieszkań - Szczecin (793 464 671)
+    await seedService({
+        name: 'Remont Szczecin 793',
+        slug: 'remont-szczecin-793',
+        category: 'renovation',
+        image: 'remont4.png',
+        plDesc: 'Remonty domów i mieszkań. Doświadczenie w branży. Szczecin.',
+        ukDesc: 'Ремонт будинків та квартир. Досвід у галузі. Щецін.',
+        enDesc: 'House and apartment renovations. Industry experience. Szczecin.',
+        ruDesc: 'Ремонт домов и квартир. Опыт в отрасли. Щецин.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 793 464 671' },
+        ],
+    });
+
+    // 50. Remonty mieszkań - Szczecin (601 654 288)
+    await seedService({
+        name: 'Remont Szczecin 601',
+        slug: 'remont-szczecin-601',
+        category: 'renovation',
+        image: 'remont5.png',
+        plDesc: 'Remonty mieszkań w Szczecinie.',
+        ukDesc: 'Ремонт квартир у Щеціні.',
+        enDesc: 'Apartment renovations in Szczecin.',
+        ruDesc: 'Ремонт квартир в Щецине.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 601 654 288' },
+        ],
+    });
+
+    // --- LUBLIN ---
+
+    // 51. Remont mieszkań Lublin (z ukraińskojęzycznego postu)
+    await seedService({
+        name: 'Remont Mieszkań Lublin UA',
+        slug: 'remont-mieszkan-lublin-ua',
+        category: 'renovation',
+        image: 'remont1.png',
+        plDesc: 'Remonty mieszkań w Lublinie. Ekipa ukraińskojęzyczna.',
+        ukDesc: 'Ремонт квартир у Любліні. Україномовна бригада.',
+        enDesc: 'Apartment renovations in Lublin. Ukrainian-speaking crew.',
+        ruDesc: 'Ремонт квартир в Люблине. Украиноязычная бригада.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 52. Usługi remontowo-naprawcze Lublin
+    await seedService({
+        name: 'Usługi Remontowe Lublin',
+        slug: 'uslugi-remontowe-lublin',
+        category: 'renovation',
+        image: 'remont2.png',
+        plDesc: 'Usługi remontowo-naprawcze na terenie Lublina i okolic.',
+        ukDesc: 'Ремонтні послуги на території Любліна та околиць.',
+        enDesc: 'Renovation and repair services in Lublin and surroundings.',
+        ruDesc: 'Ремонтные услуги на территории Люблина и окрестностей.',
+        tags: ['finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 53. Remonty, Wykończenia Wnętrz, Adaptacje - Lublin
+    await seedService({
+        name: 'Wykończenia Wnętrz Lublin',
+        slug: 'wykonczenia-wnetrz-lublin',
+        category: 'renovation',
+        image: 'remont3.png',
+        plDesc: 'Remonty, wykończenia wnętrz, adaptacje — kompleksowo. Lublin i okolice.',
+        ukDesc: 'Ремонти, оздоблення інтер\'єрів, адаптації — комплексно. Люблін та околиці.',
+        enDesc: 'Renovations, interior finishing, adaptations — comprehensive. Lublin and surroundings.',
+        ruDesc: 'Ремонты, отделка интерьеров, адаптации — комплексно. Люблин и окрестности.',
+        tags: ['finishing', 'painting', 'tiles', 'flooring', 'repair'],
+        languages: ['pl', 'uk'],
+        locations: [
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PartialService, View } from '@/types';
 import { cn } from '@/lib/utilities';
-import { formatAddress } from '@/lib/consts';
+import { formatAddress, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
 import { Button } from '@/components/ui/button/button';
 import { useTranslations } from 'next-intl';
 import React from 'react';
@@ -20,6 +20,7 @@ export const MobileBottomMarkerCard = ({
                                            currentView
                                        }: Props) => {
     const t = useTranslations('Popup');
+    const tCounties = useTranslations('MapPage.counties');
     const { handleViewChange } = useViewState();
 
     // Early return for better readability
@@ -31,7 +32,10 @@ export const MobileBottomMarkerCard = ({
     const image = selectedService.image
         ? `/services/${selectedService.image}`
         : '/default.png';
-    const address = formatAddress(selectedService);
+    const translatedVoivodeship = selectedService.voivodeship
+        ? tCounties(VOIVODESHIP_TO_MESSAGE_KEY[selectedService.voivodeship] ?? selectedService.voivodeship)
+        : null;
+    const address = formatAddress({ ...selectedService, voivodeship: translatedVoivodeship });
     const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${selectedService.latitude},${selectedService.longitude}`;
 
     const handleListViewClick = (e: React.MouseEvent) => {
