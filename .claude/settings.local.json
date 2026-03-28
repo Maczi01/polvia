@@ -36,7 +36,11 @@
       "Bash(grep:*)",
       "Bash(wc:*)",
       "WebFetch(domain:ukrainoczka.pl)",
-      "WebFetch(domain:fixly.pl)"
+      "WebFetch(domain:fixly.pl)",
+      "Bash(cat:*)",
+      "WebFetch(domain:www.facebook.com)",
+      "WebFetch(domain:art-home-wro.blogspot.com)",
+      "WebFetch(domain:www.youtube.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

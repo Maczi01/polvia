@@ -2089,6 +2089,380 @@ async function mainSeed() {
         ],
     });
 
+    // 5. Korzhak Gallen
+    await seedService({
+        name: 'Korzhak Gallen',
+        slug: 'korzhak-gallen',
+        category: 'renovation',
+        plDesc: 'Firma specjalizująca się w kompleksowych remontach mieszkań, domów oraz lokali biurowych i usługowych. Wykończenia od stanu deweloperskiego pod klucz. 16 lat doświadczenia. Wrocław i okolice.',
+        ukDesc: 'Фірма, що спеціалізується на комплексних ремонтах квартир, будинків та офісних і комерційних приміщень. Оздоблення від стану забудовника під ключ. 16 років досвіду. Вроцлав та околиці.',
+        enDesc: 'Company specializing in comprehensive renovations of apartments, houses, and office/commercial spaces. Turnkey finishing from developer state. 16 years of experience. Wrocław and surroundings.',
+        ruDesc: 'Фирма, специализирующаяся на комплексных ремонтах квартир, домов и офисных/коммерческих помещений. Отделка от состояния застройщика под ключ. 16 лет опыта. Вроцлав и окрестности.',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/korzhak',
+        locations: [
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 6. PINKEL BUD
+    await seedService({
+        name: 'Pinkel Bud',
+        slug: 'pinkel-bud',
+        category: 'renovation',
+        plDesc: 'Wykończenia wysokiego standardu z 16-letnim doświadczeniem. Tynki dekoracyjne, stiuk wenecki, beton architektoniczny, instalacje LED, zabudowa GK, sufity podwieszane, wygłuszanie, adaptacje poddaszy. 558 opinii na Fixly (4.8/5). Warszawa i okolice.',
+        ukDesc: 'Оздоблення високого стандарту з 16-річним досвідом. Декоративні штукатурки, венеціанський стук, архітектурний бетон, LED-інсталяції, монтаж гіпсокартону, підвісні стелі, звукоізоляція, адаптація мансард. 558 відгуків на Fixly (4.8/5). Варшава та околиці.',
+        enDesc: 'High-standard finishing with 16 years of experience. Decorative plasters, Venetian stucco, architectural concrete, LED installations, drywall, suspended ceilings, soundproofing, attic adaptations. 558 reviews on Fixly (4.8/5). Warsaw and surroundings.',
+        ruDesc: 'Отделка высокого стандарта с 16-летним опытом. Декоративные штукатурки, венецианский стук, архитектурный бетон, LED-инсталляции, монтаж гипсокартона, подвесные потолки, звукоизоляция, адаптация мансард. 558 отзывов на Fixly (4.8/5). Варшава и окрестности.',
+        tags: ['drywall', 'painting', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/7zvBYJNR',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'pinkel2020@interia.pl' },
+        ],
+    });
+
+    // 7. IRB Groups - Dmytro Andriutsa
+    await seedService({
+        name: 'IRB Groups',
+        slug: 'irb-groups',
+        category: 'renovation',
+        plDesc: 'Montaż ogrzewania, instalacje wod-kan, elektryka, remonty wykończeniowe, zabudowa GK ścian i sufitów, płytki i gres. 16 lat doświadczenia. Ocena 5.0/5 na Fixly. Warszawa i okolice (40 km).',
+        ukDesc: 'Монтаж опалення, водопровідні та каналізаційні інсталяції, електрика, оздоблювальні ремонти, монтаж гіпсокартону стін і стель, плитка та керамограніт. 16 років досвіду. Оцінка 5.0/5 на Fixly. Варшава та околиці (40 км).',
+        enDesc: 'Heating installation, plumbing, electrical work, finishing renovations, drywall walls and ceilings, tiles and porcelain stoneware. 16 years of experience. Rated 5.0/5 on Fixly. Warsaw and surroundings (40 km).',
+        ruDesc: 'Монтаж отопления, водопроводные и канализационные инсталляции, электрика, отделочные ремонты, монтаж гипсокартона стен и потолков, плитка и керамогранит. 16 лет опыта. Оценка 5.0/5 на Fixly. Варшава и окрестности (40 км).',
+        tags: ['tiles', 'drywall', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/dmytro-andriutsa-wijgeqase',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 8. Va-Ro - Vasyl Savko
+    await seedService({
+        name: 'Va-Ro',
+        slug: 'va-ro',
+        category: 'renovation',
+        plDesc: 'Montaż i serwis klimatyzacji, rekuperacji oraz wentylacji. Czyszczenie, odgrzybianie i naprawa klimatyzacji. 10 lat doświadczenia. Ocena 5.0/5 na Fixly. Oleśnica, Wrocław i okolice (40 km).',
+        ukDesc: 'Монтаж та сервіс кондиціонерів, рекуперації та вентиляції. Чистка, дезінфекція та ремонт кондиціонерів. 10 років досвіду. Оцінка 5.0/5 на Fixly. Олесниця, Вроцлав та околиці (40 км).',
+        enDesc: 'Air conditioning, recuperation and ventilation installation and service. Cleaning, decontamination and repair of AC systems. 10 years of experience. Rated 5.0/5 on Fixly. Oleśnica, Wrocław and surroundings (40 km).',
+        ruDesc: 'Монтаж и сервис кондиционеров, рекуперации и вентиляции. Чистка, дезинфекция и ремонт кондиционеров. 10 лет опыта. Оценка 5.0/5 на Fixly. Олесница, Вроцлав и окрестности (40 км).',
+        tags: ['ac', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/cdvbjg0q',
+        locations: [
+            { city: 'Oleśnica', street: null, voivodeship: 'dolnoslaskie', latitude: 51.2099, longitude: 17.3936, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 9. Satelit Pl19 - Oleh Nychyporuk
+    await seedService({
+        name: 'Satelit Pl19',
+        slug: 'satelit-pl19',
+        category: 'renovation',
+        plDesc: 'Pełny zakres usług elektrycznych, instalacje hydrauliczne i wod-kan, instalacje przeciwpożarowe i gazowe. 16 lat doświadczenia. Ocena 5.0/5 na Fixly. Gdańsk, Gdynia, Sopot i okolice (40 km).',
+        ukDesc: 'Повний спектр електричних послуг, гідравлічні та водопровідні інсталяції, протипожежні та газові інсталяції. 16 років досвіду. Оцінка 5.0/5 на Fixly. Гданськ, Гдиня, Сопот та околиці (40 км).',
+        enDesc: 'Full range of electrical services, hydraulic and plumbing installations, fire protection and gas installations. 16 years of experience. Rated 5.0/5 on Fixly. Gdańsk, Gdynia, Sopot and surroundings (40 km).',
+        ruDesc: 'Полный спектр электрических услуг, гидравлические и водопроводные инсталляции, противопожарные и газовые установки. 16 лет опыта. Оценка 5.0/5 на Fixly. Гданьск, Гдыня, Сопот и окрестности (40 км).',
+        tags: ['repair', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/oleh-nychyporuk-hyrhvpl_h',
+        locations: [
+            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: 54.352, longitude: 18.6466, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 10. Weekendowo - Volodymyr Handzyuk
+    await seedService({
+        name: 'Weekendowo',
+        slug: 'weekendowo',
+        category: 'renovation',
+        plDesc: 'Usługi hydrauliczne i elektryczne, kompleksowe remonty łazienek, układanie glazury i terakoty, malowanie, zabudowa GK, montaż podłóg. 19 lat doświadczenia. Ocena 5.0/5 na Fixly. Warszawa i okolice (50 km).',
+        ukDesc: 'Гідравлічні та електричні послуги, комплексні ремонти ванних кімнат, укладання глазурі та теракоти, фарбування, монтаж гіпсокартону, укладання підлог. 19 років досвіду. Оцінка 5.0/5 на Fixly. Варшава та околиці (50 км).',
+        enDesc: 'Plumbing and electrical services, comprehensive bathroom renovations, tile laying, painting, drywall, flooring installation. 19 years of experience. Rated 5.0/5 on Fixly. Warsaw and surroundings (50 km).',
+        ruDesc: 'Гидравлические и электрические услуги, комплексные ремонты ванных комнат, укладка глазури и терракоты, покраска, монтаж гипсокартона, укладка полов. 19 лет опыта. Оценка 5.0/5 на Fixly. Варшава и окрестности (50 км).',
+        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/volodymyr-handzyuk-dwptzh9dz',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 11. Oleh Honcharuk
+    await seedService({
+        name: 'Oleh Honcharuk',
+        slug: 'oleh-honcharuk',
+        category: 'renovation',
+        plDesc: 'Kompleksowe usługi remontowe, instalacyjne, hydrauliczne i elektryczne. Malowanie, prace złotej rączki. 16 lat doświadczenia w branży. Warszawa i okolice (50 km).',
+        ukDesc: 'Комплексні ремонтні, монтажні, гідравлічні та електричні послуги. Фарбування, послуги майстра на всі руки. 16 років досвіду в галузі. Варшава та околиці (50 км).',
+        enDesc: 'Comprehensive renovation, installation, plumbing and electrical services. Painting, handyman work. 16 years of industry experience. Warsaw and surroundings (50 km).',
+        ruDesc: 'Комплексные ремонтные, монтажные, гидравлические и электрические услуги. Покраска, услуги мастера на все руки. 16 лет опыта в отрасли. Варшава и окрестности (50 км).',
+        tags: ['painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/kyxceoip',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 12. DS Remonty i Wykończenia - Dmytro Shelest
+    await seedService({
+        name: 'DS Remonty i Wykończenia',
+        slug: 'ds-remonty-i-wykonczenia',
+        category: 'renovation',
+        plDesc: 'Sufity podwieszane, ścianki działowe, malowanie, tynkowanie, szpachlowanie ścian. Gwarancja jakości. 386 usług w tym hydraulika, montaż okien i drzwi, ogrzewanie. 8 lat doświadczenia, ocena 4.8/5 (61 opinii). Kraków i okolice.',
+        ukDesc: 'Підвісні стелі, перегородки, фарбування, штукатурення, шпаклювання стін. Гарантія якості. 386 послуг включаючи сантехніку, монтаж вікон і дверей, опалення. 8 років досвіду, оцінка 4.8/5 (61 відгук). Краків та околиці.',
+        enDesc: 'Suspended ceilings, partition walls, painting, plastering, wall finishing. Quality guaranteed. 386 services including plumbing, window/door installation, heating. 8 years of experience, rated 4.8/5 (61 reviews). Kraków and surroundings.',
+        ruDesc: 'Подвесные потолки, перегородки, покраска, штукатурка, шпаклёвка стен. Гарантия качества. 386 услуг включая сантехнику, монтаж окон и дверей, отопление. 8 лет опыта, оценка 4.8/5 (61 отзыв). Краков и окрестности.',
+        tags: ['drywall', 'painting', 'finishing', 'tiles', 'flooring', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/GYwmqLQk',
+        locations: [
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 13. Vasyl Zakharuk
+    await seedService({
+        name: 'Vasyl Zakharuk',
+        slug: 'vasyl-zakharuk',
+        category: 'renovation',
+        plDesc: 'Malowanie ścian, zabudowa GK, tapetowanie, wykończenia podłóg, remonty łazienek i kuchni, montaż mebli, prace złotej rączki. 19 lat doświadczenia, ocena 5.0/5 na Fixly. Kraków i okolice (40 km).',
+        ukDesc: 'Фарбування стін, монтаж гіпсокартону, шпалерування, оздоблення підлог, ремонти ванних кімнат і кухонь, збирання меблів, послуги майстра. 19 років досвіду, оцінка 5.0/5 на Fixly. Краків та околиці (40 км).',
+        enDesc: 'Wall painting, drywall, wallpapering, floor finishing, bathroom and kitchen renovations, furniture assembly, handyman services. 19 years of experience, rated 5.0/5 on Fixly. Kraków and surroundings (40 km).',
+        ruDesc: 'Покраска стен, монтаж гипсокартона, поклейка обоев, отделка полов, ремонт ванных комнат и кухонь, сборка мебели, услуги мастера. 19 лет опыта, оценка 5.0/5 на Fixly. Краков и окрестности (40 км).',
+        tags: ['painting', 'drywall', 'flooring', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/pJdy0tFO',
+        locations: [
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 14. STB - Volodymyr Yurkevych
+    await seedService({
+        name: 'STB',
+        slug: 'stb-yurkevych',
+        category: 'renovation',
+        plDesc: 'Remonty mieszkań o dowolnym stopniu trudności w krótkim terminie. Malowanie, układanie płytek, zabudowa GK, podłogi, sufity podwieszane, ocieplenie poddaszy. 8 lat doświadczenia, ocena 5.0/5 (27 opinii). Warszawa i okolice (20 km).',
+        ukDesc: 'Ремонти квартир будь-якої складності в короткі терміни. Фарбування, укладання плитки, монтаж гіпсокартону, підлоги, підвісні стелі, утеплення мансард. 8 років досвіду, оцінка 5.0/5 (27 відгуків). Варшава та околиці (20 км).',
+        enDesc: 'Apartment renovations of any difficulty in short timeframes. Painting, tile laying, drywall, flooring, suspended ceilings, attic insulation. 8 years of experience, rated 5.0/5 (27 reviews). Warsaw and surroundings (20 km).',
+        ruDesc: 'Ремонт квартир любой сложности в короткие сроки. Покраска, укладка плитки, монтаж гипсокартона, полы, подвесные потолки, утепление мансард. 8 лет опыта, оценка 5.0/5 (27 отзывов). Варшава и окрестности (20 км).',
+        tags: ['tiles', 'drywall', 'painting', 'flooring', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/volodymyr-yurkevych-1y_04tsya',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 15. Volodymyr Lytvynenko
+    await seedService({
+        name: 'Volodymyr Lytvynenko',
+        slug: 'volodymyr-lytvynenko',
+        category: 'renovation',
+        plDesc: 'Układanie płytek, parkietów i paneli, zabudowa GK, szpachlowanie, sufity podwieszane, prace fundamentowe i konstrukcyjne. 16 lat doświadczenia. Kraków i okolice (40 km).',
+        ukDesc: 'Укладання плитки, паркету та панелей, монтаж гіпсокартону, шпаклювання, підвісні стелі, фундаментні та конструкційні роботи. 16 років досвіду. Краків та околиці (40 км).',
+        enDesc: 'Tile, parquet and panel laying, drywall, plastering, suspended ceilings, foundation and structural work. 16 years of experience. Kraków and surroundings (40 km).',
+        ruDesc: 'Укладка плитки, паркета и панелей, монтаж гипсокартона, шпаклёвка, подвесные потолки, фундаментные и конструкционные работы. 16 лет опыта. Краков и окрестности (40 км).',
+        tags: ['tiles', 'flooring', 'drywall', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/flreagps',
+        locations: [
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 16. Dmytro Melnyk
+    await seedService({
+        name: 'Dmytro Melnyk',
+        slug: 'dmytro-melnyk',
+        category: 'renovation',
+        plDesc: 'Specjalista od poddaszy — adaptacja, ocieplenie, ocieplenie pianką, remont, zabudowa. Gipsowanie i szpachlowanie ścian. Kraków i okolice.',
+        ukDesc: 'Спеціаліст з мансард — адаптація, утеплення, утеплення піною, ремонт, обшивка. Гіпсування та шпаклювання стін. Краків та околиці.',
+        enDesc: 'Attic specialist — adaptation, insulation, spray foam insulation, renovation, finishing. Plastering and wall finishing. Kraków and surroundings.',
+        ruDesc: 'Специалист по мансардам — адаптация, утепление, утепление пеной, ремонт, обшивка. Гипсование и шпаклёвка стен. Краков и окрестности.',
+        tags: ['drywall', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/lkefsznq',
+        locations: [
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 17. Dmytro Andriievskyi
+    await seedService({
+        name: 'Dmytro Andriievskyi',
+        slug: 'dmytro-andriievskyi',
+        category: 'renovation',
+        plDesc: 'Malowanie ścian, układanie płytek, zabudowa GK, podłogi, remonty łazienek, wykończenia wnętrz. Kraków i okolice (40 km).',
+        ukDesc: 'Фарбування стін, укладання плитки, монтаж гіпсокартону, підлоги, ремонти ванних кімнат, оздоблення інтер\'єрів. Краків та околиці (40 км).',
+        enDesc: 'Wall painting, tile laying, drywall, flooring, bathroom renovations, interior finishing. Kraków and surroundings (40 km).',
+        ruDesc: 'Покраска стен, укладка плитки, монтаж гипсокартона, полы, ремонт ванных комнат, отделка интерьеров. Краков и окрестности (40 км).',
+        tags: ['painting', 'tiles', 'drywall', 'flooring', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/zs42ouw6',
+        locations: [
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 18. m2 Firma budowlana - Volodymyr Maksymyk
+    await seedService({
+        name: 'm2 Firma Budowlana',
+        slug: 'm2-firma-budowlana',
+        category: 'renovation',
+        plDesc: 'Malowanie, wykończenia ścian, podłogi, remonty łazienek i kuchni, tynki maszynowe. Poznań i okolice (49 km).',
+        ukDesc: 'Фарбування, оздоблення стін, підлоги, ремонти ванних кімнат і кухонь, машинні штукатурки. Познань та околиці (49 км).',
+        enDesc: 'Painting, wall finishing, flooring, bathroom and kitchen renovations, machine plastering. Poznań and surroundings (49 km).',
+        ruDesc: 'Покраска, отделка стен, полы, ремонт ванных комнат и кухонь, машинная штукатурка. Познань и окрестности (49 км).',
+        tags: ['painting', 'flooring', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/vjau29kv',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 19. E.M Bud - Dmytro Afonin
+    await seedService({
+        name: 'E.M Bud',
+        slug: 'em-bud',
+        category: 'renovation',
+        plDesc: 'Malowanie, szpachlowanie, ocieplenie, wykończenia wnętrz, montaż listew i naprawy konstrukcyjne. Meble i sprzątanie poremontowe. 4 lata doświadczenia, ocena 4.9/5 (21 opinii). Poznań i okolice (50 km).',
+        ukDesc: 'Фарбування, шпаклювання, утеплення, оздоблення інтер\'єрів, монтаж плінтусів та конструкційні ремонти. Меблі та прибирання після ремонту. 4 роки досвіду, оцінка 4.9/5 (21 відгук). Познань та околиці (50 км).',
+        enDesc: 'Painting, plastering, insulation, interior finishing, baseboard installation and structural repairs. Furniture and post-renovation cleaning. 4 years of experience, rated 4.9/5 (21 reviews). Poznań and surroundings (50 km).',
+        ruDesc: 'Покраска, шпаклёвка, утепление, отделка интерьеров, монтаж плинтусов и конструкционные ремонты. Мебель и уборка после ремонта. 4 года опыта, оценка 4.9/5 (21 отзыв). Познань и окрестности (50 км).',
+        tags: ['painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/0ku3bpls',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 20. IVI BUD - Ihor Mysko
+    await seedService({
+        name: 'IVI BUD',
+        slug: 'ivi-bud',
+        category: 'renovation',
+        plDesc: 'Firma budowlana — kompleksowe remonty budynków, mieszkań i biur. Malowanie, szpachlowanie, płytki, podłogi, zabudowa GK, instalacje elektryczne, sprzątanie. Ponad 20 lat doświadczenia. Poznań i okolice (15 km).',
+        ukDesc: 'Будівельна фірма — комплексні ремонти будівель, квартир та офісів. Фарбування, шпаклювання, плитка, підлоги, монтаж гіпсокартону, електричні інсталяції, прибирання. Понад 20 років досвіду. Познань та околиці (15 км).',
+        enDesc: 'Construction company — comprehensive building, apartment and office renovations. Painting, plastering, tiles, flooring, drywall, electrical installations, cleaning. Over 20 years of experience. Poznań and surroundings (15 km).',
+        ruDesc: 'Строительная фирма — комплексные ремонты зданий, квартир и офисов. Покраска, шпаклёвка, плитка, полы, монтаж гипсокартона, электроинсталляции, уборка. Более 20 лет опыта. Познань и окрестности (15 км).',
+        tags: ['painting', 'tiles', 'flooring', 'drywall', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/ytw1l97n',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 21. Dmytro Akhtyniuk
+    await seedService({
+        name: 'Dmytro Akhtyniuk',
+        slug: 'dmytro-akhtyniuk',
+        category: 'renovation',
+        plDesc: 'Malowanie, remonty mieszkań, domów, łazienek i kuchni, zabudowa GK, podłogi, prace złotej rączki. 8 lat doświadczenia, ocena 5.0/5. Poznań i okolice (40 km).',
+        ukDesc: 'Фарбування, ремонти квартир, будинків, ванних кімнат і кухонь, монтаж гіпсокартону, підлоги, послуги майстра. 8 років досвіду, оцінка 5.0/5. Познань та околиці (40 км).',
+        enDesc: 'Painting, apartment, house, bathroom and kitchen renovations, drywall, flooring, handyman services. 8 years of experience, rated 5.0/5. Poznań and surroundings (40 km).',
+        ruDesc: 'Покраска, ремонт квартир, домов, ванных комнат и кухонь, монтаж гипсокартона, полы, услуги мастера. 8 лет опыта, оценка 5.0/5. Познань и окрестности (40 км).',
+        tags: ['painting', 'drywall', 'flooring', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/frmglsru',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 22. Vasyl Tsiupa
+    await seedService({
+        name: 'Vasyl Tsiupa',
+        slug: 'vasyl-tsiupa',
+        category: 'renovation',
+        plDesc: 'Remonty, malowanie, instalacje hydrauliczne i elektryczne, stolarstwo, montaż okien, płytki, prace ogrodowe, złota rączka. 13 lat doświadczenia w budownictwie, ocena 4.9/5 (27 opinii). Warszawa i okolice (31 km).',
+        ukDesc: 'Ремонти, фарбування, гідравлічні та електричні інсталяції, столярство, монтаж вікон, плитка, садові роботи, майстер на всі руки. 13 років досвіду в будівництві, оцінка 4.9/5 (27 відгуків). Варшава та околиці (31 км).',
+        enDesc: 'Renovations, painting, plumbing and electrical installations, carpentry, window installation, tiles, landscaping, handyman services. 13 years of construction experience, rated 4.9/5 (27 reviews). Warsaw and surroundings (31 km).',
+        ruDesc: 'Ремонты, покраска, гидравлические и электрические инсталляции, столярство, монтаж окон, плитка, садовые работы, мастер на все руки. 13 лет опыта в строительстве, оценка 4.9/5 (27 отзывов). Варшава и окрестности (31 км).',
+        tags: ['painting', 'tiles', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/lnl6z68f',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 23. Serwis Remont - Ihor Sobol
+    await seedService({
+        name: 'Serwis Remont Ihor Sobol',
+        slug: 'serwis-remont-ihor-sobol',
+        category: 'renovation',
+        plDesc: 'Remonty, montaż i naprawy, malowanie, budowa domów, hydraulika i elektryka. Wrocław i okolice (50 km).',
+        ukDesc: 'Ремонти, монтаж та ремонти, фарбування, будівництво будинків, сантехніка та електрика. Вроцлав та околиці (50 км).',
+        enDesc: 'Renovations, installation and repairs, painting, house building, plumbing and electrical work. Wrocław and surroundings (50 km).',
+        ruDesc: 'Ремонты, монтаж и ремонты, покраска, строительство домов, сантехника и электрика. Вроцлав и окрестности (50 км).',
+        tags: ['painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/m1m5tfjm',
+        locations: [
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 24. Oleh Babych
+    await seedService({
+        name: 'Oleh Babych',
+        slug: 'oleh-babych',
+        category: 'renovation',
+        plDesc: 'Specjalista malarz — malowanie ścian, sufitów, drzwi, płytek, tapetowanie, malowanie dekoracyjne, gruntowanie. Ponad 20 lat doświadczenia, ocena 5.0/5. Poznań i okolice (40 km).',
+        ukDesc: 'Спеціаліст маляр — фарбування стін, стель, дверей, плитки, шпалерування, декоративне фарбування, ґрунтування. Понад 20 років досвіду, оцінка 5.0/5. Познань та околиці (40 км).',
+        enDesc: 'Painting specialist — walls, ceilings, doors, tiles, wallpapering, decorative painting, priming. Over 20 years of experience, rated 5.0/5. Poznań and surroundings (40 km).',
+        ruDesc: 'Специалист маляр — покраска стен, потолков, дверей, плитки, поклейка обоев, декоративная покраска, грунтовка. Более 20 лет опыта, оценка 5.0/5. Познань и окрестности (40 км).',
+        tags: ['painting', 'finishing'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/mo4i13va',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 25. Volodymyr Shafran
+    await seedService({
+        name: 'Volodymyr Shafran',
+        slug: 'volodymyr-shafran',
+        category: 'renovation',
+        plDesc: 'Remonty, montaż i naprawy, malowanie, złota rączka, sprzątanie poremontowe, transport. 133 kategorie usług. Ocena 5.0/5. Poznań i okolice.',
+        ukDesc: 'Ремонти, монтаж та ремонти, фарбування, майстер на всі руки, прибирання після ремонту, транспорт. 133 категорії послуг. Оцінка 5.0/5. Познань та околиці.',
+        enDesc: 'Renovations, installation and repairs, painting, handyman services, post-renovation cleaning, transport. 133 service categories. Rated 5.0/5. Poznań and surroundings.',
+        ruDesc: 'Ремонты, монтаж и ремонты, покраска, мастер на все руки, уборка после ремонта, транспорт. 133 категории услуг. Оценка 5.0/5. Познань и окрестности.',
+        tags: ['painting', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/blbzyyaz',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 26. Vasyl Petrytsiuk
+    await seedService({
+        name: 'Vasyl Petrytsiuk',
+        slug: 'vasyl-petrytsiuk',
+        category: 'renovation',
+        plDesc: 'Remonty, montaż i naprawy, malowanie, złota rączka, budowa domów, sprzątanie. 190 kategorii usług. Ocena 5.0/5. Poznań i okolice.',
+        ukDesc: 'Ремонти, монтаж та ремонти, фарбування, майстер на всі руки, будівництво будинків, прибирання. 190 категорій послуг. Оцінка 5.0/5. Познань та околиці.',
+        enDesc: 'Renovations, installation and repairs, painting, handyman services, house building, cleaning. 190 service categories. Rated 5.0/5. Poznań and surroundings.',
+        ruDesc: 'Ремонты, монтаж и ремонты, покраска, мастер на все руки, строительство домов, уборка. 190 категорий услуг. Оценка 5.0/5. Познань и окрестности.',
+        tags: ['painting', 'drywall', 'flooring', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://fixly.pl/profil/zdqa3sik',
+        locations: [
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
     console.log('✅ Seed zakończony z tagami!');
 }
 

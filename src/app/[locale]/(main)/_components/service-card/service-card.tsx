@@ -338,9 +338,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
         const whatsappLink = whatsappNumber
             ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`
-            : socials?.whatsapp ?? (phoneNumber
-                ? `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}`
-                : null);
+            : socials?.whatsapp ?? null;
 
         const navigateLink = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 

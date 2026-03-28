@@ -1,6 +1,11 @@
 import { ReactNode } from 'react';
 import { Link } from '@/i18n/navigation';
 import { LayoutDashboard, List, Plus } from 'lucide-react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     return (

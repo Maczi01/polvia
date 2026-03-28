@@ -4,7 +4,7 @@ import { getPosts } from '@/lib/posts';
 import { CATEGORY_SLUGS, COUNTY_SLUGS } from '@/lib/slug-mappings';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://polvia.com';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl';
     const currentDate = new Date().toISOString();
 
     // -------------------------------------------------------
@@ -172,27 +172,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ] as MetadataRoute.Sitemap);
 
     // -------------------------------------------------------
-    // 6. Category + County — /mapa/{category}/{county}
+    // 6. Łączymy wszystko
+    // (Kombinacje category+county pominięte — zbyt wiele stron z thin content)
     // -------------------------------------------------------
-    const combinationPages: MetadataRoute.Sitemap = categoryKeys.flatMap(key =>
-        COUNTY_SLUGS.flatMap(county => [
-            {
-                url: `${baseUrl}/mapa/${CATEGORY_SLUGS.pl[key]}/${county}`,
-                lastModified: currentDate,
-                changeFrequency: 'weekly',
-                priority: 0.4,
-            },
-            {
-                url: `${baseUrl}/en/map/${CATEGORY_SLUGS.en[key]}/${county}`,
-                lastModified: currentDate,
-                changeFrequency: 'weekly',
-                priority: 0.4,
-            },
-        ] as MetadataRoute.Sitemap),
-    );
-
-    // -------------------------------------------------------
-    // 7. Łączymy wszystko
-    // -------------------------------------------------------
-    return [...rootPages, ...staticPages, ...blogPages, ...categoryPages, ...countyPages, ...combinationPages];
+    return [...rootPages, ...staticPages, ...blogPages, ...categoryPages, ...countyPages];
 }

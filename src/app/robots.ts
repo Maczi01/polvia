@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://polvia.com';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl';
 
     return {
         rules: {
@@ -16,6 +16,7 @@ export default function robots(): MetadataRoute.Robots {
                 '/api/',
                 '/_next/',
                 '/admin/',
+                '/dashboard/',
                 '*.pdf$',
             ],
         },
