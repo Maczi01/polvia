@@ -5,7 +5,7 @@ import {
     EnglishMediaTable,
     PolishMediaTable,
 } from '@/app/[locale]/blog/_components/polish-media-table-pl';
-import { DataProcessingTableEN, DataProcessingTablePL } from '@/app/[locale]/blog/_components/data-processing-table';
+import { DataProcessingTableEN, DataProcessingTablePL, DataProcessingTableRU, DataProcessingTableUK } from '@/app/[locale]/blog/_components/data-processing-table';
 
 function Code({ children, ...props }: any) {
     const codeHTML = highlight(children);
@@ -38,7 +38,9 @@ const components = {
     PolishMediaTable,
     EnglishMediaTable,
     DataProcessingTablePL,
-    DataProcessingTableEN
+    DataProcessingTableEN,
+    DataProcessingTableRU,
+    DataProcessingTableUK
 };
 
 export const MDXContent = (props: JSX.IntrinsicAttributes & MDXRemoteProps) => {

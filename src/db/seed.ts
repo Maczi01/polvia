@@ -2463,6 +2463,24 @@ async function mainSeed() {
         ],
     });
 
+    // 27. Art Home - Oleksandr Savka
+    await seedService({
+        name: 'Art Home',
+        slug: 'art-home-wroclaw',
+        category: 'renovation',
+        plDesc: 'Kompleksowe remonty mieszkań, domów, biur i lokali. Projektowanie wnętrz, meble na zamówienie, montaż mebli. Firma prowadzona przez Oleksandra Savkę. Wrocław.',
+        ukDesc: 'Комплексні ремонти квартир, будинків, офісів та приміщень. Дизайн інтер\'єрів, меблі на замовлення, монтаж меблів. Фірма під керівництвом Олександра Савки. Вроцлав.',
+        enDesc: 'Comprehensive renovations of apartments, houses, offices and premises. Interior design, custom furniture, furniture installation. Company run by Oleksandr Savka. Wrocław.',
+        ruDesc: 'Комплексные ремонты квартир, домов, офисов и помещений. Дизайн интерьеров, мебель на заказ, монтаж мебели. Фирма под руководством Александра Савки. Вроцлав.',
+        tags: ['finishing', 'painting', 'tiles', 'flooring', 'drywall', 'repair'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://art-home-wro.blogspot.com/',
+        socials: { facebook: 'https://www.facebook.com/Art.Home.Wro' },
+        locations: [
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
     console.log('✅ Seed zakończony z tagami!');
 }
 
