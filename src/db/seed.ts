@@ -118,6 +118,10 @@ async function mainSeed() {
         { key: 'pro-service', pl: 'Profesjonalny serwis', uk: 'Професійний сервіс', en: 'Pro Service', ru: 'Профессиональный сервис' },
         { key: 'engine-repair', pl: 'Naprawa silnika', uk: 'Ремонт двигуна', en: 'Engine Repair', ru: 'Ремонт двигателя' },
         { key: 'clutch', pl: 'Sprzęgło', uk: 'Зчеплення', en: 'Clutch', ru: 'Сцепление' },
+        { key: 'accounting', pl: 'Księgowość', uk: 'Бухгалтерія', en: 'Accounting', ru: 'Бухгалтерия' },
+        { key: 'tax', pl: 'Podatki', uk: 'Податки', en: 'Tax', ru: 'Налоги' },
+        { key: 'business-registration', pl: 'Rejestracja firmy', uk: 'Реєстрація фірми', en: 'Business Registration', ru: 'Регистрация фирмы' },
+        { key: 'foreigners', pl: 'Cudzoziemcy', uk: 'Іноземці', en: 'Foreigners', ru: 'Иностранцы' },
     ];
 
     for (const t of tagsToCreate) {
@@ -2980,6 +2984,455 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         locations: [
             { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // --- KSIĘGOWOŚĆ / FINANSE / PRAWO (nowe firmy) ---
+
+    // 54. UKDN Biuro Rachunkowe
+    await seedService({
+        name: 'UKDN Biuro Rachunkowe',
+        slug: 'ukdn-biuro-rachunkowe',
+        category: 'financial',
+        ukName: 'UKDN Бухгалтерія', enName: 'UKDN Accounting Office', ruName: 'UKDN Бухгалтерия',
+        plDesc: 'Biuro rachunkowe z Warszawy specjalizujące się w obsłudze biznesu z Europy Wschodniej. Księgowość uproszczona i pełna, kadry i płace, rejestracja firm, doradztwo podatkowe, zwroty VAT oraz pozwolenia na pracę.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що спеціалізується на обслуговуванні бізнесу зі Східної Європи. Спрощена та повна бухгалтерія, кадри та зарплати, реєстрація фірм, податкові консультації, повернення ПДВ та дозволи на роботу.',
+        enDesc: 'Warsaw-based accounting office specializing in serving Eastern European businesses. Simplified and full accounting, payroll, company registration, tax consulting, VAT refunds and work permits.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на обслуживании бизнеса из Восточной Европы. Упрощённая и полная бухгалтерия, кадры и зарплаты, регистрация фирм, налоговые консультации, возврат НДС и разрешения на работу.',
+        tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://ukdn.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'Ochota', voivodeship: 'mazowieckie', latitude: 52.2135, longitude: 20.9815, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 573 535 803', email: 'biuro@ukdn.pl' },
+        ],
+    });
+
+    // 55. OK-Service
+    await seedService({
+        name: 'OK-Service',
+        slug: 'ok-service',
+        category: 'financial',
+        ukName: 'OK-Service', enName: 'OK-Service', ruName: 'OK-Service',
+        plDesc: 'Biuro rachunkowe w Warszawie oferujące księgowość, rejestrację firm, legalizację pobytu cudzoziemców, audyty finansowe, wirtualne biuro oraz kompleksowe wsparcie biznesowe w języku ukraińskim i polskim.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що пропонує бухгалтерію, реєстрацію фірм, легалізацію перебування іноземців, фінансові аудити, віртуальний офіс та комплексну підтримку бізнесу українською та польською мовами.',
+        enDesc: 'Warsaw accounting office offering bookkeeping, company registration, foreigner legalization, financial audits, virtual office and comprehensive business support in Ukrainian and Polish.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее бухгалтерию, регистрацию фирм, легализацию пребывания иностранцев, финансовые аудиты, виртуальный офис и комплексную поддержку бизнеса на украинском и польском языках.',
+        tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk'],
+        socials: { instagram: 'https://www.instagram.com/okservice.com.pl/' },
+        webpage: 'https://www.okservice.com.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Modlińska 6A lokal 107', voivodeship: 'mazowieckie', latitude: 52.2985, longitude: 20.9955, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 660 435 218', email: 'biuro@okservice.com.pl' },
+        ],
+    });
+
+    // 56. Business Life
+    await seedService({
+        name: 'Business Life',
+        slug: 'business-life',
+        category: 'financial',
+        ukName: 'Business Life', enName: 'Business Life', ruName: 'Business Life',
+        plDesc: 'Biuro księgowe dla Ukraińców w Warszawie. Pełna i uproszczona księgowość, zakładanie firm, obsługa dokumentów urzędowych, PESEL, profil zaufany, pozwolenia na pobyt, rejestracja pojazdów i licencje taxi.',
+        ukDesc: 'Бухгалтерське бюро для українців у Варшаві. Повна та спрощена бухгалтерія, відкриття фірм, оформлення документів, PESEL, довірений профіль, дозволи на перебування, реєстрація авто та ліцензії таксі.',
+        enDesc: 'Accounting office for Ukrainians in Warsaw. Full and simplified bookkeeping, company establishment, document handling, PESEL, trusted profile, residence permits, vehicle registration and taxi licenses.',
+        ruDesc: 'Бухгалтерское бюро для украинцев в Варшаве. Полная и упрощённая бухгалтерия, открытие фирм, оформление документов, PESEL, доверенный профиль, разрешения на пребывание, регистрация авто и лицензии такси.',
+        tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://biuro-businesslife.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'Mokotów', voivodeship: 'mazowieckie', latitude: 52.1935, longitude: 21.0355, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 516 736 060' },
+        ],
+    });
+
+    // 57. Tax Safe
+    await seedService({
+        name: 'Tax Safe',
+        slug: 'tax-safe',
+        category: 'financial',
+        ukName: 'Tax Safe', enName: 'Tax Safe', ruName: 'Tax Safe',
+        plDesc: 'Ogólnopolska sieć biur rachunkowych z ponad 25-letnim doświadczeniem. Ponad 40 oddziałów w Polsce. Oferuje usługi księgowe dedykowane klientom z Ukrainy – prowadzenie firmy, rozliczenia podatkowe i doradztwo.',
+        ukDesc: 'Загальнопольська мережа бухгалтерських бюро з понад 25-річним досвідом. Понад 40 відділень у Польщі. Пропонує бухгалтерські послуги для клієнтів з України – ведення фірми, податкові розрахунки та консультації.',
+        enDesc: 'Nationwide network of accounting offices with over 25 years of experience. Over 40 branches in Poland. Offers accounting services dedicated to Ukrainian clients – business management, tax settlements and advisory.',
+        ruDesc: 'Общепольская сеть бухгалтерских бюро с более чем 25-летним опытом. Более 40 отделений в Польше. Предлагает бухгалтерские услуги для клиентов из Украины – ведение фирмы, налоговые расчёты и консультации.',
+        tags: ['accounting', 'tax', 'foreigners'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://taxsafe.pl/',
+        socials: { facebook: 'https://www.facebook.com/taxsafepl/' },
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 692 102 000', email: 'serwis@taxsafe.pl' },
+        ],
+    });
+
+    // 58. WW Finance
+    await seedService({
+        name: 'WW Finance',
+        slug: 'ww-finance',
+        category: 'financial',
+        ukName: 'WW Finance', enName: 'WW Finance', ruName: 'WW Finance',
+        plDesc: 'Biuro rachunkowe w Warszawie oferujące pełną księgowość, deklaracje podatkowe, kadry i płace, rozliczenia VAT, rejestrację firm, pomoc w otwarciu konta bankowego oraz wsparcie kredytowe i leasingowe. Obsługa w języku ukraińskim, rosyjskim i polskim.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що пропонує повну бухгалтерію, податкові декларації, кадри та зарплати, розрахунки ПДВ, реєстрацію фірм, допомогу у відкритті банківського рахунку та кредитну і лізингову підтримку. Обслуговування українською, російською та польською мовами.',
+        enDesc: 'Warsaw accounting office offering full bookkeeping, tax declarations, payroll, VAT accounting, company registration, bank account setup and credit/leasing support. Service in Ukrainian, Russian and Polish.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее полную бухгалтерию, налоговые декларации, кадры и зарплаты, расчёты НДС, регистрацию фирм, помощь в открытии банковского счёта и кредитную и лизинговую поддержку. Обслуживание на украинском, русском и польском языках.',
+        tags: ['accounting', 'tax', 'business-registration', 'documents'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        webpage: 'https://ww-finance.pl/ru/',
+        socials: { facebook: 'https://www.facebook.com/profile.php?id=61550059505406' },
+        locations: [
+            { city: 'Warszawa', street: 'ul. Nowogrodzka 31 lok. 414', voivodeship: 'mazowieckie', latitude: 52.2275, longitude: 21.0125, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 664 270 133' },
+        ],
+    });
+
+    // 59. Buchalter Warszawa (GURU SERWIS)
+    await seedService({
+        name: 'Buchalter Warszawa',
+        slug: 'buchalter-warszawa',
+        category: 'financial',
+        plName: 'Buchalter Warszawa',
+        ukName: 'Бухгалтер Варшава', enName: 'Buchalter Warsaw', ruName: 'Бухгалтер Варшава',
+        plDesc: 'Biuro rachunkowe w centrum Warszawy. Pełna księgowość dla spółek i JDG, rozliczenia podatkowe, kadry i płace, legalizacja pobytu cudzoziemców, konsultacje księgowe 24/7 oraz outsourcing rachunkowości.',
+        ukDesc: 'Бухгалтерське бюро в центрі Варшави. Повна бухгалтерія для компаній та ФОП, податкові розрахунки, кадри та зарплати, легалізація перебування іноземців, бухгалтерські консультації 24/7 та аутсорсинг бухгалтерії.',
+        enDesc: 'Accounting office in central Warsaw. Full bookkeeping for companies and sole traders, tax settlements, payroll, foreigner legalization, 24/7 accounting consultations and outsourcing.',
+        ruDesc: 'Бухгалтерское бюро в центре Варшавы. Полная бухгалтерия для компаний и ИП, налоговые расчёты, кадры и зарплаты, легализация пребывания иностранцев, бухгалтерские консультации 24/7 и аутсорсинг бухгалтерии.',
+        tags: ['accounting', 'tax', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://buchalterwarszawa.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Grzybowska 87', voivodeship: 'mazowieckie', latitude: 52.2345, longitude: 20.9925, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 799 894 969', email: 'buchalterwarszawa.pl@gmail.com' },
+        ],
+    });
+
+    // 60. Lasko Biuro Rachunkowe
+    await seedService({
+        name: 'Lasko Biuro Rachunkowe',
+        slug: 'lasko-biuro-rachunkowe',
+        category: 'financial',
+        ukName: 'Lasko Бухгалтерія', enName: 'Lasko Accounting Office', ruName: 'Lasko Бухгалтерия',
+        plDesc: 'Biuro rachunkowe we Wrocławiu. Ryczałt, KPiR, pełna księgowość, kadry i płace, rejestracja działalności, rozliczenia VAT, doradztwo podatkowe, audyty oraz pomoc w pozyskaniu finansowania.',
+        ukDesc: 'Бухгалтерське бюро у Вроцлаві. Спрощене та повне ведення бухгалтерії, кадри та зарплати, реєстрація діяльності, розрахунки ПДВ, податкові консультації, аудити та допомога у залученні фінансування.',
+        enDesc: 'Accounting office in Wrocław. Lump sum, KPiR, full bookkeeping, payroll, business registration, VAT settlements, tax consulting, audits and financing support.',
+        ruDesc: 'Бухгалтерское бюро во Вроцлаве. Упрощённая и полная бухгалтерия, кадры и зарплаты, регистрация деятельности, расчёты НДС, налоговые консультации, аудиты и помощь в получении финансирования.',
+        tags: ['accounting', 'tax', 'business-registration'],
+        languages: ['pl'],
+        socials: { facebook: 'https://www.facebook.com/Biuro.Rachunkowe.Lasko', instagram: 'https://www.instagram.com/laskobiurorachunkowe/' },
+        webpage: 'https://lasko.com.pl/uslugi-ksiegowe/',
+        locations: [
+            { city: 'Wrocław', street: 'ul. Świdnicka 39, oficyna 1 p. pok. 2', voivodeship: 'dolnoslaskie', latitude: 51.1055, longitude: 17.0295, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 71 787 99 77' },
+        ],
+    });
+
+    // 61. MDDP UA Hub
+    await seedService({
+        name: 'MDDP UA Hub',
+        slug: 'mddp-ua-hub',
+        category: 'financial',
+        ukName: 'MDDP UA Hub', enName: 'MDDP UA Hub', ruName: 'MDDP UA Hub',
+        plDesc: 'Dział UA Hub kancelarii MDDP oferujący kompleksowe doradztwo podatkowe i prawne dla ukraińskich firm i organizacji pozarządowych wchodzących na polski rynek. Wsparcie formalno-prawne i organizacyjne.',
+        ukDesc: 'Відділ UA Hub канцелярії MDDP, що пропонує комплексне податкове та юридичне консультування для українських компаній та НУО, які виходять на польський ринок. Формально-правова та організаційна підтримка.',
+        enDesc: 'UA Hub division of MDDP law firm offering comprehensive tax and legal advisory for Ukrainian companies and NGOs entering the Polish market. Formal, legal and organizational support.',
+        ruDesc: 'Отдел UA Hub канцелярии MDDP, предлагающий комплексное налоговое и юридическое консультирование для украинских компаний и НКО, выходящих на польский рынок. Формально-правовая и организационная поддержка.',
+        tags: ['tax', 'legal', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'en'],
+        socials: { facebook: 'https://www.facebook.com/mddp.kariera', linkedin: 'https://www.linkedin.com/company/mddp/', instagram: 'https://www.instagram.com/mddp.kariera_pl/' },
+        webpage: 'https://www.mddp.pl/ua-hub-kompleksowe-doradztwo-podatkowe/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Senatorska 18a', voivodeship: 'mazowieckie', latitude: 52.2425, longitude: 21.0085, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 22 322 68 88', email: 'biuro@mddp.pl' },
+        ],
+    });
+
+    // 62. Kancelaria MJ-Legal
+    await seedService({
+        name: 'Kancelaria Adwokacka MJ-Legal',
+        slug: 'mj-legal',
+        category: 'law',
+        ukName: 'Адвокатська канцелярія MJ-Legal', enName: 'MJ-Legal Law Office', ruName: 'Адвокатская канцелярия MJ-Legal',
+        plDesc: 'Kancelaria adwokacka specjalizująca się w prawie handlowym i obsłudze prawnej Ukraińców zakładających firmy w Polsce. Kompleksowe doradztwo prawne, rejestracja spółek, prawo pracy, ochrona własności intelektualnej.',
+        ukDesc: 'Адвокатська канцелярія, що спеціалізується на комерційному праві та юридичному обслуговуванні українців, які відкривають бізнес у Польщі. Комплексне юридичне консультування, реєстрація компаній, трудове право, захист інтелектуальної власності.',
+        enDesc: 'Law firm specializing in commercial law and legal services for Ukrainians starting businesses in Poland. Comprehensive legal advice, company registration, labor law, intellectual property protection.',
+        ruDesc: 'Адвокатская канцелярия, специализирующаяся на коммерческом праве и юридическом обслуживании украинцев, открывающих бизнес в Польше. Комплексное юридическое консультирование, регистрация компаний, трудовое право, защита интеллектуальной собственности.',
+        tags: ['legal', 'documents', 'business-registration', 'foreigners'],
+        languages: ['pl', 'uk'],
+        socials: { facebook: 'https://www.facebook.com/profile.php?id=100077966179786', instagram: 'https://www.instagram.com/it_mustbe_law/', linkedin: 'https://www.linkedin.com/in/marzena-jakowenko/' },
+        webpage: 'https://mj-legal.pl/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 530 705 565', email: 'office@mj-legal.pl' },
+        ],
+    });
+
+    // 63. Biuro Rachunkowe Precyzja
+    await seedService({
+        name: 'Biuro Rachunkowe Precyzja',
+        slug: 'biuro-precyzja',
+        category: 'financial',
+        ukName: 'Бухгалтерське бюро Precyzja', enName: 'Precyzja Accounting Office', ruName: 'Бухгалтерское бюро Precyzja',
+        plDesc: 'Biuro rachunkowe w Warszawie specjalizujące się w obsłudze Ukraińców prowadzących firmę w Polsce. Księgowość JDG i spółek, rozliczenia międzynarodowe, zaświadczenia A1, kadry i płace oraz księgowość online.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що спеціалізується на обслуговуванні українців, які ведуть бізнес у Польщі. Бухгалтерія ФОП та компаній, міжнародні розрахунки, довідки A1, кадри та зарплати та онлайн-бухгалтерія.',
+        enDesc: 'Accounting office in Warsaw specializing in serving Ukrainians running businesses in Poland. Bookkeeping for sole traders and companies, international settlements, A1 certificates, payroll and online accounting.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на обслуживании украинцев, ведущих бизнес в Польше. Бухгалтерия ИП и компаний, международные расчёты, справки A1, кадры и зарплаты и онлайн-бухгалтерия.',
+        tags: ['accounting', 'tax', 'foreigners', 'documents'],
+        languages: ['pl', 'uk'],
+        socials: { facebook: 'https://www.facebook.com/BiuroPrecyzja', linkedin: 'https://www.linkedin.com/company/biuro-precyzja/' },
+        webpage: 'https://www.biuroprecyzja.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Twarda 18', voivodeship: 'mazowieckie', latitude: 52.2325, longitude: 20.9995, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 517 855 874', email: 'biuro@biuroprecyzja.pl' },
+        ],
+    });
+
+    // 64. Portal biznes.gov.pl/Ukraina
+    await seedService({
+        name: 'Biznes.gov.pl – Portal dla Ukraińców',
+        slug: 'biznes-gov-pl-ukraina',
+        category: 'help_support',
+        ukName: 'Biznes.gov.pl – Портал для українців', enName: 'Biznes.gov.pl – Portal for Ukrainians', ruName: 'Biznes.gov.pl – Портал для украинцев',
+        plDesc: 'Rządowy portal Ministerstwa Rozwoju i Technologii z informacjami dla Ukraińców o zakładaniu i prowadzeniu działalności gospodarczej w Polsce, uzyskaniu numeru PESEL oraz zatrudnieniu. Dostępny w języku ukraińskim.',
+        ukDesc: 'Урядовий портал Міністерства розвитку і технологій з інформацією для українців про відкриття та ведення бізнесу в Польщі, отримання номера PESEL та працевлаштування. Доступний українською мовою.',
+        enDesc: 'Government portal by the Ministry of Development and Technology with information for Ukrainians about starting and running a business in Poland, obtaining a PESEL number and employment. Available in Ukrainian.',
+        ruDesc: 'Правительственный портал Министерства развития и технологий с информацией для украинцев об открытии и ведении бизнеса в Польше, получении номера PESEL и трудоустройстве. Доступен на украинском языке.',
+        tags: ['legal', 'documents', 'foreigners', 'business-registration'],
+        languages: ['pl', 'uk'],
+        webpage: 'https://www.biznes.gov.pl/pl/ukraina',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 65. KIDP – Wyszukiwarka doradców podatkowych
+    await seedService({
+        name: 'KIDP – Krajowa Izba Doradców Podatkowych',
+        slug: 'kidp-wyszukaj-doradce',
+        category: 'financial',
+        ukName: 'KIDP – Національна палата податкових консультантів', enName: 'KIDP – National Chamber of Tax Advisors', ruName: 'KIDP – Национальная палата налоговых консультантов',
+        plDesc: 'Oficjalna wyszukiwarka Krajowej Izby Doradców Podatkowych pozwalająca znaleźć certyfikowanego doradcę podatkowego w całej Polsce. Weryfikacja uprawnień, szkolenia i mediacja.',
+        ukDesc: 'Офіційна пошукова система Національної палати податкових консультантів, що дозволяє знайти сертифікованого податкового консультанта по всій Польщі. Перевірка кваліфікації, навчання та медіація.',
+        enDesc: 'Official search engine of the National Chamber of Tax Advisors for finding certified tax advisors across Poland. Credential verification, training and mediation.',
+        ruDesc: 'Официальная поисковая система Национальной палаты налоговых консультантов для поиска сертифицированного налогового консультанта по всей Польше. Проверка квалификации, обучение и медиация.',
+        tags: ['tax', 'legal', 'documents'],
+        languages: ['pl'],
+        webpage: 'https://kidp.pl/wyszukaj-doradce-podatkowego',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 66. Finexpert (Finance Expert)
+    await seedService({
+        name: 'Finexpert',
+        slug: 'finexpert',
+        category: 'financial',
+        ukName: 'Finexpert', enName: 'Finexpert – Finance Expert', ruName: 'Finexpert',
+        plDesc: 'Biuro rachunkowe specjalizujące się w uruchamianiu i prowadzeniu biznesu w Polsce dla przedsiębiorców z Ukrainy. Rejestracja firm, księgowość i doradztwo biznesowe.',
+        ukDesc: 'Бухгалтерське бюро, що спеціалізується на запуску та супроводі бізнесу в Польщі для підприємців з України. Реєстрація фірм, бухгалтерія та бізнес-консультування.',
+        enDesc: 'Accounting office specializing in launching and managing businesses in Poland for Ukrainian entrepreneurs. Company registration, bookkeeping and business consulting.',
+        ruDesc: 'Бухгалтерское бюро, специализирующееся на запуске и сопровождении бизнеса в Польше для предпринимателей из Украины. Регистрация фирм, бухгалтерия и бизнес-консультирование.',
+        tags: ['accounting', 'business-registration', 'foreigners'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        webpage: 'https://finexp.pl/ua/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 67. TaxAnna
+    await seedService({
+        name: 'TaxAnna',
+        slug: 'taxanna',
+        category: 'financial',
+        ukName: 'TaxAnna', enName: 'TaxAnna', ruName: 'TaxAnna',
+        plDesc: 'Ukraińskojęzyczna księgowa w Warszawie. Pełna i uproszczona księgowość, deklaracje VAT/PIT/CIT, kadry i płace, rejestracja firm, analizy finansowe, audyty oraz obsługa KSeF. Specjalizacja w obsłudze ukraińskich przedsiębiorców i specjalistów IT.',
+        ukDesc: 'Україномовний бухгалтер у Варшаві. Повна та спрощена бухгалтерія, декларації VAT/PIT/CIT, кадри та зарплати, реєстрація фірм, фінансові аналізи, аудити та обслуговування KSeF. Спеціалізація на обслуговуванні українських підприємців та IT-спеціалістів.',
+        enDesc: 'Ukrainian-speaking accountant in Warsaw. Full and simplified bookkeeping, VAT/PIT/CIT declarations, payroll, company registration, financial analysis, audits and KSeF support. Specializing in serving Ukrainian entrepreneurs and IT specialists.',
+        ruDesc: 'Украиноязычный бухгалтер в Варшаве. Полная и упрощённая бухгалтерия, декларации VAT/PIT/CIT, кадры и зарплаты, регистрация фирм, финансовые анализы, аудиты и обслуживание KSeF. Специализация на обслуживании украинских предпринимателей и IT-специалистов.',
+        tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
+        languages: ['pl', 'uk'],
+        socials: { instagram: 'https://www.instagram.com/anna.pereriadkina/', facebook: 'https://www.facebook.com/anna.pereriadkina' },
+        webpage: 'https://taxanna.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'rondo Ignacego Daszyńskiego 2b, 24 piętro, biuro 45', voivodeship: 'mazowieckie', latitude: 52.2295, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 536 317 319', email: 'pereriadkina@gmail.com' },
+        ],
+    });
+
+    // 68. DROGIPOL BizHub
+    await seedService({
+        name: 'DROGIPOL BizHub',
+        slug: 'drogipol-bizhub',
+        category: 'financial',
+        ukName: 'DROGIPOL BizHub', enName: 'DROGIPOL BizHub', ruName: 'DROGIPOL BizHub',
+        plDesc: 'Firma oferująca kompleksowe usługi dla biznesu: rejestracja spółek i JDG, księgowość, legalizacja pobytu, ubezpieczenia, usługi finansowe oraz kadry i płace. Obsługa w języku ukraińskim i rosyjskim.',
+        ukDesc: 'Компанія, що пропонує комплексні бізнес-послуги: реєстрація компаній та ФОП, бухгалтерія, легалізація перебування, страхування, фінансові послуги та кадри й зарплати. Обслуговування українською та російською мовами.',
+        enDesc: 'Company offering comprehensive business services: registration of companies and sole traders, accounting, legalization of stay, insurance, financial services and payroll. Service in Ukrainian and Russian.',
+        ruDesc: 'Компания, предлагающая комплексные бизнес-услуги: регистрация компаний и ИП, бухгалтерия, легализация пребывания, страхование, финансовые услуги и кадры и зарплаты. Обслуживание на украинском и русском языках.',
+        tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://biz.drogipol.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Marii Rodziewiczówny 1/804', voivodeship: 'mazowieckie', latitude: 52.2185, longitude: 21.0745, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 786 639 200', email: 'biuro@drogipol.pl' },
+        ],
+    });
+
+    // 69. KDP Kancelaria Doradztwa Podatkowego
+    await seedService({
+        name: 'KDP Kancelaria Doradztwa Podatkowego',
+        slug: 'kdp-kancelaria',
+        category: 'financial',
+        ukName: 'KDP Канцелярія податкового консультування', enName: 'KDP Tax Advisory Office', ruName: 'KDP Канцелярия налогового консультирования',
+        plDesc: 'Kancelaria doradztwa podatkowego Grażyny Gawryczuk z oddziałami w Warszawie i Białej Podlaskiej. Doradztwo podatkowe, biuro rachunkowe, zakładanie firm oraz innowacyjna platforma e-księgowości.',
+        ukDesc: 'Канцелярія податкового консультування Гражини Гавричук з відділеннями у Варшаві та Білій Підляській. Податкове консультування, бухгалтерське бюро, реєстрація фірм та інноваційна платформа е-бухгалтерії.',
+        enDesc: 'Tax advisory office of Grażyna Gawryczuk with branches in Warsaw and Biała Podlaska. Tax consulting, accounting office, company registration and innovative e-accounting platform.',
+        ruDesc: 'Канцелярия налогового консультирования Гражины Гавричук с отделениями в Варшаве и Белой Подляской. Налоговое консультирование, бухгалтерское бюро, регистрация фирм и инновационная платформа э-бухгалтерии.',
+        tags: ['tax', 'accounting', 'business-registration', 'documents'],
+        languages: ['pl', 'en'],
+        webpage: 'https://www.kdp-kancelaria.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Floriańska 6/02', voivodeship: 'mazowieckie', latitude: 52.2855, longitude: 21.0385, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 698 640 133', email: 'warszawa@kdp-kancelaria.pl' },
+            { city: 'Biała Podlaska', street: 'ul. Sadowa 14', voivodeship: 'lubelskie', latitude: 52.0325, longitude: 23.1165, openingHours: standardShopHours, phoneNumber: '+48 692 490 651', email: 'ksiegowosc@kdp-kancelaria.pl' },
+        ],
+    });
+
+    // 70. BST Group (Business Start)
+    await seedService({
+        name: 'BST Group',
+        slug: 'bst-group',
+        category: 'financial',
+        ukName: 'BST Group', enName: 'BST Group – Business Start', ruName: 'BST Group',
+        plDesc: 'Biuro rachunkowe w Warszawie oferujące kompleksową obsługę księgową: rozliczenia podatkowe, deklaracje VAT i CIT, sprawozdania statystyczne, kadry i płace, rejestracja firm, legalizacja pobytu oraz doradztwo biznesowe. Obsługa w językach ukraińskim, rosyjskim, polskim i angielskim.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що пропонує комплексне бухгалтерське обслуговування: податкові розрахунки, декларації ПДВ та CIT, статистичні звіти, кадри та зарплати, реєстрація фірм, легалізація перебування та бізнес-консультування. Обслуговування українською, російською, польською та англійською мовами.',
+        enDesc: 'Accounting office in Warsaw offering comprehensive bookkeeping services: tax settlements, VAT and CIT declarations, statistical reports, payroll, company registration, legalization of stay and business consulting. Service in Ukrainian, Russian, Polish and English.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексное бухгалтерское обслуживание: налоговые расчёты, декларации НДС и CIT, статистические отчёты, кадры и зарплаты, регистрация фирм, легализация пребывания и бизнес-консультирование. Обслуживание на украинском, русском, польском и английском языках.',
+        tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        socials: { instagram: 'https://www.instagram.com/bstgroup.pl/', facebook: 'https://www.facebook.com/bstgrouppl' },
+        webpage: 'https://bstgroup.pl/uk/buhgalterske-obslugovuvannya/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Ostrobramska 101a lok. 301', voivodeship: 'mazowieckie', latitude: 52.2385, longitude: 21.0825, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 790 871 098', email: 'bioro@bstgroup.pl' },
+        ],
+    });
+
+    // 71. Taxovia
+    await seedService({
+        name: 'Taxovia',
+        slug: 'taxovia',
+        category: 'financial',
+        ukName: 'Taxovia', enName: 'Taxovia', ruName: 'Taxovia',
+        plDesc: 'Biuro rachunkowe w Warszawie specjalizujące się w zakładaniu firm dla obcokrajowców. Doradztwo prawne i podatkowe, przygotowanie dokumentów, tłumaczenia, uzyskanie NIP/REGON/KRS, otwarcie konta firmowego, rejestracja VAT oraz wirtualne biuro.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що спеціалізується на реєстрації фірм для іноземців. Юридичне та податкове консультування, підготовка документів, переклади, отримання NIP/REGON/KRS, відкриття фірмового рахунку, реєстрація ПДВ та віртуальний офіс.',
+        enDesc: 'Accounting office in Warsaw specializing in company registration for foreigners. Legal and tax consulting, document preparation, translations, NIP/REGON/KRS acquisition, corporate bank account setup, VAT registration and virtual office.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на регистрации фирм для иностранцев. Юридическое и налоговое консультирование, подготовка документов, переводы, получение NIP/REGON/KRS, открытие фирменного счёта, регистрация НДС и виртуальный офис.',
+        tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'en', 'de'],
+        webpage: 'https://www.taxovia.pl/uslugi/zakladanie-firm-dla-obcokrajowcow',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Szkoły Orląt 4 lok. 106', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.0575, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 781 444 440', email: 'biuro@taxovia.pl' },
+        ],
+    });
+
+    // 72. Romaniuk & Partners
+    await seedService({
+        name: 'Romaniuk & Partners',
+        slug: 'romaniuk-partners',
+        category: 'financial',
+        ukName: 'Romaniuk & Partners', enName: 'Romaniuk & Partners', ruName: 'Romaniuk & Partners',
+        plDesc: 'Międzynarodowa firma doradcza specjalizująca się w organizacji i prowadzeniu księgowości w Polsce. Obsługa nowych polskich spółek, sporządzanie sprawozdań finansowych, korekty księgowe oraz reprezentacja przed urzędami. Obsługa w języku ukraińskim, angielskim, rosyjskim i polskim.',
+        ukDesc: 'Міжнародна консалтингова компанія, що спеціалізується на організації та веденні бухгалтерського обліку в Польщі. Обслуговування нових польських компаній, підготовка фінансової звітності, бухгалтерські корекції та представництво перед органами влади. Обслуговування українською, англійською, російською та польською мовами.',
+        enDesc: 'International consulting firm specializing in organizing and managing accounting in Poland. Servicing new Polish companies, preparing financial reports, accounting corrections and representation before authorities. Service in Ukrainian, English, Russian and Polish.',
+        ruDesc: 'Международная консалтинговая компания, специализирующаяся на организации и ведении бухгалтерского учёта в Польше. Обслуживание новых польских компаний, подготовка финансовой отчётности, бухгалтерские корректировки и представительство перед органами власти. Обслуживание на украинском, английском, русском и польском языках.',
+        tags: ['accounting', 'tax', 'legal', 'documents'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        socials: { facebook: 'https://www.facebook.com/romaniuk.partners', youtube: 'https://www.youtube.com/channel/UCruwnI6GUCNBmT_vzMNKTHw' },
+        webpage: 'https://r-partners.pl/uk/orhanizatsiya-vedennya-bukhhalterskoho-obliku-v-polshchi/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 731 775 959', email: 'm.romaniuk@r-partners.pl' },
+        ],
+    });
+
+    // 73. Dobra Księgowa (OL-TAX)
+    await seedService({
+        name: 'Dobra Księgowa',
+        slug: 'dobra-ksiegowa',
+        category: 'financial',
+        ukName: 'Dobra Księgowa', enName: 'Dobra Księgowa – Good Accountant', ruName: 'Dobra Księgowa',
+        plDesc: 'Biuro rachunkowe OL-TAX ze Stargardu oferujące księgowość dla firm i osób z Ukrainy. Rejestracja działalności, rejestracja VAT, pełna księgowość, konsultacje indywidualne, szkolenia dla księgowych oraz mentoring biznesowy. Obsługa zdalna w całej Polsce.',
+        ukDesc: 'Бухгалтерське бюро OL-TAX зі Старгарда, що пропонує бухгалтерію для фірм та осіб з України. Реєстрація діяльності, реєстрація ПДВ, повна бухгалтерія, індивідуальні консультації, навчання для бухгалтерів та бізнес-менторство. Дистанційне обслуговування по всій Польщі.',
+        enDesc: 'OL-TAX accounting office from Stargard offering bookkeeping for companies and individuals from Ukraine. Business registration, VAT registration, full accounting, individual consultations, training for accountants and business mentoring. Remote service across Poland.',
+        ruDesc: 'Бухгалтерское бюро OL-TAX из Старгарда, предлагающее бухгалтерию для фирм и лиц из Украины. Регистрация деятельности, регистрация НДС, полная бухгалтерия, индивидуальные консультации, обучение для бухгалтеров и бизнес-менторство. Дистанционное обслуживание по всей Польше.',
+        tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
+        languages: ['pl', 'uk', 'ru'],
+        webpage: 'https://dobraksiegowa.info/oferta/oferta-dla-osob-z-ukrainy/',
+        locations: [
+            { city: 'Stargard', street: 'ul. Marszałka Józefa Piłsudskiego 15/3', voivodeship: 'zachodniopomorskie', latitude: 53.3365, longitude: 15.0505, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 783 001 883', email: 'biuro@dobraksiegowa.info' },
+        ],
+    });
+
+    // 74. Nikitas Biuro Rachunkowe
+    await seedService({
+        name: 'Nikitas Biuro Rachunkowe',
+        slug: 'nikitas',
+        category: 'financial',
+        ukName: 'Nikitas Бухгалтерія', enName: 'Nikitas Accounting Office', ruName: 'Nikitas Бухгалтерия',
+        plDesc: 'Biuro rachunkowe w Warszawie oferujące kompleksowe usługi księgowe online: analizę dokumentów, optymalizację podatkową, kadry i płace, planowanie biznesowe oraz pomoc w zakładaniu firmy. Obsługa wielojęzyczna.',
+        ukDesc: 'Бухгалтерське бюро у Варшаві, що пропонує комплексні онлайн-бухгалтерські послуги: аналіз документів, податкову оптимізацію, кадри та зарплати, бізнес-планування та допомогу у відкритті фірми. Багатомовне обслуговування.',
+        enDesc: 'Accounting office in Warsaw offering comprehensive online bookkeeping services: document analysis, tax optimization, payroll, business planning and help with starting a company. Multilingual service.',
+        ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексные онлайн-бухгалтерские услуги: анализ документов, налоговую оптимизацию, кадры и зарплаты, бизнес-планирование и помощь в открытии фирмы. Многоязычное обслуживание.',
+        tags: ['accounting', 'tax', 'business-registration'],
+        languages: ['pl', 'ru'],
+        webpage: 'https://www.nikitas.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Płochocińska 18A/U13', voivodeship: 'mazowieckie', latitude: 52.3055, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true },
+        ],
+    });
+
+    // 75. Evolution Group (BizEvolution)
+    await seedService({
+        name: 'Evolution Group',
+        slug: 'evolution-group',
+        category: 'financial',
+        ukName: 'Evolution Group', enName: 'Evolution Group', ruName: 'Evolution Group',
+        plDesc: 'Firma doradcza działająca od 2015 roku oferująca kompleksowe usługi dla biznesu: doradztwo biznesowe, rejestracja firm, księgowość i podatki, kadry i płace, kancelaria prawna, wirtualne biuro, ubezpieczenia oraz asystencja osobista. Obsługa w językach polskim, ukraińskim, rosyjskim i angielskim.',
+        ukDesc: 'Консалтингова компанія, що працює з 2015 року, пропонуючи комплексні послуги для бізнесу: бізнес-консультування, реєстрація фірм, бухгалтерія та податки, кадри та зарплати, юридична канцелярія, віртуальний офіс, страхування та персональна асистенція. Обслуговування польською, українською, російською та англійською мовами.',
+        enDesc: 'Consulting company operating since 2015 offering comprehensive business services: business consulting, company registration, accounting and taxes, payroll, legal office, virtual office, insurance and personal assistance. Service in Polish, Ukrainian, Russian and English.',
+        ruDesc: 'Консалтинговая компания, работающая с 2015 года, предлагающая комплексные услуги для бизнеса: бизнес-консультирование, регистрация фирм, бухгалтерия и налоги, кадры и зарплаты, юридическая канцелярия, виртуальный офис, страхование и персональная ассистенция. Обслуживание на польском, украинском, русском и английском языках.',
+        tags: ['accounting', 'tax', 'legal', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        socials: { linkedin: 'https://pl.linkedin.com/company/biz-evolution-pl' },
+        webpage: 'https://www.bizevolution.pl/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Juliana Smulikowskiego 4a/16', voivodeship: 'mazowieckie', latitude: 52.2355, longitude: 21.0125, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 577 001 351', email: 'biuro@bizevolution.pl' },
+        ],
+    });
+
+    // 76. ARK Biuro Rachunkowe
+    await seedService({
+        name: 'ARK Biuro Rachunkowe',
+        slug: 'ark-biuro-rachunkowe',
+        category: 'financial',
+        ukName: 'ARK Бухгалтерія', enName: 'ARK Accounting Office', ruName: 'ARK Бухгалтерия',
+        plDesc: 'Biuro rachunkowe oferujące obsługę online w całej Polsce. Księgowość JDG i spółek, rejestracja firm, odzyskiwanie księgowości, kadry i płace, profil zaufany oraz pomoc w relokacji biznesu do Polski. Obsługa w języku rosyjskim, polskim i angielskim.',
+        ukDesc: 'Бухгалтерське бюро, що пропонує онлайн-обслуговування по всій Польщі. Бухгалтерія ФОП та компаній, реєстрація фірм, відновлення бухгалтерії, кадри та зарплати, довірений профіль та допомога у релокації бізнесу до Польщі. Обслуговування російською, польською та англійською мовами.',
+        enDesc: 'Accounting office offering online service across Poland. Bookkeeping for sole traders and companies, company registration, accounting recovery, payroll, trusted profile and help with business relocation to Poland. Service in Russian, Polish and English.',
+        ruDesc: 'Бухгалтерское бюро, предлагающее онлайн-обслуживание по всей Польше. Бухгалтерия ИП и компаний, регистрация фирм, восстановление бухгалтерии, кадры и зарплаты, доверенный профиль и помощь в релокации бизнеса в Польшу. Обслуживание на русском, польском и английском языках.',
+        tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        languages: ['pl', 'ru', 'en'],
+        socials: { instagram: 'https://www.instagram.com/ark_biuro_rachunkowe/', facebook: 'https://www.facebook.com/ARK.Biuro.Rachunkowe', youtube: 'https://www.youtube.com/@ARK_Biuro_Rachunkowe' },
+        webpage: 'https://biuro-ark.pl/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 451 100 945' },
+        ],
+    });
+
+    // 77. AM Salvia
+    await seedService({
+        name: 'AM Salvia',
+        slug: 'am-salvia',
+        category: 'financial',
+        ukName: 'AM Salvia', enName: 'AM Salvia', ruName: 'AM Salvia',
+        plDesc: 'Biuro rachunkowe na warszawskiej Pradze Południe. Pełna księgowość, obsługa kadrowo-płacowa, doradztwo podatkowe i finansowe, audyty oraz specjalistyczna księgowość dla cudzoziemców – rozliczenia podatkowe i rejestracja działalności.',
+        ukDesc: 'Бухгалтерське бюро на варшавській Празі Полудніє. Повна бухгалтерія, кадрово-зарплатне обслуговування, податкове та фінансове консультування, аудити та спеціалізована бухгалтерія для іноземців – податкові розрахунки та реєстрація діяльності.',
+        enDesc: 'Accounting office in Warsaw\'s Praga Południe district. Full bookkeeping, payroll services, tax and financial consulting, audits and specialized accounting for foreigners – tax settlements and business registration.',
+        ruDesc: 'Бухгалтерское бюро на варшавской Праге Полудне. Полная бухгалтерия, кадрово-зарплатное обслуживание, налоговое и финансовое консультирование, аудиты и специализированная бухгалтерия для иностранцев – налоговые расчёты и регистрация деятельности.',
+        tags: ['accounting', 'tax', 'foreigners', 'documents'],
+        languages: ['pl'],
+        socials: { facebook: 'https://www.facebook.com/amsalviaksiegowosc', instagram: 'https://www.instagram.com/amsalvia_podatki_ksiegowosc/', linkedin: 'https://pl.linkedin.com/company/amsalvia-sp-z-o-o' },
+        webpage: 'https://amsalvia.pl/ksiegowosc-dla-cudzoziemcow/',
+        locations: [
+            { city: 'Warszawa', street: 'ul. Niekłańska 11A/1', voivodeship: 'mazowieckie', latitude: 52.2485, longitude: 21.0675, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 667 087 957', email: 'biuro@mksalvia.pl' },
         ],
     });
 

@@ -2,6 +2,52 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 
+const FilterSkeleton = () => {
+    return (
+        <>
+            {/* Mobile Filter Skeleton */}
+            <div className="fixed inset-x-0 top-20 z-[9] flex flex-col border-b border-gray-200 bg-white py-0 shadow-sm dark:border-gray-700 dark:bg-gray-900 md:hidden">
+                {/* First row - Search and County */}
+                <div className="flex h-12 flex-row items-center justify-between gap-x-4 px-2">
+                    <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                </div>
+                {/* Second row - View Switcher and Filter Button */}
+                <div className="flex h-12 flex-row items-center justify-between gap-x-4 px-2">
+                    <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                    <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                </div>
+            </div>
+            {/* Spacer for mobile */}
+            <div className="h-24 md:hidden" />
+
+            {/* Desktop Filter Skeleton */}
+            <div className="hidden md:block">
+                <div className="w-full max-w-full overflow-x-hidden bg-[#F6F6F7] px-3 pb-4 pt-2 dark:bg-[#111827]">
+                    <div className="flex flex-row flex-nowrap items-center gap-x-4">
+                        <div className="flex w-1/4 flex-none items-center gap-x-4">
+                            <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                            <div className="h-10 w-1/2 animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                        </div>
+                        <div className="flex w-3/4 min-w-0 items-center gap-x-4">
+                            {/* Remove filter button skeleton */}
+                            <div className="h-10 w-28 flex-none animate-pulse rounded-md bg-gray-200 dark:bg-gray-700" />
+                            {/* Category buttons skeleton */}
+                            {Array(8)
+                                .fill(0)
+                                .map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="h-10 w-28 flex-none animate-pulse rounded-full bg-gray-200 dark:bg-gray-700"
+                                    />
+                                ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
 
 const ServiceCardSkeleton = () => {
     return (
@@ -91,6 +137,8 @@ export const ServicesLoadingSkeleton = ({ searchParams }: { searchParams?: { vie
     // Default is map view - only show list skeleton when explicitly in list view
     if (isListView) {
         return (
+            <>
+            <FilterSkeleton />
             <main className="relative h-full px-2">
                 <div className="flex size-full gap-0 overflow-y-auto md:gap-x-2">
                     <div className="w-full md:w-7/12">
@@ -109,11 +157,14 @@ export const ServicesLoadingSkeleton = ({ searchParams }: { searchParams?: { vie
                     </div>
                 </div>
             </main>
+            </>
         );
     }
 
     // Default map view - show map skeleton on mobile, both on desktop
     return (
+        <>
+        <FilterSkeleton />
         <main className="relative h-full px-2">
             <div className="flex size-full">
                 {/* Mobile: Show only map skeleton by default */}
@@ -140,5 +191,6 @@ export const ServicesLoadingSkeleton = ({ searchParams }: { searchParams?: { vie
                 </div>
             </div>
         </main>
+        </>
     );
 };
