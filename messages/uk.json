@@ -2,6 +2,54 @@
   "VerifiedBadge": {
     "text": "Перевірено"
   },
+  "FirmaPage": {
+    "breadcrumbHome": "Polvia",
+    "address": "Адреса",
+    "phone": "Телефон",
+    "email": "Ел. пошта",
+    "website": "Вебсайт",
+    "languages": "Мови",
+    "openingHours": "Години роботи",
+    "closed": "Зачинено",
+    "description": "Опис",
+    "showOnMap": "Показати на мапі",
+    "relatedServices": "Схожі компанії",
+    "viewProfile": "Переглянути профіль",
+    "metaTitle": "{name} – {category} у {city} | Polvia",
+    "metaTitleNoCity": "{name} – {category} | Polvia",
+    "metaDescription": "Профіль компанії {name}. {category} у {city}. Контакти, адреса, розташування та інша інформація.",
+    "metaDescriptionNoCity": "Профіль компанії {name}. {category}. Контакти, адреса та інша інформація."
+  },
+  "MiastoPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "Українські компанії у місті {city}",
+    "intro": "Переглядайте каталог українських компаній та послуг у місті {city}. Знайдіть контакти, адреси та розташування.",
+    "topCategories": "Популярні категорії",
+    "allBusinesses": "Компанії у {city}",
+    "showOnMap": "Показати на мапі",
+    "viewProfile": "Переглянути профіль",
+    "noBusinesses": "Немає компаній у цьому місті.",
+    "metaTitle": "Українські компанії у {city} | Polvia",
+    "metaDescription": "Знайдіть українські компанії, магазини та послуги у {city}. Список компаній, контакти та розташування.",
+    "businessCount": "{count, plural, one {# компанія} few {# компанії} many {# компаній} other {# компаній}}"
+  },
+  "MiastoCategoryPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "{category} у {city}",
+    "intro": "Список українських компаній у категорії {category} у місті {city}. Знайдіть контакти, адреси та розташування.",
+    "showOnMap": "Показати на мапі",
+    "viewProfile": "Переглянути профіль",
+    "backToCity": "Усі компанії у {city}",
+    "relatedCategories": "Інші категорії у {city}",
+    "metaTitle": "{category} у {city} – українські компанії | Polvia",
+    "metaDescription": "Знайдіть українські компанії у категорії {category} у {city}. Список компаній, контакти та розташування.",
+    "businessCount": "{count, plural, one {# компанія} few {# компанії} many {# компаній} other {# компаній}}",
+    "faqTitle": "Часті запитання",
+    "faqQ1": "Як знайти {category} у {city}?",
+    "faqA1": "Переглядайте наш список компаній у категорії {category} у {city}. Кожна компанія містить контакти та розташування.",
+    "faqQ2": "Скільки компаній {category} у {city}?",
+    "faqA2": "У нашому каталозі {count} {count, plural, one {компанія} few {компанії} many {# компаній} other {компаній}} у категорії {category} у {city}."
+  },
   "Metadata": {
     "title": "Каталог українських фірм та послуг у Польщі",
     "description": "Polvia - сайт українських компаній у Польщі. Карта підприємств у Польщі. Магазини, юридичні, фінансові, ремонтні послуги та багато іншого - легко знайти на карті!",
@@ -146,7 +194,8 @@
     "mail": "Email",
     "call": "Зателефонувати",
     "whatsapp": "WhatsApp",
-    "languages": "Говоримо:"
+    "languages": "Говоримо:",
+    "viewProfile": "Профіль"
   },
   "Calculator": {
     "monthlyIncome": "Місячний дохід",
@@ -221,6 +270,7 @@
     "ServiceDescription": "Знайдіть перевірені українські фірми, спеціалістів та послуги у Польщі",
     "MapDescription": "Карта українських підприємств у Польщі",
     "popularCompanies": "Популярні компанії",
+    "popularCities": "Популярні міста",
     "Grocery": "Продукти",
     "Gastronomy": "Гастрономія",
     "Government": "Державні",
@@ -379,7 +429,8 @@
     "home": "Головна",
     "contact": "Контакт",
     "blog": "Блог",
-    "map": "Карта"
+    "map": "Карта",
+    "cities": "Міста"
   },
   "NewsletterThanks": {
     "title": "Дякуємо за підписку!",

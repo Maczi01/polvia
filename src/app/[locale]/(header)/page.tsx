@@ -3,6 +3,7 @@ import HeroSection from '@/app/[locale]/(header)/_components/hero-section';
 import { CategoryPreviewServer } from '@/app/[locale]/(header)/_components/category-preview-server';
 import { PopularServices } from '@/app/[locale]/(header)/_components/popular-services';
 import { Faq } from '@/app/[locale]/(header)/_components/faq';
+import { PopularCities } from '@/app/[locale]/(header)/_components/popular-cities';
 import { StatsBar } from './_components/stats-bar';
 import { HowItWorks } from '@/app/[locale]/(header)/_components/how-it-works';
 import ScrollToTopButton from '@/app/[locale]/(header)/_components/scroll-to-top-button';
@@ -19,6 +20,7 @@ export default async function HomePage({ params }: { params: any }) {
             <HowItWorks />
             <CategoryPreviewServer />
             <PopularServices params={params} />
+            <PopularCities />
             <TrustSection />
             <StatsBar />
             <Faq />

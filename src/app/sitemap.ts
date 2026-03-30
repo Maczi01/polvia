@@ -1,7 +1,15 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/posts';
-import { CATEGORY_SLUGS, COUNTY_SLUGS } from '@/lib/slug-mappings';
+import { getAllActiveServiceLocationSlugs } from '@/lib/seo-queries';
+import {
+    CATEGORY_SLUGS,
+    COUNTY_SLUGS,
+    CITY_SLUGS,
+    CATEGORY_KEYS,
+} from '@/lib/slug-mappings';
+import { locales, defaultLocale } from '@/i18n/config';
+import type { Locale } from '@/i18n/config';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl';
@@ -171,9 +179,69 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
     ] as MetadataRoute.Sitemap);
 
+    // Helper: build locale-prefixed URL
+    const localeUrl = (locale: Locale, path: string) =>
+        locale === defaultLocale ? `${baseUrl}${path}` : `${baseUrl}/${locale}${path}`;
+
     // -------------------------------------------------------
-    // 6. Łączymy wszystko
-    // (Kombinacje category+county pominięte — zbyt wiele stron z thin content)
+    // 6. SEO — /firma/[slug] (location profile pages, all locales)
     // -------------------------------------------------------
-    return [...rootPages, ...staticPages, ...blogPages, ...categoryPages, ...countyPages];
+    let firmaPages: MetadataRoute.Sitemap = [];
+    try {
+        const locations = await getAllActiveServiceLocationSlugs();
+        firmaPages = locations.flatMap(loc =>
+            locales.map(locale => ({
+                url: localeUrl(locale, `/firma/${loc.slug}`),
+                lastModified: loc.updatedAt
+                    ? new Date(loc.updatedAt).toISOString()
+                    : currentDate,
+                changeFrequency: 'weekly' as const,
+                priority: 0.7,
+            })),
+        );
+    } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error generating firma pages for sitemap:', error);
+        }
+    }
+
+    // -------------------------------------------------------
+    // 7. SEO — /miasto/[city] (city landing pages, all locales)
+    // -------------------------------------------------------
+    const cityPages: MetadataRoute.Sitemap = CITY_SLUGS.flatMap(city =>
+        locales.map(locale => ({
+            url: localeUrl(locale, `/miasto/${city}`),
+            lastModified: currentDate,
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        })),
+    );
+
+    // -------------------------------------------------------
+    // 8. SEO — /miasto/[city]/[category] (city + category pages, all locales)
+    // -------------------------------------------------------
+    const cityAndCategoryPages: MetadataRoute.Sitemap = CITY_SLUGS.flatMap(city =>
+        locales.flatMap(locale =>
+            CATEGORY_KEYS.map(key => ({
+                url: localeUrl(locale, `/miasto/${city}/${CATEGORY_SLUGS[locale][key]}`),
+                lastModified: currentDate,
+                changeFrequency: 'weekly' as const,
+                priority: 0.7,
+            })),
+        ),
+    );
+
+    // -------------------------------------------------------
+    // 9. Łączymy wszystko
+    // -------------------------------------------------------
+    return [
+        ...rootPages,
+        ...staticPages,
+        ...blogPages,
+        ...categoryPages,
+        ...countyPages,
+        ...firmaPages,
+        ...cityPages,
+        ...cityAndCategoryPages,
+    ];
 }

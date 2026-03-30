@@ -2,6 +2,54 @@
   "VerifiedBadge": {
     "text": "Zweryfikowano"
   },
+  "FirmaPage": {
+    "breadcrumbHome": "Polvia",
+    "address": "Adres",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "website": "Strona WWW",
+    "languages": "Języki",
+    "openingHours": "Godziny otwarcia",
+    "closed": "Zamknięte",
+    "description": "Opis",
+    "showOnMap": "Zobacz na mapie",
+    "relatedServices": "Podobne firmy",
+    "viewProfile": "Zobacz profil",
+    "metaTitle": "{name} – {category} w {city} | Polvia",
+    "metaTitleNoCity": "{name} – {category} | Polvia",
+    "metaDescription": "Sprawdź profil firmy {name}. {category} w {city}. Kontakt, adres, lokalizacja i więcej informacji.",
+    "metaDescriptionNoCity": "Sprawdź profil firmy {name}. {category}. Kontakt, adres i więcej informacji."
+  },
+  "MiastoPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "Ukraińskie firmy w {city}",
+    "intro": "Przeglądaj katalog ukraińskich firm i usług w mieście {city}. Znajdź kontakt, adres i lokalizację.",
+    "topCategories": "Popularne kategorie",
+    "allBusinesses": "Firmy w {city}",
+    "showOnMap": "Zobacz na mapie",
+    "viewProfile": "Zobacz profil",
+    "noBusinesses": "Brak firm w tym mieście.",
+    "metaTitle": "Ukraińskie firmy w {city} | Polvia",
+    "metaDescription": "Znajdź ukraińskie firmy, sklepy i usługi w {city}. Sprawdź listę firm, dane kontaktowe i lokalizacje.",
+    "businessCount": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firm}}"
+  },
+  "MiastoCategoryPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "{category} w {city}",
+    "intro": "Lista ukraińskich firm z kategorii {category} w mieście {city}. Znajdź kontakt, adres i lokalizację.",
+    "showOnMap": "Zobacz na mapie",
+    "viewProfile": "Zobacz profil",
+    "backToCity": "Wszystkie firmy w {city}",
+    "relatedCategories": "Inne kategorie w {city}",
+    "metaTitle": "{category} w {city} – ukraińskie firmy | Polvia",
+    "metaDescription": "Znajdź ukraińskie firmy z kategorii {category} w {city}. Lista firm, kontakty i lokalizacje.",
+    "businessCount": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firm}}",
+    "faqTitle": "Najczęściej zadawane pytania",
+    "faqQ1": "Jak znaleźć {category} w {city}?",
+    "faqA1": "Przeglądaj naszą listę firm z kategorii {category} w {city}. Każda firma posiada dane kontaktowe i lokalizację.",
+    "faqQ2": "Ile firm z kategorii {category} jest w {city}?",
+    "faqA2": "W naszym katalogu znajduje się {count} {count, plural, one {firma} few {firmy} many {firm} other {firm}} z kategorii {category} w {city}."
+  },
   "Metadata": {
     "title": "Katalog ukraińskich firm i usług w Polsce",
     "description": "Polvia - katalog ukraińskich firm w Polsce. Mapa biznesów w Polsce. Sklepy, usługi prawne, finansowe, remontowe i wiele innych - łatwe do znalezienia na mapie!",
@@ -147,7 +195,8 @@
     "mail": "Email",
     "call": "Zadzwoń",
     "whatsapp": "WhatsApp",
-    "languages": "Mówimy:"
+    "languages": "Mówimy:",
+    "viewProfile": "Zobacz profil"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
@@ -221,6 +270,7 @@
     "ServiceDescription": "Znajdź sprawdzone ukraińskie firmy, specjalistów i usługi w Polsce",
     "MapDescription": "Mapa Polski z oznaczonymi ukraińskimi firmami",
     "popularCompanies": "Popularne firmy",
+    "popularCities": "Popularne miasta",
     "Grocery": "Spożywcze",
     "Gastronomy": "Gastronomia",
     "Government": "Urzędowe",
@@ -381,7 +431,8 @@
     "home": "Strona główna",
     "contact": "Kontakt",
     "blog": "Blog",
-    "map": "Mapa"
+    "map": "Mapa",
+    "cities": "Miasta"
   },
   "NewsletterThanks": {
     "title": "Dziękujemy za zapis!",

@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utilities';
 import { Button } from '@/components/ui/button/button';
 import { mapCategoryToBadgeColor, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
-import { Clock, Globe, MapPin, Phone, MessageCircle, Navigation } from 'lucide-react';
+import { Clock, Globe, Mail, MapPin, Phone, MessageCircle, Navigation, User } from 'lucide-react';
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
@@ -19,6 +19,7 @@ const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     en: { src: '/icons/gb.svg', alt: 'English' },
     ru: { src: '/icons/ru.svg', alt: 'Russian' },
     uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
+    be: { src: '/icons/by.svg', alt: 'Belarusian' },
 };
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -44,6 +45,18 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 const TikTokIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
         <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.53a6.27 6.27 0 00-.79-.05A6.34 6.34 0 003.15 15.65a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.22a8.16 8.16 0 004.76 1.52V7.3a4.82 4.82 0 01-1-.61z" />
+    </svg>
+);
+
+const TelegramIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0 12 12 0 0011.944 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+    </svg>
+);
+
+const ViberIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M11.4 0C9.473.028 5.333.344 3.02 2.467 1.302 4.187.541 6.783.453 9.96c-.088 3.178-.199 9.139 5.603 10.784l.007.006-.004 2.457s-.04.993.616 1.196c.792.245 1.258-.51 2.014-1.326.415-.448.986-1.105 1.42-1.607 3.912.329 6.92-.423 7.265-.539.794-.267 5.283-.834 6.016-6.806.755-6.159-.354-10.048-2.342-11.806C19.083.76 14.57.027 11.4 0zm.525 1.8h.088c2.738.022 6.717.551 8.376 2.04 1.658 1.467 2.622 4.985 1.964 10.3-.618 5.01-4.252 5.342-4.923 5.568-.287.096-2.854.731-6.2.531 0 0-2.456 2.967-3.224 3.74-.12.121-.263.168-.357.145-.132-.033-.168-.19-.165-.42l.026-4.06c-4.863-1.382-4.576-6.398-4.503-9.065.073-2.667.695-4.89 2.129-6.31C6.584 2.858 9.28 1.834 11.925 1.8zM11.8 4.6a.525.525 0 00-.007 1.05c1.326.013 2.462.483 3.382 1.381.92.899 1.427 2.168 1.446 3.463a.525.525 0 001.05-.012c-.023-1.572-.64-3.083-1.754-4.175-1.113-1.091-2.49-1.693-4.11-1.707H11.8zm-3.233.9c-.263-.005-.54.073-.804.293-.547.456-.987 1.003-1.162 1.26a2.3 2.3 0 00-.38 1.532c.094.674.416 1.458.973 2.39.855 1.487 1.98 2.982 3.398 4.365 1.06 1.034 2.598 2.145 3.87 2.87.927.529 2.17 1.103 3.067 1.1.59-.003 1.07-.204 1.453-.665l.006-.006c.35-.427.607-.882.652-1.26a.898.898 0 00-.326-.818l-2.07-1.593a.911.911 0 00-1.048-.092l-1.2.652c-.16.088-.393.064-.534-.052l-.006-.006a15.094 15.094 0 01-1.634-1.532 14.22 14.22 0 01-1.396-1.716l-.005-.007c-.098-.15-.112-.363-.014-.518l.67-1.14a.911.911 0 00-.04-1.058L10.05 5.92a.898.898 0 00-.685-.408 1.27 1.27 0 00-.198-.012zm3.493 1.1a.525.525 0 00-.022 1.05c.793.017 1.438.322 1.967.863.529.54.838 1.265.856 2.048a.525.525 0 001.05-.024c-.023-1.05-.44-1.96-1.15-2.684-.71-.723-1.586-1.222-2.694-1.252h-.007z" />
     </svg>
 );
 
@@ -112,6 +125,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         {
             id,
             serviceId,
+            slug,
             className,
             image,
             name,
@@ -149,6 +163,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const [isExpanding, setIsExpanding] = useState(false);
         const t = useTranslations('MapCard');
         const tCounties = useTranslations('MapPage.counties');
+        const locale = useLocale();
 
         const COLLAPSE_MS = 300;
         const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -348,8 +363,11 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             : socials?.whatsapp ?? null;
 
         const navigateLink = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+        const profileHref = slug
+            ? (locale === 'pl' ? `/firma/${slug}` : `/${locale}/firma/${slug}`)
+            : null;
 
-        const hasSocials = socials && (socials.facebook || socials.instagram || socials.tiktok);
+        const hasSocials = socials && (socials.facebook || socials.instagram || socials.tiktok || socials.telegram || socials.viber);
 
         const actionButtonCount = [phoneNumber, whatsappLink, true].filter(Boolean).length;
 
@@ -527,6 +545,23 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                         </span>
                                     </Link>
                                 )}
+
+                                {/* Email */}
+                                {email && (
+                                    <a
+                                        href={`mailto:${email}`}
+                                        className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        <Mail
+                                            size={16}
+                                            className="shrink-0 text-gray-400"
+                                        />
+                                        <span className="text-blue-600 hover:underline dark:text-blue-400">
+                                            {email}
+                                        </span>
+                                    </a>
+                                )}
                             </div>
 
                             {/* Languages - top right */}
@@ -585,6 +620,16 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 {socials.tiktok && (
                                     <SocialLink href={socials.tiktok} className="bg-black dark:bg-gray-900">
                                         <TikTokIcon />
+                                    </SocialLink>
+                                )}
+                                {socials?.telegram && (
+                                    <SocialLink href={socials.telegram} className="bg-[#26A5E4]">
+                                        <TelegramIcon />
+                                    </SocialLink>
+                                )}
+                                {socials?.viber && (
+                                    <SocialLink href={socials.viber} className="bg-[#7360F2]">
+                                        <ViberIcon />
                                     </SocialLink>
                                 )}
                                 {socials?.linkedin && (
@@ -656,6 +701,20 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 </button>
                             </Link>
                         </div>
+
+                        {/* View profile link */}
+                        {profileHref && (
+                            <div className="pt-1">
+                                <Link
+                                    href={profileHref}
+                                    onClick={e => e.stopPropagation()}
+                                    className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                >
+                                    <User size={18} />
+                                    {t('viewProfile')}
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </Card>

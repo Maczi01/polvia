@@ -1,18 +1,11 @@
 'use client';
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { Service } from '@/types';
 import { Badge } from '@/components/ui/badge/badge';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { mapCategoryToBadgeColor } from '@/lib/consts';
 import { Link } from '@/i18n/navigation';
-import { AppPathnames } from '@/i18n/routing';
-
-type ValidHref =
-    | AppPathnames
-    | {
-    pathname: AppPathnames;
-    query?: Record<string, any>;
-};
 
 const PopularServiceCard = ({
                                 icon,
@@ -23,7 +16,7 @@ const PopularServiceCard = ({
     icon?: string;
     name: string;
     category: string;
-    href: ValidHref;
+    href: string;
 }) => {
     const badgeColor = mapCategoryToBadgeColor(category);
     const baseClasses = [
@@ -97,13 +90,13 @@ const PopularServiceCard = ({
 
     if (href) {
         return (
-            <Link
+            <NextLink
                 href={href}
                 className={baseClasses}
                 aria-label={`${name}, ${t(`${category}`)}`}
             >
                 {content}
-            </Link>
+            </NextLink>
         );
     }
 
@@ -116,10 +109,14 @@ type PopularServicesGridClientProps = {
 
 export function PopularServicesGridClient({ services }: PopularServicesGridClientProps) {
     const t = useTranslations('Main');
+    const locale = useLocale();
 
     const imageMap = (image: string) => {
         return image ? `/services/${image.trimEnd()}` : '/default.png';
     };
+
+    const profileHref = (slug: string) =>
+        locale === 'pl' ? `/firma/${slug}` : `/${locale}/firma/${slug}`;
 
     // Ensure we only show top 5 services
     const topServices = services.slice(0, 5);
@@ -144,10 +141,7 @@ export function PopularServicesGridClient({ services }: PopularServicesGridClien
                     {topServices.map((service, index) => (
                         <PopularServiceCard
                             key={service.id}
-                            href={{
-                                pathname: '/map' as AppPathnames,
-                                query: { slug: service.slug },
-                            }}
+                            href={profileHref(service.slug)}
                             icon={imageMap(service.image!)}
                             name={service.name}
                             category={service.category}

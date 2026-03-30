@@ -2,6 +2,54 @@
   "VerifiedBadge": {
     "text": "Verified"
   },
+  "FirmaPage": {
+    "breadcrumbHome": "Polvia",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website",
+    "languages": "Languages",
+    "openingHours": "Opening hours",
+    "closed": "Closed",
+    "description": "Description",
+    "showOnMap": "Show on map",
+    "relatedServices": "Similar businesses",
+    "viewProfile": "View profile",
+    "metaTitle": "{name} – {category} in {city} | Polvia",
+    "metaTitleNoCity": "{name} – {category} | Polvia",
+    "metaDescription": "Check the profile of {name}. {category} in {city}. Contact, address, location and more.",
+    "metaDescriptionNoCity": "Check the profile of {name}. {category}. Contact, address and more."
+  },
+  "MiastoPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "Ukrainian businesses in {city}",
+    "intro": "Browse the directory of Ukrainian businesses and services in {city}. Find contact details, addresses and locations.",
+    "topCategories": "Popular categories",
+    "allBusinesses": "Businesses in {city}",
+    "showOnMap": "Show on map",
+    "viewProfile": "View profile",
+    "noBusinesses": "No businesses in this city.",
+    "metaTitle": "Ukrainian businesses in {city} | Polvia",
+    "metaDescription": "Find Ukrainian businesses, shops and services in {city}. Browse listings, contact details and locations.",
+    "businessCount": "{count, plural, one {# business} other {# businesses}}"
+  },
+  "MiastoCategoryPage": {
+    "breadcrumbHome": "Polvia",
+    "h1": "{category} in {city}",
+    "intro": "Browse Ukrainian businesses in the {category} category in {city}. Find contact details, addresses and locations.",
+    "showOnMap": "Show on map",
+    "viewProfile": "View profile",
+    "backToCity": "All businesses in {city}",
+    "relatedCategories": "Other categories in {city}",
+    "metaTitle": "{category} in {city} – Ukrainian businesses | Polvia",
+    "metaDescription": "Find Ukrainian {category} businesses in {city}. Browse listings, contact details and locations.",
+    "businessCount": "{count, plural, one {# business} other {# businesses}}",
+    "faqTitle": "Frequently asked questions",
+    "faqQ1": "How to find {category} in {city}?",
+    "faqA1": "Browse our list of {category} businesses in {city}. Each listing includes contact details and location.",
+    "faqQ2": "How many {category} businesses are in {city}?",
+    "faqA2": "Our directory lists {count} {count, plural, one {business} other {businesses}} in the {category} category in {city}."
+  },
   "Metadata": {
     "title": "Directory of Ukrainian Businesses and Services in Poland",
     "description": "Polie - Ukrainian business directory in Poland is a map of businesses in Poland. Shops, legal, financial, renovation services and many others - easy to find on the map!",
@@ -146,7 +194,8 @@
     "mail": "Email",
     "call": "Call",
     "whatsapp": "WhatsApp",
-    "languages": "We speak:"
+    "languages": "We speak:",
+    "viewProfile": "View profile"
   },
   "Calculator": {
     "monthlyIncome": "Monthly income",
@@ -221,6 +270,7 @@
     "ServiceDescription": "Find trusted Ukrainian businesses, specialists, and services in Poland",
     "MapDescription": "Map of Ukrainian businesses in Poland",
     "popularCompanies": "Popular companies",
+    "popularCities": "Popular cities",
     "Grocery": "Grocery",
     "Gastronomy": "Gastronomy",
     "Government": "Government",
@@ -380,7 +430,8 @@
     "home": "Home",
     "contact": "Contact",
     "blog": "Blog",
-    "map": "Map"
+    "map": "Map",
+    "cities": "Cities"
   },
   "NewsletterThanks": {
     "title": "Thanks for subscribing!",

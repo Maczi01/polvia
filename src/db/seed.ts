@@ -2212,7 +2212,7 @@ async function mainSeed() {
 
     // 10. Weekendowo - Volodymyr Handzyuk
     await seedService({
-        name: 'Weekendowo',
+        name: 'Volodymyr Handzyuk, Weekendowo',
         slug: 'weekendowo',
         category: 'renovation',
         image: 'remont5.png',
@@ -2360,7 +2360,7 @@ async function mainSeed() {
         name: 'Volodymyr Maksymyk m2 Firma Budowlana',
         slug: 'm2-firma-budowlana',
         category: 'renovation',
-        image: 'remont3.png',
+        image: 'm2.png',
         ukName: 'm2 Будівельна Фірма', enName: 'm2 Construction Company', ruName: 'm2 Строительная Компания',
         plDesc: 'Malowanie, wykończenia ścian, podłogi, remonty łazienek i kuchni, tynki maszynowe. Poznań i okolice (49 km).',
         ukDesc: 'Фарбування, оздоблення стін, підлоги, ремонти ванних кімнат і кухонь, машинні штукатурки. Познань та околиці (49 км).',
@@ -2370,13 +2370,13 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://www.facebook.com/m2remontofficial',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie',phoneNumber: '+380 95 615 8777', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', phoneNumber: '+380 95 615 8777', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
     // 19. E.M Bud - Dmytro Afonin
     await seedService({
-        name: 'E.M Bud',
+        name: 'Afonin Dmytro, E.M Bud',
         slug: 'em-bud',
         category: 'renovation',
         image: 'remont4.png',
@@ -2538,36 +2538,16 @@ async function mainSeed() {
         ],
     });
 
-    // 28. Igor Vonsovic - Remont mieszkania, domy. Wrocław
-    await seedService({
-        name: 'Igor Vonsovic Remont',
-        slug: 'igor-vonsovic-remont',
-        category: 'renovation',
-        image: 'remont3.png',
-        plDesc: 'Remont mieszkań i domów pod klucz we Wrocławiu. Kompleksowe wykończenia wnętrz. Ul. Obrońców Poczty Gdańskiej, Wrocław.',
-        ukDesc: 'Ремонт квартир та будинків під ключ у Вроцлаві. Комплексне оздоблення інтер\'єрів. Вул. Оборонців Пошти Гданської, Вроцлав.',
-        enDesc: 'Turnkey apartment and house renovation in Wrocław. Comprehensive interior finishing. Obrońców Poczty Gdańskiej street, Wrocław.',
-        ruDesc: 'Ремонт квартир и домов под ключ во Вроцлаве. Комплексная отделка интерьеров. Ул. Оборонцув Почты Гданьской, Вроцлав.',
-        tags: ['finishing', 'painting', 'tiles', 'flooring', 'drywall', 'repair'],
-        languages: ['pl', 'uk'],
-        webpage: 'https://www.wykonczeniawnetrzwroclaw.pl/',
-        whatsappNumber: '+48796515066',
-        socials: { facebook: 'https://www.facebook.com/igorvonsovic' },
-        locations: [
-            { city: 'Wrocław', phoneNumber: '+48796515066', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
     // 29. Сергей - Remont квартир Wrocław
     await seedService({
         name: 'Serhiy Remont Wrocław',
         slug: 'serhiy-remont-wroclaw',
         category: 'renovation',
         image: 'remont4.png',
-        plDesc: 'Remonty mieszkań we Wrocławiu. Kontakt: Sergiej.',
-        ukDesc: 'Ремонт квартир у Вроцлаві. Контакт: Сергій.',
-        enDesc: 'Apartment renovations in Wrocław. Contact: Serhiy.',
-        ruDesc: 'Ремонт квартир во Вроцлаве. Контакт: Сергей.',
+        plDesc: 'Remonty mieszkań we Wrocławiu.',
+        ukDesc: 'Ремонт квартир у Вроцлаві.',
+        enDesc: 'Apartment renovations in Wrocław.',
+        ruDesc: 'Ремонт квартир во Вроцлаве.',
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk', 'ru'],
         whatsappNumber: '+48 512 123 579',
@@ -2617,14 +2597,14 @@ async function mainSeed() {
 
     // 32. Ligaremontu - Vladymyr Tishyn
     await seedService({
-        name: 'Ligaremontu',
+        name: 'Liga remontu',
         slug: 'ligaremontu',
         category: 'renovation',
         image: 'ligaremontu.png',
-        plDesc: 'Firma remontowa wykonująca remonty pod klucz. Klejenie włókniny szklanej, papier Knauf po wszystkich kątach. Warszawa.',
-        ukDesc: 'Ремонтна фірма, що виконує ремонт під ключ. Поклейка склохолста, папір Кнауф по всіх кутах. Варшава.',
-        enDesc: 'Renovation company performing turnkey renovations. Fiberglass wallpaper, Knauf paper on all corners. Warsaw.',
-        ruDesc: 'Ремонтная фирма, выполняющая ремонт под ключ. Поклейка стеклохолста, бумага Кнауф по всем углам. Варшава.',
+        plDesc: 'Firma remontowa wykonująca remonty pod klucz.',
+        ukDesc: 'Ремонтна фірма, що виконує ремонт під ключ.',
+        enDesc: 'Renovation company performing turnkey renovations.',
+        ruDesc: 'Ремонтная фирма, выполняющая ремонт под ключ.',
         tags: ['finishing', 'painting', 'drywall', 'repair'],
         languages: ['pl', 'uk'],
         whatsappNumber: '+48666668946',
@@ -2634,20 +2614,22 @@ async function mainSeed() {
         ],
     });
 
-    // 33. Alex Tatsiuk
+    // 33. Alvares Company
     await seedService({
-        name: 'Alex Tatsiuk Remont',
-        slug: 'alex-tatsiuk-remont',
+        name: 'Alvares',
+        slug: 'alvares-remont',
         category: 'renovation',
-        image: 'remont3.png',
+        image: 'alvares.png',
         plDesc: 'Jakościowe remonty mieszkań w Warszawie.',
         ukDesc: 'Якісні ремонти квартир у Варшаві.',
         enDesc: 'Quality apartment renovations in Warsaw.',
         ruDesc: 'Качественные ремонты квартир в Варшаве.',
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
+        whatsappNumber: '+48 790 764 428',
+        socials: { facebook: 'https://www.facebook.com/AlvaresCompany/', instagram: 'https://www.instagram.com/alvares_co_', tiktok: 'https://www.tiktok.com/@alvarescompany1' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 213 933', email: 'alvaresandcompany@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 790 764 428', email: 'alvaresandcompany@gmail.com' },
         ],
     });
 
@@ -2724,20 +2706,20 @@ async function mainSeed() {
         ],
     });
 
-    // 38. Aliaksei Zamyslau - kompleksowy remont
+    // 38. Transport Serwis – Przeprowadzki, transport, montaż mebli (Aliaksei Zamyslau)
     await seedService({
-        name: 'Aliaksei Zamyslau Remont',
-        slug: 'aliaksei-zamyslau-remont',
-        category: 'renovation',
-        image: 'remont3.png',
-        plDesc: 'Remont mieszkań, domów, biur. Wykończenia, płytki, GK, parkiet, laminat, elektryka, hydraulika, drzwi, okna, meble, kuchnie, demontaż, wywóz śmieci, transport materiałów, sprzątanie poremontowe. Warszawa i okolice.',
-        ukDesc: 'Ремонт квартир, будинків, офісів. Оздоблення, плитка, ГКЛ, паркет, ламінат, електрика, сантехніка, двері, вікна, меблі, кухні, демонтаж, вивіз сміття, транспорт матеріалів, прибирання після ремонту. Варшава та околиці.',
-        enDesc: 'Renovation of apartments, houses, offices. Finishing, tiles, drywall, parquet, laminate, electrical, plumbing, doors, windows, furniture, kitchens, demolition, waste removal, material transport, post-renovation cleaning. Warsaw and surroundings.',
-        ruDesc: 'Ремонт квартир, домов, офисов. Отделка, плитка, ГКЛ, паркет, ламинат, электрика, сантехника, двери, окна, мебель, кухни, демонтаж, вывоз мусора, транспорт материалов, уборка после ремонта. Варшава и окрестности.',
-        tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
+        name: 'Transport Serwis',
+        slug: 'transport-serwis-warszawa',
+        category: 'transport',
+        plDesc: 'Przeprowadzki, transport rzeczy oraz montaż mebli (w tym IKEA). Szybka i sprawna obsługa w Warszawie i okolicach.',
+        ukDesc: 'Переїзди, транспортування речей та монтаж меблів (в тому числі IKEA). Швидке та якісне обслуговування у Варшаві та околицях.',
+        enDesc: 'Moving services, item transport and furniture assembly (including IKEA). Fast and efficient service in Warsaw and surroundings.',
+        ruDesc: 'Переезды, транспортировка вещей и сборка мебели (в том числе IKEA). Быстрое и качественное обслуживание в Варшаве и окрестностях.',
+        tags: ['delivery', 'logistics'],
         languages: ['pl', 'uk', 'ru'],
+        socials: { instagram: 'https://www.instagram.com/transportserwis/', facebook: 'https://www.facebook.com/profile.php?id=100083004203979' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 780 002 838' , email: 'zamyslaualiaksei@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 780 002 838', email: 'alexeyzamyslov@gmail.com' },
         ],
     });
 
@@ -2760,98 +2742,30 @@ async function mainSeed() {
         ],
     });
 
-    // 41. Vasilii Zubco - Łódź
+    // 44. Rental in Silesia – Agencja nieruchomości Katowice (Liudmila Vovk-Overko)
     await seedService({
-        name: 'Vasilii Zubco Remont',
-        slug: 'vasilii-zubco-remont',
-        category: 'renovation',
-        image: 'remont1.png',
-        plDesc: 'Remonty mieszkań i biur: tynki, szpachlowanie, malowanie, płytki. Szybko i tanio. Łódź.',
-        ukDesc: 'Ремонт квартир та офісів: штукатурка, шпаклювання, фарбування, плитка. Швидко та недорого. Лодзь.',
-        enDesc: 'Apartment and office renovations: plastering, filling, painting, tiles. Fast and affordable. Łódź.',
-        ruDesc: 'Ремонт квартир и офисов: штукатурка, шпаклёвка, покраска, плитка. Быстро и недорого. Лодзь.',
-        tags: ['painting', 'tiles', 'finishing', 'repair'],
-        languages: ['pl', 'uk', 'ru'],
-        locations: [
-            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 443 237' },
-        ],
-    });
-
-    // 42. Дрібний Ремонт - Łódź
-    await seedService({
-        name: 'Dribnyj Remont',
-        slug: 'dribnyj-remont-lodz',
-        category: 'renovation',
-        image: 'remont2.png',
-        plDesc: 'Remonty mieszkań w Łodzi.',
-        ukDesc: 'Ремонт квартир у Лодзі.',
-        enDesc: 'Apartment renovations in Łódź.',
-        ruDesc: 'Ремонт квартир в Лодзи.',
-        tags: ['finishing', 'repair'],
+        name: 'Rental in Silesia',
+        slug: 'rental-in-silesia-katowice',
+        category: 'real_estate',
+        plDesc: 'Agencja nieruchomości w Katowicach i okolicach. Pełen suprowód: od poszukiwania mieszkania do aktu notarialnego. Obsługa w języku ukraińskim i polskim.',
+        ukDesc: 'Агенція нерухомості у Катовіцах та околицях. Повний супровід: від пошуку квартири до нотаріального акту. Обслуговування українською та польською мовами.',
+        enDesc: 'Real estate agency in Katowice and surroundings. Full support: from apartment search to notarial deed. Service in Ukrainian and Polish.',
+        ruDesc: 'Агентство недвижимости в Катовице и окрестностях. Полное сопровождение: от поиска квартиры до нотариального акта. Обслуживание на украинском и польском языках.',
+        tags: ['foreigners', 'documents'],
+        image: 'rentalinsilesia.png',
         languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 796 713 544' },
-        ],
-    });
-
-    // 43. Саня Олександр - Katowice
-    await seedService({
-        name: 'Oleksandr Remont Katowice',
-        slug: 'oleksandr-remont-katowice',
-        category: 'renovation',
-        image: 'remont3.png',
-        plDesc: 'Kompleksowe remonty mieszkań: kapitalny, kosmetyczny, euro, pod klucz, biura. Remonty łazienek, kuchni. Wyrównanie ścian, szpachlowanie, malowanie, parkiet, laminat, płytki, kamień dekoracyjny, elektryka, hydraulika. Katowice.',
-        ukDesc: 'Комплексний ремонт квартир: капітальний, косметичний, євро, під ключ, офіси. Ремонт ванної, кухні. Вирівнювання стін, шпаклівка, фарбування, паркет, ламінат, плитка, декоративний камінь, електрика, сантехніка. Катовіце.',
-        enDesc: 'Comprehensive apartment renovations: capital, cosmetic, euro, turnkey, offices. Bathroom and kitchen renovations. Wall leveling, plastering, painting, parquet, laminate, tiles, decorative stone, electrical, plumbing. Katowice.',
-        ruDesc: 'Комплексный ремонт квартир: капитальный, косметический, евро, под ключ, офисы. Ремонт ванной, кухни. Выравнивание стен, шпаклёвка, покраска, паркет, ламинат, плитка, декоративный камень, электрика, сантехника. Катовице.',
-        tags: ['tiles', 'flooring', 'painting', 'drywall', 'finishing', 'repair'],
-        languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 125 309' },
-        ],
-    });
-
-    // 44. Katowice Remonty i Wykończenia (Remontiago)
-    await seedService({
-        name: 'Remontiago',
-        slug: 'remontiago-katowice',
-        category: 'renovation',
-        image: 'remont4.png',
-        plDesc: 'Remonty i wykończenia mieszkań w Katowicach. Bezpłatna konsultacja. Instagram: remontiago.',
-        ukDesc: 'Ремонти та оздоблення квартир у Катовіцах. Безкоштовна консультація. Instagram: remontiago.',
-        enDesc: 'Apartment renovations and finishing in Katowice. Free consultation. Instagram: remontiago.',
-        ruDesc: 'Ремонт и отделка квартир в Катовице. Бесплатная консультация. Instagram: remontiago.',
-        tags: ['finishing', 'painting', 'tiles', 'repair'],
-        languages: ['pl', 'uk'],
-        socials: { instagram: 'https://instagram.com/remontiago' },
+        socials: { instagram: 'https://www.instagram.com/liudmyla.vovk.realty/' },
         locations: [
             { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 570 182 180' },
         ],
     });
 
-    // 45. KOPA POLSKA - Олег Ковальчук
-    await seedService({
-        name: 'Kopa Polska',
-        slug: 'kopa-polska',
-        category: 'renovation',
-        image: 'remont5.png',
-        plDesc: 'Firma remontowo-budowlana. Remonty mieszkań, prace murarskie, elewacje, prace wykończeniowe. Gwarancja 1 rok. Katowice i okolice.',
-        ukDesc: 'Ремонтно-будівельна фірма. Ремонт квартир, мурарські роботи, фасади, оздоблювальні роботи. Гарантія 1 рік. Катовіце та околиці.',
-        enDesc: 'Construction and renovation company. Apartment renovations, masonry, facades, finishing works. 1 year guarantee. Katowice and surroundings.',
-        ruDesc: 'Ремонтно-строительная фирма. Ремонт квартир, каменные работы, фасады, отделочные работы. Гарантия 1 год. Катовице и окрестности.',
-        tags: ['finishing', 'painting', 'repair'],
-        languages: ['pl', 'uk'],
-        webpage: 'https://kopapolska.pl/',
-        locations: [
-            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 727 803 272' },
-        ],
-    });
 
     // --- SZCZECIN ---
 
     // 46. Remont mieszkań i biur - Szczecin (881 210 928)
     await seedService({
-        name: 'Remont Szczecin 881',
+        name: 'Remont Szczecin Andrzej Żhdaniuk',
         slug: 'remont-szczecin-881',
         category: 'renovation',
         image: 'remont1.png',
@@ -2883,34 +2797,17 @@ async function mainSeed() {
         ],
     });
 
-    // 48. Majstry universaly - Szczecin
+    // 49. ST Master – Usługi glazurnicze Szczecin (Anatolii Pavlenko)
     await seedService({
-        name: 'Majstry Universaly Szczecin',
-        slug: 'majstry-universaly-szczecin',
+        name: 'ST Master',
+        slug: 'st-master-szczecin',
         category: 'renovation',
-        image: 'remont3.png',
-        plDesc: 'Ekipa remontowa — majstrowie uniwersalni. Szczecin.',
-        ukDesc: 'Ремонтна бригада — майстри універсали. Щецін.',
-        enDesc: 'Renovation crew — universal craftsmen. Szczecin.',
-        ruDesc: 'Ремонтная бригада — мастера универсалы. Щецин.',
-        tags: ['finishing', 'repair'],
-        languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
-    // 49. Remont domów i mieszkań - Szczecin (793 464 671)
-    await seedService({
-        name: 'Remont Szczecin 793',
-        slug: 'remont-szczecin-793',
-        category: 'renovation',
-        image: 'remont4.png',
-        plDesc: 'Remonty domów i mieszkań. Doświadczenie w branży. Szczecin.',
-        ukDesc: 'Ремонт будинків та квартир. Досвід у галузі. Щецін.',
-        enDesc: 'House and apartment renovations. Industry experience. Szczecin.',
-        ruDesc: 'Ремонт домов и квартир. Опыт в отрасли. Щецин.',
-        tags: ['finishing', 'repair'],
+        plDesc: 'Profesjonalne usługi glazurnicze w Szczecinie. Przygotowanie podłoża, hydroizolacja, rozmierzanie i układanie płytek, szlifowanie glazury 45°, szlifowanie niestandardowej glazury, prace hydrauliczne i elektryczne, pomoc w transporcie, darmowa wycena. Szybki termin realizacji.',
+        ukDesc: 'Професійні послуги плиточника у Щеціні. Підготовка основи, гідроізоляція, розмітка та укладання плитки, шліфування глазурі 45°, шліфування нестандартної глазурі, сантехнічні та електричні роботи, допомога з транспортом, безкоштовна оцінка. Швидкі терміни виконання.',
+        enDesc: 'Professional tiling services in Szczecin. Surface preparation, waterproof insulation, tile measuring and laying, 45° tile grinding, non-standard tile grinding, plumbing and electrical work, transport assistance, free estimates. Fast turnaround.',
+        ruDesc: 'Профессиональные услуги плиточника в Щецине. Подготовка основания, гидроизоляция, разметка и укладка плитки, шлифовка глазури 45°, шлифовка нестандартной глазури, сантехнические и электрические работы, помощь с транспортом, бесплатная оценка. Быстрые сроки выполнения.',
+        tags: ['tiles', 'finishing', 'repair'],
+        images: 'remont3.png',
         languages: ['pl', 'uk'],
         locations: [
             { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 793 464 671' },
@@ -2935,58 +2832,6 @@ async function mainSeed() {
     });
 
     // --- LUBLIN ---
-
-    // 51. Remont mieszkań Lublin (z ukraińskojęzycznego postu)
-    await seedService({
-        name: 'Remont Mieszkań Lublin UA',
-        slug: 'remont-mieszkan-lublin-ua',
-        category: 'renovation',
-        image: 'remont1.png',
-        plDesc: 'Remonty mieszkań w Lublinie. Ekipa ukraińskojęzyczna.',
-        ukDesc: 'Ремонт квартир у Любліні. Україномовна бригада.',
-        enDesc: 'Apartment renovations in Lublin. Ukrainian-speaking crew.',
-        ruDesc: 'Ремонт квартир в Люблине. Украиноязычная бригада.',
-        tags: ['finishing', 'repair'],
-        languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
-    // 52. Usługi remontowo-naprawcze Lublin
-    await seedService({
-        name: 'Usługi Remontowe Lublin',
-        slug: 'uslugi-remontowe-lublin',
-        category: 'renovation',
-        image: 'remont2.png',
-        plDesc: 'Usługi remontowo-naprawcze na terenie Lublina i okolic.',
-        ukDesc: 'Ремонтні послуги на території Любліна та околиць.',
-        enDesc: 'Renovation and repair services in Lublin and surroundings.',
-        ruDesc: 'Ремонтные услуги на территории Люблина и окрестностей.',
-        tags: ['finishing', 'repair'],
-        languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
-    // 53. Remonty, Wykończenia Wnętrz, Adaptacje - Lublin
-    await seedService({
-        name: 'Wykończenia Wnętrz Lublin',
-        slug: 'wykonczenia-wnetrz-lublin',
-        category: 'renovation',
-        image: 'remont3.png',
-        plDesc: 'Remonty, wykończenia wnętrz, adaptacje — kompleksowo. Lublin i okolice.',
-        ukDesc: 'Ремонти, оздоблення інтер\'єрів, адаптації — комплексно. Люблін та околиці.',
-        enDesc: 'Renovations, interior finishing, adaptations — comprehensive. Lublin and surroundings.',
-        ruDesc: 'Ремонты, отделка интерьеров, адаптации — комплексно. Люблин и окрестности.',
-        tags: ['finishing', 'painting', 'tiles', 'flooring', 'repair'],
-        languages: ['pl', 'uk'],
-        locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
     // --- KSIĘGOWOŚĆ / FINANSE / PRAWO (nowe firmy) ---
 
     // 54. UKDN Biuro Rachunkowe
@@ -3002,6 +2847,7 @@ async function mainSeed() {
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://ukdn.pl/',
+        image: 'ukdn.png',
         locations: [
             { city: 'Warszawa', street: 'Ochota', voivodeship: 'mazowieckie', latitude: 52.2135, longitude: 20.9815, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 573 535 803', email: 'biuro@ukdn.pl' },
         ],
@@ -3020,6 +2866,8 @@ async function mainSeed() {
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk'],
         socials: { instagram: 'https://www.instagram.com/okservice.com.pl/' },
+        whatsappNumber: '+48 886 969 813',
+        image: 'okservice.png',
         webpage: 'https://www.okservice.com.pl/',
         locations: [
             { city: 'Warszawa', street: 'ul. Modlińska 6A lokal 107', voivodeship: 'mazowieckie', latitude: 52.2985, longitude: 20.9955, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 660 435 218', email: 'biuro@okservice.com.pl' },
@@ -3037,6 +2885,7 @@ async function mainSeed() {
         enDesc: 'Accounting office for Ukrainians in Warsaw. Full and simplified bookkeeping, company establishment, document handling, PESEL, trusted profile, residence permits, vehicle registration and taxi licenses.',
         ruDesc: 'Бухгалтерское бюро для украинцев в Варшаве. Полная и упрощённая бухгалтерия, открытие фирм, оформление документов, PESEL, доверенный профиль, разрешения на пребывание, регистрация авто и лицензии такси.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        image: 'bussinesslife.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://biuro-businesslife.pl/',
         locations: [
@@ -3057,6 +2906,7 @@ async function mainSeed() {
         tags: ['accounting', 'tax', 'foreigners'],
         languages: ['pl', 'uk'],
         webpage: 'https://taxsafe.pl/',
+        image: 'taxsafe.png',
         socials: { facebook: 'https://www.facebook.com/taxsafepl/' },
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 692 102 000', email: 'serwis@taxsafe.pl' },
@@ -3076,6 +2926,7 @@ async function mainSeed() {
         tags: ['accounting', 'tax', 'business-registration', 'documents'],
         languages: ['pl', 'uk', 'ru', 'en'],
         webpage: 'https://ww-finance.pl/ru/',
+        image: 'wwfinance.png',
         socials: { facebook: 'https://www.facebook.com/profile.php?id=61550059505406' },
         locations: [
             { city: 'Warszawa', street: 'ul. Nowogrodzka 31 lok. 414', voivodeship: 'mazowieckie', latitude: 52.2275, longitude: 21.0125, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 664 270 133' },
@@ -3095,30 +2946,14 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро в центре Варшавы. Полная бухгалтерия для компаний и ИП, налоговые расчёты, кадры и зарплаты, легализация пребывания иностранцев, бухгалтерские консультации 24/7 и аутсорсинг бухгалтерии.',
         tags: ['accounting', 'tax', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'ru'],
+        image: 'buchalter.png',
         webpage: 'https://buchalterwarszawa.pl/',
+        whatsappNumber: '+48 799 894 969',
         locations: [
             { city: 'Warszawa', street: 'ul. Grzybowska 87', voivodeship: 'mazowieckie', latitude: 52.2345, longitude: 20.9925, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 799 894 969', email: 'buchalterwarszawa.pl@gmail.com' },
         ],
     });
 
-    // 60. Lasko Biuro Rachunkowe
-    await seedService({
-        name: 'Lasko Biuro Rachunkowe',
-        slug: 'lasko-biuro-rachunkowe',
-        category: 'financial',
-        ukName: 'Lasko Бухгалтерія', enName: 'Lasko Accounting Office', ruName: 'Lasko Бухгалтерия',
-        plDesc: 'Biuro rachunkowe we Wrocławiu. Ryczałt, KPiR, pełna księgowość, kadry i płace, rejestracja działalności, rozliczenia VAT, doradztwo podatkowe, audyty oraz pomoc w pozyskaniu finansowania.',
-        ukDesc: 'Бухгалтерське бюро у Вроцлаві. Спрощене та повне ведення бухгалтерії, кадри та зарплати, реєстрація діяльності, розрахунки ПДВ, податкові консультації, аудити та допомога у залученні фінансування.',
-        enDesc: 'Accounting office in Wrocław. Lump sum, KPiR, full bookkeeping, payroll, business registration, VAT settlements, tax consulting, audits and financing support.',
-        ruDesc: 'Бухгалтерское бюро во Вроцлаве. Упрощённая и полная бухгалтерия, кадры и зарплаты, регистрация деятельности, расчёты НДС, налоговые консультации, аудиты и помощь в получении финансирования.',
-        tags: ['accounting', 'tax', 'business-registration'],
-        languages: ['pl'],
-        socials: { facebook: 'https://www.facebook.com/Biuro.Rachunkowe.Lasko', instagram: 'https://www.instagram.com/laskobiurorachunkowe/' },
-        webpage: 'https://lasko.com.pl/uslugi-ksiegowe/',
-        locations: [
-            { city: 'Wrocław', street: 'ul. Świdnicka 39, oficyna 1 p. pok. 2', voivodeship: 'dolnoslaskie', latitude: 51.1055, longitude: 17.0295, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 71 787 99 77' },
-        ],
-    });
 
     // 61. MDDP UA Hub
     await seedService({
@@ -3132,6 +2967,7 @@ async function mainSeed() {
         ruDesc: 'Отдел UA Hub канцелярии MDDP, предлагающий комплексное налоговое и юридическое консультирование для украинских компаний и НКО, выходящих на польский рынок. Формально-правовая и организационная поддержка.',
         tags: ['tax', 'legal', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'en'],
+        image: 'mddp.png',
         socials: { facebook: 'https://www.facebook.com/mddp.kariera', linkedin: 'https://www.linkedin.com/company/mddp/', instagram: 'https://www.instagram.com/mddp.kariera_pl/' },
         webpage: 'https://www.mddp.pl/ua-hub-kompleksowe-doradztwo-podatkowe/',
         locations: [
@@ -3158,25 +2994,6 @@ async function mainSeed() {
         ],
     });
 
-    // 63. Biuro Rachunkowe Precyzja
-    await seedService({
-        name: 'Biuro Rachunkowe Precyzja',
-        slug: 'biuro-precyzja',
-        category: 'financial',
-        ukName: 'Бухгалтерське бюро Precyzja', enName: 'Precyzja Accounting Office', ruName: 'Бухгалтерское бюро Precyzja',
-        plDesc: 'Biuro rachunkowe w Warszawie specjalizujące się w obsłudze Ukraińców prowadzących firmę w Polsce. Księgowość JDG i spółek, rozliczenia międzynarodowe, zaświadczenia A1, kadry i płace oraz księgowość online.',
-        ukDesc: 'Бухгалтерське бюро у Варшаві, що спеціалізується на обслуговуванні українців, які ведуть бізнес у Польщі. Бухгалтерія ФОП та компаній, міжнародні розрахунки, довідки A1, кадри та зарплати та онлайн-бухгалтерія.',
-        enDesc: 'Accounting office in Warsaw specializing in serving Ukrainians running businesses in Poland. Bookkeeping for sole traders and companies, international settlements, A1 certificates, payroll and online accounting.',
-        ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на обслуживании украинцев, ведущих бизнес в Польше. Бухгалтерия ИП и компаний, международные расчёты, справки A1, кадры и зарплаты и онлайн-бухгалтерия.',
-        tags: ['accounting', 'tax', 'foreigners', 'documents'],
-        languages: ['pl', 'uk'],
-        socials: { facebook: 'https://www.facebook.com/BiuroPrecyzja', linkedin: 'https://www.linkedin.com/company/biuro-precyzja/' },
-        webpage: 'https://www.biuroprecyzja.pl/',
-        locations: [
-            { city: 'Warszawa', street: 'ul. Twarda 18', voivodeship: 'mazowieckie', latitude: 52.2325, longitude: 20.9995, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 517 855 874', email: 'biuro@biuroprecyzja.pl' },
-        ],
-    });
-
     // 64. Portal biznes.gov.pl/Ukraina
     await seedService({
         name: 'Biznes.gov.pl – Portal dla Ukraińców',
@@ -3195,39 +3012,23 @@ async function mainSeed() {
         ],
     });
 
-    // 65. KIDP – Wyszukiwarka doradców podatkowych
-    await seedService({
-        name: 'KIDP – Krajowa Izba Doradców Podatkowych',
-        slug: 'kidp-wyszukaj-doradce',
-        category: 'financial',
-        ukName: 'KIDP – Національна палата податкових консультантів', enName: 'KIDP – National Chamber of Tax Advisors', ruName: 'KIDP – Национальная палата налоговых консультантов',
-        plDesc: 'Oficjalna wyszukiwarka Krajowej Izby Doradców Podatkowych pozwalająca znaleźć certyfikowanego doradcę podatkowego w całej Polsce. Weryfikacja uprawnień, szkolenia i mediacja.',
-        ukDesc: 'Офіційна пошукова система Національної палати податкових консультантів, що дозволяє знайти сертифікованого податкового консультанта по всій Польщі. Перевірка кваліфікації, навчання та медіація.',
-        enDesc: 'Official search engine of the National Chamber of Tax Advisors for finding certified tax advisors across Poland. Credential verification, training and mediation.',
-        ruDesc: 'Официальная поисковая система Национальной палаты налоговых консультантов для поиска сертифицированного налогового консультанта по всей Польше. Проверка квалификации, обучение и медиация.',
-        tags: ['tax', 'legal', 'documents'],
-        languages: ['pl'],
-        webpage: 'https://kidp.pl/wyszukaj-doradce-podatkowego',
-        locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
-        ],
-    });
-
     // 66. Finexpert (Finance Expert)
     await seedService({
-        name: 'Finexpert',
+        name: 'Finance Expert',
         slug: 'finexpert',
         category: 'financial',
-        ukName: 'Finexpert', enName: 'Finexpert – Finance Expert', ruName: 'Finexpert',
+        ukName: 'Finexpert – Finance Expert', enName: 'Finexpert – Finance Expert', ruName: 'Finexpert',
         plDesc: 'Biuro rachunkowe specjalizujące się w uruchamianiu i prowadzeniu biznesu w Polsce dla przedsiębiorców z Ukrainy. Rejestracja firm, księgowość i doradztwo biznesowe.',
         ukDesc: 'Бухгалтерське бюро, що спеціалізується на запуску та супроводі бізнесу в Польщі для підприємців з України. Реєстрація фірм, бухгалтерія та бізнес-консультування.',
         enDesc: 'Accounting office specializing in launching and managing businesses in Poland for Ukrainian entrepreneurs. Company registration, bookkeeping and business consulting.',
         ruDesc: 'Бухгалтерское бюро, специализирующееся на запуске и сопровождении бизнеса в Польше для предпринимателей из Украины. Регистрация фирм, бухгалтерия и бизнес-консультирование.',
         tags: ['accounting', 'business-registration', 'foreigners'],
         languages: ['pl', 'uk', 'ru', 'en'],
+        image: 'financeexpert.png',
         webpage: 'https://finexp.pl/ua/',
+        socials: { telegram: 'https://t.me/FinanceExpertpl_bot', viber: 'viber://pa?chatURI=biznesexpert' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48717282182'  },
         ],
     });
 
@@ -3242,8 +3043,12 @@ async function mainSeed() {
         enDesc: 'Ukrainian-speaking accountant in Warsaw. Full and simplified bookkeeping, VAT/PIT/CIT declarations, payroll, company registration, financial analysis, audits and KSeF support. Specializing in serving Ukrainian entrepreneurs and IT specialists.',
         ruDesc: 'Украиноязычный бухгалтер в Варшаве. Полная и упрощённая бухгалтерия, декларации VAT/PIT/CIT, кадры и зарплаты, регистрация фирм, финансовые анализы, аудиты и обслуживание KSeF. Специализация на обслуживании украинских предпринимателей и IT-специалистов.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
+        image: 'taxanna.png',
         languages: ['pl', 'uk'],
-        socials: { instagram: 'https://www.instagram.com/anna.pereriadkina/', facebook: 'https://www.facebook.com/anna.pereriadkina' },
+        socials: {
+            instagram: 'https://www.instagram.com/anna.pereriadkina/',
+            facebook: 'https://www.facebook.com/anna.pereriadkina',
+        },
         webpage: 'https://taxanna.pl/',
         locations: [
             { city: 'Warszawa', street: 'rondo Ignacego Daszyńskiego 2b, 24 piętro, biuro 45', voivodeship: 'mazowieckie', latitude: 52.2295, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 536 317 319', email: 'pereriadkina@gmail.com' },
@@ -3263,27 +3068,9 @@ async function mainSeed() {
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://biz.drogipol.pl/',
+        image: 'drogipol.png',
         locations: [
             { city: 'Warszawa', street: 'ul. Marii Rodziewiczówny 1/804', voivodeship: 'mazowieckie', latitude: 52.2185, longitude: 21.0745, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 786 639 200', email: 'biuro@drogipol.pl' },
-        ],
-    });
-
-    // 69. KDP Kancelaria Doradztwa Podatkowego
-    await seedService({
-        name: 'KDP Kancelaria Doradztwa Podatkowego',
-        slug: 'kdp-kancelaria',
-        category: 'financial',
-        ukName: 'KDP Канцелярія податкового консультування', enName: 'KDP Tax Advisory Office', ruName: 'KDP Канцелярия налогового консультирования',
-        plDesc: 'Kancelaria doradztwa podatkowego Grażyny Gawryczuk z oddziałami w Warszawie i Białej Podlaskiej. Doradztwo podatkowe, biuro rachunkowe, zakładanie firm oraz innowacyjna platforma e-księgowości.',
-        ukDesc: 'Канцелярія податкового консультування Гражини Гавричук з відділеннями у Варшаві та Білій Підляській. Податкове консультування, бухгалтерське бюро, реєстрація фірм та інноваційна платформа е-бухгалтерії.',
-        enDesc: 'Tax advisory office of Grażyna Gawryczuk with branches in Warsaw and Biała Podlaska. Tax consulting, accounting office, company registration and innovative e-accounting platform.',
-        ruDesc: 'Канцелярия налогового консультирования Гражины Гавричук с отделениями в Варшаве и Белой Подляской. Налоговое консультирование, бухгалтерское бюро, регистрация фирм и инновационная платформа э-бухгалтерии.',
-        tags: ['tax', 'accounting', 'business-registration', 'documents'],
-        languages: ['pl', 'en'],
-        webpage: 'https://www.kdp-kancelaria.pl/',
-        locations: [
-            { city: 'Warszawa', street: 'ul. Floriańska 6/02', voivodeship: 'mazowieckie', latitude: 52.2855, longitude: 21.0385, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 698 640 133', email: 'warszawa@kdp-kancelaria.pl' },
-            { city: 'Biała Podlaska', street: 'ul. Sadowa 14', voivodeship: 'lubelskie', latitude: 52.0325, longitude: 23.1165, openingHours: standardShopHours, phoneNumber: '+48 692 490 651', email: 'ksiegowosc@kdp-kancelaria.pl' },
         ],
     });
 
@@ -3299,7 +3086,8 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексное бухгалтерское обслуживание: налоговые расчёты, декларации НДС и CIT, статистические отчёты, кадры и зарплаты, регистрация фирм, легализация пребывания и бизнес-консультирование. Обслуживание на украинском, русском, польском и английском языках.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'ru', 'en'],
-        socials: { instagram: 'https://www.instagram.com/bstgroup.pl/', facebook: 'https://www.facebook.com/bstgrouppl' },
+        image: 'bst.png',
+        socials: { instagram: 'https://www.instagram.com/bstgroup.pl/', facebook: 'https://www.facebook.com/bstgrouppl', telegram: 'https://t.me/BSTKsiegowa', viber: 'viber://contact?number=%2B48601434253', whatsapp: 'https://api.whatsapp.com/send?phone=48601434253' },
         webpage: 'https://bstgroup.pl/uk/buhgalterske-obslugovuvannya/',
         locations: [
             { city: 'Warszawa', street: 'ul. Ostrobramska 101a lok. 301', voivodeship: 'mazowieckie', latitude: 52.2385, longitude: 21.0825, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 790 871 098', email: 'bioro@bstgroup.pl' },
@@ -3318,6 +3106,7 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на регистрации фирм для иностранцев. Юридическое и налоговое консультирование, подготовка документов, переводы, получение NIP/REGON/KRS, открытие фирменного счёта, регистрация НДС и виртуальный офис.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'en', 'de'],
+        image: 'taxovia.png',
         webpage: 'https://www.taxovia.pl/uslugi/zakladanie-firm-dla-obcokrajowcow',
         locations: [
             { city: 'Warszawa', street: 'ul. Szkoły Orląt 4 lok. 106', voivodeship: 'mazowieckie', latitude: 52.2215, longitude: 21.0575, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 781 444 440', email: 'biuro@taxovia.pl' },
@@ -3336,6 +3125,7 @@ async function mainSeed() {
         ruDesc: 'Международная консалтинговая компания, специализирующаяся на организации и ведении бухгалтерского учёта в Польше. Обслуживание новых польских компаний, подготовка финансовой отчётности, бухгалтерские корректировки и представительство перед органами власти. Обслуживание на украинском, английском, русском и польском языках.',
         tags: ['accounting', 'tax', 'legal', 'documents'],
         languages: ['pl', 'uk', 'ru', 'en'],
+        image: 'romaniuk.png',
         socials: { facebook: 'https://www.facebook.com/romaniuk.partners', youtube: 'https://www.youtube.com/channel/UCruwnI6GUCNBmT_vzMNKTHw' },
         webpage: 'https://r-partners.pl/uk/orhanizatsiya-vedennya-bukhhalterskoho-obliku-v-polshchi/',
         locations: [
@@ -3355,6 +3145,7 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро OL-TAX из Старгарда, предлагающее бухгалтерию для фирм и лиц из Украины. Регистрация деятельности, регистрация НДС, полная бухгалтерия, индивидуальные консультации, обучение для бухгалтеров и бизнес-менторство. Дистанционное обслуживание по всей Польше.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
         languages: ['pl', 'uk', 'ru'],
+        image: 'dobraksiegowa.png',
         webpage: 'https://dobraksiegowa.info/oferta/oferta-dla-osob-z-ukrainy/',
         locations: [
             { city: 'Stargard', street: 'ul. Marszałka Józefa Piłsudskiego 15/3', voivodeship: 'zachodniopomorskie', latitude: 53.3365, longitude: 15.0505, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 783 001 883', email: 'biuro@dobraksiegowa.info' },
@@ -3372,10 +3163,12 @@ async function mainSeed() {
         enDesc: 'Accounting office in Warsaw offering comprehensive online bookkeeping services: document analysis, tax optimization, payroll, business planning and help with starting a company. Multilingual service.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексные онлайн-бухгалтерские услуги: анализ документов, налоговую оптимизацию, кадры и зарплаты, бизнес-планирование и помощь в открытии фирмы. Многоязычное обслуживание.',
         tags: ['accounting', 'tax', 'business-registration'],
+        image: 'nikitas.png',
         languages: ['pl', 'ru'],
+        whatsappNumber: '+48 797 707 581',
         webpage: 'https://www.nikitas.pl/',
         locations: [
-            { city: 'Warszawa', street: 'ul. Płochocińska 18A/U13', voivodeship: 'mazowieckie', latitude: 52.3055, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: 'ul. Płochocińska 18A/U13', voivodeship: 'mazowieckie', latitude: 52.3055, longitude: 20.9985, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 797 707 581', email: 'ashulga.nikitas@gmail.com' },
         ],
     });
 
@@ -3391,6 +3184,7 @@ async function mainSeed() {
         ruDesc: 'Консалтинговая компания, работающая с 2015 года, предлагающая комплексные услуги для бизнеса: бизнес-консультирование, регистрация фирм, бухгалтерия и налоги, кадры и зарплаты, юридическая канцелярия, виртуальный офис, страхование и персональная ассистенция. Обслуживание на польском, украинском, русском и английском языках.',
         tags: ['accounting', 'tax', 'legal', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'uk', 'ru', 'en'],
+        image: 'evolution.png',
         socials: { linkedin: 'https://pl.linkedin.com/company/biz-evolution-pl' },
         webpage: 'https://www.bizevolution.pl/',
         locations: [
@@ -3410,7 +3204,9 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро, предлагающее онлайн-обслуживание по всей Польше. Бухгалтерия ИП и компаний, регистрация фирм, восстановление бухгалтерии, кадры и зарплаты, доверенный профиль и помощь в релокации бизнеса в Польшу. Обслуживание на русском, польском и английском языках.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
         languages: ['pl', 'ru', 'en'],
-        socials: { instagram: 'https://www.instagram.com/ark_biuro_rachunkowe/', facebook: 'https://www.facebook.com/ARK.Biuro.Rachunkowe', youtube: 'https://www.youtube.com/@ARK_Biuro_Rachunkowe' },
+        image: 'ark.png',
+        whatsappNumber: '+48 451 100 945',
+        socials: { instagram: 'https://www.instagram.com/ark_biuro_rachunkowe/', facebook: 'https://www.facebook.com/ARK.Biuro.Rachunkowe', youtube: 'https://www.youtube.com/@ARK_Biuro_Rachunkowe', telegram: 'https://t.me/+48451100945' },
         webpage: 'https://biuro-ark.pl/',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 451 100 945' },
@@ -3429,10 +3225,28 @@ async function mainSeed() {
         ruDesc: 'Бухгалтерское бюро на варшавской Праге Полудне. Полная бухгалтерия, кадрово-зарплатное обслуживание, налоговое и финансовое консультирование, аудиты и специализированная бухгалтерия для иностранцев – налоговые расчёты и регистрация деятельности.',
         tags: ['accounting', 'tax', 'foreigners', 'documents'],
         languages: ['pl'],
+        image: 'amsalvia.png',
         socials: { facebook: 'https://www.facebook.com/amsalviaksiegowosc', instagram: 'https://www.instagram.com/amsalvia_podatki_ksiegowosc/', linkedin: 'https://pl.linkedin.com/company/amsalvia-sp-z-o-o' },
         webpage: 'https://amsalvia.pl/ksiegowosc-dla-cudzoziemcow/',
         locations: [
             { city: 'Warszawa', street: 'ul. Niekłańska 11A/1', voivodeship: 'mazowieckie', latitude: 52.2485, longitude: 21.0675, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 667 087 957', email: 'biuro@mksalvia.pl' },
+        ],
+    });
+
+    // 78. Serhii Baranov – Montaż i Remonty
+    await seedService({
+        name: 'Serhii Baranov – Montaż i Remonty',
+        slug: 'serhii-baranov-montaz',
+        category: 'renovation',
+        plDesc: 'Profesjonalne usługi montażowe i remontowe: meble na wymiar, meble modułowe (IKEA), montaż podłogi i listew przypodłogowych, przeróbki elektryczne, podłączenia kuchenek elektrycznych, biały montaż elektryki. Dobre ceny i krótkie terminy.',
+        ukDesc: 'Професійні послуги монтажу та ремонту: меблі на замовлення, модульні меблі (IKEA), укладання підлоги та плінтусів, електричні переробки, підключення електричних плит, білий монтаж електрики. Хороші ціни та короткі терміни.',
+        enDesc: 'Professional assembly and renovation services: custom furniture, modular furniture (IKEA), floor and baseboard installation, electrical modifications, electric stove connections, electrical white assembly. Good prices and short deadlines.',
+        ruDesc: 'Профессиональные услуги монтажа и ремонта: мебель на заказ, модульная мебель (IKEA), укладка пола и плинтусов, электрические переделки, подключение электрических плит, белый монтаж электрики. Хорошие цены и короткие сроки.',
+        tags: ['flooring', 'finishing', 'repair'],
+        languages: ['pl', 'uk'],
+        whatsappNumber: '+48 577 318 554',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 577 318 554' },
         ],
     });
 

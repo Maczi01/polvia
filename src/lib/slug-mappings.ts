@@ -115,21 +115,58 @@ export const COUNTY_SLUGS = [
 
 export type CountySlug = (typeof COUNTY_SLUGS)[number];
 
-// City slug → display name (with diacritics) mapping
-export const CITY_SLUG_TO_NAME: Record<string, string> = {
-    'warszawa': 'warszawa',
-    'krakow': 'kraków',
-    'lodz': 'łódź',
-    'wroclaw': 'wrocław',
-    'poznan': 'poznań',
-    'gdansk': 'gdańsk',
-    'szczecin': 'szczecin',
+export type CitySlug = 'warszawa' | 'krakow' | 'lodz' | 'wroclaw' | 'poznan' | 'gdansk' | 'szczecin';
+
+// City dictionary with locale-aware display names and raw DB value matching
+export const CITIES: Record<CitySlug, {
+    voivodeship: CountySlug;
+    names: Record<Locale, string>;
+    rawMatches: string[];
+}> = {
+    warszawa: {
+        voivodeship: 'mazowieckie',
+        names: { pl: 'Warszawa', en: 'Warsaw', ru: 'Варшава', uk: 'Варшава' },
+        rawMatches: ['Warszawa', 'warszawa', 'Warsaw'],
+    },
+    krakow: {
+        voivodeship: 'malopolskie',
+        names: { pl: 'Kraków', en: 'Krakow', ru: 'Краков', uk: 'Краків' },
+        rawMatches: ['Kraków', 'kraków', 'Krakow', 'krakow'],
+    },
+    lodz: {
+        voivodeship: 'lodzkie',
+        names: { pl: 'Łódź', en: 'Lodz', ru: 'Лодзь', uk: 'Лодзь' },
+        rawMatches: ['Łódź', 'łódź', 'Lodz', 'lodz'],
+    },
+    wroclaw: {
+        voivodeship: 'dolnoslaskie',
+        names: { pl: 'Wrocław', en: 'Wroclaw', ru: 'Вроцлав', uk: 'Вроцлав' },
+        rawMatches: ['Wrocław', 'wrocław', 'Wroclaw', 'wroclaw'],
+    },
+    poznan: {
+        voivodeship: 'wielkopolskie',
+        names: { pl: 'Poznań', en: 'Poznan', ru: 'Познань', uk: 'Познань' },
+        rawMatches: ['Poznań', 'poznań', 'Poznan', 'poznan'],
+    },
+    gdansk: {
+        voivodeship: 'pomorskie',
+        names: { pl: 'Gdańsk', en: 'Gdansk', ru: 'Гданьск', uk: 'Гданськ' },
+        rawMatches: ['Gdańsk', 'gdańsk', 'Gdansk', 'gdansk'],
+    },
+    szczecin: {
+        voivodeship: 'zachodniopomorskie',
+        names: { pl: 'Szczecin', en: 'Szczecin', ru: 'Щецин', uk: 'Щецін' },
+        rawMatches: ['Szczecin', 'szczecin'],
+    },
 };
 
 // City slugs (ASCII, no diacritics)
-export const CITY_SLUGS = Object.keys(CITY_SLUG_TO_NAME) as unknown as readonly CitySlug[];
+export const CITY_SLUGS = Object.keys(CITIES) as unknown as readonly CitySlug[];
 
-export type CitySlug = 'warszawa' | 'krakow' | 'lodz' | 'wroclaw' | 'poznan' | 'gdansk' | 'szczecin';
+// Backwards-compatible mapping (used by map-slug-parser)
+export const CITY_SLUG_TO_NAME: Record<string, string> = Object.fromEntries(
+    Object.entries(CITIES).map(([slug, city]) => [slug, city.names.pl.toLowerCase()]),
+);
 
 // Reverse lookup maps (built at runtime for performance)
 const reverseCategoryMaps = {
@@ -260,8 +297,66 @@ export function normalizeCitySlug(city: string): string {
 /**
  * Get the original city name (with diacritics) from a slug
  * @param slug - City slug (e.g., "krakow")
- * @returns City name with diacritics (e.g., "kraków") or null if invalid
+ * @returns City name with diacritics lowercase (e.g., "kraków") or null if invalid
  */
 export function getCityNameFromSlug(slug: string): string | null {
     return CITY_SLUG_TO_NAME[slug.toLowerCase()] || null;
+}
+
+/**
+ * Get the locale-aware display name for a city
+ * @param slug - City slug (e.g., "krakow")
+ * @param locale - Current locale
+ * @returns Capitalized city name (e.g., "Kraków" for pl, "Krakow" for en) or null
+ */
+export function getCityDisplayName(slug: string, locale: Locale): string | null {
+    const city = CITIES[slug.toLowerCase() as CitySlug];
+    return city?.names[locale] ?? null;
+}
+
+/**
+ * Get the raw DB city values that match a given city slug.
+ * Used for SQL WHERE clauses to filter service_locations by city.
+ */
+export function getCityRawMatches(slug: CitySlug): string[] {
+    return CITIES[slug]?.rawMatches ?? [];
+}
+
+/**
+ * Resolve a raw DB city value to a normalized CitySlug.
+ * First tries exact match against known rawMatches, then falls back to slug normalization.
+ */
+let rawToCitySlugCache: Map<string, CitySlug> | null = null;
+
+function buildRawToCitySlugCache(): Map<string, CitySlug> {
+    if (rawToCitySlugCache) return rawToCitySlugCache;
+    const map = new Map<string, CitySlug>();
+    for (const [slug, city] of Object.entries(CITIES)) {
+        for (const raw of city.rawMatches) {
+            map.set(raw, slug as CitySlug);
+        }
+    }
+    rawToCitySlugCache = map;
+    return map;
+}
+
+export function normalizeCityFromRaw(rawCity: string): CitySlug | null {
+    const cache = buildRawToCitySlugCache();
+
+    // Exact match against known raw values
+    const exactMatch = cache.get(rawCity);
+    if (exactMatch) return exactMatch;
+
+    // Fallback: normalize and check if it's a valid city slug
+    const normalized = normalizeCitySlug(rawCity);
+    if (isValidCitySlug(normalized)) return normalized;
+
+    return null;
+}
+
+/**
+ * Get the voivodeship for a city slug
+ */
+export function getCityVoivodeship(slug: CitySlug): CountySlug {
+    return CITIES[slug].voivodeship;
 }

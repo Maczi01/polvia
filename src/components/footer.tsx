@@ -1,13 +1,17 @@
 import React from 'react';
 import Image from 'next/image';
+import NextLink from 'next/link';
 import { Link } from '@/i18n/navigation';
 import { FooterNewsletter } from '@/app/[locale]/(header)/_components/footer-newsletter';
-import { getTranslations } from 'next-intl/server';
+import { getTranslations, getLocale } from 'next-intl/server';
 import { Logo } from './logo';
 import { serviceName } from '@/lib/consts';
+import { CITY_SLUGS, getCityDisplayName } from '@/lib/slug-mappings';
+import type { Locale } from '@/i18n/config';
 
 export const Footer = async () => {
     const t = await getTranslations('FooterNewsletter');
+    const locale = (await getLocale()) as Locale;
 
     return (
         <footer
@@ -61,6 +65,31 @@ export const Footer = async () => {
                         {/*>*/}
                         {/*    {t('blog')}*/}
                         {/*</Link>*/}
+                    </nav>
+
+                    {/* City links */}
+                    <nav
+                        className="flex flex-col items-start space-y-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1 sm:space-y-0 lg:flex-1 lg:justify-center"
+                        aria-label={t('cities')}
+                    >
+                        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            {t('cities')}
+                        </span>
+                        {CITY_SLUGS.map(slug => {
+                            const cityName = getCityDisplayName(slug, locale);
+                            const href = locale === 'pl'
+                                ? `/miasto/${slug}`
+                                : `/${locale}/miasto/${slug}`;
+                            return (
+                                <NextLink
+                                    key={slug}
+                                    href={href}
+                                    className="whitespace-nowrap rounded-md px-0 py-1 text-sm text-gray-600 transition-colors hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 dark:text-gray-300 dark:hover:text-gray-100 md:px-1"
+                                >
+                                    {cityName}
+                                </NextLink>
+                            );
+                        })}
                     </nav>
 
                     {/* Newsletter section */}

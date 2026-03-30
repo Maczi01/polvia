@@ -75,7 +75,8 @@
       "WebFetch(domain:www.bizevolution.pl)",
       "WebFetch(domain:biuro-ark.pl)",
       "WebFetch(domain:amsalvia.pl)",
-      "WebFetch(domain:www.biura-rachunkowe.waw.pl)"
+      "WebFetch(domain:www.biura-rachunkowe.waw.pl)",
+      "WebFetch(domain:www.instagram.com)"
     ]
   },
   "enableAllProjectMcpServers": true,
