@@ -96,7 +96,7 @@ export const Footer = async () => {
                     {/* Social Media Links */}
                     <div className="flex items-center space-x-4" aria-label="Media społecznościowe">
                         <a
-                            href="https://www.facebook.com/profile.php?id=61581810938368"
+                            href="https://www.facebook.com/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="rounded-md p-1 text-gray-600 transition-colors hover:text-[#1877F2] focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-[#1877F2]"

@@ -42,7 +42,7 @@ export const HowItWorks = async () => {
                             >
                                 {/* Header */}
                                 <div className="mb-6 flex items-center gap-3 border-b border-gray-100 pb-4">
-                                    <div className="flex size-8 items-center justify-center rounded-lg bg-green text-sm font-bold text-white">
+                                    <div className="flex size-8 items-center justify-center rounded-lg bg-white border-2 dark:bg-blue-700 border-blue-500 text-sm font-bold text-white">
                                         <Image
                                             src="/logo/only.svg"
                                             alt={t('logo')}
