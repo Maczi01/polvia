@@ -46,9 +46,9 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         const baseUrl = env.NEXT_PUBLIC_SITE_URL;
         const postUrl = `${baseUrl}/${locale}/blog/${slug}`;
 
-        const allLocales = ['pl', 'en', 'ru', 'uk'] as const;
+        const availableLocales = await getAvailableTranslations(slug);
         const languagesMap: Record<string, string> = {
-            ...Object.fromEntries(allLocales.map(l => [l, `${baseUrl}/${l}/blog/${slug}`])),
+            ...Object.fromEntries(availableLocales.map(l => [l, `${baseUrl}/${l}/blog/${slug}`])),
             'x-default': baseUrl,
         };
 

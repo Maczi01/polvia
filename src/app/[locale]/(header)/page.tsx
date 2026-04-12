@@ -22,7 +22,7 @@ export default async function HomePage({ params }: { params: any }) {
             <TrustSection />
             <StatsBar />
             <Faq />
-            {/*<BlogSection params={params} />*/}
+            <BlogSection params={params} />
             <ScrollToTopButton />
         </div>
     );

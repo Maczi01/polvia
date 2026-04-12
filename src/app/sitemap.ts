@@ -102,29 +102,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 3. Posty blogowe
     // -------------------------------------------------------
     const blogPages: MetadataRoute.Sitemap = [];
-    try {
-        const plPosts = await getPosts('pl');
-        for (const post of plPosts) {
-            blogPages.push({
-                url: `${baseUrl}/blog/${post.slug}`, // Polski bez prefiksu
-                lastModified: post.publishedAt
-                    ? new Date(post.publishedAt).toISOString()
-                    : currentDate,
-                changeFrequency: 'monthly',
-                priority: 0.7,
-            });
-        }
+    const blogLocales = [
+        { locale: 'pl', prefix: '' },
+        { locale: 'en', prefix: '/en' },
+        { locale: 'ru', prefix: '/ru' },
+        { locale: 'uk', prefix: '/uk' },
+    ] as const;
 
-        const enPosts = await getPosts('en');
-        for (const post of enPosts) {
-            blogPages.push({
-                url: `${baseUrl}/en/blog/${post.slug}`, // Angielski z prefiksem
-                lastModified: post.publishedAt
-                    ? new Date(post.publishedAt).toISOString()
-                    : currentDate,
-                changeFrequency: 'monthly',
-                priority: 0.7,
-            });
+    try {
+        for (const { locale, prefix } of blogLocales) {
+            const posts = await getPosts(locale);
+            for (const post of posts) {
+                blogPages.push({
+                    url: `${baseUrl}${prefix}/blog/${post.slug}`,
+                    lastModified: post.publishedAt
+                        ? new Date(post.publishedAt).toISOString()
+                        : currentDate,
+                    changeFrequency: 'monthly',
+                    priority: 0.7,
+                });
+            }
         }
     } catch (error) {
         // Log error in production environment if needed
