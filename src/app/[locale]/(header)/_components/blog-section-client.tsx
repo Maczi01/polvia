@@ -114,7 +114,9 @@ export function BlogSectionClient({ post, locale }: BlogSectionClientProps) {
                         {/*<Link className="text-green" href="/blog">*/}
                         {/*    {t('blog')}*/}
                         {/*</Link>*/}
-                        {/*<span className="text-green dark:text-green">Blog</span>*/}
+                        <span className="text-green dark:text-green">
+                             {t('blog')}{' '}
+                        </span>
                     </h2>
                     <p className="mx-auto max-w-2xl text-base text-gray-600 dark:text-gray-300 lg:text-lg">
                         {t('subtitle')}
