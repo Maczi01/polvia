@@ -8,10 +8,6 @@ export default function robots(): MetadataRoute.Robots {
             userAgent: '*',
             allow: '/',
             disallow: [
-                // Block query parameter URLs (these redirect to slug-based URLs)
-                '/map?*',
-                '/mapa?*',
-                '/en/map?*',
                 // Block sensitive paths
                 '/api/',
                 '/_next/',
