@@ -98,11 +98,10 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
             siteName: serviceNameFromCapitalLetter,
         },
         robots: {
-            // noindex combination pages (category+county) — thin content
-            index: !(parseResult.success && parseResult.filters.category && parseResult.filters.county),
+            index: true,
             follow: true,
             googleBot: {
-                index: !(parseResult.success && parseResult.filters.category && parseResult.filters.county),
+                index: true,
                 follow: true,
             },
         },
