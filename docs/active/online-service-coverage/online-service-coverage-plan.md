@@ -1,7 +1,7 @@
 # Plan: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-19
+**Ostatnia aktualizacja:** 2026-08-20
 
 ## Źródła
 

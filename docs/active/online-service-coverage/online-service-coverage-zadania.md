@@ -1,7 +1,7 @@
 # Zadania: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-19
+**Ostatnia aktualizacja:** 2026-08-20
 
 ## Źródła
 
@@ -90,25 +90,77 @@ interaktywnym.
 **Delegate to:** `feature-builder-web-data` · **Nakład:** M · **Zależności:** U0
 **Wymagania:** R1, R9
 
-- [ ] `src/db/schema.ts` — `coverageEnum = pgEnum('coverage', ['local', 'online', 'hybrid'])`
-- [ ] `src/db/schema.ts` — kolumna `coverage` na `servicesTable`, `notNull().default('local')`
-- [ ] `src/db/schema.ts` — zdejmij `notNull()` z `serviceLocationsTable.latitude` i `longitude`
-- [ ] `src/db/schema.ts` — **zachowaj** indeksy `idx_location_latitude` / `idx_location_longitude`
-- [ ] Wygeneruj migrację: `npm run drizzle:generate` (plik w `drizzle/` — **nigdy** nie edytuj ręcznie)
-- [ ] `src/types/index.ts` — `Service.latitude: number | null`, `Service.longitude: number | null`
-- [ ] `src/types/index.ts` — `Service.coverage: Coverage`; typ `Coverage` inferowany ze schematu Drizzle
-- [ ] `src/lib/queries.ts` — `coverage` do selecta w `getServices`
-- [ ] `src/lib/queries.ts` — `coverage` do selecta w `getMostPopular` (**zduplikowany select — nie pomiń**)
-- [ ] `src/lib/queries.ts` — **nie zmieniaj** `innerJoin` na `leftJoin` (decyzja 2 w kontekście)
-- [ ] Stwórz `src/db/schema.test.ts` — guard na wartości `coverageEnum`
-- [ ] Przejrzyj pełną listę błędów z `npx tsc --noEmit` i odnotuj miejsca zakładające `number` (mapa pracy dla U7, U8)
-- [ ] `Test:` typ `Coverage` przyjmuje `'local' | 'online' | 'hybrid'` i odrzuca inne wartości
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów po zaktualizowaniu wszystkich miejsc użycia
-- [ ] `Weryfikacja:` `npx jest src/lib src/db` — testy przechodzą
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów (`eslint-plugin-drizzle` bez ostrzeżeń)
-- [ ] `Weryfikacja:` `git diff --stat drizzle/` pokazuje wyłącznie nowy plik migracji, zero modyfikacji istniejących
+- [x] `src/db/schema.ts` — `coverageEnum = pgEnum('coverage', ['local', 'online', 'hybrid'])` + typ `Coverage`
+- [x] `src/db/schema.ts` — kolumna `coverage` na `servicesTable`, `notNull().default('local')`
+- [x] `src/db/schema.ts` — zdejmij `notNull()` z `serviceLocationsTable.latitude` i `longitude`
+- [x] `src/db/schema.ts` — **zachowaj** indeksy `idx_location_latitude` / `idx_location_longitude`
+- [x] `src/types/index.ts` — `Service.latitude: number | null`, `Service.longitude: number | null`
+- [x] `src/types/index.ts` — `Service.coverage: Coverage`; typ `Coverage` inferowany ze schematu Drizzle
+- [x] `src/lib/queries.ts` — `coverage` do selecta w `getServices`
+- [x] `src/lib/queries.ts` — `coverage` do selecta w `getMostPopular` (zduplikowany select — oba pokryte)
+- [x] `src/lib/queries.ts` — **nie zmieniono** `innerJoin` na `leftJoin` (decyzja 2 w kontekście — potwierdzona)
+- [x] Stwórz `src/db/schema.test.ts` — guard na wartości `coverageEnum`
+- [x] Przejrzyj pełną listę błędów z `npx tsc --noEmit` — 15 błędów w 5 plikach, rozbiór niżej
+- [x] `Test:` typ `Coverage` przyjmuje `'local' | 'online' | 'hybrid'` i odrzuca inne wartości — **4/4 PASS**
+- [x] `Weryfikacja:` `npx tsc --noEmit` — **0 błędów**
+- [x] `Weryfikacja:` `npx jest` — **95/95 PASS** (3 suity)
+- [x] `Weryfikacja:` `npx next lint` — **0 błędów** (same preegzystujące warningi)
+- [ ] Wygeneruj migrację — **BLOKADA: wymaga TTY, patrz niżej**
+- [ ] `Weryfikacja:` `git diff --stat drizzle/` pokazuje wyłącznie nowy plik migracji — czeka na migrację
+- [ ] `Operator:` `npx drizzle-kit generate --name add_coverage_and_nullable_coords` → wybierz **`+ coverage create enum`**
 - [ ] `Operator:` `npm run drizzle:push` (albo `npx tsx sequential-migrate.ts`) na lokalnej bazie dev
 - [ ] `Operator:` potwierdź, że kolumna `coverage` istnieje i ma `'local'` dla wszystkich istniejących wierszy
+
+Commit: `f7e7b87`
+
+#### BLOKADA — migracja wymaga interaktywnego terminala
+
+`npm run drizzle:generate` w `package.json` woła **przedawniony** `drizzle-kit generate:pg`
+(drizzle-kit 0.30.5), który nic nie generuje — tylko wypisuje ostrzeżenie o deprecacji.
+
+Poprawna komenda `npx drizzle-kit generate` zadaje pytanie:
+
+```
+Is coverage enum created or renamed from another enum?
+❯ + coverage          create enum
+  ~ county › coverage rename enum
+```
+
+Trzeba wybrać **pierwszą opcję**. Wybór drugiej wygenerowałby `ALTER TYPE county RENAME TO coverage`
+— destrukcyjnie i błędnie. Pytanie pojawia się, bo w `drizzle/meta/*.json` (snapshoty 0011–0013)
+siedzi enum `county`, którego **nie ma w `src/db/schema.ts`** — preegzystujący rozjazd snapshotów,
+niezależny od tego zadania.
+
+Bash i PowerShell w tej sesji nie mają TTY (`printf '\n' |` nie pomaga, biblioteka promptów wymaga
+terminala), a `drizzle-kit generate --help` nie ma flagi nieinteraktywnej. Do uruchomienia ręcznie.
+
+**Osobne znalezisko do naprawy kiedyś:** skrypt `drizzle:generate` w `package.json` jest martwy.
+Poza scope'em tego zadania.
+
+#### Odchylenia od planu w U1 (wszystkie zgłoszone i zaakceptowane)
+
+1. **`src/lib/map-utils.ts` — plik przeoczony w planie.** Nie było go w `Pliki:` żadnego unitu.
+   Linia 7 **już** filtrowała `latitude != null && longitude != null` — autor przewidział
+   nullowalność, tylko TypeScript nie zawęża typu przez zwykły `.filter()`. Poprawka to predykat
+   typu, **zero zmiany zachowania**.
+2. **`src/app/api/services/route.ts` — plan deklarował „bez zmian".** Deklaracja była zbyt mocna:
+   brak `coverage` w selekcie **i** w przepisywanym ręcznie obiekcie (linia ~216) łamie współdzielony
+   typ `PartialService`. Dodane w obu miejscach. **Zachowanie route'u bez zmian** — granica scope'u
+   dotyczyła logiki, nie pól selecta. Doprecyzowane w planie technicznym.
+3. **Poprawki kompilacyjne w plikach U7/U8 wchłonięte do U1** (decyzja użytkownika). Powód:
+   „nullowalne współrzędne" nie da się zamknąć jako samodzielny zielony commit — zdjęcie `notNull`
+   psuje kompilację u konsumentów. Alternatywą był czerwony typecheck przez całą Fazę 4, łamiący
+   quality gate z `CLAUDE.md` i hałasujący hook Stop przy każdym kroku.
+
+#### Co z tego wynika dla U7 i U8 — częściowo już zrobione
+
+- **U7:** `createPoints` w `overview-map/utility.ts` **już filtruje brak współrzędnych** i ma typ
+  `LocatedService`. U7 dokłada **wyłącznie** warunek `coverage !== 'online'` oraz empty state (R11).
+  Komentarz w kodzie wskazuje miejsce.
+- **U8:** gardy `!== undefined` → `!= null` w `service-card.tsx:251,286` **już naprawione**
+  (to była regresja wprowadzana przez U1, więc musiała paść razem z nią). `marker-popup.tsx` ma
+  early return bez współrzędnych. U8 dokłada badge zasięgu, ukrycie `navigateLink` (`:350` —
+  **wciąż nietknięte**), characterization testy i asercje `jest-axe`.
 
 ---
 

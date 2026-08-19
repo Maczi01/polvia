@@ -65,7 +65,10 @@ Przeniesione z dokumentu źródłowego:
 
 Dodane w planowaniu:
 
-- Bez zmian w `/api/services` (semantic search) — uzasadnienie w Kluczowych decyzjach.
+- Bez zmian **w logice** `/api/services` (semantic search) — uzasadnienie w Kluczowych decyzjach.
+  **Sprostowanie z wykonania U1:** pola selecta i ręcznie przepisywany obiekt odpowiedzi **musiały**
+  dostać `coverage`, bo route zwraca współdzielony typ `PartialService`. Granica dotyczy zachowania
+  (brak filtrowania po zasięgu, brak nowych parametrów), nie kształtu wiersza.
 - Bez `/mapa/{kategoria}/online` w sitemapie w tej iteracji — tylko `/mapa/online`.
 - Bez konsolidacji czterech źródeł prawdy o kategoriach — zgłoszone jako ryzyko, nie naprawiane tutaj.
 
@@ -257,7 +260,7 @@ unitach dały się w ogóle domknąć.
 
 ### Faza 1 — Fundament danych
 
-- [ ] **Unit 1: `coverage` w schemacie + nullowalne współrzędne + typy + zapytania**
+- [x] **Unit 1: `coverage` w schemacie + nullowalne współrzędne + typy + zapytania** — commit `f7e7b87`, migracja pending
 
 **Cel:** Wprowadzić zasięg do modelu danych i dopuścić wpis bez współrzędnych, nie zmieniając
 semantyki istniejących zapytań.
@@ -266,11 +269,22 @@ semantyki istniejących zapytań.
 
 **Zależności:** Unit 0 (żeby weryfikacja typecheck była wiarygodna)
 
+> **Sprostowanie z wykonania:** pierwotny podział był błędny — zdjęcie `notNull` ze współrzędnych
+> psuje kompilację u konsumentów, więc U1 **nie mógł** być samodzielnym zielonym commitem, a jego
+> kryterium „tsc zero błędów" było strukturalnie nieosiągalne. Decyzją użytkownika U1 wchłonął
+> minimalne poprawki kompilacyjne (`!= null`, predykaty typu) w plikach U7/U8. Unity 7 i 8 zachowują
+> całą warstwę **zachowania** — patrz notatki w ich sekcjach.
+
 **Pliki:**
 - Modyfikuj: `src/db/schema.ts`
-- Stwórz: `drizzle/00XX_*.sql` *(wygenerowany przez `npm run drizzle:generate` — NIGDY nie edytowany ręcznie)*
+- Stwórz: `drizzle/00XX_*.sql` *(generowany przez `npx drizzle-kit generate` — `npm run drizzle:generate` jest martwy, woła przedawniony `generate:pg`; NIGDY nie edytowany ręcznie)*
 - Modyfikuj: `src/types/index.ts`
 - Modyfikuj: `src/lib/queries.ts`
+- Modyfikuj: `src/lib/map-utils.ts` *(dopisane w wykonaniu — przeoczone w planowaniu; predykat typu w filtrze, zero zmiany zachowania)*
+- Modyfikuj: `src/app/api/services/route.ts` *(dopisane w wykonaniu — `coverage` w selekcie i w przepisywanym obiekcie; wymóg współdzielonego typu, nie zmiana logiki)*
+- Modyfikuj: `src/app/[locale]/(main)/_components/overview-map/utility.ts` *(wchłonięte: typ `LocatedService` + filtr braku współrzędnych; warunek `coverage` zostaje w U7)*
+- Modyfikuj: `src/app/[locale]/(main)/_components/service-card/service-card.tsx` *(wchłonięte: gardy `!= null`; badge i `navigateLink` zostają w U8)*
+- Modyfikuj: `src/app/[locale]/(main)/_components/marker-popup.tsx` *(wchłonięte: early return bez współrzędnych)*
 - Test (unit): `src/db/schema.test.ts` *(guard na wartości `coverageEnum` — łapie przypadkową zmianę nazwy wartości, od której zależą parser URL, Zod i filtry)*
 
 **Delegate to:** feature-builder-web-data
@@ -300,14 +314,15 @@ przejrzyj ją i odnotuj, zanim zaczniesz gasić pojedyncze przypadki.
 - `src/db/aliases.ts` — jeśli potrzebny alias.
 
 **Scenariusze testowe:**
-- [Unit] Typ `Coverage` przyjmuje `'local' | 'online' | 'hybrid'` i odrzuca inne wartości
-  (test typu przez `@ts-expect-error` albo asercja na `coverageEnum.enumValues`).
+- [x] [Unit] Typ `Coverage` przyjmuje `'local' | 'online' | 'hybrid'` i odrzuca inne wartości
+  (test typu przez `@ts-expect-error` albo asercja na `coverageEnum.enumValues`) — **4/4 PASS**
 
 **Weryfikacja:**
-- `npx tsc --noEmit` kończy się zerem błędów po zaktualizowaniu wszystkich miejsc użycia.
-- `npx jest src/lib` — testy przechodzą.
-- `npx next lint` — zero błędów (`eslint-plugin-drizzle` bez ostrzeżeń na zmianach schematu).
-- `git diff --stat drizzle/` pokazuje wyłącznie nowy plik migracji, zero modyfikacji istniejących.
+- [x] `npx tsc --noEmit` kończy się zerem błędów po zaktualizowaniu wszystkich miejsc użycia — **0**
+- [x] `npx jest src/lib` — testy przechodzą — **95/95 w całym repo**
+- [x] `npx next lint` — zero błędów (`eslint-plugin-drizzle` bez ostrzeżeń na zmianach schematu) — **0**
+- [ ] `git diff --stat drizzle/` pokazuje wyłącznie nowy plik migracji, zero modyfikacji istniejących
+      — **czeka na wygenerowanie migracji (wymaga TTY, patrz zadania.md)**
 
 **Operator checklist:**
 - [ ] `npm run drizzle:push` (albo `npx tsx sequential-migrate.ts`) na lokalnej bazie dev

@@ -1,7 +1,7 @@
 # Kontekst: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-19
+**Ostatnia aktualizacja:** 2026-08-20
 
 ## Źródła
 
@@ -152,6 +152,34 @@ Fakty ustalone przez faktyczne uruchomienie, nie założone. Istotne dla każdeg
   więc reguła `color-contrast` nie wykonuje się — 16 testów kontrastu w `badge.test.tsx`
   przechodzi próżno. Asercje `jest-axe` w nowych testach mają wartość dla struktury i ARIA,
   **nie dla kontrastu kolorów**. Kontrast wymaga weryfikacji w przeglądarce (krok `Operator:`).
+
+## Dziennik wykonania
+
+### U0 — czysty baseline typecheck (commit `c40d10c`, docs `18a9c1e`)
+
+Założenie planu było błędne: brakujące barrele maskowały niespójność API `Badge`, nie tylko brak
+modułu. Rozstrzygnięcie: `children` jako główne API (shadcn/ui), `label` jako opcjonalny override
+z priorytetem — cztery produkcyjne call site'y zachowały identyczne wyjście. Naprawiony bug
+produkcyjny: `pricing/page.tsx` pokazywał „Empty" zamiast przetłumaczonego tekstu.
+Dług do przeglądu: `role="status"` + `tabIndex={0}` na każdym badge'u (wymóg testów).
+
+### U1 — `coverage` + nullowalne współrzędne (commit `f7e7b87`)
+
+**Potwierdzone w kodzie:** decyzja 2 z tego dokumentu (`innerJoin` zostaje) okazała się słuszna —
+nie było potrzeby ruszania joinów. Decyzja 3 (`openingHours` bez migracji) też się utrzymała.
+
+**Skala skutków nullowalności:** 15 błędów typecheck w 5 plikach. Dwa z nich były poza planem
+(`src/lib/map-utils.ts` — przeoczony; `src/app/api/services/route.ts` — objęty zbyt mocno
+sformułowaną granicą scope'u). Pozostałe 10 w plikach U7/U8, wchłonięte do U1 decyzją użytkownika,
+bo „nullowalne współrzędne" nie da się zamknąć jako samodzielny zielony commit.
+
+**Reguła na przyszłość:** zmiana nullowalności kolumny jest z natury cross-cutting. Przy kolejnym
+takim ruchu planować ją jako jeden unit razem z konsumentami, nie rozbijać na fazy — inaczej repo
+nie kompiluje się między commitami, `git bisect` traci sens, a quality gate z `CLAUDE.md` blokuje
+commitowanie.
+
+**Otwarte:** migracja Drizzle wymaga interaktywnego terminala (szczegóły i dokładna komenda
+w `zadania.md`). Do czasu jej wygenerowania `schema.ts` i `drizzle/` są rozjechane.
 
 ## Pułapki (świadome, udokumentowane)
 
