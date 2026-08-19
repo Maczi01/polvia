@@ -248,7 +248,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         setCardToExpand(id);
                         handleIncreasePopularityCounter(serviceId);
 
-                        if (latitude !== undefined && longitude !== undefined) {
+                        if (latitude != null && longitude != null) {
                             handleFlyTo(longitude, latitude);
                             setPopup({
                                 id,
@@ -283,7 +283,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 setCardToExpand(id);
                 handleIncreasePopularityCounter(serviceId);
 
-                if (latitude !== undefined && longitude !== undefined) {
+                if (latitude != null && longitude != null) {
                     handleFlyTo(longitude, latitude);
                     setPopup({
                         id,

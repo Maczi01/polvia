@@ -29,6 +29,7 @@ export async function getServices(locale: string = 'en') {
             description: servicesTranslationsAlias.description,
 
             category: servicesTable.category,
+            coverage: servicesTable.coverage,
             city: serviceLocationsTable.city,
             street: serviceLocationsTable.street,
             voivodeship: serviceLocationsTable.voivodeship,
@@ -144,6 +145,7 @@ export async function getMostPopular(locale: string) {
             description: servicesTranslationsAlias.description,
 
             category: servicesTable.category,
+            coverage: servicesTable.coverage,
             city: serviceLocationsTable.city,
             street: serviceLocationsTable.street,
             voivodeship: serviceLocationsTable.voivodeship,

@@ -48,8 +48,11 @@ export const initialViewState = {
     pitch: 0,
 };
 
+/** Usluga, ktora da sie postawic na mapie — ma oba wspolrzedne. */
+export type LocatedService = PartialService & { latitude: number; longitude: number };
+
 export function createPoint(
-    item: PartialService,
+    item: LocatedService,
 ): PointFeature<ItemPointFeatureProperties> {
     const { longitude, latitude } = item;
     return {
@@ -66,7 +69,14 @@ export function createPoint(
 export function createPoints(
     items: PartialService[],
 ): PointFeature<ItemPointFeatureProperties>[] {
-    return items.map(createPoint);
+    // Pin wymaga wspolrzednych. Warunek na `coverage` (brak pinu dla `online`)
+    // dochodzi w U7 — tutaj wylacznie zawezenie typu po nullowalnosci.
+    return items
+        .filter(
+            (item): item is LocatedService =>
+                item.latitude != null && item.longitude != null,
+        )
+        .map(createPoint);
 }
 
 export function mapFeature(properties: ItemPointFeatureProperties): ItemPointClusterProperties {

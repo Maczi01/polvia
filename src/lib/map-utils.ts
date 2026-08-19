@@ -4,7 +4,12 @@ import { PartialService } from '@/types';
 export function calculateServicesBounds(services: PartialService[]) {
     if (services.length === 0) return null;
 
-    const validServices = services.filter(s => s.latitude != null && s.longitude != null);
+    // Predykat typu, nie zwykly filter — inaczej TS nie zawezi `number | null` do `number`
+    // w Math.min/max ponizej. Zachowanie bez zmian: ten filtr istnial tu wczesniej.
+    const validServices = services.filter(
+        (s): s is PartialService & { latitude: number; longitude: number } =>
+            s.latitude != null && s.longitude != null,
+    );
     if (validServices.length === 0) return null;
 
     const lats = validServices.map(s => s.latitude);
