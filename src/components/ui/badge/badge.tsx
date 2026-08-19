@@ -84,23 +84,41 @@ const badgeVariantsList = [
 export interface BadgeProps
     extends React.HTMLAttributes<HTMLDivElement>,
         VariantProps<typeof badgeVariants> {
-    label: string;
+    /**
+     * Optional text override. When provided it takes precedence over `children`
+     * and is rendered with its first letter capitalised.
+     */
+    label?: string;
     index?: number;
 }
 
-function Badge({ className, variant = 'default', label = 'empty', index, ...props }: BadgeProps) {
+function Badge({
+    className,
+    variant = 'default',
+    label,
+    index,
+    children,
+    ...props
+}: BadgeProps) {
     const variantToUse =
         index === undefined ? variant : badgeVariantsList[index % badgeVariantsList.length];
     const textColorClass =
         variantTextColors[variantToUse as keyof typeof variantTextColors] ||
         variantTextColors.default;
-    const capitalized = label.charAt(0).toUpperCase() + label.slice(1);
+    const content = label === undefined ? children : label.charAt(0).toUpperCase() + label.slice(1);
     return (
         <div
-            className={cn('whitespace-nowrap', badgeVariants({ variant: variantToUse }), className)}
+            role="status"
+            tabIndex={0}
+            className={cn(
+                'whitespace-nowrap',
+                badgeVariants({ variant: variantToUse }),
+                textColorClass,
+                className,
+            )}
             {...props}
         >
-            <span className={textColorClass}>{capitalized}</span>
+            {content}
         </div>
     );
 }
