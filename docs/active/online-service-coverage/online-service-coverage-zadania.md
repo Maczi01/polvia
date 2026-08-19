@@ -29,13 +29,57 @@
 > Warunek sensowności całej weryfikacji. Dopóki te 2 błędy istnieją, `npx tsc --noEmit` zawsze
 > failuje i żaden checkbox `Weryfikacja:` w tym planie nie da się domknąć.
 
-- [ ] Stwórz `src/components/ui/badge/index.ts` — re-eksport publicznego API z `badge.tsx`
-- [ ] Stwórz `src/components/ui/button/index.ts` — re-eksport publicznego API z `button.tsx`
-- [ ] Nie modyfikuj plików testowych — brakuje pliku produkcyjnego, nie test jest zły
-- [ ] `Test:` `badge.test.tsx` przechodzi bez zmian w pliku testowym
-- [ ] `Test:` `button.test.tsx` przechodzi bez zmian w pliku testowym
-- [ ] `Weryfikacja:` `npx tsc --noEmit` kończy się zerem błędów
-- [ ] `Weryfikacja:` `npx jest src/components/ui/badge src/components/ui/button` — wszystkie testy przechodzą
+- [x] Stwórz `src/components/ui/badge/index.ts` — re-eksport publicznego API z `badge.tsx`
+- [x] Stwórz `src/components/ui/button/index.ts` — re-eksport publicznego API z `button.tsx`
+- [x] Nie modyfikuj plików testowych — brakuje pliku produkcyjnego, nie test jest zły
+- [x] `Test:` `button.test.tsx` przechodzi bez zmian w pliku testowym — **8/8 zielone**
+- [x] `Weryfikacja:` `npx tsc --noEmit` kończy się zerem błędów — **PASS (exit 0)**
+- [x] `Weryfikacja:` `npx eslint` na zmienionych plikach — zero błędów
+- [x] `Test:` `badge.test.tsx` przechodzi — **83/83**; jedna zmiana w pliku testowym, uzasadniona niżej
+- [x] `Weryfikacja:` `npx jest src/components/ui/badge src/components/ui/button` — **91/91 PASS**
+
+#### U0 okazał się większy, niż założono w planie — zrealizowany, 1 pozycja otwarta
+
+Założenie planu („2 brakujące barrele → czysty typecheck") było **błędne**. Brakujący `index.ts`
+maskował niespójność API komponentu `Badge`: cały suite `badge.test.tsx` nie startował
+(nierozwiązany moduł), więc 50 failujących testów było ukryte, nie nieistniejące.
+
+**Źródło niespójności** (`badge.tsx`, stan przed zmianą):
+
+1. `BadgeProps.label` był **wymagany**, a implementacja miała dla niego default `label = 'empty'` —
+   default na wymaganym propie to martwy kod.
+2. `Badge` renderował **wyłącznie `label`** w wewnętrznym `<span>` i **ignorował `children`**
+   (jawne JSX children wygrywają z `props.children` przy `{...props}`).
+3. Klasy wariantu były na `div`, tekst w `<span>` — testy asercjonują klasy tła na elemencie
+   **zawierającym tekst**.
+4. Brak `role="status"` i `tabIndex` — wymaganych przez testy ARIA i keyboard.
+
+**Bug produkcyjny naprawiony po drodze:** `src/app/[locale]/(header)/pricing/page.tsx:39` renderuje
+`<Badge>{t('recommended')}</Badge>`. Bez `label` i z ignorowanymi `children` użytkownik widział
+na stronie cennika napis **„Empty"** zamiast „Polecane". Teraz renderuje poprawny tekst.
+
+**Decyzja (użytkownik):** API oparte na `children`, jak w shadcn/ui. `label` pozostaje
+**opcjonalnym override'em z priorytetem nad `children`** — dzięki temu wszystkie cztery produkcyjne
+call site'y używające `label=` (`services-table.tsx:84`, `service-card.tsx:436`, `service-card.tsx:562`,
+`popular-services-card.tsx:90`) zachowują **identyczne wyjście**, bez żadnej zmiany w tych plikach.
+
+**Wynik:** typecheck **0 błędów**, lint **0 błędów** (same preegzystujące warningi), testy **91/91**.
+Commit: `c40d10c` — osobny od feature'a zasięgu, żeby dał się zrewertować niezależnie.
+
+**Jedna zmiana w pliku testowym — decyzja użytkownika, uzasadnienie:**
+`badge.test.tsx:111` oczekiwał dla wariantu `red` klas `bg-[#FDE8EC] border-[#F9C4CE]`, a kod ma
+`bg-[#FFF0F0] border-[#F5D0D0]`. Asercje dla `green` (`:114`) i `orange` (`:117`) w tym samym teście
+zgadzały się z kodem **co do znaku** — czyli paleta czerwonego została kiedyś świadomie zmieniona,
+a test nie zaktualizowany. Zaktualizowano oczekiwany hex do obecnego tokenu. To **nie osłabienie
+asercji** (nadal sprawdza konkretne klasy tła i obramowania), a alternatywą było cofnięcie palety,
+czyli regresja wizualna w całej aplikacji.
+
+**Uwaga a11y do rozważenia osobno:** kontrakt testów wymusił `role="status"` i `tabIndex={0}`
+na **każdym** badge'u. `role="status"` to region live — czytnik ekranu zapowiada każdy badge jako
+aktualizację; `tabIndex={0}` wstawia każdy badge w kolejność tabulacji. Na mapie karta usługi
+ma do 3 badge'ów tagów, więc na liście wyników to dziesiątki przystanków klawiatury i regionów
+live. Zaimplementowane zgodnie z testami, ale warte osobnego przeglądu — badge nie jest elementem
+interaktywnym.
 
 ---
 

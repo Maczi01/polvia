@@ -133,6 +133,26 @@ U0 ──► U1 ──┬──► U2 ──► (dashboard gotowy)
 U4 ─────────┴──► (niezależny, może iść równolegle z Fazą 1–2; wymagany przez U5, U6, U9)
 ```
 
+## Baseline weryfikacji (zmierzony 2026-08-20, po U0)
+
+Fakty ustalone przez faktyczne uruchomienie, nie założone. Istotne dla każdego kolejnego unitu.
+
+- **`npx tsc --noEmit` → 0 błędów.** Czysty baseline osiągnięty w U0.
+- **`npx jest` → 91/91, ale tylko 2 suity w całym repo:** `badge` i `button`. Poza nimi projekt
+  **nie ma żadnych testów**. Każdy plik testowy w tym planie (`service-coverage.test.ts`,
+  `map-slug-parser.test.ts`, `map-url-builder.test.ts`, `sitemap.test.ts`, testy komponentów)
+  będzie **pierwszym testem w swoim obszarze** — nie ma lokalnego wzorca do skopiowania poza
+  `badge.test.tsx`.
+- **`npx next lint` → exit 0, ale dziesiątki preegzystujących warningów** (`no-explicit-any`,
+  `no-console`, `no-unused-vars`) m.in. w `src/lib/queries.ts`, `src/lib/scripts.ts`,
+  `src/types/index.ts`. Osiągalny próg to **zero błędów**, nie zero warningów — checkboxy
+  `Weryfikacja:` są tak sformułowane celowo. Nie traktować warningów jako blokady, ale też
+  nie dodawać nowych.
+- **`jest-axe` nie sprawdza realnie kontrastu.** jsdom nie implementuje `canvas.getContext`,
+  więc reguła `color-contrast` nie wykonuje się — 16 testów kontrastu w `badge.test.tsx`
+  przechodzi próżno. Asercje `jest-axe` w nowych testach mają wartość dla struktury i ARIA,
+  **nie dla kontrastu kolorów**. Kontrast wymaga weryfikacji w przeglądarce (krok `Operator:`).
+
 ## Pułapki (świadome, udokumentowane)
 
 - **`z.coerce.number()` na pustym stringu daje `0`, nie `null`** — najbardziej prawdopodobne źródło
