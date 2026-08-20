@@ -8,65 +8,30 @@ import {
     servicesTagsTable,
     tagsTable,
     tagsTranslationsTable,
-    categoryEnum,
-    statusEnum,
-    voivodeshipEnum,
 } from '@/db/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { z } from 'zod';
 import { writeFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import slugify from 'slugify';
 import sharp from 'sharp';
 
-const categoryValues = categoryEnum.enumValues;
-const statusValues = statusEnum.enumValues;
-const voivodeshipValues = voivodeshipEnum.enumValues;
+import {
+    categoryValues,
+    coverageValues,
+    parseRawServiceData,
+    serviceSchema,
+    statusValues,
+    voivodeshipValues,
+    type ServiceFormData,
+} from './_service-schema';
+
+export type { ServiceFormData } from './_service-schema';
 
 const ALLOWED_IMAGE_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
-const serviceSchema = z.object({
-    name: z.string().min(1, 'Name is required').max(255),
-    category: z.enum(categoryValues as [string, ...string[]]),
-    status: z.enum(statusValues as [string, ...string[]]).default('active'),
-    webpage: z.string().max(255).optional().or(z.literal('')),
-    nip: z.string().max(10).optional().or(z.literal('')),
-    languages: z.array(z.string()).default(['pl']),
-    whatsappNumber: z.string().max(20).optional().or(z.literal('')),
-    socials: z.object({
-        instagram: z.string().optional().or(z.literal('')),
-        telegram: z.string().optional().or(z.literal('')),
-        tiktok: z.string().optional().or(z.literal('')),
-        facebook: z.string().optional().or(z.literal('')),
-        youtube: z.string().optional().or(z.literal('')),
-        viber: z.string().optional().or(z.literal('')),
-        whatsapp: z.string().optional().or(z.literal('')),
-    }).optional(),
-    // Location
-    city: z.string().max(255).optional().or(z.literal('')),
-    street: z.string().max(255).optional().or(z.literal('')),
-    voivodeship: z.enum(voivodeshipValues as [string, ...string[]]).optional().or(z.literal('')),
-    postcode: z.string().max(20).optional().or(z.literal('')),
-    latitude: z.coerce.number().min(-90).max(90),
-    longitude: z.coerce.number().min(-180).max(180),
-    phoneNumber: z.string().max(50).optional().or(z.literal('')),
-    email: z.string().email().max(255).optional().or(z.literal('')),
-    // Translations
-    namePl: z.string().max(255).optional().or(z.literal('')),
-    nameEn: z.string().max(255).optional().or(z.literal('')),
-    nameUk: z.string().max(255).optional().or(z.literal('')),
-    nameRu: z.string().max(255).optional().or(z.literal('')),
-    descriptionPl: z.string().optional().or(z.literal('')),
-    descriptionEn: z.string().optional().or(z.literal('')),
-    descriptionUk: z.string().optional().or(z.literal('')),
-    descriptionRu: z.string().optional().or(z.literal('')),
-    // Tags
-    tags: z.array(z.string()).default([]),
-});
 
-export type ServiceFormData = z.infer<typeof serviceSchema>;
 
 export type ActionResult = {
     success: boolean;
@@ -80,6 +45,7 @@ export async function getServicesForDashboard() {
             id: servicesTable.id,
             name: servicesTable.name,
             category: servicesTable.category,
+            coverage: servicesTable.coverage,
             status: servicesTable.status,
             createdAt: servicesTable.createdAt,
             slug: serviceLocationsTable.slug,
@@ -141,12 +107,15 @@ export type ServiceEditData = {
         viber?: string;
         whatsapp?: string;
     };
+    coverage: string;
     city: string;
     street: string;
     voivodeship: string;
     postcode: string;
-    latitude: number;
-    longitude: number;
+    // Nullowalne: wpis o zasiegu `online` nie musi miec wspolrzednych.
+    // NIE zamieniac na 0 — formularz zapisalby wtedy pin na (0, 0).
+    latitude: number | null;
+    longitude: number | null;
     phoneNumber: string;
     email: string;
     namePl: string;
@@ -196,6 +165,7 @@ export async function getServiceById(id: string): Promise<ServiceEditData | null
         id: service.id,
         name: service.name,
         category: service.category,
+        coverage: service.coverage,
         status: service.status,
         webpage: location?.webpage ?? '',
         nip: location?.nip ?? '',
@@ -207,8 +177,8 @@ export async function getServiceById(id: string): Promise<ServiceEditData | null
         street: location?.street ?? '',
         voivodeship: location?.voivodeship ?? '',
         postcode: location?.postcode ?? '',
-        latitude: location?.latitude ?? 0,
-        longitude: location?.longitude ?? 0,
+        latitude: location?.latitude ?? null,
+        longitude: location?.longitude ?? null,
         phoneNumber: location?.phoneNumber ?? '',
         email: location?.email ?? '',
         namePl: translationMap['pl']?.name ?? '',
@@ -221,48 +191,6 @@ export async function getServiceById(id: string): Promise<ServiceEditData | null
         descriptionRu: translationMap['ru']?.description ?? '',
         tags: tagRows.map((r) => r.tagId),
     };
-}
-
-function parseRawServiceData(formData: FormData) {
-    const raw = {
-        name: formData.get('name') as string,
-        category: formData.get('category') as string,
-        status: (formData.get('status') as string) || 'active',
-        webpage: formData.get('webpage') as string,
-        nip: formData.get('nip') as string,
-        languages: formData.getAll('languages') as string[],
-        whatsappNumber: formData.get('whatsappNumber') as string,
-        socials: {
-            instagram: formData.get('socials.instagram') as string,
-            telegram: formData.get('socials.telegram') as string,
-            tiktok: formData.get('socials.tiktok') as string,
-            facebook: formData.get('socials.facebook') as string,
-            youtube: formData.get('socials.youtube') as string,
-            viber: formData.get('socials.viber') as string,
-            whatsapp: formData.get('socials.whatsapp') as string,
-        },
-        city: formData.get('city') as string,
-        street: formData.get('street') as string,
-        voivodeship: formData.get('voivodeship') as string,
-        postcode: formData.get('postcode') as string,
-        latitude: formData.get('latitude') as string,
-        longitude: formData.get('longitude') as string,
-        phoneNumber: formData.get('phoneNumber') as string,
-        email: formData.get('email') as string,
-        namePl: formData.get('namePl') as string,
-        nameEn: formData.get('nameEn') as string,
-        nameUk: formData.get('nameUk') as string,
-        nameRu: formData.get('nameRu') as string,
-        descriptionPl: formData.get('descriptionPl') as string,
-        descriptionEn: formData.get('descriptionEn') as string,
-        descriptionUk: formData.get('descriptionUk') as string,
-        descriptionRu: formData.get('descriptionRu') as string,
-        tags: formData.getAll('tags') as string[],
-    };
-    if (raw.languages.length === 0) {
-        raw.languages = ['pl'];
-    }
-    return raw;
 }
 
 function validateImage(imageFile: File | null): ActionResult | null {
@@ -461,6 +389,7 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
             .values({
                 name: data.name,
                 category: data.category as typeof categoryValues[number],
+                coverage: data.coverage as typeof coverageValues[number],
                 status: data.status as typeof statusValues[number],
                 image: imageFilename,
                 languages: data.languages,
@@ -541,6 +470,7 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
             .set({
                 name: data.name,
                 category: data.category as typeof categoryValues[number],
+                coverage: data.coverage as typeof coverageValues[number],
                 status: data.status as typeof statusValues[number],
                 image: imageFilename,
                 languages: data.languages,

@@ -21,6 +21,26 @@ const categories = [
 
 const statuses = ['active', 'inactive', 'pending'] as const;
 
+// Kolejnosc i wartosci musza zgadzac sie z coverageEnum w src/db/schema.ts.
+// Walidacja i tak czerpie z enuma, wiec bledna wartosc zostanie odrzucona.
+const coverageOptions = [
+    {
+        value: 'local',
+        label: 'Local — na miejscu',
+        hint: 'Obsluga wylacznie w punkcie. Pin na mapie, wspolrzedne wymagane.',
+    },
+    {
+        value: 'online',
+        label: 'Online — cala Polska',
+        hint: 'Brak punktu obslugi. Bez pinu na mapie; miasto wymagane, wspolrzedne opcjonalne.',
+    },
+    {
+        value: 'hybrid',
+        label: 'Hybrid — punkt i zdalnie',
+        hint: 'Punkt obslugi ORAZ obsluga zdalna. Pin na mapie i obecnosc w wynikach online.',
+    },
+] as const;
+
 const voivodeships = [
     { value: 'dolnoslaskie', label: 'Dolnośląskie' },
     { value: 'kujawsko-pomorskie', label: 'Kujawsko-Pomorskie' },
@@ -67,6 +87,13 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
     const [creatingTag, setCreatingTag] = useState(false);
 
     const d = initialData;
+
+    // Zasieg steruje tym, ktore pola sa wymagane: wpis `online` nie ma punktu
+    // obslugi, wiec nie potrzebuje wspolrzednych; `local` i `hybrid` maja pin
+    // na mapie, wiec potrzebuja. Miasto jest wymagane poza `local`.
+    const [coverage, setCoverage] = useState<string>(d?.coverage ?? 'local');
+    const needsCoordinates = coverage !== 'online';
+    const needsCity = coverage !== 'local';
 
     const handleCreateTag = async () => {
         setCreatingTag(true);
@@ -133,6 +160,35 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         </Select>
                         {state.errors?.category && (
                             <p className="text-sm text-destructive">{state.errors.category[0]}</p>
+                        )}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="coverage">Coverage *</Label>
+                        <Select name="coverage" required value={coverage} onValueChange={setCoverage}>
+                            <SelectTrigger
+                                className="rounded-md"
+                                aria-describedby={
+                                    state.errors?.coverage ? 'coverage-error' : 'coverage-hint'
+                                }
+                            >
+                                <SelectValue placeholder="Select coverage" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {coverageOptions.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <p id="coverage-hint" className="text-sm text-gray-500 dark:text-gray-400">
+                            {coverageOptions.find((o) => o.value === coverage)?.hint}
+                        </p>
+                        {state.errors?.coverage && (
+                            <p id="coverage-error" className="text-sm text-destructive">
+                                {state.errors.coverage[0]}
+                            </p>
                         )}
                     </div>
 
@@ -334,10 +390,19 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 <h3 className="border-b pb-2 text-lg font-semibold">Location</h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                        <Label htmlFor="city">City</Label>
-                        <Input id="city" name="city" placeholder="Warsaw" defaultValue={d?.city} />
+                        <Label htmlFor="city">City {needsCity ? '*' : ''}</Label>
+                        <Input
+                            id="city"
+                            name="city"
+                            placeholder="Warsaw"
+                            required={needsCity}
+                            aria-describedby={state.errors?.city ? 'city-error' : undefined}
+                            defaultValue={d?.city}
+                        />
                         {state.errors?.city && (
-                            <p className="text-sm text-destructive">{state.errors.city[0]}</p>
+                            <p id="city-error" className="text-sm text-destructive">
+                                {state.errors.city[0]}
+                            </p>
                         )}
                     </div>
 
@@ -405,38 +470,44 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="latitude">Latitude *</Label>
+                        <Label htmlFor="latitude">Latitude {needsCoordinates ? '*' : ''}</Label>
                         <input
                             ref={latRef}
                             id="latitude"
                             name="latitude"
                             type="number"
                             step="any"
-                            required
+                            required={needsCoordinates}
+                            aria-describedby={state.errors?.latitude ? 'latitude-error' : undefined}
                             placeholder="52.2297"
-                            defaultValue={d?.latitude}
+                            defaultValue={d?.latitude ?? ''}
                             className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-gray-900 shadow-sm transition-colors placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-300 md:text-sm"
                         />
                         {state.errors?.latitude && (
-                            <p className="text-sm text-destructive">{state.errors.latitude[0]}</p>
+                            <p id="latitude-error" className="text-sm text-destructive">
+                                {state.errors.latitude[0]}
+                            </p>
                         )}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="longitude">Longitude *</Label>
+                        <Label htmlFor="longitude">Longitude {needsCoordinates ? '*' : ''}</Label>
                         <input
                             ref={lonRef}
                             id="longitude"
                             name="longitude"
                             type="number"
                             step="any"
-                            required
+                            required={needsCoordinates}
+                            aria-describedby={state.errors?.longitude ? 'longitude-error' : undefined}
                             placeholder="21.0122"
-                            defaultValue={d?.longitude}
+                            defaultValue={d?.longitude ?? ''}
                             className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-base text-gray-900 shadow-sm transition-colors placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-300 md:text-sm"
                         />
                         {state.errors?.longitude && (
-                            <p className="text-sm text-destructive">{state.errors.longitude[0]}</p>
+                            <p id="longitude-error" className="text-sm text-destructive">
+                                {state.errors.longitude[0]}
+                            </p>
                         )}
                     </div>
 
