@@ -138,7 +138,7 @@ async function mainSeed() {
     // --- HELPER: SEEDER FUNCTION ---
     // To keep this readable and handle tags easily
     async function seedService(data: {
-        name: string, slug: string, category: any, webpage?: string,
+        name: string, slug: string, category: any, coverage?: 'local' | 'online' | 'hybrid', webpage?: string,
         image?: string,
         plName?: string, ukName?: string, enName?: string, ruName?: string,
         plDesc: string, ukDesc: string, enDesc: string, ruDesc: string,
@@ -152,6 +152,7 @@ async function mainSeed() {
         const [service] = await db.insert(servicesTable).values({
             name: data.name,
             category: data.category,
+            coverage: data.coverage ?? 'local',
             image: data.image,
             languages: data.languages || ['pl', 'uk', 'en', 'ru'],
             status: 'active'
@@ -3163,6 +3164,7 @@ async function mainSeed() {
         name: 'Biuro Rachunkowe Precyzja',
         slug: 'biuro-precyzja',
         category: 'financial',
+        coverage: 'hybrid',
         ukName: 'Бухгалтерське бюро Precyzja', enName: 'Precyzja Accounting Office', ruName: 'Бухгалтерское бюро Precyzja',
         plDesc: 'Biuro rachunkowe w Warszawie specjalizujące się w obsłudze Ukraińców prowadzących firmę w Polsce. Księgowość JDG i spółek, rozliczenia międzynarodowe, zaświadczenia A1, kadry i płace oraz księgowość online.',
         ukDesc: 'Бухгалтерське бюро у Варшаві, що спеціалізується на обслуговуванні українців, які ведуть бізнес у Польщі. Бухгалтерія ФОП та компаній, міжнародні розрахунки, довідки A1, кадри та зарплати та онлайн-бухгалтерія.',
@@ -3348,6 +3350,7 @@ async function mainSeed() {
         name: 'Dobra Księgowa',
         slug: 'dobra-ksiegowa',
         category: 'financial',
+        coverage: 'hybrid',
         ukName: 'Dobra Księgowa', enName: 'Dobra Księgowa – Good Accountant', ruName: 'Dobra Księgowa',
         plDesc: 'Biuro rachunkowe OL-TAX ze Stargardu oferujące księgowość dla firm i osób z Ukrainy. Rejestracja działalności, rejestracja VAT, pełna księgowość, konsultacje indywidualne, szkolenia dla księgowych oraz mentoring biznesowy. Obsługa zdalna w całej Polsce.',
         ukDesc: 'Бухгалтерське бюро OL-TAX зі Старгарда, що пропонує бухгалтерію для фірм та осіб з України. Реєстрація діяльності, реєстрація ПДВ, повна бухгалтерія, індивідуальні консультації, навчання для бухгалтерів та бізнес-менторство. Дистанційне обслуговування по всій Польщі.',
@@ -3366,6 +3369,7 @@ async function mainSeed() {
         name: 'Nikitas Biuro Rachunkowe',
         slug: 'nikitas',
         category: 'financial',
+        coverage: 'hybrid',
         ukName: 'Nikitas Бухгалтерія', enName: 'Nikitas Accounting Office', ruName: 'Nikitas Бухгалтерия',
         plDesc: 'Biuro rachunkowe w Warszawie oferujące kompleksowe usługi księgowe online: analizę dokumentów, optymalizację podatkową, kadry i płace, planowanie biznesowe oraz pomoc w zakładaniu firmy. Obsługa wielojęzyczna.',
         ukDesc: 'Бухгалтерське бюро у Варшаві, що пропонує комплексні онлайн-бухгалтерські послуги: аналіз документів, податкову оптимізацію, кадри та зарплати, бізнес-планування та допомогу у відкритті фірми. Багатомовне обслуговування.',
@@ -3403,6 +3407,7 @@ async function mainSeed() {
         name: 'ARK Biuro Rachunkowe',
         slug: 'ark-biuro-rachunkowe',
         category: 'financial',
+        coverage: 'hybrid',
         ukName: 'ARK Бухгалтерія', enName: 'ARK Accounting Office', ruName: 'ARK Бухгалтерия',
         plDesc: 'Biuro rachunkowe oferujące obsługę online w całej Polsce. Księgowość JDG i spółek, rejestracja firm, odzyskiwanie księgowości, kadry i płace, profil zaufany oraz pomoc w relokacji biznesu do Polski. Obsługa w języku rosyjskim, polskim i angielskim.',
         ukDesc: 'Бухгалтерське бюро, що пропонує онлайн-обслуговування по всій Польщі. Бухгалтерія ФОП та компаній, реєстрація фірм, відновлення бухгалтерії, кадри та зарплати, довірений профіль та допомога у релокації бізнесу до Польщі. Обслуговування російською, польською та англійською мовами.',
@@ -3433,6 +3438,31 @@ async function mainSeed() {
         webpage: 'https://amsalvia.pl/ksiegowosc-dla-cudzoziemcow/',
         locations: [
             { city: 'Warszawa', street: 'ul. Niekłańska 11A/1', voivodeship: 'mazowieckie', latitude: 52.2485, longitude: 21.0675, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 667 087 957', email: 'biuro@mksalvia.pl' },
+        ],
+    });
+
+    // 78. FotoDoKarty — wpis referencyjny o zasiegu `online`.
+    // Serwis w calosci zdalny: upload selfie -> gotowy plik JPG mailem (~20 s),
+    // zdjecie biometryczne na karte pobytu w wymogach portalu MOS (684x883 px).
+    // Ma adres rejestrowy w Warszawie, ale NIE ma punktu stacjonarnego — dlatego
+    // celowo bez `street` i bez wspolrzednych: pin na mapie klamalby "przyjdz tu",
+    // a filtr wojewodztwa ukrylby usluge przed cala Polska, ktora obsluguje.
+    // `openingHours: {}` — godziny otwarcia nie maja sensu dla obslugi zdalnej.
+    await seedService({
+        name: 'FotoDoKarty',
+        slug: 'fotodokarty',
+        category: 'others',
+        coverage: 'online',
+        ukName: 'FotoDoKarty', enName: 'FotoDoKarty', ruName: 'FotoDoKarty',
+        plDesc: 'Zdjecie biometryczne na karte pobytu online, bez wychodzenia z domu. Wysylasz selfie telefonem, serwis weryfikuje wymogi portalu MOS i odsyla gotowy plik JPG w ciagu ok. 20 sekund. Bez kolejek i bez fotobudki. Obsluga calej Polski.',
+        ukDesc: 'Біометричне фото на карту побиту онлайн, не виходячи з дому. Надсилаєте селфі з телефону, сервіс перевіряє вимоги порталу MOS і надсилає готовий файл JPG протягом близько 20 секунд. Без черг і без фотокабіни. Обслуговування по всій Польщі.',
+        enDesc: 'Biometric photo for a Polish residence card, fully online. Send a selfie from your phone, the service checks it against MOS portal requirements and emails a ready JPG file in about 20 seconds. No queues, no photo booth. Serves all of Poland.',
+        ruDesc: 'Биометрическое фото на карту побыту онлайн, не выходя из дома. Отправляете селфи с телефона, сервис проверяет требования портала MOS и присылает готовый файл JPG примерно за 20 секунд. Без очередей и без фотокабины. Обслуживание по всей Польше.',
+        tags: ['documents', 'foreigners'],
+        languages: ['pl', 'uk', 'ru', 'en'],
+        webpage: 'https://fotodokarty.com.pl/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true },
         ],
     });
 
