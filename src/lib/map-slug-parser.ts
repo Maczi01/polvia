@@ -11,6 +11,7 @@
 
 import {
     getCategoryFromSlug,
+    isOnlineSlug,
     isValidCountySlug,
     normalizeCountySlug,
     isValidCitySlug,
@@ -26,6 +27,12 @@ export type MapFilters = {
     category: CategoryKey | null;
     county: CountySlug | null;
     city: string | null;
+    /**
+     * Zawezenie do uslug o zasiegu zdalnym (`online` i `hybrid`).
+     * Zajmuje ten sam slot URL-a co `county` / `city`, wiec jest z nimi
+     * wzajemnie wykluczajace — patrz COVERAGE_ONLINE_SLUG.
+     */
+    onlineOnly: boolean;
 };
 
 export type ParseSlugResult =
@@ -55,7 +62,7 @@ export function parseMapSlug(
     if (!slug || slug.length === 0) {
         return {
             success: true,
-            filters: { category: null, county: null, city: null },
+            filters: { category: null, county: null, city: null, onlineOnly: false },
         };
     }
 
@@ -96,12 +103,21 @@ function parseSingleSegment(
     locale: Locale,
     basePath: string,
 ): ParseSlugResult {
-    // Try category first
+    // Try coverage first — jawna kolejnosc; `online` nie koliduje z niczym,
+    // ale sprawdzenie przed lokalizacja czyni intencje oczywista.
+    if (isOnlineSlug(segment)) {
+        return {
+            success: true,
+            filters: { category: null, county: null, city: null, onlineOnly: true },
+        };
+    }
+
+    // Try category
     const category = getCategoryFromSlug(segment, locale);
     if (category) {
         return {
             success: true,
-            filters: { category, county: null, city: null },
+            filters: { category, county: null, city: null, onlineOnly: false },
         };
     }
 
@@ -110,7 +126,7 @@ function parseSingleSegment(
     if (isValidCountySlug(normalizedCounty)) {
         return {
             success: true,
-            filters: { category: null, county: normalizedCounty, city: null },
+            filters: { category: null, county: normalizedCounty, city: null, onlineOnly: false },
         };
     }
 
@@ -119,7 +135,12 @@ function parseSingleSegment(
     if (isValidCitySlug(normalizedCity)) {
         return {
             success: true,
-            filters: { category: null, county: null, city: getCityNameFromSlug(normalizedCity) },
+            filters: {
+                category: null,
+                county: null,
+                city: getCityNameFromSlug(normalizedCity),
+                onlineOnly: false,
+            },
         };
     }
 
@@ -150,12 +171,21 @@ function parseTwoSegments(
         };
     }
 
-    // Second segment: try county first, then city
+    // Second segment: coverage, then county, then city.
+    // `/mapa/{wojewodztwo}/online` odpada samo — pierwszy segment musi byc
+    // kategoria, wiec NIE dopisujemy tu osobnej reguly odrzucania.
+    if (isOnlineSlug(second)) {
+        return {
+            success: true,
+            filters: { category, county: null, city: null, onlineOnly: true },
+        };
+    }
+
     const normalizedCounty = normalizeCountySlug(second);
     if (isValidCountySlug(normalizedCounty)) {
         return {
             success: true,
-            filters: { category, county: normalizedCounty, city: null },
+            filters: { category, county: normalizedCounty, city: null, onlineOnly: false },
         };
     }
 
@@ -163,7 +193,12 @@ function parseTwoSegments(
     if (isValidCitySlug(normalizedCity)) {
         return {
             success: true,
-            filters: { category, county: null, city: getCityNameFromSlug(normalizedCity) },
+            filters: {
+                category,
+                county: null,
+                city: getCityNameFromSlug(normalizedCity),
+                onlineOnly: false,
+            },
         };
     }
 

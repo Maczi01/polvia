@@ -3,11 +3,17 @@
  * Generates type-safe URLs with slug-based paths and query parameters
  */
 
-import { getSlugFromCategory, normalizeCountySlug, isValidCountySlug, normalizeCitySlug, isValidCitySlug } from './slug-mappings';
+import { getSlugFromCategory, normalizeCountySlug, isValidCountySlug, normalizeCitySlug, isValidCitySlug, COVERAGE_ONLINE_SLUG } from './slug-mappings';
 import type { Locale } from '@/i18n/config';
 
 export type MapUrlParams = {
     category?: string | null;
+    /**
+     * Zawezenie do zasiegu zdalnego. Zajmuje ten sam slot sciezki co `county`
+     * i `city`, wiec ma nad nimi priorytet — wybor "Online" oznacza rezygnacje
+     * z zawezenia geograficznego.
+     */
+    onlineOnly?: boolean | null;
     county?: string | null;
     city?: string | null;
     query?: string | null;
@@ -38,7 +44,7 @@ export type MapUrl = {
  * @returns URL object with pathname and optional query params
  */
 export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
-    const { category, county, city, query, place, view } = params;
+    const { category, onlineOnly, county, city, query, place, view } = params;
 
     // Base pathname
     const basePath = '/map';
@@ -54,7 +60,10 @@ export function buildMapUrl(params: MapUrlParams, locale: Locale): MapUrl {
         }
     }
 
-    if (county) {
+    // Zasieg i lokalizacja dziela jeden slot sciezki — `online` wygrywa.
+    if (onlineOnly) {
+        slugParts.push(COVERAGE_ONLINE_SLUG);
+    } else if (county) {
         const countySlug = normalizeCountySlug(county);
         if (isValidCountySlug(countySlug)) {
             slugParts.push(countySlug);

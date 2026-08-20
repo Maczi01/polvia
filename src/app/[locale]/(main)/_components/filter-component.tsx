@@ -41,6 +41,10 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
     const [selectedCounty, setSelectedCounty] = useState(initialFilters?.county || null);
     const [selectedCity, setSelectedCity] = useState(initialFilters?.city || null);
 
+    // U4 dodaje wylacznie PRZENOSZENIE tej flagi, zeby zmiana kategorii nie gubila
+    // aktywnego zasiegu w URL-u. Interaktywny chip "Online" dochodzi w U6.
+    const onlineOnly = initialFilters?.onlineOnly ?? false;
+
     // Keep query params for search, id, and view
     const [searchInput, setSearchInput] = useQueryState('query', { defaultValue: '' });
     const [selectedId, setSelectedId] = useQueryState('id', { defaultValue: '' });
@@ -69,10 +73,10 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
             setSelectedCity(city);
 
             // Notify parent component of filter changes
-            onFiltersChange?.({ category: category as any, county: county as any, city });
+            onFiltersChange?.({ category: category as any, county: county as any, city, onlineOnly });
 
             // Build the new URL path (localized for browser URL bar)
-            const url = buildMapUrl({ category, county, city }, locale);
+            const url = buildMapUrl({ category, county, city, onlineOnly }, locale);
             const localizedPath = localizeMapPath(url.pathname, locale);
             const basePath = locale === 'pl' ? '' : '/en';
             const fullPath = `${basePath}${localizedPath}`;
@@ -80,7 +84,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
             // Update URL without navigation (instant, no reload)
             window.history.pushState({}, '', fullPath);
         },
-        [locale, onFiltersChange],
+        [locale, onFiltersChange, onlineOnly],
     );
 
     const resetAllFilters = useCallback(() => {
@@ -94,7 +98,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         setSelectedCity(null);
 
         // Notify parent component of filter changes
-        onFiltersChange?.({ category: null, county: null, city: null });
+        onFiltersChange?.({ category: null, county: null, city: null, onlineOnly: false });
 
         // Update URL to base path without navigation
         const basePath = locale === 'pl' ? '/mapa' : '/en/map';
