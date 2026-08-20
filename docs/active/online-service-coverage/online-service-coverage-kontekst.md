@@ -20,7 +20,7 @@
 | Plik | Rola w zadaniu |
 |---|---|
 | `src/db/schema.ts` | Nowy `coverageEnum`; `coverage` na `servicesTable`; zdjęcie `notNull` z `latitude`/`longitude` |
-| `drizzle/` | Migracja **wyłącznie** przez `npm run drizzle:generate` — nigdy ręcznie |
+| `drizzle/` | **Nie dotyka tego zadania.** Katalog jest martwy — schemat aplikujemy `npx drizzle-kit push` |
 | `src/lib/queries.ts` | `coverage` do selektów w `getServices` **i** `getMostPopular` (zduplikowane selecty) |
 | `src/types/index.ts` | `Service.latitude`/`longitude` → `number \| null`; nowe `Service.coverage` |
 | `src/db/seed.ts` | R12 — backfill zasięgu; wpisy referencyjne `online` i `hybrid` |
@@ -52,7 +52,8 @@
 
 | Plik | Rola w zadaniu |
 |---|---|
-| `src/app/[locale]/(dashboard)/dashboard/_actions.ts` | `serviceSchema` — `coverage`, opcjonalne współrzędne, walidacja krzyżowa |
+| `src/app/[locale]/(dashboard)/dashboard/_service-schema.ts` | **Nowy w U2** — `serviceSchema`, `parseRawServiceData`; czysty, testowalny bez bazy |
+| `src/app/[locale]/(dashboard)/dashboard/_actions.ts` | Server Actions; `coverage` w insercie i update'cie |
 | `src/app/[locale]/(dashboard)/dashboard/_components/service-form.tsx` | Select zasięgu; warunkowa gwiazdka przy współrzędnych |
 | `src/app/[locale]/(dashboard)/dashboard/_components/services-table.tsx` | Kolumna zasięgu |
 
@@ -76,8 +77,8 @@
   + pętla po usługach + `cardIndex++`. Ten sam wzorzec, ta sama tablica `allServices`.
 - **Nawigacja filtra** → `filter-component.tsx:110` (`handleCategoryClick`) i `navigateWithFilters`:
   `buildMapUrl` + `localizeMapPath` + `window.history.pushState` bez nawigacji.
-- **Wartości enuma w Zod** → `_actions.ts:23`: `categoryValues = categoryEnum.enumValues`.
-  `coverage` czerpiemy identycznie — bez ręcznego duplikatu listy.
+- **Wartości enuma w Zod** → `_service-schema.ts`: `coverageValues = coverageEnum.enumValues`
+  (wydzielone z `_actions.ts` w U2). Bez ręcznego duplikatu listy.
 - **Dodatkowe oznaczenie na karcie** → `VerifiedBadge` (`service-card.tsx:401`) jako wzorzec
   umiejscowienia badge'a zasięgu.
 - **Kształt testu** → `src/components/ui/badge/badge.test.tsx`: Jest + RTL + `jest-axe`
@@ -117,7 +118,8 @@ Pełne uzasadnienia w planie technicznym, sekcja „Kluczowe decyzje techniczne"
 ### Techniczne
 
 - **Lokalna baza:** `docker-compose up -d` (Postgres + pgvector).
-- **Migracje:** `npm run drizzle:generate` → `npm run drizzle:push` (albo `npx tsx sequential-migrate.ts`).
+- **Schemat na bazie:** `npx drizzle-kit push`. **NIE** `drizzle:generate` — skrypt jest martwy,
+  a snapshoty w `drizzle/meta` w ruinie (rozbiór w `zadania.md`, U1).
 - **OpenAI API:** `npm run db:embeddings` dla nowych wpisów — inaczej nie wyjdą w semantic search.
 - **Brak `.env.e2e`** — automatyczne E2E niedostępne w tym projekcie.
 
