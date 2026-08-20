@@ -250,8 +250,10 @@ Commit: `25b3c08`
 - [x] `Weryfikacja:` `grep -c "coverage: 'online'" src/db/seed.ts` → **1**
 - [x] `Weryfikacja:` `grep -c "coverage: 'hybrid'" src/db/seed.ts` → **4**
 - [x] `Weryfikacja:` `npx jest` — **110/110 PASS**, `npx next lint` — **0 błędów**
-- [ ] `Operator:` `npm run db:reset` — **operacja destrukcyjna, wymaga Twojej zgody** (patrz niżej)
-- [ ] `Operator:` `npm run db:embeddings` — regeneracja obejmuje nowe wpisy (koszt OpenAI)
+- [x] `Operator:` `npm run db:reset` — wykonane za zgodą użytkownika; seed przeszedł do końca
+- [x] `Operator:` potwierdzono w bazie: **135 `local` / 4 `hybrid` / 1 `online`**; FotoDoKarty jako `online` bez ulicy i bez współrzędnych, `openingHours` = `{}`; Dobra Księgowa (Stargard) jako `hybrid` w `zachodniopomorskim`; niezmiennik „`local`/`hybrid` mają współrzędne" — **zero naruszeń**
+- [ ] `Operator:` `npm run db:embeddings` — **wymagane po resecie**: drop usunął wszystkie embeddingi,
+      więc semantic search jest teraz w devie martwy dla wszystkich 140 usług (koszt OpenAI)
 
 Commit: `0702eeb`
 
