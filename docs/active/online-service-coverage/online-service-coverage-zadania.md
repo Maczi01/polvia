@@ -1,7 +1,7 @@
 # Zadania: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-20
+**Ostatnia aktualizacja:** 2026-08-21
 
 ## Źródła
 
@@ -178,29 +178,59 @@ Nie generujemy plików migracji, dopóki `drizzle/` nie zostanie zresetowany (os
 > Najbardziej ryzykowny punkt planu. Pisany **test-first**: najpierw failujący test na puste
 > `latitude` z `FormData` (oczekiwane `null`, nie `0`), potem poprawa schematu.
 
-- [ ] `_actions.ts` — `coverageValues = coverageEnum.enumValues`; `coverage: z.enum(coverageValues)`
-- [ ] `_actions.ts` — `latitude` / `longitude` z wymaganych na opcjonalne
-- [ ] `_actions.ts` — puste wejście z `FormData` daje `null`, **nie `0`** (`z.coerce.number()` na `''` → `0`)
-- [ ] `_actions.ts` — `.superRefine()`: `coverage !== 'local'` → `city` wymagane
-- [ ] `_actions.ts` — `.superRefine()`: `coverage === 'local'` → współrzędne wymagane
-- [ ] `_actions.ts` — `coverage === 'online'` zapisuje `openingHours: {}`
-- [ ] `_actions.ts` — błędy walidacji trafiają w konkretne pole, nie w błąd ogólny
-- [ ] `service-form.tsx` — select zasięgu obok selecta kategorii
-- [ ] `service-form.tsx` — gwiazdka „*" przy `Latitude`/`Longitude` warunkowa albo usunięta
-- [ ] `service-form.tsx` — błędy walidacji przez `aria-describedby`
-- [ ] `service-form.tsx` — **nie** dodawaj `government` do lokalnej tablicy `categories` (poza scope'em)
-- [ ] `services-table.tsx` — kolumna zasięgu
-- [ ] Stwórz `src/app/[locale]/(dashboard)/dashboard/_actions.test.ts`
-- [ ] `Test:` `coverage: 'online'` + `city: 'Warszawa'` + puste współrzędne → walidacja przechodzi, współrzędne `null` (nie `0`)
-- [ ] `Test:` `coverage: 'online'` + puste `city` → walidacja odrzuca z błędem na polu `city`
-- [ ] `Test:` `coverage: 'local'` + puste `latitude` → walidacja odrzuca
-- [ ] `Test:` `coverage` nieobecny w `FormData` → domyślnie `'local'`
-- [ ] `Test:` `coverage: 'zdalnie'` (wartość spoza enuma) → walidacja odrzuca
-- [ ] `Test:` `coverage: 'online'` → zapisany `openingHours` to `{}`
-- [ ] `Weryfikacja:` `npx jest src/app/[locale]/(dashboard)` — wszystkie testy przechodzą
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów
-- [ ] `Operator:` dodaj FotoDoKarty przez formularz dashboardu (`coverage: online`, Warszawa, bez ulicy i współrzędnych) — zapis bez błędu
+- [x] **Stwórz `_service-schema.ts`** — czysta warstwa walidacji, wydzielona z `_actions.ts`
+- [x] `_service-schema.ts` — `coverageValues = coverageEnum.enumValues`; `coverage: z.enum(...)`
+- [x] `_service-schema.ts` — `latitude` / `longitude` z wymaganych na opcjonalne
+- [x] `_service-schema.ts` — puste wejście z `FormData` daje `null`, **nie `0`**
+- [x] `_service-schema.ts` — `.superRefine()`: `coverage !== 'local'` → `city` wymagane
+- [x] `_service-schema.ts` — `.superRefine()`: `coverage !== 'online'` → współrzędne wymagane
+- [x] `coverage === 'online'` zapisuje `openingHours: {}` — **było już tak dla każdej nowej usługi**
+- [x] Błędy walidacji trafiają w konkretne pole (`path: ['city']` / `['latitude']`)
+- [x] `_actions.ts` — `coverage` w insercie **i** update'cie `servicesTable`
+- [x] `_actions.ts` — `getServiceById`: `?? 0` → `?? null` na współrzędnych
+- [x] `_actions.ts` — `coverage` w `getServicesForDashboard`
+- [x] `service-form.tsx` — select zasięgu obok selecta kategorii, z podpowiedzią per wartość
+- [x] `service-form.tsx` — warunkowe `required` i gwiazdki na współrzędnych i mieście
+- [x] `service-form.tsx` — błędy walidacji przez `aria-describedby`
+- [x] `service-form.tsx` — **nie** dodano `government` do lokalnej tablicy `categories`
+- [x] `services-table.tsx` — kolumna Coverage (+ `colSpan` 10 → 11)
+- [x] Stwórz `_service-schema.test.ts` — **15 scenariuszy**
+- [x] `Test:` `coverage: 'online'` + `city` + puste współrzędne → przechodzi, współrzędne `null` (nie `0`)
+- [x] `Test:` `coverage: 'online'` + puste `city` → odrzucone z błędem na polu `city`
+- [x] `Test:` `coverage: 'local'` + puste `latitude` → odrzucone
+- [x] `Test:` `coverage` nieobecny w `FormData` → domyślnie `'local'`
+- [x] `Test:` `coverage: 'zdalnie'` → odrzucone
+- [x] `Test:` `coverage: 'online'` → `openingHours` to `{}`
+- [x] `Weryfikacja:` `npx jest` — **110/110 PASS**
+- [x] `Weryfikacja:` `npx tsc --noEmit` — **0 błędów**
+- [x] `Weryfikacja:` `npx next lint` — **0 błędów**
+- [ ] `Operator:` dodaj wpis `online` przez formularz dashboardu — potwierdź zapis bez ulicy i współrzędnych
+
+Commit: `25b3c08`
+
+#### Odchylenia i znaleziska w U2
+
+1. **Nowy plik `_service-schema.ts` — poza zadeklarowanymi `Pliki:`.** Powód wymuszony:
+   `src/db/index.ts` tworzy klienta postgres **przy ładowaniu modułu**, więc zaimportowanie
+   `_actions.ts` w teście otwierałoby połączenie z bazą. `@/db/schema` jest bezpieczny (tylko
+   definicje tabel i enumów), więc czysta warstwa walidacji jest w pełni testowalna.
+   Uboczna korzyść: `_actions.ts` schudł o ~100 linii.
+2. **Bug ze współrzędnymi `0,0` był preegzystujący, nie wprowadzony tą zmianą.** `FormData.get()`
+   zwraca `null` dla pola nieobecnego, `z.coerce.number()` zamienia to na `0` — czyli **już
+   przed tym zadaniem** zgłoszenie bez współrzędnych dawało pin w Zatoce Gwinejskiej.
+3. **`getServiceById` miał ten sam bug w drugą stronę:** `location?.latitude ?? 0` wstawiało `0`
+   do formularza edycji, więc zapis utrwalał fałszywy pin. Naprawione na `?? null`.
+4. **Współrzędne wymagane też dla `hybrid`, nie tylko `local`** — plan mówił tylko o `local`,
+   ale `hybrid` ma pin na mapie (R3), więc bez współrzędnych byłby niespójny.
+5. **`openingHours: {}` było już domyślne** dla każdej nowej usługi (`_actions.ts`), więc wymóg
+   dla `online` spełnia się sam. Dashboard w ogóle nie ustawia godzin otwarcia.
+6. **Builder `FormData` w teście musi podawać wszystkie pola jako `''`.** Wzorzec
+   `z.string().optional().or(z.literal(''))`, użyty w tym repo dla każdego pola opcjonalnego,
+   **nie przyjmuje `null`** — a `formData.get()` zwraca `null` dla pola pominiętego. Realny
+   formularz renderuje wszystkie inputy, więc posyła `''`. Test był nierealistyczny, nie schemat.
+   *Potencjalne hardening na przyszłość: te pola mogłyby tolerować `null`. Poza scope'em.*
+
+---
 
 ### U3. Dane referencyjne w seedzie
 
@@ -209,18 +239,37 @@ Nie generujemy plików migracji, dopóki `drizzle/` nie zostanie zresetowany (os
 
 > Dane wymagane przez scenariusze `Operator:` w U6 i U7. Deliverable buildera, nie operatora.
 
-- [ ] `src/db/seed.ts` — przejrzyj opisy pod kątem „online", „zdalnie", „w całej Polsce", „Remote service across Poland" (m.in. okolice linii 3167, 3354, 3370, 3407)
-- [ ] `src/db/seed.ts` — nadaj znalezionym wpisom `coverage: 'hybrid'` (mają biura **i** obsługują zdalnie)
-- [ ] `src/db/seed.ts` — dodaj wpis `coverage: 'online'`: FotoDoKarty, Warszawa, bez ulicy, bez współrzędnych, kategoria `others`, `openingHours: {}`
-- [ ] `src/db/seed.ts` — dodaj wpis `coverage: 'hybrid'` **poza Mazowszem** (do weryfikacji dedupe w obie strony)
-- [ ] `src/db/seed.ts` — utrzymaj idempotentność (`onConflictDoNothing` / upsert, bez zależności od ID z bazy)
-- [ ] `src/db/seed.ts` — wpisy `local` zostają bez zmian (kolumna ma default)
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów
-- [ ] `Weryfikacja:` `grep -c "coverage: 'online'" src/db/seed.ts` zwraca ≥ 1
-- [ ] `Weryfikacja:` `grep -c "coverage: 'hybrid'" src/db/seed.ts` zwraca ≥ 2
-- [ ] `Operator:` `npm run db:seed` na bazie dev przechodzi bez błędu
-- [ ] `Operator:` powtórny `npm run db:seed` bez duplikatów (potwierdzenie idempotentności)
-- [ ] `Operator:` `npm run db:embeddings` — regeneracja obejmuje nowe wpisy
+- [x] `src/db/seed.ts` — przejrzano opisy pod kątem „online", „zdalnie", „w całej Polsce", „Remote service across Poland"
+- [x] `src/db/seed.ts` — `seedService` przyjmuje opcjonalny `coverage`, domyślnie `'local'`
+- [x] `src/db/seed.ts` — cztery wpisy oznaczone `coverage: 'hybrid'`: `biuro-precyzja`, `dobra-ksiegowa`, `nikitas`, `ark-biuro-rachunkowe`
+- [x] `src/db/seed.ts` — wpis `coverage: 'hybrid'` **poza Mazowszem**: `dobra-ksiegowa` (Stargard, `zachodniopomorskie`)
+- [x] `src/db/seed.ts` — wpis `coverage: 'online'`: FotoDoKarty, Warszawa, bez ulicy, bez współrzędnych, kategoria `others`, `openingHours: {}`
+- [x] `src/db/seed.ts` — wpisy `local` bez zmian (kolumna ma default)
+- [x] ~~utrzymaj idempotentność~~ — **wymóg oparty na błędnym założeniu, patrz niżej**
+- [x] `Weryfikacja:` `npx tsc --noEmit` — **0 błędów**
+- [x] `Weryfikacja:` `grep -c "coverage: 'online'" src/db/seed.ts` → **1**
+- [x] `Weryfikacja:` `grep -c "coverage: 'hybrid'" src/db/seed.ts` → **4**
+- [x] `Weryfikacja:` `npx jest` — **110/110 PASS**, `npx next lint` — **0 błędów**
+- [ ] `Operator:` `npm run db:reset` — **operacja destrukcyjna, wymaga Twojej zgody** (patrz niżej)
+- [ ] `Operator:` `npm run db:embeddings` — regeneracja obejmuje nowe wpisy (koszt OpenAI)
+
+Commit: `0702eeb`
+
+#### Sprostowanie: seed nigdy nie był idempotentny
+
+Wymóg „utrzymaj idempotentność (`onConflictDoNothing` / upsert)" z planu opierał się na błędnym
+założeniu. W `src/db/seed.ts` (3447 linii) **nie ma ani jednego** `delete`, `TRUNCATE` czy
+`onConflictDoNothing` — tylko zwykłe `db.insert(...)`. Seed zakłada świeżą bazę i opiera się na
+`db:drop` przed sobą: `db:reset` = `db:drop && drizzle:push && db:seed`.
+
+Ponieważ `serviceLocationsTable.slug` jest `unique`, **powtórne `npm run db:seed` na zapełnionej
+bazie wywali się** na naruszeniu unikalności — nie stworzy duplikatów, ale i nie przejdzie.
+Doklejanie idempotencji do 3447 linii byłoby osobnym, dużym zadaniem, więc korygujemy wymóg
+zamiast go realizować.
+
+**Konsekwencja praktyczna:** żeby dane referencyjne U3 znalazły się w bazie, potrzebny jest
+`npm run db:reset`, który **niszczy lokalne dane**. Nie uruchamiam tego bez wyraźnej zgody.
+Jeśli dodałeś ręcznie jakiekolwiek wpisy przez dashboard — zostaną utracone.
 
 ---
 

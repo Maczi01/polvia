@@ -1,7 +1,7 @@
 # Kontekst: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-20
+**Ostatnia aktualizacja:** 2026-08-21
 
 ## Źródła
 
@@ -190,6 +190,30 @@ migracji `0014`, do snapshotu wyciekł alias Drizzle jako „tabela", a `0000` m
 `county` to relikt po forku `abroad-services` (hrabstwa irlandzkie). Projekt żyje na `push` —
 widać to w `db:reset`. **`CLAUDE.md` opisuje ścieżkę `generate` → `push`, która nie działa** —
 do sprostowania, inaczej każda kolejna sesja powtórzy ten sam objazd.
+
+### U2 + U3 — Faza 2 (commity `25b3c08`, `0702eeb`)
+
+**Wydzielono `_service-schema.ts`** — czysta warstwa walidacji. Wymuszone testowalnością:
+`src/db/index.ts` tworzy klienta postgres przy ładowaniu modułu, więc `_actions.ts` nie da się
+zaimportować w teście bez otwierania połączenia. `@/db/schema` jest bezpieczny.
+
+**Dwa bugi ze współrzędnymi `0,0` — oba preegzystujące, nie wprowadzone tą zmianą:**
+`z.coerce.number()` zamieniał `null` i `''` z `FormData` na `0` (zgłoszenie bez współrzędnych →
+pin w Zatoce Gwinejskiej), a `getServiceById` robił `?? 0`, więc formularz edycji utrwalał
+fałszywy pin. Oba naprawione.
+
+**Współrzędne wymagane też dla `hybrid`** — plan mówił tylko o `local`, ale `hybrid` ma pin (R3).
+
+**`openingHours: {}` było już domyślne** dla każdej nowej usługi — decyzja 3 potwierdzona w kodzie.
+
+**Reguła o testach w tym repo:** wzorzec `z.string().optional().or(z.literal(''))`, użyty dla
+każdego pola opcjonalnego, **nie przyjmuje `null`**, a `formData.get()` zwraca `null` dla pola
+pominiętego. Builder `FormData` w teście musi podawać wszystkie pola jako `''`, bo tak zachowuje
+się realny formularz. Dotyczy każdego przyszłego testu tego schematu.
+
+**Seed nigdy nie był idempotentny** — zero `delete`/`TRUNCATE`/`onConflictDoNothing` w 3447 liniach.
+Opiera się na `db:drop`. Powtórne `db:seed` na zapełnionej bazie wywali się na unikalnym `slug`.
+Wymóg z planu skorygowany, nie zrealizowany.
 
 ## Pułapki (świadome, udokumentowane)
 
