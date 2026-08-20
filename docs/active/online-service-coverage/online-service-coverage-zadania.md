@@ -105,37 +105,41 @@ interaktywnym.
 - [x] `Weryfikacja:` `npx tsc --noEmit` — **0 błędów**
 - [x] `Weryfikacja:` `npx jest` — **95/95 PASS** (3 suity)
 - [x] `Weryfikacja:` `npx next lint` — **0 błędów** (same preegzystujące warningi)
-- [ ] Wygeneruj migrację — **BLOKADA: wymaga TTY, patrz niżej**
-- [ ] `Weryfikacja:` `git diff --stat drizzle/` pokazuje wyłącznie nowy plik migracji — czeka na migrację
-- [ ] `Operator:` `npx drizzle-kit generate --name add_coverage_and_nullable_coords` → wybierz **`+ coverage create enum`**
-- [ ] `Operator:` `npm run drizzle:push` (albo `npx tsx sequential-migrate.ts`) na lokalnej bazie dev
-- [ ] `Operator:` potwierdź, że kolumna `coverage` istnieje i ma `'local'` dla wszystkich istniejących wierszy
+- [x] Zastosuj zmianę schematu na bazie — **`npx drizzle-kit push`, nie `generate`** (uzasadnienie niżej)
+- [x] `Operator:` `npx drizzle-kit push` — `[✓] Changes applied`, zero pytań, zero propozycji destrukcyjnych
+- [x] `Operator:` potwierdzono w bazie: enum `coverage` (`local`/`online`/`hybrid`), kolumna `NOT NULL DEFAULT 'local'::coverage`, `latitude`/`longitude` nullowalne, `slug` nadal `NOT NULL`, 127 istniejących usług = `local`, oba indeksy na współrzędnych przetrwały
+- [x] ~~`Weryfikacja:` `git diff --stat drizzle/`~~ — **nie dotyczy**, w tym repo nie powstaje plik migracji
 
-Commit: `f7e7b87`
+Commit: `f7e7b87` (kod), zmiana schematu zaaplikowana przez `push`
 
-#### BLOKADA — migracja wymaga interaktywnego terminala
+#### Dlaczego `drizzle:generate` jest w tym repo nieużywalny — sprostowanie planu
 
-`npm run drizzle:generate` w `package.json` woła **przedawniony** `drizzle-kit generate:pg`
-(drizzle-kit 0.30.5), który nic nie generuje — tylko wypisuje ostrzeżenie o deprecacji.
+Plan zakładał `schema.ts` → `drizzle:generate` → `drizzle:push`, zgodnie z `CLAUDE.md`.
+**Ta ścieżka w tym repo nie działa.** Ustalone empirycznie:
 
-Poprawna komenda `npx drizzle-kit generate` zadaje pytanie:
+1. `npm run drizzle:generate` woła **przedawniony** `drizzle-kit generate:pg` (drizzle-kit 0.30.5) —
+   nie generuje nic, tylko wypisuje ostrzeżenie o deprecacji. Skrypt jest martwy.
+2. `npx drizzle-kit generate` startuje, ale **snapshoty są w stanie ruiny**:
+   - `drizzle/meta/0013_snapshot.json` (najnowszy) zna **dwa** enumy: `category` i `county`.
+     `schema.ts` ma cztery. Stąd trzy pytania „create or rename" (`coverage`, `status`, `voivodeship`).
+   - `_journal.json` kończy się na `0013`, a `0014_add_services_id_sequence.sql` dopisano **ręcznie,
+     bez snapshotu**.
+   - Snapshot nie zna tabeli `service_locations` — czyli głównej tabeli aplikacji.
+   - Jako kandydata do przemianowania Drizzle proponował `services_translations_alias`, co **nie jest
+     tabelą** — to nazwa aliasu z `src/db/aliases.ts`, która wyciekła do snapshotu.
+   - `drizzle/0000_opposite_dark_beast.sql` ma **błąd składni**: `'grocery', 'grocery' 'transport'`
+     (brak przecinka), więc nigdy nie zaaplikował się czysto.
+   - `county` to relikt po forku `abroad-services` — enum z hrabstwami irlandzkimi
+     (Antrim, Armagh, Dublin, Galway…), zastąpiony przez `voivodeship`.
+3. Wynikiem `generate` byłaby migracja próbująca **utworzyć od zera** typy i tabele już istniejące
+   w bazie — nieaplikowalna (`already exists`) i opisująca nieprawdę o stanie bazy.
 
-```
-Is coverage enum created or renamed from another enum?
-❯ + coverage          create enum
-  ~ county › coverage rename enum
-```
+`push` porównuje `schema.ts` z **żywą bazą**, nie ze snapshotem, więc zadziałał od razu i poprawnie.
+Potwierdza to zresztą sam `package.json`: `db:reset` to `db:drop && drizzle:push && db:seed` —
+projekt od początku żyje na `push`, a katalog `drizzle/` jest martwym balastem po forku.
 
-Trzeba wybrać **pierwszą opcję**. Wybór drugiej wygenerowałby `ALTER TYPE county RENAME TO coverage`
-— destrukcyjnie i błędnie. Pytanie pojawia się, bo w `drizzle/meta/*.json` (snapshoty 0011–0013)
-siedzi enum `county`, którego **nie ma w `src/db/schema.ts`** — preegzystujący rozjazd snapshotów,
-niezależny od tego zadania.
-
-Bash i PowerShell w tej sesji nie mają TTY (`printf '\n' |` nie pomaga, biblioteka promptów wymaga
-terminala), a `drizzle-kit generate --help` nie ma flagi nieinteraktywnej. Do uruchomienia ręcznie.
-
-**Osobne znalezisko do naprawy kiedyś:** skrypt `drizzle:generate` w `package.json` jest martwy.
-Poza scope'em tego zadania.
+**Wniosek dla kolejnych faz:** zmiany schematu w tym repo aplikujemy przez `npx drizzle-kit push`.
+Nie generujemy plików migracji, dopóki `drizzle/` nie zostanie zresetowany (osobne zadanie).
 
 #### Odchylenia od planu w U1 (wszystkie zgłoszone i zaakceptowane)
 

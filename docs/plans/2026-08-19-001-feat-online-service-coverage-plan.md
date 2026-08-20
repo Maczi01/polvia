@@ -277,7 +277,9 @@ semantyki istniejących zapytań.
 
 **Pliki:**
 - Modyfikuj: `src/db/schema.ts`
-- Stwórz: `drizzle/00XX_*.sql` *(generowany przez `npx drizzle-kit generate` — `npm run drizzle:generate` jest martwy, woła przedawniony `generate:pg`; NIGDY nie edytowany ręcznie)*
+- ~~Stwórz: `drizzle/00XX_*.sql`~~ — **nie dotyczy.** `generate` jest w tym repo nieużywalny
+  (snapshoty w ruinie, szczegóły w `zadania.md`). Zmianę schematu aplikuje `npx drizzle-kit push`,
+  który porównuje `schema.ts` z żywą bazą. Dotyczy **wszystkich** przyszłych zmian schematu w tym planie.
 - Modyfikuj: `src/types/index.ts`
 - Modyfikuj: `src/lib/queries.ts`
 - Modyfikuj: `src/lib/map-utils.ts` *(dopisane w wykonaniu — przeoczone w planowaniu; predykat typu w filtrze, zero zmiany zachowania)*

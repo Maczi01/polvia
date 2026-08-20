@@ -178,8 +178,18 @@ takim ruchu planować ją jako jeden unit razem z konsumentami, nie rozbijać na
 nie kompiluje się między commitami, `git bisect` traci sens, a quality gate z `CLAUDE.md` blokuje
 commitowanie.
 
-**Otwarte:** migracja Drizzle wymaga interaktywnego terminala (szczegóły i dokładna komenda
-w `zadania.md`). Do czasu jej wygenerowania `schema.ts` i `drizzle/` są rozjechane.
+**Zmiana schematu zaaplikowana przez `npx drizzle-kit push`** — nie przez migrację. Potwierdzone
+zapytaniem do bazy: enum `coverage` w poprawnej kolejności, kolumna `NOT NULL DEFAULT 'local'`,
+współrzędne nullowalne, `slug` nadal `NOT NULL` (co potwierdza decyzję 2), 127 istniejących usług
+= `local`, oba indeksy na współrzędnych na miejscu.
+
+**Odkrycie o skali projektu, nie tylko tego zadania: katalog `drizzle/` jest martwy.**
+`generate` jest w tym repo nieużywalny — pełny rozbiór w `zadania.md`. Najkrócej: najnowszy snapshot
+zna 2 z 4 enumów, nie zna tabeli `service_locations`, `_journal` kończy się na `0013` przy istniejącej
+migracji `0014`, do snapshotu wyciekł alias Drizzle jako „tabela", a `0000` ma błąd składni.
+`county` to relikt po forku `abroad-services` (hrabstwa irlandzkie). Projekt żyje na `push` —
+widać to w `db:reset`. **`CLAUDE.md` opisuje ścieżkę `generate` → `push`, która nie działa** —
+do sprostowania, inaczej każda kolejna sesja powtórzy ten sam objazd.
 
 ## Pułapki (świadome, udokumentowane)
 
