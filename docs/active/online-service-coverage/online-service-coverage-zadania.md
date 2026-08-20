@@ -285,31 +285,61 @@ Jeśli dodałeś ręcznie jakiekolwiek wpisy przez dashboard — zostaną utraco
 > Czyste funkcje — pisz **test-first**, jeden przypadek na raz (tracer bullets).
 > Regresja w parserze objawia się jako 404 na produkcji.
 
-- [ ] `slug-mappings.ts` — `COVERAGE_ONLINE_SLUG = 'online'` + predykat `isOnlineSlug(segment)`
-- [ ] `slug-mappings.ts` — `online` **nie** wchodzi do `CATEGORY_SLUGS` (nie jest kategorią)
-- [ ] `map-slug-parser.ts` — `MapFilters` zyskuje `onlineOnly: boolean`
-- [ ] `map-slug-parser.ts` — `parseSingleSegment`: sprawdzaj `online` przed county i city (jawna kolejność)
-- [ ] `map-slug-parser.ts` — `parseTwoSegments`: drugi segment `online` → `{ category, onlineOnly: true }`
-- [ ] `map-slug-parser.ts` — **nie** dopisuj reguły odrzucania dla `/mapa/pomorskie/online` (odpada istniejącą ścieżką)
-- [ ] `map-url-builder.ts` — `onlineOnly` wypełnia slot county/city; ustal kolejność gałęzi
-- [ ] Uzgodnij z U6, czy wybór „Online" czyści województwo (URL i UI muszą się zgadzać)
-- [ ] Zaktualizuj wszystkie miejsca budujące `MapFilters` (typecheck je wskaże)
-- [ ] Stwórz `src/lib/map-slug-parser.test.ts`
-- [ ] Stwórz `src/lib/map-url-builder.test.ts`
-- [ ] `Test:` `parseMapSlug(['online'], 'pl')` → `onlineOnly: true`, kategoria/county/city `null`
-- [ ] `Test:` `parseMapSlug(['prawne', 'online'], 'pl')` → `category: 'law'`, `onlineOnly: true`
-- [ ] `Test:` `parseMapSlug(['law', 'online'], 'en')` → `category: 'law'`, `onlineOnly: true`
-- [ ] `Test:` `parseMapSlug(['pomorskie', 'online'], 'pl')` → `success: false`, redirect na `basePath`
-- [ ] `Test:` `parseMapSlug(['online', 'pomorskie'], 'pl')` → `success: false`
-- [ ] `Test:` `parseMapSlug(['online', 'prawne', 'pomorskie'], 'pl')` → `success: false` (>2 segmenty)
-- [ ] `Test:` `parseMapSlug(undefined, 'pl')` → `onlineOnly: false` (regresja: wartość domyślna)
-- [ ] `Test:` `buildMapUrl({ onlineOnly: true }, 'pl')` → `pathname: '/map/online'`
-- [ ] `Test:` `buildMapUrl({ category: 'law', onlineOnly: true }, 'pl')` → `pathname: '/map/prawne/online'`
-- [ ] `Test:` round-trip dla każdego locale: `parseMapSlug(buildMapUrl(f).pathname.split('/'))` zwraca `f`
-- [ ] `Test:` `isOnlineSlug` nie koliduje z `CATEGORY_SLUGS`, `COUNTY_SLUGS`, `CITY_SLUGS`
-- [ ] `Weryfikacja:` `npx jest src/lib/map-slug-parser.test.ts src/lib/map-url-builder.test.ts` — wszystkie przechodzą
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów (w tym miejsca budujące `MapFilters`)
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów
+- [x] `slug-mappings.ts` — `COVERAGE_ONLINE_SLUG = 'online'` + predykat `isOnlineSlug(segment)`
+- [x] `slug-mappings.ts` — `online` **nie** wchodzi do `CATEGORY_SLUGS` (nie jest kategorią)
+- [x] `map-slug-parser.ts` — `MapFilters` zyskuje **wymagane** `onlineOnly: boolean` (bez stanu `undefined`)
+- [x] `map-slug-parser.ts` — `parseSingleSegment`: `online` sprawdzany przed county i city
+- [x] `map-slug-parser.ts` — `parseTwoSegments`: drugi segment `online` → `{ category, onlineOnly: true }`
+- [x] `map-slug-parser.ts` — **nie** dopisano reguły odrzucania dla `/mapa/pomorskie/online`
+- [x] `map-url-builder.ts` — `onlineOnly` wypełnia slot county/city, z priorytetem nad nimi
+- [x] Rozstrzygnięte: wybór „Online" **czyści** województwo i miasto — jeden slot ścieżki
+- [x] Zaktualizowano 4 miejsca budujące `MapFilters` (`map-page-client.tsx` ×2, `filter-component.tsx` ×2)
+- [x] Stwórz `src/lib/map-slug-parser.test.ts`
+- [x] Stwórz `src/lib/map-url-builder.test.ts`
+- [x] `Test:` `parseMapSlug(['online'], 'pl')` → `onlineOnly: true`, kategoria/county/city `null`
+- [x] `Test:` `parseMapSlug(['prawne', 'online'], 'pl')` → `category: 'law'`, `onlineOnly: true`
+- [x] `Test:` `parseMapSlug(['law', 'online'], 'en')` → `category: 'law'`, `onlineOnly: true`
+- [x] `Test:` `parseMapSlug(['pomorskie', 'online'], 'pl')` → `success: false`, redirect na `basePath`
+- [x] `Test:` `parseMapSlug(['online', 'pomorskie'], 'pl')` → `success: false`
+- [x] `Test:` `parseMapSlug(['online', 'prawne', 'pomorskie'], 'pl')` → `success: false` (>2 segmenty)
+- [x] `Test:` `parseMapSlug(undefined, 'pl')` → `onlineOnly: false` (regresja: wartość domyślna)
+- [x] `Test:` `buildMapUrl({ onlineOnly: true }, 'pl')` → `pathname: '/map/online'`
+- [x] `Test:` `buildMapUrl({ category: 'law', onlineOnly: true }, 'pl')` → `pathname: '/map/prawne/online'`
+- [x] `Test:` round-trip dla każdego locale — 4 kombinacje filtrów × 4 locale
+- [x] `Test:` `isOnlineSlug` nie koliduje z `CATEGORY_SLUGS`, `COUNTY_SLUGS`, `CITY_SLUGS`
+- [x] `Test:` regresje na istniejących trasach (kategoria sama, województwo samo, kategoria + województwo)
+- [x] `Weryfikacja:` `npx jest map-slug-parser map-url-builder` — **30/30 PASS**
+- [x] `Weryfikacja:` `npx tsc --noEmit` — **0 błędów**
+- [x] `Weryfikacja:` `npx next lint` — **0 błędów**
+- [x] `Weryfikacja:` pełny `npx jest` — **140/140 PASS** (6 suit)
+
+Commit: `1dc0c67`
+
+#### Rozstrzygnięcia i odchylenia w U4
+
+1. **`onlineOnly` czyści województwo i miasto** — odroczone pytanie z planu („uzgodnij z U6").
+   Uzasadnienie: zasięg i lokalizacja dzielą **jeden slot ścieżki** (`/mapa/{tu}`), więc są
+   wzajemnie wykluczające. Wybór „Online" oznacza rezygnację z zawężenia geograficznego.
+   **To nie koliduje z R5** — tam sekcja online jest widoczna przy aktywnym filtrze województwa,
+   ale to zachowanie *sekcji listy*, nie filtra `onlineOnly`. Dwie różne rzeczy.
+2. **`onlineOnly` jako wymagany boolean, nie opcjonalny** — odroczone pytanie z planu.
+   Opcjonalne pole dawałoby trzeci stan (`undefined`) bez znaczenia semantycznego. Zasięg
+   regionalny jest poza scope'em, więc nie budujemy pod niego abstrakcji.
+3. **`/mapa/pomorskie/online` odpada bez nowego kodu** — potwierdzone testem. `parseTwoSegments`
+   wymaga kategorii jako pierwszego segmentu, więc przekierowuje na `basePath`. Przewidywanie
+   z planu okazało się trafne.
+4. **`filter-component.tsx` dotknięty minimalnie** — U4 dodaje wyłącznie *przenoszenie* flagi
+   (`initialFilters?.onlineOnly ?? false` do `onFiltersChange` i `buildMapUrl`), żeby zmiana
+   kategorii nie gubiła aktywnego zasięgu w URL-u. Bez tego `/mapa/online` + klik kategorii
+   dawałoby `/mapa/prawne`, cicho tracąc filtr. Interaktywny chip zostaje w U6.
+
+#### Bug preegzystujący znaleziony po drodze — poza scope'em
+
+`filter-component.tsx` hardkoduje prefiks `/en` dla **każdego** locale niebędącego `pl`:
+`const basePath = locale === 'pl' ? '' : '/en'` (w `navigateWithFilters`) oraz
+`locale === 'pl' ? '/mapa' : '/en/map'` (w `resetAllFilters`). Na `ru` i `uk` nawigacja filtrem
+przepisuje URL na `/en/...`, czyli **przełącza użytkownikowi język**. Nie naprawiam tutaj —
+nie należy do zasięgu i wymaga decyzji, czy użyć `localizeMapPath` z prawidłowym prefiksem.
 
 ---
 
