@@ -13,6 +13,7 @@ import { useLocale } from 'next-intl';
 import { calculateServicesBounds } from '@/lib/map-utils';
 import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
+import { splitServicesByCoverage } from '@/lib/service-coverage';
 
 type Props = {
     services: PartialService[];
@@ -38,6 +39,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const selectedCounty = initialFilters?.county || '';
     const selectedCategory = initialFilters?.category || '';
     const selectedCity = initialFilters?.city || '';
+    const onlineOnly = initialFilters?.onlineOnly ?? false;
     const [popup, setPopup] = useState<PopupMarkerData | null>(null);
     const [selectedService, setSelectedService] = useState<PartialService | null>(null);
     const [isMobile, setIsMobile] = useState(false);
@@ -73,39 +75,23 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
 
     const previousSelectedCellName = useRef('');
 
-    const frontendFilteredServices = useMemo(() => {
-        const query = searchInput ? searchInput.toLowerCase().trim() : '';
-        let filtered = initialServices;
+    const coverageFilters = useMemo(
+        () => ({
+            query: searchInput,
+            category: selectedCategory,
+            county: selectedCounty,
+            city: selectedCity,
+            onlineOnly,
+        }),
+        [searchInput, selectedCategory, selectedCounty, selectedCity, onlineOnly],
+    );
 
-        if (query) {
-            filtered = filtered.filter(
-                s =>
-                    s.name.toLowerCase().includes(query) ||
-                    s.description?.toLowerCase().includes(query) ||
-                    s.city?.toLowerCase().includes(query) ||
-                    s.category?.toLowerCase().includes(query) ||
-                    s.tags?.some(tag => tag.toLowerCase().includes(query)),
-            );
-        }
-
-        if (selectedCity) {
-            filtered = filtered.filter(
-                s => s.city?.toLowerCase() === selectedCity.toLowerCase(),
-            );
-        } else if (selectedCounty) {
-            filtered = filtered.filter(
-                s => s.voivodeship?.toLowerCase() === selectedCounty.toLowerCase(),
-            );
-        }
-
-        if (selectedCategory) {
-            filtered = filtered.filter(
-                s => s.category?.toLowerCase() === selectedCategory.toLowerCase(),
-            );
-        }
-
-        return filtered;
-    }, [searchInput, selectedCounty, selectedCity, selectedCategory, initialServices]);
+    // Lista lokalna NIE moze zalezec od wynikow semantycznych — jej dlugosc steruje
+    // fetchem embeddingow nizej, wiec zaleznosc w druga strone dalaby cykl.
+    const localResults = useMemo(
+        () => splitServicesByCoverage(initialServices, coverageFilters).localResults,
+        [initialServices, coverageFilters],
+    );
 
     const fetchEmbeddingResults = useCallback(
         async (query: string, category?: string, county?: string, excludeIds: string[] = []) => {
@@ -185,7 +171,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             if (currentSearchParams === lastSearchParamsRef.current) return false;
 
             // Trigger if we have too few results
-            if (frontendFilteredServices.length < minResults) return true;
+            if (localResults.length < minResults) return true;
 
             // Also trigger if we have a category filter and query seems semantic
             // (contains multiple words or non-exact matches)
@@ -210,7 +196,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             setIsLoadingEmbeddings(true);
 
             debounceTimeoutRef.current = setTimeout(() => {
-                const excludeIds = frontendFilteredServices.map(s => s.serviceId);
+                const excludeIds = localResults.map(s => s.serviceId);
                 fetchEmbeddingResults(
                     searchInput.trim(),
                     selectedCategory || undefined,
@@ -234,41 +220,50 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         searchInput,
         selectedCategory,
         selectedCounty,
-        frontendFilteredServices.length,
+        localResults.length,
         fetchEmbeddingResults,
     ]);
 
-    const finalServices = useMemo(() => {
-        // Don't merge - keep them separate
-        return {
-            frontendFiltered: frontendFilteredServices,
-            embeddingResults: embeddingResults.filter(service => {
-                if (selectedCity) {
-                    if (service.city?.toLowerCase() !== selectedCity.toLowerCase()) {
-                        return false;
-                    }
-                } else if (
-                    selectedCounty &&
-                    service.voivodeship?.toLowerCase() !== selectedCounty.toLowerCase()
-                ) {
+    // Wyniki semantyczne zawezone tak samo jak wczesniej — filtr geograficzny i kategoria.
+    const filteredEmbeddingResults = useMemo(() => {
+        return embeddingResults.filter(service => {
+            if (selectedCity) {
+                if (service.city?.toLowerCase() !== selectedCity.toLowerCase()) {
                     return false;
                 }
+            } else if (
+                selectedCounty &&
+                service.voivodeship?.toLowerCase() !== selectedCounty.toLowerCase()
+            ) {
+                return false;
+            }
 
-                if (
-                    selectedCategory &&
-                    service.category?.toLowerCase() !== selectedCategory.toLowerCase()
-                ) {
-                    return false;
-                }
+            if (
+                selectedCategory &&
+                service.category?.toLowerCase() !== selectedCategory.toLowerCase()
+            ) {
+                return false;
+            }
 
-                return true;
-            })
-        };
-    }, [frontendFilteredServices, embeddingResults, selectedCounty, selectedCity, selectedCategory]);
+            return true;
+        });
+    }, [embeddingResults, selectedCounty, selectedCity, selectedCategory]);
 
+    // Sekcja online odejmuje to, co juz widac na ekranie: liste lokalna ORAZ wyniki
+    // semantyczne (R6). Drugie wywolanie tej samej, przetestowanej funkcji — tanie
+    // i bezpieczniejsze niz powtarzanie reguly deduplikacji tutaj.
+    const onlineResults = useMemo(
+        () =>
+            splitServicesByCoverage(initialServices, coverageFilters, filteredEmbeddingResults)
+                .onlineResults,
+        [initialServices, coverageFilters, filteredEmbeddingResults],
+    );
+
+    // Wspolna lista do wyszukiwania karty po id/slug, refow i lookupow. Mapa dostaje
+    // ja tez, ale sama pomija wpisy bez wspolrzednych (createPoints).
     const filteredServices = useMemo(() => {
-        return [...finalServices.frontendFiltered, ...finalServices.embeddingResults];
-    }, [finalServices]);
+        return [...localResults, ...onlineResults, ...filteredEmbeddingResults];
+    }, [localResults, onlineResults, filteredEmbeddingResults]);
 
     const handleHoverPlace = useCallback(
         (serviceId: string | null) => {
@@ -586,7 +581,8 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             {process.env.NODE_ENV === 'development' &&
                 (searchInput || embeddingResults.length > 0) && (
                     <div className="absolute right-0 top-0 z-50 bg-black p-2 text-xs text-white">
-                        <div>Frontend: {frontendFilteredServices.length}</div>
+                        <div>Lokalne: {localResults.length}</div>
+                        <div>Online: {onlineResults.length}</div>
                         {embeddingResults.length > 0 && (
                             <div>Embedding: {embeddingResults.length}</div>
                         )}
@@ -618,15 +614,16 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                         height: isMobile && currentView === 'list' ? '100%' : undefined,
                     }}
                 >
-                    {finalServices.frontendFiltered.length > 0 || finalServices.embeddingResults.length > 0 || isLoadingEmbeddings ? (
+                    {localResults.length > 0 || onlineResults.length > 0 || filteredEmbeddingResults.length > 0 || isLoadingEmbeddings ? (
                         <>
                             <MapList
                                 ref={mapListRef}
                                 handleHoverPlace={handleHoverPlace}
                                 resetMap={resetMap}
                                 handleFlyTo={handleFlyTo}
-                                frontendFilteredServices={finalServices.frontendFiltered}
-                                embeddingResults={finalServices.embeddingResults}
+                                frontendFilteredServices={localResults}
+                                embeddingResults={filteredEmbeddingResults}
+                                onlineResults={onlineResults}
                                 isLoadingEmbeddings={isLoadingEmbeddings}
                                 embeddingMeta={embeddingMeta}
                                 cardRefs={cardRefs}
