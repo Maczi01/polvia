@@ -12,7 +12,7 @@ import {
 import { ServiceCard } from '../service-card/service-card';
 import { VList, VListHandle } from 'virtua';
 import { useScrollableListHandle } from '@/hooks/use-scrollable-list-handle';
-import { ArrowUp, Sparkles, Search } from 'lucide-react';
+import { ArrowUp, Globe, Sparkles, Search } from 'lucide-react';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useTranslations } from 'next-intl';
@@ -31,6 +31,8 @@ type EmbeddingMeta = {
 
 type MapListProps = {
     frontendFilteredServices: PartialService[];
+    /** Uslugi dostepne zdalnie, po odjeciu tego, co widac w pozostalych sekcjach (R6). */
+    onlineResults: PartialService[];
     embeddingResults: PartialService[];
     isLoadingEmbeddings: boolean;
     embeddingMeta: EmbeddingMeta;
@@ -81,6 +83,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
     (
         {
             frontendFilteredServices,
+            onlineResults,
             embeddingResults,
             isLoadingEmbeddings,
             embeddingMeta,
@@ -105,9 +108,12 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         const CARD_COLLAPSE_MS = 300;
 
         // Combine services for internal logic (refs, scrolling, etc.)
+        // KOLEJNOSC MUSI ODPOWIADAC kolejnosci renderowania sekcji w renderServiceCards(),
+        // bo `cardIndex` i `cardRefs` sa wspolne dla wszystkich sekcji. Rozjechanie
+        // tego psuje scrollowanie i rozwijanie kart.
         const allServices = useMemo(
-            () => [...frontendFilteredServices, ...embeddingResults],
-            [frontendFilteredServices, embeddingResults],
+            () => [...frontendFilteredServices, ...onlineResults, ...embeddingResults],
+            [frontendFilteredServices, onlineResults, embeddingResults],
         );
 
         useScrollableListHandle(ref, containerRef, virtuaListRef, allServices);
@@ -254,10 +260,46 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                             message={t("no_exact_matches")}
                             icon={Search}
                             isLoadingRecommendations={isLoadingEmbeddings}
-                            hasRecommendations={embeddingResults.length > 0}
+                            hasRecommendations={onlineResults.length > 0 || embeddingResults.length > 0}
                         />
                     </div>
                 );
+            }
+
+            // Online coverage section — zawsze widoczna, niezaleznie od filtra
+            // geograficznego (R4). Wpisy bez pinu na mapie zyja wylacznie tutaj.
+            if (onlineResults.length > 0) {
+                cards.push(
+                    <SectionHeader
+                        key="online-header"
+                        icon={Globe}
+                        title={t('available_online', { count: onlineResults.length })}
+                        subtitle={t('available_online_subtitle')}
+                    />
+                );
+
+                onlineResults.forEach((service) => {
+                    cards.push(
+                        <div key={`online-${service.id}`} className="mb-2 md:mb-4">
+                            <ServiceCard
+                                ref={element => {
+                                    if (cardRefs.current) {
+                                        cardRefs.current[cardIndex] = element;
+                                    }
+                                }}
+                                handleFlyTo={handleFlyTo}
+                                index={cardIndex}
+                                resetMap={resetMap}
+                                setCardToExpand={setCardToExpand}
+                                cardToExpand={cardToExpand}
+                                handleHoverPlace={handleHoverPlace}
+                                setPopup={setPopup}
+                                {...service}
+                            />
+                        </div>
+                    );
+                    cardIndex++;
+                });
             }
 
             // Embedding results section
@@ -333,7 +375,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         };
 
         // Show empty state when no results at all
-        if (frontendFilteredServices.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
+        if (frontendFilteredServices.length === 0 && onlineResults.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
             return (
                 <div className="flex h-full items-center justify-center bg-[#F6F6F7] dark:bg-gray-900">
                     <EmptyState
