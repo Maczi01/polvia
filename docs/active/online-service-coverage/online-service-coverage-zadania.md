@@ -1,7 +1,7 @@
 # Zadania: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-21
+**Ostatnia aktualizacja:** 2026-08-22
 
 ## Źródła
 
@@ -345,76 +345,121 @@ nie należy do zasięgu i wymaga decyzji, czy użyć `localizeMapPath` z prawid�
 
 ## Faza 4 — UI odkrywania
 
-### U5. Logika kubełkowania jako czysta funkcja
+### U5. Logika kubelkowania jako czysta funkcja
 
-**Delegate to:** `feature-builder-web-data` · **Nakład:** M · **Zależności:** U1, U4
+**Delegate to:** `feature-builder-web-data` - **Naklad:** M - **Zaleznosci:** U1, U4
 **Wymagania:** R4, R5, R6
 
-> Test-first. Reguła dedupe ma najwięcej nieoczywistych przypadków — pokryj ją najpierw.
+- [x] Stworz `src/lib/service-coverage.ts` - `splitServicesByCoverage(services, filters, alreadyShown)`
+- [x] Regula 1: filtr kategorii i tekstu stosuje sie do **obu** kubelkow
+- [x] Regula 2: kubelek lokalny - `coverage !== 'online'` **i** przechodzi filtr geograficzny
+- [x] Regula 3: kubelek online - `coverage !== 'local'`, **bez** filtra geograficznego
+- [x] Regula 4: dedupe - usun z online to, co jest w liscie lokalnej **lub** w `embeddingResults`
+- [x] Regula 5: `onlineOnly === true` -> lista lokalna pusta, online bez odejmowania geograficznego
+- [x] **Nie** dodano `import 'server-only'`
+- [x] **Nie** dodano wlasnego sortowania
+- [x] Komentarz przy funkcji: czwarta sekcja listy musi dopisac sie do `alreadyShown`
+- [x] `services-client-component.tsx` - filtrowanie zastapione wywolaniem funkcji
+- [x] Zachowana 1:1 semantyka filtrow tekstowych i geograficznych (w tym priorytet miasta)
+- [x] Stworz `src/lib/service-coverage.test.ts` - **16 scenariuszy**
+- [x] `Test:` brak filtrow - `hybrid` z Warszawy **tylko** w liscie lokalnej
+- [x] `Test:` filtr `pomorskie` - `hybrid` z Warszawy **tylko** w sekcji online
+- [x] `Test:` filtr `pomorskie` - `hybrid` z Gdanska **tylko** w liscie lokalnej
+- [x] `Test:` `online` nigdy w liscie lokalnej, niezaleznie od filtra geograficznego
+- [x] `Test:` `local` nigdy w sekcji online
+- [x] `Test:` wpis z `embeddingResults` nieobecny w sekcji online (oraz: inny wpis go nie usuwa)
+- [x] `Test:` kategoria `law` + wpis `online` w `law` -> obecny w sekcji online
+- [x] `Test:` kategoria `law` + wpis `online` w `health` -> nieobecny w obu kubelkach
+- [x] `Test:` `onlineOnly: true` -> lista lokalna pusta, online zawiera `online` i `hybrid`
+- [x] `Test:` `onlineOnly: true` + filtr `pomorskie` -> filtr geograficzny nie zaweza online
+- [x] `Test:` pusta lista wejsciowa -> oba kubelki puste
+- [x] `Test:` zachowanie kolejnosci wejsciowej (sortowanie pochodzi z zapytania)
+- [x] `Weryfikacja:` `npx jest service-coverage` - **16/16 PASS**
+- [x] `Weryfikacja:` `npx tsc --noEmit` - **0 bledow**
+- [x] `Weryfikacja:` `npx next lint` - **0 bledow**
+- [x] `Weryfikacja:` `grep -c "server-only" src/lib/service-coverage.ts` -> **0**
 
-- [ ] Stwórz `src/lib/service-coverage.ts` — funkcja przyjmuje listę, filtry i `embeddingResults`, zwraca `{ localResults, onlineResults }`
-- [ ] Reguła 1: filtr kategorii i tekstu stosuje się do **obu** kubełków (zasięg ortogonalny)
-- [ ] Reguła 2: kubełek lokalny — `coverage !== 'online'` **i** przechodzi filtr geograficzny
-- [ ] Reguła 3: kubełek online — `coverage !== 'local'`, **bez** filtra geograficznego
-- [ ] Reguła 4: dedupe — usuń z kubełka online wszystko, czego `id` jest w kubełku lokalnym **lub** w `embeddingResults`
-- [ ] Reguła 5: `onlineOnly === true` → kubełek lokalny pusty, online bez odejmowania geograficznego
-- [ ] **Nie** dodawaj `import 'server-only'` (funkcja używana przez Client Component)
-- [ ] **Nie** dodawaj własnego sortowania — `getServices` już sortuje po `priority` i `clicks`
-- [ ] Komentarz przy funkcji: czwarta sekcja listy musi dopisać się do zbioru odejmowanego
-- [ ] `services-client-component.tsx` — zastąp rozproszone filtrowanie wywołaniem funkcji; `frontendFilteredServices` → `localResults`
-- [ ] Zachowaj 1:1 semantykę istniejących filtrów tekstowych i geograficznych
-- [ ] Stwórz `src/lib/service-coverage.test.ts`
-- [ ] `Test:` brak filtrów — wpis `hybrid` z Warszawy trafia **tylko** do listy lokalnej
-- [ ] `Test:` filtr `pomorskie` — wpis `hybrid` z Warszawy trafia **tylko** do sekcji online
-- [ ] `Test:` filtr `pomorskie` — wpis `hybrid` z Gdańska trafia **tylko** do listy lokalnej
-- [ ] `Test:` wpis `online` nigdy nie trafia do listy lokalnej, niezależnie od filtra geograficznego
-- [ ] `Test:` wpis `local` nigdy nie trafia do sekcji online
-- [ ] `Test:` wpis obecny w `embeddingResults` nie pojawia się w sekcji online
-- [ ] `Test:` filtr kategorii `law` + wpis `online` w `law` → obecny w sekcji online
-- [ ] `Test:` filtr kategorii `law` + wpis `online` w `health` → nieobecny w obu kubełkach
-- [ ] `Test:` `onlineOnly: true` → lista lokalna pusta, sekcja online zawiera `online` i `hybrid`
-- [ ] `Test:` `onlineOnly: true` + filtr `pomorskie` → filtr geograficzny nie zawęża sekcji online
-- [ ] `Test:` pusta lista wejściowa → oba kubełki puste, bez wyjątku
-- [ ] `Weryfikacja:` `npx jest src/lib/service-coverage.test.ts` — wszystkie testy przechodzą
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów
-- [ ] `Weryfikacja:` `grep -c "server-only" src/lib/service-coverage.ts` zwraca `0`
+Commit: `c567f3d`
 
-### U6. Sekcja „Dostępne online" + filtr „Online" + i18n
+#### Znalezisko: funkcja wolana dwa razy, zeby uniknac cyklu
 
-**Delegate to:** `feature-builder-web-ui` · **Nakład:** L · **Zależności:** U4, U5
+`localResults` **nie moze** zalezec od wynikow semantycznych, bo jego dlugosc steruje fetchem
+embeddingow (`services-client-component.tsx`). Zaleznosc w druga strone dalaby cykl
+`localResults -> fetch -> embeddingResults -> localResults`.
+
+Dlatego `splitServicesByCoverage` jest wolana dwa razy: raz bez `alreadyShown` (lista lokalna,
+zasila trigger fetchu), raz z `alreadyShown` (sekcja online). Czesc `onlineResults` z pierwszego
+wywolania jest odrzucana. Koszt to dwa przejscia po ~140 elementach - nieporownywalnie taniej
+niz powtorzenie reguly deduplikacji w komponencie, gdzie nie mialaby testow.
+
+---
+
+### U6. Sekcja "Dostepne online" + filtr "Online" + i18n
+
+**Delegate to:** `feature-builder-web-ui` - **Naklad:** L - **Zaleznosci:** U4, U5
 **Wymagania:** R4, R6, R7, R10
 
-- [ ] `map-list.tsx` — trzecia sekcja w `renderServiceCards()` wzorcem sekcji embeddingów (`:263`)
-- [ ] `map-list.tsx` — `SectionHeader` z ikoną `lucide` (`Globe` / `Wifi`), tytuł z `useTranslations('MapList')`, licznik w tytule
-- [ ] `map-list.tsx` — **dodaj `onlineResults` do `allServices`** (`:108`) i utrzymaj wspólny `cardIndex`
-- [ ] `map-list.tsx` — kolejność sekcji: lokalna → online → embeddingi
-- [ ] `map-list.tsx` — sekcja online tylko przy `onlineResults.length > 0`
-- [ ] `services-client-component.tsx` — przekaż `onlineResults` do `MapList`
-- [ ] `filter-component.tsx` — chip „Online" komponentem `ButtonCategory`
-- [ ] `filter-component.tsx` — nawigacja przez `buildMapUrl` + `localizeMapPath` + `window.history.pushState`
-- [ ] `filter-component.tsx` — **`resetAllFilters` zeruje `onlineOnly`**
-- [ ] `mobile-filter-modal.tsx` — chip „Online" (ładowany dynamicznie, `ssr: false` — łatwo pominąć)
-- [ ] Import nawigacji wyłącznie z `@/i18n/navigation` — nigdy `next/link` ani `next/navigation`
-- [ ] `messages/pl.json` — klucze: tytuł sekcji, podtytuł, etykieta chipa
-- [ ] `messages/en.json` — te same klucze
-- [ ] `messages/ru.json` — te same klucze
-- [ ] `messages/uk.json` — te same klucze
-- [ ] Stwórz `src/app/[locale]/(main)/_components/map-list/map-list.test.tsx`
-- [ ] `Test:` `onlineResults` niepuste → nagłówek sekcji obecny, karty wyrenderowane
-- [ ] `Test:` `onlineResults` puste → nagłówek sekcji **nieobecny**
-- [ ] `Test:` trzy sekcje jednocześnie → `cardIndex` unikalny, `cardRefs` bez dziur
-- [ ] `Test:` wszystkie kubełki puste → `EmptyState`, bez nagłówków sekcji
-- [ ] `Test:` asercja `jest-axe` bez naruszeń dla widoku z trzema sekcjami
-- [ ] `Weryfikacja:` `npx jest src/app/[locale]/(main)` — wszystkie testy przechodzą, w tym `jest-axe`
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów
-- [ ] `Weryfikacja:` dla każdego nowego klucza i18n `grep -l "<klucz>" messages/*.json` zwraca 4 pliki
-- [ ] `Operator:` `/mapa/pomorskie` → sekcja „Dostępne online w całej Polsce" z FotoDoKarty, zero błędów w konsoli
-- [ ] `Operator:` klik chipa „Online" → URL `/mapa/online`, lista tylko `online` i `hybrid`
-- [ ] `Operator:` klik „Prawne" + „Online" → URL `/mapa/prawne/online`, wyniki zawężone po obu osiach
-- [ ] `Operator:` klik „Resetuj" → URL wraca na `/mapa`, chip „Online" nieaktywny
-- [ ] `Operator:` ten sam przepływ na `/en/map/online` — tytuł przetłumaczony, brak surowych kluczy i18n
+- [x] `map-list.tsx` - trzecia sekcja wzorcem sekcji embeddingow
+- [x] `map-list.tsx` - `SectionHeader` z ikona `Globe`, tytul z licznikiem
+- [x] `map-list.tsx` - **`onlineResults` dopisane do `allServices`**, wspolny `cardIndex`
+- [x] `map-list.tsx` - kolejnosc: lokalna -> online -> embeddingi
+- [x] `map-list.tsx` - sekcja online tylko przy `onlineResults.length > 0`
+- [x] `map-list.tsx` - `EmptyState` uwzglednia wyniki online w `hasRecommendations`
+- [x] `services-client-component.tsx` - `onlineResults` przekazane do `MapList`
+- [x] `filter-component.tsx` - chip "Online" komponentem `ButtonCategory`, poza scrollowanym rzedem
+- [x] `filter-component.tsx` - nawigacja przez `buildMapUrl` + `localizeMapPath` + `pushState`
+- [x] `filter-component.tsx` - **`resetAllFilters` zeruje `onlineOnly`**
+- [x] `filter-component.tsx` - `hasActiveFilters` uwzglednia `onlineOnly`
+- [x] `filter-component.tsx` - synchronizacja z `initialFilters.onlineOnly` (back/forward)
+- [x] `mobile-filter-modal.tsx` - chip "Online" (ladowany dynamicznie - nie pominiety)
+- [x] `messages/pl.json` - 5 nowych kluczy
+- [x] `messages/en.json` - te same klucze
+- [x] `messages/ru.json` - te same klucze
+- [x] `messages/uk.json` - te same klucze
+- [x] Nowa ikona `public/icons/online.svg` w stylu pozostalych
+- [x] Stworz `map-list.test.tsx` - **7 scenariuszy**
+- [x] `Test:` `onlineResults` niepuste -> naglowek sekcji obecny, karty wyrenderowane
+- [x] `Test:` `onlineResults` puste -> naglowek sekcji **nieobecny**
+- [x] `Test:` sekcja online widoczna nawet bez wynikow lokalnych
+- [x] `Test:` trzy sekcje naraz -> kazda usluga dokladnie raz, brak kolizji refow
+- [x] `Test:` kolejnosc sekcji: lokalne -> online -> semantyczne
+- [x] `Test:` wszystkie kubelki puste -> `EmptyState`, bez naglowkow sekcji
+- [x] `Test:` asercja `jest-axe` bez naruszen przy trzech sekcjach
+- [x] `Weryfikacja:` `npx jest` - **163/163 PASS** (8 suit)
+- [x] `Weryfikacja:` `npx tsc --noEmit` - **0 bledow**
+- [x] `Weryfikacja:` `npx next lint` - **0 bledow**
+- [x] `Weryfikacja:` kazdy nowy klucz i18n obecny w **4** plikach `messages/*.json`
+- [ ] `Operator:` `/mapa/pomorskie` -> sekcja "Dostepne online" z FotoDoKarty, zero bledow w konsoli
+- [ ] `Operator:` klik chipa "Online" -> URL `/mapa/online`, lista tylko `online` i `hybrid`
+- [ ] `Operator:` klik "Prawne" + "Online" -> URL `/mapa/prawne/online`
+- [ ] `Operator:` klik "Resetuj" -> URL wraca na `/mapa`, chip nieaktywny
+- [ ] `Operator:` ten sam przeplyw na `/en/map/online` - tytul przetlumaczony
+
+Commit: `27d8ec7` (U6), `112913a` (infrastruktura testowa)
+
+#### Odblokowanie testow komponentow - dwie luki srodowiska
+
+Repo mialo dotad testy tylko dla `Badge` i `Button`, ktore nie dotykaly ani ikon, ani listy
+wirtualizowanej. Pierwszy test `MapList` odslonil dwie blokady, obie naprawione w `112913a`:
+
+1. **`lucide-react` publikuje ESM** dla warunku `browser` wybieranego przez jsdom, a `next/jest`
+   wyklucza `node_modules` z transformacji -> `Cannot use import statement outside a module`.
+   Ustawienie `transformIgnorePatterns` **nie dziala** - `next/jest` nadpisuje ten klucz.
+   Rozwiazanie: `moduleNameMapper` na build CJS samej biblioteki (ikony renderuja sie normalnie).
+2. **jsdom nie implementuje `ResizeObserver`**, a `virtua` konstruuje go przy renderze kazdego
+   elementu -> `ResizeObserver is not a constructor`. Stub w `setupAfterEnv.ts`.
+
+To nie obejscia blokad, a brakujace czesci srodowiska - bez nich testu nie da sie uruchomic.
+
+#### Uwaga o asercji indeksow
+
+`useMediaQuery` startuje od `false` i przelacza sie dopiero w efekcie, wiec pierwszy render idzie
+sciezka desktopowa przez `virtua`. W jsdom kontener ma zerowa wysokosc, wiec zbior zamontowanych
+elementow jest **niedeterministyczny** - pierwsza wersja testu sprawdzala `cardRefs.current.length`
+i failowala losowo. Asercja celuje teraz w DOM (kazda usluga dokladnie raz) oraz w brak kolizji
+wsrod *przypisanych* refow. Testujemy `MapList`, nie wirtualizacje `virtua`.
+
+---
 
 ### U7. Mapa — piny tylko dla odwiedzalnych + empty state
 

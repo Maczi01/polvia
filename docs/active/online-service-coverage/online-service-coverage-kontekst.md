@@ -1,7 +1,7 @@
 # Kontekst: Zasięg usługi (lokalna / online / hybryda)
 
 **Branch:** `feature/online-service-coverage`
-**Ostatnia aktualizacja:** 2026-08-21
+**Ostatnia aktualizacja:** 2026-08-22
 
 ## Źródła
 
@@ -216,6 +216,32 @@ się realny formularz. Dotyczy każdego przyszłego testu tego schematu.
 **Seed nigdy nie był idempotentny** — zero `delete`/`TRUNCATE`/`onConflictDoNothing` w 3447 liniach.
 Opiera się na `db:drop`. Powtórne `db:seed` na zapełnionej bazie wywali się na unikalnym `slug`.
 Wymóg z planu skorygowany, nie zrealizowany.
+
+### U4 — warstwa URL (commit `1dc0c67`)
+
+Rozstrzygnięte dwa odroczone pytania: `onlineOnly` **czyści** województwo i miasto (dzielą jeden
+slot ścieżki, więc są wzajemnie wykluczające) i jest **wymaganym** booleanem, bez stanu `undefined`.
+To nie koliduje z R5 — tam sekcja online jest widoczna przy aktywnym filtrze województwa, ale to
+zachowanie *sekcji listy*, nie filtra `onlineOnly`. Dwie różne rzeczy, łatwe do pomylenia.
+
+Nowy bug preegzystujący: `filter-component.tsx` hardkoduje prefiks `/en` dla każdego locale poza
+`pl` (dwa miejsca), więc na `ru` i `uk` klik filtra **przełącza użytkownikowi język**. Poza scope'em.
+
+### U5 + U6 — kubełkowanie i sekcja listy (commity `c567f3d`, `27d8ec7`, `112913a`)
+
+**Ograniczenie, które kształtuje kod:** `localResults` nie może zależeć od wyników semantycznych,
+bo jego długość steruje fetchem embeddingów — powstałby cykl. Dlatego
+`splitServicesByCoverage` jest wołana **dwa razy**: raz bez odejmowania (lista lokalna), raz
+z odejmowaniem (sekcja online). Nie „optymalizować" tego do jednego wywołania.
+
+**Testy komponentów były w tym repo niemożliwe do uruchomienia.** Dwie luki środowiska, obie
+naprawione w `112913a`: `lucide-react` publikuje ESM dla warunku `browser` (a `next/jest` nadpisuje
+`transformIgnorePatterns`, więc pomaga tylko `moduleNameMapper` na build CJS), oraz jsdom nie ma
+`ResizeObserver`, którego wymaga `virtua`. Każdy przyszły test komponentu korzysta z tych napraw.
+
+**Reguła na przyszłość dla testów listy:** `useMediaQuery` startuje od `false`, więc pierwszy render
+idzie ścieżką desktopową przez `virtua`, a w jsdom kontener ma zerową wysokość — zbiór zamontowanych
+elementów jest **niedeterministyczny**. Nie asercjonować długości `cardRefs`; celować w DOM.
 
 ## Pułapki (świadome, udokumentowane)
 
