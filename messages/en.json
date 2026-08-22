@@ -481,7 +481,8 @@
     "finding_more_results": "Finding More Results...",
     "available_online": "Available online across Poland ({count})",
     "available_online_subtitle": "Remote service — no need to travel",
-    "map_no_pins": "These services are delivered remotely, so they have no location on the map. Switch to the list to see them."
+    "map_no_pins": "These services are delivered remotely, so they have no location on the map. Switch to the list to see them.",
+    "online_banner": "Available online across Poland: {count}. Jump to them"
   },
   "HeroMap": {
     "places": "{count} places",

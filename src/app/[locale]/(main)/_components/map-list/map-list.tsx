@@ -12,7 +12,7 @@ import {
 import { ServiceCard } from '../service-card/service-card';
 import { VList, VListHandle } from 'virtua';
 import { useScrollableListHandle } from '@/hooks/use-scrollable-list-handle';
-import { ArrowUp, Globe, Sparkles, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Globe, Sparkles, Search } from 'lucide-react';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useTranslations } from 'next-intl';
@@ -401,6 +401,26 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                     transform: 'translate3d(0,0,0)',
                 }}
             >
+                {onlineResults.length > 0 && frontendFilteredServices.length > 0 && (
+                    <button
+                        type="button"
+                        onClick={() => scrollToIndex(frontendFilteredServices.length, {
+                            align: 'start',
+                            smooth: true,
+                        })}
+                        className="mb-2 flex w-full items-center gap-2 rounded-lg border border-aqua/40 bg-aqua/10
+                            px-4 py-2.5 text-left text-sm text-gray-700 transition-colors
+                            hover:bg-aqua/20 focus-visible:outline-none focus-visible:ring-2
+                            focus-visible:ring-ring dark:text-gray-200 md:mb-4"
+                    >
+                        <Globe className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                        <span className="flex-1">
+                            {t('online_banner', { count: onlineResults.length })}
+                        </span>
+                        <ArrowDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                    </button>
+                )}
+
                 {isMobile ? (
                     <div className="size-full pb-8" style={{ minHeight: 'fit-content' }}>
                         {renderServiceCards()}

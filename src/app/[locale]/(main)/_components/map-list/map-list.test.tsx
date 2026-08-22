@@ -1,5 +1,6 @@
 import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { MapList } from './map-list';
@@ -167,6 +168,41 @@ describe('<MapList /> — sekcja uslug online', () => {
 
         expect(screen.queryByText('available_online')).not.toBeInTheDocument();
         expect(screen.queryByText('also_recommended')).not.toBeInTheDocument();
+    });
+
+    describe('banner nad lista', () => {
+        it('pojawia sie, gdy sa wyniki lokalne ORAZ online', () => {
+            renderList({
+                frontendFilteredServices: [service()],
+                onlineResults: [service({ coverage: 'online' })],
+            });
+
+            expect(screen.getByRole('button', { name: /online_banner/ })).toBeInTheDocument();
+        });
+
+        it('nie pojawia sie bez wynikow online', () => {
+            renderList({ frontendFilteredServices: [service()] });
+
+            expect(screen.queryByText('online_banner')).not.toBeInTheDocument();
+        });
+
+        it('nie pojawia sie, gdy nie ma wynikow lokalnych — sekcja jest juz na gorze', () => {
+            renderList({ onlineResults: [service({ coverage: 'online' })] });
+
+            expect(screen.queryByText('online_banner')).not.toBeInTheDocument();
+        });
+
+        it('klikniecie nie rzuca wyjatkiem', async () => {
+            renderList({
+                frontendFilteredServices: [service()],
+                onlineResults: [service({ coverage: 'online' })],
+            });
+
+            const banner = screen.getByRole('button', { name: /online_banner/ });
+            await userEvent.click(banner);
+
+            expect(banner).toBeInTheDocument();
+        });
     });
 
     it('przechodzi asercje dostepnosci przy trzech sekcjach', async () => {
