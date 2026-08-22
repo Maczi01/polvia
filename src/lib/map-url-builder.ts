@@ -154,6 +154,24 @@ export function localizeMapPath(pathname: string, locale: Locale): string {
 }
 
 /**
+ * Prefiks sciezki dla danego locale. `pl` jest domyslny, wiec nie ma prefiksu.
+ *
+ * Istnieje, bo ten warunek byl wcześniej wpisany na sztywno jako `'/en'` w trzech
+ * miejscach, co na `ru` i `uk` przelaczalo uzytkownikowi jezyk przy kliknieciu filtra.
+ */
+export function localePathPrefix(locale: Locale): string {
+    return locale === 'pl' ? '' : `/${locale}`;
+}
+
+/**
+ * Pelna sciezka bazowa mapy dla danego locale: `/mapa` dla `pl`,
+ * `/{locale}/map` dla pozostalych.
+ */
+export function localizedMapBasePath(locale: Locale): string {
+    return `${localePathPrefix(locale)}${localizeMapPath('/map', locale)}`;
+}
+
+/**
  * Build URL string from MapUrl object
  * Useful for redirects and navigation
  * @param mapUrl - Map URL object

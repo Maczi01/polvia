@@ -13,7 +13,7 @@ import { ButtonCategory } from '@/app/[locale]/(main)/_components/button-categor
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
-import { buildMapUrl, localizeMapPath } from '@/lib/map-url-builder';
+import { buildMapUrl, localePathPrefix, localizedMapBasePath, localizeMapPath } from '@/lib/map-url-builder';
 import { normalizeCountySlug } from '@/lib/slug-mappings';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import type { Locale } from '@/i18n/config';
@@ -106,7 +106,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                 locale,
             );
             const localizedPath = localizeMapPath(url.pathname, locale);
-            const basePath = locale === 'pl' ? '' : '/en';
+            const basePath = localePathPrefix(locale);
             const fullPath = `${basePath}${localizedPath}`;
 
             // Update URL without navigation (instant, no reload)
@@ -130,7 +130,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         onFiltersChange?.({ category: null, county: null, city: null, onlineOnly: false });
 
         // Update URL to base path without navigation
-        const basePath = locale === 'pl' ? '/mapa' : '/en/map';
+        const basePath = localizedMapBasePath(locale);
         window.history.pushState({}, '', basePath);
     }, [setSearchInput, setSelectedId, locale, onFiltersChange]);
 

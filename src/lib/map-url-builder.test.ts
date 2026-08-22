@@ -1,5 +1,11 @@
 import { locales, type Locale } from '@/i18n/config';
-import { buildMapUrl, localizeMapPath, stringifyMapUrl } from '@/lib/map-url-builder';
+import {
+    buildMapUrl,
+    localePathPrefix,
+    localizedMapBasePath,
+    localizeMapPath,
+    stringifyMapUrl,
+} from '@/lib/map-url-builder';
 
 describe('buildMapUrl — slug `online`', () => {
     it('sam onlineOnly daje /map/online', () => {
@@ -78,5 +84,31 @@ describe('localizeMapPath + stringifyMapUrl dla trasy online', () => {
         const url = buildMapUrl({ category: 'law', onlineOnly: true, query: 'test' }, 'pl');
 
         expect(stringifyMapUrl(url)).toBe('/map/prawne/online?query=test');
+    });
+});
+
+describe('localePathPrefix i localizedMapBasePath', () => {
+    it('pl nie ma prefiksu', () => {
+        expect(localePathPrefix('pl')).toBe('');
+    });
+
+    it('kazde pozostale locale dostaje WLASNY prefiks, nie /en', () => {
+        expect(localePathPrefix('en')).toBe('/en');
+        expect(localePathPrefix('ru')).toBe('/ru');
+        expect(localePathPrefix('uk')).toBe('/uk');
+    });
+
+    it('sciezka bazowa mapy per locale', () => {
+        expect(localizedMapBasePath('pl')).toBe('/mapa');
+        expect(localizedMapBasePath('en')).toBe('/en/map');
+        expect(localizedMapBasePath('ru')).toBe('/ru/map');
+        expect(localizedMapBasePath('uk')).toBe('/uk/map');
+    });
+
+    it('zadne locale poza en nie dostaje sciezki z /en', () => {
+        for (const locale of locales) {
+            if (locale === 'en') continue;
+            expect(localizedMapBasePath(locale as Locale)).not.toContain('/en');
+        }
     });
 });
