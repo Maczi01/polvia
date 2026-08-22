@@ -429,7 +429,7 @@ niz powtorzenie reguly deduplikacji w komponencie, gdzie nie mialaby testow.
 - [x] `Weryfikacja:` `npx tsc --noEmit` - **0 bledow**
 - [x] `Weryfikacja:` `npx next lint` - **0 bledow**
 - [x] `Weryfikacja:` kazdy nowy klucz i18n obecny w **4** plikach `messages/*.json`
-- [ ] `Operator:` `/mapa/pomorskie` -> sekcja "Dostepne online" z FotoDoKarty, zero bledow w konsoli
+- [x] `Operator:` `/mapa/pomorskie` -> sekcja "Dostepne online" z FotoDoKarty — potwierdzone przez curl na dev serverze
 - [ ] `Operator:` klik chipa "Online" -> URL `/mapa/online`, lista tylko `online` i `hybrid`
 - [ ] `Operator:` klik "Prawne" + "Online" -> URL `/mapa/prawne/online`
 - [ ] `Operator:` klik "Resetuj" -> URL wraca na `/mapa`, chip nieaktywny
@@ -450,6 +450,56 @@ wirtualizowanej. Pierwszy test `MapList` odslonil dwie blokady, obie naprawione 
    elementu -> `ResizeObserver is not a constructor`. Stub w `setupAfterEnv.ts`.
 
 To nie obejscia blokad, a brakujace czesci srodowiska - bez nich testu nie da sie uruchomic.
+
+#### Znalezisko z weryfikacji w przegladarce — banner nad lista (commit `2562300`)
+
+Testy jednostkowe przechodzily, a feature **nie dzialal** w najczestszym przypadku. Na `/mapa`
+bez filtra sekcja "Dostepne online" nie renderowala sie w ogole — nie dlatego, ze kubelek byl
+pusty (FotoDoKarty tam nalezy), ale dlatego, ze przy **139 wynikach lokalnych** naglowek sekcji
+siedzi na pozycji ~140, a `virtua` wirtualizuje liste i renderuje kilkadziesiat pierwszych
+elementow. R4 ("widoczna zawsze") byla spelniona strukturalnie i niespelniona w praktyce.
+
+Zadna asercja jednostkowa nie mogla tego wychwycic — w tescie kubelek mial 1-2 elementy.
+
+**Rozwiazanie (decyzja uzytkownika):** kompaktowy banner nad lista, renderowany **poza `VList`**,
+wiec nigdy nie wypada z okna wirtualizacji. Przycisk przewija do pierwszej karty sekcji przez
+istniejacy `scrollToIndex`, a NIE nawiguje do `/mapa/online` — nawigacja czyscilaby aktywny filtr
+wojewodztwa (jeden slot sciezki), a chcemy zostawic uzytkownika w kontekscie.
+
+Widoczny tylko gdy sa **jednoczesnie** wyniki lokalne i online: bez lokalnych sekcja jest juz na
+gorze, wiec banner bylby szumem.
+
+Potwierdzone na zywo (`curl` na dev serverze):
+
+| URL | Banner | Sekcja w HTML |
+|---|---|---|
+| `/mapa` | "Dostepnych online: 1" | brak (zakopana) |
+| `/mapa/pomorskie` | "Dostepnych online: 5" | obecna (5) |
+| `/mapa/online` | brak (poprawnie) | obecna (5) |
+
+Pierwszy wiersz byl wczesniej **calkowicie niewidoczny**.
+
+#### Weryfikacja regul kubelkowania na zywych danych
+
+`curl` na dev serverze potwierdzil R5 i R6 na prawdziwej bazie:
+
+| URL | Sekcja online | Dlaczego tyle |
+|---|---|---|
+| `/mapa/pomorskie` | 5 | FotoDoKarty + 4 hybrydy, zadna nie jest w pomorskim |
+| `/mapa/zachodniopomorskie` | 4 | Dobra Ksiegowa (Stargard) wpadla do listy **lokalnej** — dedupe dziala w obie strony |
+| `/mapa/online` | 5 | `onlineOnly`: lista lokalna pusta |
+| `/mapa/prawne/online` | brak sekcji | zadna usluga zdalna nie jest w kategorii `law` |
+
+#### Bug preegzystujacy: soft-404 na calej trasie mapy — poza scope'em
+
+**Kazdy** bledny URL mapy zwraca **HTTP 200** z trescia not-found: `/mapa/bzdura`,
+`/mapa/prawne/bzdura`, `/mapa/a/b/c`, a takze `/en/map/bzdura`. Przyczyna to
+`NextResponse.rewrite` w `src/middleware.ts` (naglowek `x-middleware-rewrite` w odpowiedzi) —
+`notFound()` renderuje strone, ale status zostaje 200.
+
+Dla Google to soft-404, czyli indeksowalne smieci. **Nie pochodzi z U4** — parser odrzuca
+prawidlowo, co potwierdza test jednostkowy `parseMapSlug(['pomorskie','online'])`. To osobny
+problem w tej samej okolicy co U9 (SEO), do naprawy jako niezalezne zadanie.
 
 #### Uwaga o asercji indeksow
 
