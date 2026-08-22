@@ -614,29 +614,55 @@ nie utrwalac zepsutego zachowania.
 
 ### U9. Sitemap i metadata dla `/mapa/online`
 
-**Delegate to:** `feature-builder-web-fullstack` · **Nakład:** M · **Zależności:** U4, U6
+**Delegate to:** `feature-builder-web-fullstack` - **Naklad:** M - **Zaleznosci:** U4, U6
 **Wymagania:** R8
 
-- [ ] `sitemap.ts` — dodaj `/mapa/online` i `/en/map/online` mirrorem sekcji „4. Kategorie map" (`:134`)
-- [ ] `sitemap.ts` — **utrzymaj konwencję**: kategorie emitowane tylko dla `pl` i `en`, nie dla `ru`/`uk`
-- [ ] `sitemap.ts` — **bez** kombinacji `/mapa/{kategoria}/online` (thin content, granica scope'u)
-- [ ] `page.tsx` — `onlineOnly` wpływa na `titleSuffix`
-- [ ] `page.tsx` — `onlineOnly` wpływa na `canonical`
-- [ ] `page.tsx` — `onlineOnly` przekazany do `buildMapUrl` w pętli `languageUrls` (`:74`)
-- [ ] `page.tsx` — tłumaczenie segmentu z i18n, nie hardkodowane
-- [ ] `messages/{pl,en,ru,uk}.json` — klucz tytułu (cztery pliki)
-- [ ] Stwórz `src/app/sitemap.test.ts`
-- [ ] `Test:` `sitemap()` zwraca wpis kończący się na `/mapa/online` oraz `/en/map/online`
-- [ ] `Test:` `sitemap()` **nie** zwraca żadnego URL-a `/mapa/{kategoria}/online`
-- [ ] `Test:` `sitemap()` nie zawiera duplikatów URL-i
-- [ ] `Weryfikacja:` `npx jest src/app/sitemap.test.ts` — testy przechodzą
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — zero błędów
-- [ ] `Weryfikacja:` `npx next lint` — zero błędów
-- [ ] `Weryfikacja:` `npm run build` kończy się sukcesem (najcięższy krok — na końcu)
-- [ ] `Operator:` `/sitemap.xml` na dev serverze zawiera `/mapa/online`
-- [ ] `Operator:` `/mapa/online` ma własny `<title>` różny od `/mapa`
-- [ ] `Operator:` `/mapa/online` ma `rel=canonical` na siebie i `hreflang` dla 4 locale
-- [ ] `Operator:` `/mapa/prawne/online` ma tytuł zawierający kategorię i oznaczenie online
+- [x] `sitemap.ts` - `/mapa/online` i `/en/map/online`, priorytet 0.7
+- [x] `sitemap.ts` - **utrzymana konwencja**: kategorie tylko dla `pl` i `en`, bez `ru`/`uk`
+- [x] `sitemap.ts` - **bez** kombinacji `/mapa/{kategoria}/online` (thin content)
+- [x] `page.tsx` - `onlineOnly` wplywa na `titleSuffix`
+- [x] `page.tsx` - `onlineOnly` wplywa na `canonical`
+- [x] `page.tsx` - `onlineOnly` przekazany do `buildMapUrl` w petli `languageUrls`
+- [x] `page.tsx` - etykieta z i18n (`MapPage.Categories.Online`), nie hardkodowana
+- [x] Stworz `src/app/sitemap.test.ts` - **8 scenariuszy**
+- [x] `Test:` sitemap zwraca wpisy konczace sie na `/mapa/online` oraz `/en/map/online`
+- [x] `Test:` sitemap **nie** zwraca zadnego URL-a `/{mapa|map}/{cokolwiek}/online`
+- [x] `Test:` sitemap nie zawiera duplikatow URL-i
+- [x] `Test:` wpis online ma metadane jak pozostale trasy mapy
+- [x] `Test:` regresje - strony glowne, mapa, wszystkie kategorie (pl i en), wszystkie wojewodztwa
+- [x] `Test:` konwencja utrzymana - zero URL-i `/ru/map/` i `/uk/map/`
+- [x] `Weryfikacja:` `npx jest sitemap` - **8/8 PASS**
+- [x] `Weryfikacja:` `npx tsc --noEmit` - **0 bledow**
+- [x] `Weryfikacja:` `npx next lint` - **0 bledow**
+- [x] `Weryfikacja:` `npm run build` - **przechodzi**
+- [x] `Operator:` `/sitemap.xml` zawiera `/mapa/online` i `/en/map/online`
+- [x] `Operator:` `/mapa/online` ma wlasny `<title>` rozny od `/mapa`
+- [x] `Operator:` `/mapa/online` ma `rel=canonical` na siebie i `hreflang` dla 4 locale
+- [x] `Operator:` `/mapa/prawne/online` ma tytul zawierajacy kategorie i oznaczenie online
+
+Commit: `b2de5bb`
+
+#### Potwierdzenie na dev serverze
+
+| URL | `<title>` |
+|---|---|
+| `/mapa` | Mapa Uslug - Polvia |
+| `/mapa/online` | Mapa Uslug - Polvia - **Online** |
+| `/mapa/prawne/online` | Mapa Uslug - Polvia - **Prawne, Online** |
+| `/en/map/online` | Services Map - Polvia - **Online** |
+
+`hreflang` dla czterech locale, z poprawnymi slugami kategorii per jezyk:
+`/mapa/prawne/online`, `/en/map/law/online`, `/ru/map/pravovye/online`,
+`/uk/map/pravovi/online`. Slug `online` identyczny wszedzie, zgodnie z R8.
+
+**Uwaga:** `canonical` wskazuje na `http://localhost:3000`, bo tak ustawiony jest
+`NEXT_PUBLIC_SITE_URL` w `.env` — to konfiguracja lokalna, nie blad.
+
+#### Znalezisko: `sitemap.ts` czyta `process.env` bezposrednio
+
+`src/app/sitemap.ts:7` uzywa `process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl'`,
+wbrew regule z `CLAUDE.md` ("Zero `process.env` w kodzie aplikacji, wylacznie przez `env.ts`").
+Preegzystujace, poza scope'em U9 — odnotowane.
 
 ---
 
@@ -644,6 +670,27 @@ nie utrwalac zepsutego zachowania.
 
 - [ ] `CLAUDE.md` — usuń wzmiankę o 2 błędach typecheck z sekcji „Znane odchylenia od czystego stanu repo"
 - [ ] `CLAUDE.md` — dopisz `coverage` jako drugą oś obok kategorii (żeby kolejne sesje nie proponowały „kategorii online")
-- [ ] `Weryfikacja:` pełny quality gate: `npx tsc --noEmit`, `npx jest`, `npx next lint` — wszystko zielone
+- [x] `Weryfikacja:` pełny quality gate — **tsc 0, jest 197/197 (11 suit), lint 0 błędów, `npm run build` przechodzi**
 - [ ] `Operator:` przegląd logów Vercela po wdrożeniu pod kątem wyjątków z `map/[[...slug]]` (nowy slug w parserze = najbardziej prawdopodobne źródło 500-tek)
 - [ ] `/dev-compound` — zapisz wzorzec „ortogonalny wymiar zamiast nowej wartości enuma" do `docs/solutions/`
+
+---
+
+## Znaleziska niezależne od tego zadania — do decyzji
+
+Wszystkie **preegzystujące**, żadne nie pochodzi z tej zmiany, żadnego nie naprawiałem.
+Uporządkowane po realnym wpływie na użytkownika.
+
+| # | Problem | Gdzie | Skutek |
+|---|---|---|---|
+| 1 | `getTodayHours` buduje klucz z wielkiej litery (`'Saturday'`), dane mają małą (`'saturday'`) | `service-card.tsx:82-84` | **Godziny otwarcia nigdy się nie renderują** — dla żadnej z 140 usług. Funkcja nie działała nigdy. |
+| 2 | Hardkodowany prefiks `/en` dla każdego locale ≠ `pl` | `filter-component.tsx` (2 miejsca) | Na `ru` i `uk` klik filtra **przełącza użytkownikowi język**. Grupa docelowa to Ukraińcy i Rosjanie. |
+| 3 | `NextResponse.rewrite` sprawia, że `notFound()` zwraca **HTTP 200** | `src/middleware.ts` | Każdy błędny URL mapy to soft-404 — indeksowalne śmieci dla Google. Dotyczy też `/en/map/**`. |
+| 4 | `drizzle:generate` woła przedawniony `generate:pg`; snapshoty w `drizzle/meta` w ruinie | `package.json`, `drizzle/` | Procedura zmiany schematu opisana w `CLAUDE.md` **nie działa**. Każda sesja powtórzy ten objazd. |
+| 5 | `role="status"` + `tabIndex={0}` na **każdym** badge'u | `badge.tsx` (wymóg istniejących testów) | Dziesiątki przystanków tabulacji i regionów live na liście wyników. Badge nie jest interaktywny. |
+| 6 | `process.env` czytany bezpośrednio | `sitemap.ts:7` | Wbrew regule z `CLAUDE.md` („wyłącznie przez `env.ts`"). Kosmetyczne. |
+| 7 | Cztery źródła prawdy o kategoriach; `government` osiągalne w UI, ale **niezapisywalne** | `schema.ts`, `consts.ts`, `slug-mappings.ts`, `service-form.tsx` | Kategoria widoczna w filtrach i URL-ach, której nie da się przypisać żadnej usłudze. |
+| 8 | `next/link` zamiast `@/i18n/navigation` | `service-card.tsx:8` | Wbrew regule i18n z `CLAUDE.md` — gubi prefiks locale. |
+
+Pozycje 1–3 mają realny wpływ na użytkownika końcowego. Pozycja 4 na produktywność każdej
+kolejnej sesji.
