@@ -9,7 +9,7 @@
     "lint": "next lint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "drizzle:generate": "drizzle-kit generate:pg",
+    "drizzle:generate": "drizzle-kit generate",
     "db:drop": "node --require dotenv/config --import tsx src/db/drop.ts",
     "drizzle:push": "drizzle-kit push",
     "db:seed": "node --require dotenv/config --import tsx src/db/seed.ts",
