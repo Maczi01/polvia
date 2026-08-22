@@ -117,6 +117,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             name,
             city,
             category,
+            coverage,
             street,
             voivodeship,
             tags,
@@ -347,11 +348,21 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
             ? `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`
             : socials?.whatsapp ?? null;
 
-        const navigateLink = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+        // Wpis o zasiegu `online` nie ma punktu obslugi, wiec nie ma tez czego
+        // nawigowac. Bez tego warunku link prowadzilby na "destination=null,null".
+        const hasCoordinates = latitude != null && longitude != null;
+        const navigateLink = hasCoordinates
+            ? `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`
+            : null;
+
+        // Zasieg zdalny wart jest oznaczenia na karcie: uzytkownik nie musi
+        // wnioskowac z opisu, ze nie trzeba nikad jechac (R10).
+        const servesRemotely = coverage === 'online' || coverage === 'hybrid';
 
         const hasSocials = socials && (socials.facebook || socials.instagram || socials.tiktok);
 
-        const actionButtonCount = [phoneNumber, whatsappLink, true].filter(Boolean).length;
+        const actionButtonCount = [phoneNumber, whatsappLink, hasCoordinates].filter(Boolean)
+            .length;
 
         return (
             <Card
@@ -399,6 +410,11 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                     {name}
                                 </h3>
                                 {verified && <VerifiedBadge className="shrink-0" />}
+                                {servesRemotely && (
+                                    <Badge variant="aqua" className="shrink-0">
+                                        {t('coverage_online')}
+                                    </Badge>
+                                )}
                             </div>
                             <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                                 {expanded
@@ -640,21 +656,23 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                 </Link>
                             )}
 
-                            <Link
-                                href={navigateLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={e => e.stopPropagation()}
-                                className="block"
-                            >
-                                <button
-                                    type="button"
-                                    className="flex w-full items-center justify-center gap-2 rounded-full border border-[#3b82f6] bg-[#eff6ff] px-3 py-2.5 text-sm font-medium text-[#1d4ed8] transition-colors hover:bg-[#dbeafe] dark:border-[#2563eb] dark:bg-[#172554]/20 dark:text-[#60a5fa] dark:hover:bg-[#172554]/40"
+                            {navigateLink && (
+                                <Link
+                                    href={navigateLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={e => e.stopPropagation()}
+                                    className="block"
                                 >
-                                    <Navigation size={18} />
-                                    {t('navigate')}
-                                </button>
-                            </Link>
+                                    <button
+                                        type="button"
+                                        className="flex w-full items-center justify-center gap-2 rounded-full border border-[#3b82f6] bg-[#eff6ff] px-3 py-2.5 text-sm font-medium text-[#1d4ed8] transition-colors hover:bg-[#dbeafe] dark:border-[#2563eb] dark:bg-[#172554]/20 dark:text-[#60a5fa] dark:hover:bg-[#172554]/40"
+                                    >
+                                        <Navigation size={18} />
+                                        {t('navigate')}
+                                    </button>
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>

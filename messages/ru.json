@@ -148,7 +148,8 @@
     "mail": "Email",
     "call": "Позвонить",
     "whatsapp": "WhatsApp",
-    "languages": "Говорим:"
+    "languages": "Говорим:",
+    "coverage_online": "Онлайн — вся Польша"
   },
   "Calculator": {
     "monthlyIncome": "Месячный доход",

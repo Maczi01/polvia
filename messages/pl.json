@@ -149,7 +149,8 @@
     "mail": "Email",
     "call": "Zadzwoń",
     "whatsapp": "WhatsApp",
-    "languages": "Mówimy:"
+    "languages": "Mówimy:",
+    "coverage_online": "Online — cała Polska"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
