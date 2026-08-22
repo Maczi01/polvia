@@ -105,6 +105,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         const t = useTranslations('MapList')
 
         const prevExpandedIndex = useRef<number | null>(null);
+        const onlineSectionRef = useRef<HTMLDivElement>(null);
         const CARD_COLLAPSE_MS = 300;
 
         // Combine services for internal logic (refs, scrolling, etc.)
@@ -143,6 +144,35 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             },
             [cardRefs, isMobile],
         );
+
+        /**
+         * Skok do sekcji uslug online. Dwa etapy, bo zaden pojedynczy nie wystarcza:
+         *
+         * 1. `scrollToIndex` po indeksie — jedyny sposob dotarcia do elementu, ktory
+         *    przy wirtualizacji NIE JEST jeszcze zamontowany. `smooth: false`
+         *    swiadomie: `virtua` szacuje pozycje z niezmierzonych elementow, wiec
+         *    plynne przewijanie na dystansie kilkudziesieciu kart nie dojezdza do celu
+         *    (ten sam wniosek jest juz w `scrollToTop`).
+         * 2. `scrollIntoView` na prawdziwym elemencie, gdy juz sie zamontowal — koryguje
+         *    blad oszacowania i dziala takze wtedy, gdy przewija sie zewnetrzny kontener
+         *    (`overflowY: auto`), a nie ten, ktory `virtua` uwaza za swoj.
+         *
+         * Indeks: naglowek sekcji online stoi w liscie dzieci VList dokladnie za
+         * wszystkimi kartami lokalnymi. Banner renderuje sie tylko gdy oba kubelki sa
+         * niepuste, wiec EmptyState nie przesuwa tu numeracji.
+         */
+        const scrollToOnlineSection = useCallback(() => {
+            scrollToIndex(frontendFilteredServices.length, { align: 'start', smooth: false });
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    onlineSectionRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                });
+            });
+        }, [scrollToIndex, frontendFilteredServices.length]);
 
         useEffect(() => {
             const handleScroll = () => {
@@ -270,12 +300,13 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             // geograficznego (R4). Wpisy bez pinu na mapie zyja wylacznie tutaj.
             if (onlineResults.length > 0) {
                 cards.push(
-                    <SectionHeader
-                        key="online-header"
-                        icon={Globe}
-                        title={t('available_online', { count: onlineResults.length })}
-                        subtitle={t('available_online_subtitle')}
-                    />
+                    <div key="online-header" ref={onlineSectionRef}>
+                        <SectionHeader
+                            icon={Globe}
+                            title={t('available_online', { count: onlineResults.length })}
+                            subtitle={t('available_online_subtitle')}
+                        />
+                    </div>
                 );
 
                 onlineResults.forEach((service) => {
@@ -404,10 +435,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                 {onlineResults.length > 0 && frontendFilteredServices.length > 0 && (
                     <button
                         type="button"
-                        onClick={() => scrollToIndex(frontendFilteredServices.length, {
-                            align: 'start',
-                            smooth: true,
-                        })}
+                        onClick={scrollToOnlineSection}
                         className="mb-2 flex w-full items-center gap-2 rounded-lg border border-aqua/40 bg-aqua/10
                             px-4 py-2.5 text-left text-sm text-gray-700 transition-colors
                             hover:bg-aqua/20 focus-visible:outline-none focus-visible:ring-2

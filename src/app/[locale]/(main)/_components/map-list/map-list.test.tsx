@@ -1,5 +1,5 @@
 import { createRef } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
@@ -192,16 +192,30 @@ describe('<MapList /> — sekcja uslug online', () => {
             expect(screen.queryByText('online_banner')).not.toBeInTheDocument();
         });
 
-        it('klikniecie nie rzuca wyjatkiem', async () => {
-            renderList({
-                frontendFilteredServices: [service()],
-                onlineResults: [service({ coverage: 'online' })],
-            });
+        it('klikniecie zleca przewiniecie do sekcji online', async () => {
+            // jsdom nie implementuje scrollIntoView — podmieniamy na szpiega, zeby
+            // sprawdzic, ze drugi etap skoku (korekta na prawdziwym elemencie)
+            // faktycznie sie odpala. Bez tej asercji test przechodzilby nawet gdyby
+            // ktos usunal cala logike przewijania.
+            const scrollSpy = jest.fn();
+            const original = Element.prototype.scrollIntoView;
+            Element.prototype.scrollIntoView = scrollSpy;
 
-            const banner = screen.getByRole('button', { name: /online_banner/ });
-            await userEvent.click(banner);
+            try {
+                renderList({
+                    frontendFilteredServices: [service()],
+                    onlineResults: [service({ coverage: 'online' })],
+                });
 
-            expect(banner).toBeInTheDocument();
+                await userEvent.click(screen.getByRole('button', { name: /online_banner/ }));
+
+                await waitFor(() => expect(scrollSpy).toHaveBeenCalled());
+                expect(scrollSpy).toHaveBeenCalledWith(
+                    expect.objectContaining({ block: 'start' }),
+                );
+            } finally {
+                Element.prototype.scrollIntoView = original;
+            }
         });
     });
 
