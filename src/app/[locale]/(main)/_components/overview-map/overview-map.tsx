@@ -5,6 +5,8 @@ import { Coordinates, MarkerData, MarkerDataCluster, PartialService } from '@/ty
 import useSupercluster from 'use-supercluster';
 import { MarkerPopup } from '../marker-popup';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { useTranslations } from 'next-intl';
+import { Globe } from 'lucide-react';
 import { ClusterPopup } from '../cluster-popup';
 import { createPoints, initialViewState, mapFeature, reduceCluster } from './utility';
 import { Marker } from './marker';
@@ -52,6 +54,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
          popup,
          setPopup
      }, externalRef) => {
+        const tMapList = useTranslations('MapList');
         const [bounds, setBounds] = useState<BBox>([-180, -85, 180, 85]);
         const [zoom, setZoom] = useState<number>(initialViewState.zoom);
         const [mounted, setMounted] = useState(false);
@@ -407,9 +410,25 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
         return (
             <div
                 ref={containerRef}
-                className="size-full overflow-hidden rounded-xl md:rounded-md"
+                className="relative size-full overflow-hidden rounded-xl md:rounded-md"
                 aria-label="Overview Map"
             >
+                {/* R11: na mobile widok mapy jest jedyna widoczna powierzchnia, wiec brak
+                    pinow oznaczalby pusta mape Polski bez wyjasnienia. Uslugi zdalne nie
+                    maja punktu na mapie — kierujemy uzytkownika do listy.
+                    Na desktopie lista jest obok, wiec nakladka nie jest potrzebna. */}
+                {isMobile && points.length === 0 && (
+                    <div
+                        role="status"
+                        className="absolute inset-0 z-10 flex flex-col items-center justify-center
+                            gap-3 bg-white/95 px-8 text-center dark:bg-gray-900/95"
+                    >
+                        <Globe className="size-8 text-gray-400 dark:text-gray-500" />
+                        <p className="text-sm text-gray-600 dark:text-gray-300">
+                            {tMapList('map_no_pins')}
+                        </p>
+                    </div>
+                )}
                 <MapNoSsr
                     reuseMaps
                     initialViewState={initialViewState}

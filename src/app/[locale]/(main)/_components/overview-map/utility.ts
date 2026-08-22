@@ -69,12 +69,20 @@ export function createPoint(
 export function createPoints(
     items: PartialService[],
 ): PointFeature<ItemPointFeatureProperties>[] {
-    // Pin wymaga wspolrzednych. Warunek na `coverage` (brak pinu dla `online`)
-    // dochodzi w U7 — tutaj wylacznie zawezenie typu po nullowalnosci.
+    // Mapa pokazuje WYLACZNIE to, co mozna odwiedzic (R3). Dwa warunki:
+    //
+    // 1. Wspolrzedne musza istniec — bez nich nie ma gdzie postawic pinu.
+    // 2. Zasieg `online` nie dostaje pinu NAWET ze wspolrzednymi. Wpis w pelni
+    //    zdalny moze miec adres rejestrowy (FotoDoKarty: Al. Solidarnosci
+    //    w Warszawie), ale nie ma punktu obslugi — pin mowilby "przyjdz tu",
+    //    a nie ma gdzie przyjsc.
+    //
+    // Wykluczenie dziala u zrodla, wiec clustering, `bounds` i supercluster nie
+    // wymagaja zadnych wyjatkow. `hybrid` dostaje pin automatycznie.
     return items
         .filter(
             (item): item is LocatedService =>
-                item.latitude != null && item.longitude != null,
+                item.coverage !== 'online' && item.latitude != null && item.longitude != null,
         )
         .map(createPoint);
 }
