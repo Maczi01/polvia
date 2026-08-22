@@ -28,7 +28,13 @@ export default function middleware(request: NextRequest) {
             const url = request.nextUrl.clone();
             url.pathname = localizedMapBasePath(mapPath.locale);
             url.search = '';
-            return NextResponse.redirect(url, 308);
+            // 307 (tymczasowe), NIE 308. Przekierowania trwale sa agresywnie
+            // cache'owane przez przegladarki i Google — gdyby parser kiedykolwiek
+            // zaklasyfikowal POPRAWNY URL jako bledny, uzytkownik dostalby
+            // zapamietane przekierowanie, ktorego nie da sie odwolac bez
+            // cache-bustingu. Efekt SEO jest ten sam (soft-404 znika), a blad
+            // jest odwracalny. Na 308 mozna przejsc po okresie obserwacji.
+            return NextResponse.redirect(url, 307);
         }
     }
 

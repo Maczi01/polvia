@@ -685,7 +685,7 @@ Wszystkie **preegzystujące**, żadne nie pochodzi z zadania `online-service-cov
 | # | Problem | Commit | Efekt |
 |---|---|---|---|
 | 2 | Hardkodowany prefiks `/en` dla każdego locale ≠ `pl` (3 miejsca) | `99e1a8a` | Klik filtra na `ru`/`uk` już nie przełącza języka. Warunek wyciągnięty do `localePathPrefix()` / `localizedMapBasePath()`, żeby nie powstała czwarta kopia |
-| 3 | Błędne URL-e mapy zwracały HTTP 200 z treścią 404 (soft-404) | `f9a1340` | 6 błędnych URL-i → 308 na poprawną dla locale ścieżkę bazową; 8 poprawnych → 200 bez zmian |
+| 3 | Błędne URL-e mapy zwracały HTTP 200 z treścią 404 (soft-404) | `f9a1340` | 6 błędnych URL-i → 307 na poprawną dla locale ścieżkę bazową; 8 poprawnych → 200 bez zmian. Świadomie 307, nie 308: trwałe przekierowania są cache'owane, więc błąd w klasyfikacji byłby nieodwracalny bez cache-bustingu |
 | 4 | Martwy `drizzle:generate` + myląca procedura w `CLAUDE.md` | `b1c0b60` | Skrypt faktycznie startuje; `CLAUDE.md` opisuje `push` i ostrzega przed `rename`; dopisana sekcja o zasięgu jako drugiej osi |
 
 Mechanizm soft-404 okazał się inny, niż zakładałem: **nie** rewrite w middleware, a

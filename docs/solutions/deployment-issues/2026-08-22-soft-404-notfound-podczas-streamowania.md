@@ -81,7 +81,7 @@ export default function middleware(request: NextRequest) {
             const url = request.nextUrl.clone();
             url.pathname = localizedMapBasePath(mapPath.locale);
             url.search = '';
-            return NextResponse.redirect(url, 308);
+            return NextResponse.redirect(url, 307); // tymczasowe, patrz nizej
         }
     }
 
@@ -107,9 +107,16 @@ export function parseMapPathname(pathname: string): MapPathname | null {
 }
 ```
 
-**Kompromis, świadomy:** 308 nie jest semantycznie tym samym co 404 — mówi „idź tam",
-a nie „to nie istnieje". Prawdziwe 404 wymagałoby odejścia od streamowania w tej trasie.
-308 usuwa soft-404 z indeksu, co było celem.
+**Dwa świadome kompromisy:**
+
+1. Przekierowanie nie jest semantycznie tym samym co 404 — mówi „idź tam", a nie „to nie
+   istnieje". Prawdziwe 404 wymagałoby odejścia od streamowania w tej trasie. Przekierowanie
+   usuwa soft-404 z indeksu, co było celem.
+2. **307, nie 308.** Przekierowania trwałe są agresywnie cache'owane przez przeglądarki
+   i Google. Gdyby parser kiedykolwiek zaklasyfikował **poprawny** URL jako błędny,
+   użytkownik dostałby zapamiętane przekierowanie, którego nie da się odwołać bez
+   cache-bustingu. Efekt SEO jest ten sam, a błąd odwracalny. Na 308 warto przejść dopiero
+   po okresie obserwacji na produkcji.
 
 ## Komendy diagnostyczne
 
@@ -152,7 +159,7 @@ Turbopack), `next-intl` 4, trasa `src/app/[locale]/(main)/map/[[...slug]]/page.t
 
 Problem był **preegzystujący** i dotyczył wszystkich czterech locale.
 
-Efekt po naprawie: 6 błędnych URL-i → 308 na poprawną dla locale ścieżkę bazową
+Efekt po naprawie: 6 błędnych URL-i → 307 na poprawną dla locale ścieżkę bazową
 (`/ru/map/bzdura` → `/ru/map`), 8 poprawnych URL-i → 200 bez zmian. Middleware
 42.9 kB → 44.2 kB.
 
