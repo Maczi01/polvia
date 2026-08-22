@@ -2,7 +2,7 @@
 
 Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane przez `/dev-compound` i `/dev-compound-refresh`.
 
-<!-- rule-count: 5 -->
+<!-- rule-count: 6 -->
 
 - **Zmiany schematu aplikuj przez `npx drizzle-kit push`, nie `generate`**: katalog `drizzle/` w tym repo jest martwy (snapshoty znaja 2 z 4 enumow i nie znaja tabeli `service_locations`), wiec `generate` produkuje migracje tworzaca od zera obiekty juz istniejace w bazie. Jesli `generate` zapyta o `rename`, ZATRZYMAJ SIE — wybor `~ county > coverage rename enum` jest destrukcyjny. Skrypt `npm run drizzle:generate` wola przedawniony `generate:pg` i nic nie robi.
   Source: docs/solutions/database-issues/2026-08-22-drizzle-generate-nieuzywalny-snapshoty.md
@@ -18,3 +18,6 @@ Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane prze
 
 - **Prefiks locale wyliczaj z locale, nigdy nie wpisuj `'/en'` na sztywno**: warunek `locale === 'pl' ? '' : '/en'` dziala poprawnie na `pl` i `en`, a na `ru` i `uk` cicho przelacza uzytkownikowi jezyk — wiec nie widac go w normalnym testowaniu. Uzywaj `localePathPrefix()` / `localizedMapBasePath()` z `map-url-builder.ts`. Test niech zawiera asercje NEGATYWNA: zadne locale poza `en` nie moze dostac sciezki z `/en`.
   Source: docs/solutions/deployment-issues/2026-08-22-soft-404-notfound-podczas-streamowania.md
+
+- **Jeden dev server na projekt; nigdy `npm run build` przy dzialajacym dev serverze**: produkcyjny build nadpisuje ten sam `.next`, z ktorego dev server czyta — wszystkie strony zaczynaja zwracac 500 z `ENOENT`, a przy kilku serverach worker Next.js pada z "Jest worker encountered child process exceptions" (komunikat NIE dotyczy testow). Kolejnosc: gate (`tsc`/`jest`/`lint`/`build`) przy zatrzymanym serverze, potem uruchom server do weryfikacji. Rosnace numery portow oznaczaja zywe stare procesy — sprawdzaj `Get-NetTCPConnection`, nie odpowiedz HTTP.
+  Source: docs/solutions/build-errors/2026-08-23-jest-worker-exceptions-rywalizacja-o-next.md
