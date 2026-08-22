@@ -676,21 +676,34 @@ Preegzystujace, poza scope'em U9 — odnotowane.
 
 ---
 
-## Znaleziska niezależne od tego zadania — do decyzji
+## Znaleziska niezależne od tego zadania
 
-Wszystkie **preegzystujące**, żadne nie pochodzi z tej zmiany, żadnego nie naprawiałem.
-Uporządkowane po realnym wpływie na użytkownika.
+Wszystkie **preegzystujące**, żadne nie pochodzi z zadania `online-service-coverage`.
+
+### Naprawione (2026-08-22, na życzenie użytkownika)
+
+| # | Problem | Commit | Efekt |
+|---|---|---|---|
+| 2 | Hardkodowany prefiks `/en` dla każdego locale ≠ `pl` (3 miejsca) | `99e1a8a` | Klik filtra na `ru`/`uk` już nie przełącza języka. Warunek wyciągnięty do `localePathPrefix()` / `localizedMapBasePath()`, żeby nie powstała czwarta kopia |
+| 3 | Błędne URL-e mapy zwracały HTTP 200 z treścią 404 (soft-404) | `f9a1340` | 6 błędnych URL-i → 308 na poprawną dla locale ścieżkę bazową; 8 poprawnych → 200 bez zmian |
+| 4 | Martwy `drizzle:generate` + myląca procedura w `CLAUDE.md` | `b1c0b60` | Skrypt faktycznie startuje; `CLAUDE.md` opisuje `push` i ostrzega przed `rename`; dopisana sekcja o zasięgu jako drugiej osi |
+
+Mechanizm soft-404 okazał się inny, niż zakładałem: **nie** rewrite w middleware, a
+`notFound()` odpalone po rozpoczęciu streamowania (`<Suspense>` w catch-all). Nagłówki są
+wtedy już wysłane ze statusem 200. Pełny rozbiór:
+`docs/solutions/deployment-issues/2026-08-22-soft-404-notfound-podczas-streamowania.md`.
+
+### Otwarte — do decyzji
 
 | # | Problem | Gdzie | Skutek |
 |---|---|---|---|
-| 1 | `getTodayHours` buduje klucz z wielkiej litery (`'Saturday'`), dane mają małą (`'saturday'`) | `service-card.tsx:82-84` | **Godziny otwarcia nigdy się nie renderują** — dla żadnej z 140 usług. Funkcja nie działała nigdy. |
-| 2 | Hardkodowany prefiks `/en` dla każdego locale ≠ `pl` | `filter-component.tsx` (2 miejsca) | Na `ru` i `uk` klik filtra **przełącza użytkownikowi język**. Grupa docelowa to Ukraińcy i Rosjanie. |
-| 3 | `NextResponse.rewrite` sprawia, że `notFound()` zwraca **HTTP 200** | `src/middleware.ts` | Każdy błędny URL mapy to soft-404 — indeksowalne śmieci dla Google. Dotyczy też `/en/map/**`. |
-| 4 | `drizzle:generate` woła przedawniony `generate:pg`; snapshoty w `drizzle/meta` w ruinie | `package.json`, `drizzle/` | Procedura zmiany schematu opisana w `CLAUDE.md` **nie działa**. Każda sesja powtórzy ten objazd. |
-| 5 | `role="status"` + `tabIndex={0}` na **każdym** badge'u | `badge.tsx` (wymóg istniejących testów) | Dziesiątki przystanków tabulacji i regionów live na liście wyników. Badge nie jest interaktywny. |
-| 6 | `process.env` czytany bezpośrednio | `sitemap.ts:7` | Wbrew regule z `CLAUDE.md` („wyłącznie przez `env.ts`"). Kosmetyczne. |
-| 7 | Cztery źródła prawdy o kategoriach; `government` osiągalne w UI, ale **niezapisywalne** | `schema.ts`, `consts.ts`, `slug-mappings.ts`, `service-form.tsx` | Kategoria widoczna w filtrach i URL-ach, której nie da się przypisać żadnej usłudze. |
-| 8 | `next/link` zamiast `@/i18n/navigation` | `service-card.tsx:8` | Wbrew regule i18n z `CLAUDE.md` — gubi prefiks locale. |
+| 1 | `getTodayHours` buduje klucz z wielkiej litery (`'Saturday'`), dane mają małą (`'saturday'`) | `service-card.tsx:82-84` | **Godziny otwarcia nigdy się nie renderują** — dla żadnej z 140 usług. Świadomie odłożone: naprawa zmieni wygląd wszystkich kart |
+| 5 | `role="status"` + `tabIndex={0}` na **każdym** badge'u | `badge.tsx` (wymóg istniejących testów) | Dziesiątki przystanków tabulacji i regionów live na liście wyników. Badge nie jest interaktywny |
+| 6 | `process.env` czytany bezpośrednio | `sitemap.ts:7` | Wbrew regule z `CLAUDE.md` („wyłącznie przez `env.ts`"). Kosmetyczne |
+| 7 | Cztery źródła prawdy o kategoriach; `government` osiągalne w UI, ale **niezapisywalne** | `schema.ts`, `consts.ts`, `slug-mappings.ts`, `service-form.tsx` | Kategoria widoczna w filtrach i URL-ach, której nie da się przypisać żadnej usłudze |
+| 8 | `next/link` zamiast `@/i18n/navigation` | `service-card.tsx:8` | Wbrew regule i18n z `CLAUDE.md` — gubi prefiks locale |
+| 9 | `map/not-found.tsx` to relikt po forku | `map/not-found.tsx` | Strona 404 mapy pokazuje **SVG Irlandii**, tekst „businesses across Ireland" i stopkę **„© Qolie. All rights reserved."** — nazwę obcej firmy |
+| 10 | `drop-migrate-seed` woła `drizzle:generate` | `package.json:17` | Skrypt nie działał **nigdy**: drop → nic nie wygenerowane → seed na pustej bazie. Właściwy odpowiednik to `db:reset` |
 
-Pozycje 1–3 mają realny wpływ na użytkownika końcowego. Pozycja 4 na produktywność każdej
-kolejnej sesji.
+Pozycja 9 jest widoczna dla użytkownika i dotyczy cudzej marki — warta uwagi wyżej, niż
+sugeruje numer.
