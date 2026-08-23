@@ -62,9 +62,6 @@
       "wielkopolskie": "Wielkopolskie",
       "zachodniopomorskie": "Zachodniopomorskie"
     },
-    "DropDown": {
-      "BothIrelands": "Wszystkie województwa"
-    },
     "searchInput": "Wpisz nazwę lub miejsce",
     "addYourBusiness": "Dodaj",
     "showMap": "Mapa",
@@ -599,5 +596,11 @@
         }
       }
     }
+  },
+  "NotFound": {
+    "mapHeading": "Nie znaleźliśmy tej strony",
+    "mapDescription": "Adres, który otworzyłeś, nie odpowiada żadnej kategorii ani lokalizacji na mapie.",
+    "backToMap": "Przejdź do mapy",
+    "backHome": "Strona główna"
   }
 }

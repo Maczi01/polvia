@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { PartialService, View } from '@/types';
 import { cn } from '@/lib/utilities';
@@ -36,7 +35,15 @@ export const MobileBottomMarkerCard = ({
         ? tCounties(VOIVODESHIP_TO_MESSAGE_KEY[selectedService.voivodeship] ?? selectedService.voivodeship)
         : null;
     const address = formatAddress({ ...selectedService, voivodeship: translatedVoivodeship });
-    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${selectedService.latitude},${selectedService.longitude}`;
+    // Wpis o zasiegu `online` nie ma wspolrzednych, a od czasu dodania sekcji uslug
+    // zdalnych trafia do `filteredServices`, z ktorych `handleHoverPlace` ustawia
+    // `selectedService`. Bez tego gardu tapniecie takiej karty na mobile otwieralo
+    // Google Maps z "destination=null,null".
+    const hasCoordinates =
+        selectedService.latitude != null && selectedService.longitude != null;
+    const googleMapsUrl = hasCoordinates
+        ? `https://www.google.com/maps/dir/?api=1&destination=${selectedService.latitude},${selectedService.longitude}`
+        : null;
 
     const handleListViewClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -131,6 +138,7 @@ export const MobileBottomMarkerCard = ({
                         </Button>
 
                         {/* Google Maps button - RIGHT */}
+                        {googleMapsUrl && (
                         <Button
                             variant="explore"
                             size="sm"
@@ -154,6 +162,7 @@ export const MobileBottomMarkerCard = ({
                                 {t('navigate', { fallback: 'Dojazd' })}
                             </span>
                         </Button>
+                        )}
                     </div>
                 </div>
             </div>
