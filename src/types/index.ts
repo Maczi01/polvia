@@ -1,5 +1,11 @@
 import { GeoJSON, GeoJsonProperties } from 'geojson';
 
+// Typ inferowany ze schematu Drizzle — nie pisany recznie (patrz coding-rules.md).
+// Import type-only, wiec nie trafia do bundle'a klienta.
+import type { Coverage } from '@/db/schema';
+
+export type { Coverage } from '@/db/schema';
+
 type PointClusterProperties<TProperties extends GeoJsonProperties> = TProperties;
 type PointFeature<P> = GeoJSON.Feature<GeoJSON.Point, P>;
 export type PointFeatureProperties<TProperties extends GeoJsonProperties> = {
@@ -63,13 +69,14 @@ export type Service = {
     name: string;
     description: string | null;
     category: string;
+    coverage: Coverage;
     tags: string[] | null;
     city: string | null;
     street: string | null;
     voivodeship: string | null;
     postcode: string | null;
-    latitude: number;
-    longitude: number;
+    latitude: number | null;
+    longitude: number | null;
     openingHours: Record<string, { open: string; close: string }>;
     phoneNumber: string | null;
     email: string | null;

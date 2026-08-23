@@ -1,7 +1,7 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/posts';
-import { CATEGORY_SLUGS, COUNTY_SLUGS } from '@/lib/slug-mappings';
+import { CATEGORY_SLUGS, COUNTY_SLUGS, COVERAGE_ONLINE_SLUG } from '@/lib/slug-mappings';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl';
@@ -169,8 +169,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ] as MetadataRoute.Sitemap);
 
     // -------------------------------------------------------
-    // 6. Łączymy wszystko
+    // 6. Usługi online — /mapa/online, /en/map/online
+    //
+    // Zasięg zajmuje ten sam slot ścieżki co województwo, więc trasa wygląda jak
+    // strona lokalizacji: „prawne w całej Polsce" zamiast „prawne w Pomorskim".
+    // Slug `online` jest identyczny we wszystkich locale.
+    //
+    // Priorytet wyżej niż kategorie (0.6): to jedna strona zbierająca całą podaż
+    // zdalną, nie jeden z czternastu wycinków.
+    //
+    // Kombinacje {kategoria}/online POMINIĘTE świadomie — 14 × 2 locale to thin
+    // content, dopóki większość kategorii ma zero usług zdalnych. Do dodania,
+    // gdy pojawi się podaż, najlepiej gated licznikiem z bazy.
+    // -------------------------------------------------------
+    const onlinePages: MetadataRoute.Sitemap = [
+        {
+            url: `${baseUrl}/mapa/${COVERAGE_ONLINE_SLUG}`,
+            lastModified: currentDate,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        },
+        {
+            url: `${baseUrl}/en/map/${COVERAGE_ONLINE_SLUG}`,
+            lastModified: currentDate,
+            changeFrequency: 'weekly',
+            priority: 0.7,
+        },
+    ];
+
+    // -------------------------------------------------------
+    // 7. Łączymy wszystko
     // (Kombinacje category+county pominięte — zbyt wiele stron z thin content)
     // -------------------------------------------------------
-    return [...rootPages, ...staticPages, ...blogPages, ...categoryPages, ...countyPages];
+    return [
+        ...rootPages,
+        ...staticPages,
+        ...blogPages,
+        ...onlinePages,
+        ...categoryPages,
+        ...countyPages,
+    ];
 }

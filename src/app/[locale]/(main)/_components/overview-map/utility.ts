@@ -48,8 +48,11 @@ export const initialViewState = {
     pitch: 0,
 };
 
+/** Usluga, ktora da sie postawic na mapie — ma oba wspolrzedne. */
+export type LocatedService = PartialService & { latitude: number; longitude: number };
+
 export function createPoint(
-    item: PartialService,
+    item: LocatedService,
 ): PointFeature<ItemPointFeatureProperties> {
     const { longitude, latitude } = item;
     return {
@@ -66,7 +69,22 @@ export function createPoint(
 export function createPoints(
     items: PartialService[],
 ): PointFeature<ItemPointFeatureProperties>[] {
-    return items.map(createPoint);
+    // Mapa pokazuje WYLACZNIE to, co mozna odwiedzic (R3). Dwa warunki:
+    //
+    // 1. Wspolrzedne musza istniec — bez nich nie ma gdzie postawic pinu.
+    // 2. Zasieg `online` nie dostaje pinu NAWET ze wspolrzednymi. Wpis w pelni
+    //    zdalny moze miec adres rejestrowy (FotoDoKarty: Al. Solidarnosci
+    //    w Warszawie), ale nie ma punktu obslugi — pin mowilby "przyjdz tu",
+    //    a nie ma gdzie przyjsc.
+    //
+    // Wykluczenie dziala u zrodla, wiec clustering, `bounds` i supercluster nie
+    // wymagaja zadnych wyjatkow. `hybrid` dostaje pin automatycznie.
+    return items
+        .filter(
+            (item): item is LocatedService =>
+                item.coverage !== 'online' && item.latitude != null && item.longitude != null,
+        )
+        .map(createPoint);
 }
 
 export function mapFeature(properties: ItemPointFeatureProperties): ItemPointClusterProperties {

@@ -12,7 +12,7 @@ import {
 import { ServiceCard } from '../service-card/service-card';
 import { VList, VListHandle } from 'virtua';
 import { useScrollableListHandle } from '@/hooks/use-scrollable-list-handle';
-import { ArrowUp, Sparkles, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, Globe, Sparkles, Search } from 'lucide-react';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useTranslations } from 'next-intl';
@@ -31,6 +31,8 @@ type EmbeddingMeta = {
 
 type MapListProps = {
     frontendFilteredServices: PartialService[];
+    /** Uslugi dostepne zdalnie, po odjeciu tego, co widac w pozostalych sekcjach (R6). */
+    onlineResults: PartialService[];
     embeddingResults: PartialService[];
     isLoadingEmbeddings: boolean;
     embeddingMeta: EmbeddingMeta;
@@ -81,6 +83,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
     (
         {
             frontendFilteredServices,
+            onlineResults,
             embeddingResults,
             isLoadingEmbeddings,
             embeddingMeta,
@@ -102,12 +105,16 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         const t = useTranslations('MapList')
 
         const prevExpandedIndex = useRef<number | null>(null);
+        const onlineSectionRef = useRef<HTMLDivElement>(null);
         const CARD_COLLAPSE_MS = 300;
 
         // Combine services for internal logic (refs, scrolling, etc.)
+        // KOLEJNOSC MUSI ODPOWIADAC kolejnosci renderowania sekcji w renderServiceCards(),
+        // bo `cardIndex` i `cardRefs` sa wspolne dla wszystkich sekcji. Rozjechanie
+        // tego psuje scrollowanie i rozwijanie kart.
         const allServices = useMemo(
-            () => [...frontendFilteredServices, ...embeddingResults],
-            [frontendFilteredServices, embeddingResults],
+            () => [...frontendFilteredServices, ...onlineResults, ...embeddingResults],
+            [frontendFilteredServices, onlineResults, embeddingResults],
         );
 
         useScrollableListHandle(ref, containerRef, virtuaListRef, allServices);
@@ -137,6 +144,35 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             },
             [cardRefs, isMobile],
         );
+
+        /**
+         * Skok do sekcji uslug online. Dwa etapy, bo zaden pojedynczy nie wystarcza:
+         *
+         * 1. `scrollToIndex` po indeksie — jedyny sposob dotarcia do elementu, ktory
+         *    przy wirtualizacji NIE JEST jeszcze zamontowany. `smooth: false`
+         *    swiadomie: `virtua` szacuje pozycje z niezmierzonych elementow, wiec
+         *    plynne przewijanie na dystansie kilkudziesieciu kart nie dojezdza do celu
+         *    (ten sam wniosek jest juz w `scrollToTop`).
+         * 2. `scrollIntoView` na prawdziwym elemencie, gdy juz sie zamontowal — koryguje
+         *    blad oszacowania i dziala takze wtedy, gdy przewija sie zewnetrzny kontener
+         *    (`overflowY: auto`), a nie ten, ktory `virtua` uwaza za swoj.
+         *
+         * Indeks: naglowek sekcji online stoi w liscie dzieci VList dokladnie za
+         * wszystkimi kartami lokalnymi. Banner renderuje sie tylko gdy oba kubelki sa
+         * niepuste, wiec EmptyState nie przesuwa tu numeracji.
+         */
+        const scrollToOnlineSection = useCallback(() => {
+            scrollToIndex(frontendFilteredServices.length, { align: 'start', smooth: false });
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    onlineSectionRef.current?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+                });
+            });
+        }, [scrollToIndex, frontendFilteredServices.length]);
 
         useEffect(() => {
             const handleScroll = () => {
@@ -254,10 +290,47 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                             message={t("no_exact_matches")}
                             icon={Search}
                             isLoadingRecommendations={isLoadingEmbeddings}
-                            hasRecommendations={embeddingResults.length > 0}
+                            hasRecommendations={onlineResults.length > 0 || embeddingResults.length > 0}
                         />
                     </div>
                 );
+            }
+
+            // Online coverage section — zawsze widoczna, niezaleznie od filtra
+            // geograficznego (R4). Wpisy bez pinu na mapie zyja wylacznie tutaj.
+            if (onlineResults.length > 0) {
+                cards.push(
+                    <div key="online-header" ref={onlineSectionRef}>
+                        <SectionHeader
+                            icon={Globe}
+                            title={t('available_online', { count: onlineResults.length })}
+                            subtitle={t('available_online_subtitle')}
+                        />
+                    </div>
+                );
+
+                onlineResults.forEach((service) => {
+                    cards.push(
+                        <div key={`online-${service.id}`} className="mb-2 md:mb-4">
+                            <ServiceCard
+                                ref={element => {
+                                    if (cardRefs.current) {
+                                        cardRefs.current[cardIndex] = element;
+                                    }
+                                }}
+                                handleFlyTo={handleFlyTo}
+                                index={cardIndex}
+                                resetMap={resetMap}
+                                setCardToExpand={setCardToExpand}
+                                cardToExpand={cardToExpand}
+                                handleHoverPlace={handleHoverPlace}
+                                setPopup={setPopup}
+                                {...service}
+                            />
+                        </div>
+                    );
+                    cardIndex++;
+                });
             }
 
             // Embedding results section
@@ -333,7 +406,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         };
 
         // Show empty state when no results at all
-        if (frontendFilteredServices.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
+        if (frontendFilteredServices.length === 0 && onlineResults.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
             return (
                 <div className="flex h-full items-center justify-center bg-[#F6F6F7] dark:bg-gray-900">
                     <EmptyState
@@ -359,6 +432,23 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                     transform: 'translate3d(0,0,0)',
                 }}
             >
+                {onlineResults.length > 0 && frontendFilteredServices.length > 0 && (
+                    <button
+                        type="button"
+                        onClick={scrollToOnlineSection}
+                        className="mb-2 flex w-full items-center gap-2 rounded-lg border border-aqua/40 bg-aqua/10
+                            px-4 py-2.5 text-left text-sm text-gray-700 transition-colors
+                            hover:bg-aqua/20 focus-visible:outline-none focus-visible:ring-2
+                            focus-visible:ring-ring dark:text-gray-200 md:mb-4"
+                    >
+                        <Globe className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                        <span className="flex-1">
+                            {t('online_banner', { count: onlineResults.length })}
+                        </span>
+                        <ArrowDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                    </button>
+                )}
+
                 {isMobile ? (
                     <div className="size-full pb-8" style={{ minHeight: 'fit-content' }}>
                         {renderServiceCards()}

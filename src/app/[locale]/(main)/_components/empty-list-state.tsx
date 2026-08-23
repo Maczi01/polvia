@@ -4,6 +4,8 @@ import React, { useCallback } from 'react';
 import { Filter, MapPin, Search } from 'lucide-react';
 import { useQueryState } from 'nuqs';
 import { useTranslations, useLocale } from 'next-intl';
+import { localizedMapBasePath } from '@/lib/map-url-builder';
+import type { Locale } from '@/i18n/config';
 
 export const EmptyListState = () => {
     const [, setSearchInput] = useQueryState('query', { defaultValue: '' });
@@ -16,7 +18,7 @@ export const EmptyListState = () => {
 
         // Navigate to base map path - use window.location for a clean refresh
         // This is acceptable for the empty state case (edge case)
-        const basePath = locale === 'pl' ? '/mapa' : '/en/map';
+        const basePath = localizedMapBasePath(locale as Locale);
         window.location.href = basePath;
     }, [setSearchInput, locale]);
     return (

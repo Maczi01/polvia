@@ -58,11 +58,27 @@ export const statusEnum = pgEnum('status', [
     'confirmed'
 ]);
 
+/**
+ * Zasieg obslugi — druga, ortogonalna os obok kategorii (branzy).
+ *
+ * - `local`  — obsluga wylacznie na miejscu; ma pin na mapie
+ * - `online` — obsluga wylacznie zdalna, brak punktu obslugi; NIE ma pinu na mapie
+ * - `hybrid` — punkt obslugi ORAZ obsluga zdalna; ma pin i wchodzi do wynikow online
+ */
+export const coverageEnum = pgEnum('coverage', [
+    'local',
+    'online',
+    'hybrid',
+]);
+
+export type Coverage = (typeof coverageEnum.enumValues)[number];
+
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
     category: categoryEnum('category').notNull(),
+    coverage: coverageEnum('coverage').notNull().default('local'),
     status: statusEnum('status').notNull().default('active'),
     image: varchar('image', { length: 255 }),
     languages: varchar('languages', { length: 5 }).array().notNull().default(sql`ARRAY['pl']::varchar[]`),
@@ -87,8 +103,10 @@ export const serviceLocationsTable = pgTable('service_locations', {
     street: varchar('street', { length: 255 }),
     voivodeship: voivodeshipEnum('voivodeship'),
     postcode: varchar('postcode', { length: 20 }),
-    latitude: doublePrecision('latitude').notNull(),
-    longitude: doublePrecision('longitude').notNull(),
+    // Nullowalne: wpis o zasiegu `online` nie musi miec adresu ulicznego ani wspolrzednych
+    // (R9). Wiersz lokalizacji istnieje zawsze, bo niesie wymagany `slug` i `city`.
+    latitude: doublePrecision('latitude'),
+    longitude: doublePrecision('longitude'),
     openingHours: jsonb('opening_hours').$type<Record<string, { open: string; close: string }>>().notNull(),
     phoneNumber: varchar('phone_number', { length: 50 }),
     email: varchar('email', { length: 255 }),

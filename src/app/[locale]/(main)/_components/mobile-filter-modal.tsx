@@ -16,6 +16,8 @@ interface MobileFilterModalProps {
     onSearchChange: (query: string) => void;
     selectedCounty: string;
     onCountyChange: (query: string) => void;
+    onlineOnly: boolean;
+    onOnlineToggle: () => void;
     resetAllFilters: () => void;
     clearCategories: () => void;
 }
@@ -29,6 +31,8 @@ export const MobileFilterModal = ({
                                       onSearchChange,
                                       selectedCounty,
                                       onCountyChange,
+                                      onlineOnly,
+                                      onOnlineToggle,
                                       resetAllFilters,
                                       clearCategories
                                   }: MobileFilterModalProps) => {
@@ -110,8 +114,18 @@ export const MobileFilterModal = ({
                             disabled={
                                 !selectedCategory &&
                                 !searchQuery &&
+                                !onlineOnly &&
                                 (!selectedCounty || selectedCounty === 'all-voivodeships')
                             }
+                        />
+
+                        <ButtonCategory
+                            image={'/icons/online.svg'}
+                            text={t('Categories.Online')}
+                            variant={onlineOnly ? 'aqua' : 'default'}
+                            isSelected={onlineOnly}
+                            onClick={onOnlineToggle}
+                            aria-pressed={onlineOnly}
                         />
 
                         {categories.map(({ text, key, image, variant }) => (

@@ -29,7 +29,9 @@
       "RemoveFilterMobile": "Clear category filter",
       "Remove": "Reset",
       "Filters": "Filters",
-      "AllCategories": "All categories"
+      "AllCategories": "All categories",
+      "Online": "Online",
+      "OnlineHint": "Services delivered remotely, across Poland"
     },
     "Filters": "Filters",
     "counties": {
@@ -146,7 +148,8 @@
     "mail": "Email",
     "call": "Call",
     "whatsapp": "WhatsApp",
-    "languages": "We speak:"
+    "languages": "We speak:",
+    "coverage_online": "Online — all of Poland"
   },
   "Calculator": {
     "monthlyIncome": "Monthly income",
@@ -196,7 +199,7 @@
   },
   "Main": {
     "searching": "Searching",
-    "instructions": "Enter a company name, a service category such as \u201Chairdresser\u201D or \u201Cshop\u201D, or a location such as \u201CWarsaw\u201D or \u201CKrakow\u201D to find Ukrainian businesses in Poland. You can also leave the field empty to browse all companies.",
+    "instructions": "Enter a company name, a service category such as “hairdresser” or “shop”, or a location such as “Warsaw” or “Krakow” to find Ukrainian businesses in Poland. You can also leave the field empty to browse all companies.",
     "findPolishCompanies": "Find Ukrainian companies in Poland",
     "quickActions": "Quick actions",
     "searchInstructions": "Open the map with Ukrainian businesses in Poland. If you entered a search, the results will be filtered.",
@@ -272,7 +275,6 @@
       "Others": "Others - icon of other Ukrainian services"
     },
     "mapDesc": "Image with map of Poland showing locations of Ukrainian businesses and services"
-
   },
   "Faq": {
     "navigate": "Use the up/down arrows to navigate between questions, press Enter or Space to expand/collapse an answer, and use Home/End to jump to the beginning/end of the list.",
@@ -319,13 +321,13 @@
     "question": "question",
     "enterToClose": "Press Enter to close answer",
     "enterToOpen": "Press Enter to open answer",
-    "icon" : "Icon of email",
+    "icon": "Icon of email",
     "goToContact": "Visit the contact page to ask a question or register your company.",
     "SummaryOfFAQ": "Summary of FAQs",
     "summaryFaq1": "The section contains",
     "summaryFaq2": "the most frequently asked questions about the service",
     "summaryFaq3": "The questions concern adding companies, costs, features, and data protection. If you do not find an answer to your question, please use the contact form."
-   },
+  },
   "Blog": {
     "title": "Blog",
     "readMore": "Read more →",
@@ -351,31 +353,31 @@
     "stat": "Statistics:",
     "title": " in numbers",
     "Card1": {
-    "title": "Ukrainian businesses",
-    "description": "in Poland"
-  },
+      "title": "Ukrainian businesses",
+      "description": "in Poland"
+    },
     "Card2": {
-        "title": "Country",
-        "description": "Poland"
+      "title": "Country",
+      "description": "Poland"
     },
     "Card3": {
-        "title": "Categories",
-        "description": "From grocery to financial services"
+      "title": "Categories",
+      "description": "From grocery to financial services"
     },
     "Card4": {
-        "title": "Purpose",
-        "description": "No fluff, just useful feature"
+      "title": "Purpose",
+      "description": "No fluff, just useful feature"
     },
     "Card5": {
-        "title": "Monthly Searches",
-        "description": "Helping people find Ukrainian services"
+      "title": "Monthly Searches",
+      "description": "Helping people find Ukrainian services"
     }
   },
   "FooterNewsletter": {
     "subscribe": "Subscribe to our newsletter",
-    "terms":"Terms",
-    "privacy":"Privacy",
-    "cookies":"Cookies",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
     "allRights": "© 2026 Polvia. All rights reserved.",
     "home": "Home",
     "contact": "Contact",
@@ -391,7 +393,7 @@
     "descriptionMeta": "Your email has been added to the newsletter. Stay updated with Ukrainian services in Poland.",
     "main": "Main Page",
     "map": "Business Map",
-    "join": "Join our community and help promote Ukrainian businesses in Poland \uD83C\uDF0D\n\n\n\n\n\n\n\n\n"
+    "join": "Join our community and help promote Ukrainian businesses in Poland 🌍\n\n\n\n\n\n\n\n\n"
   },
   "Loading": {
     "loading": "Loading...",
@@ -402,7 +404,7 @@
     "map": "Map",
     "filters": "Filters",
     "how": "How to find",
-    "works":"Ukrainian companies",
+    "works": "Ukrainian companies",
     "works1": "in Poland?",
     "description": "You just need to follow 3 simple steps:",
     "find": "Find",
@@ -437,7 +439,7 @@
     "steps": "Steps for using the service",
     "results": "Results"
   },
-  "Rules":{
+  "Rules": {
     "backToMainPage": "Back to main page"
   },
   "Popup": {
@@ -477,7 +479,11 @@
     "based_on": "Based on:",
     "semantic_search_results": "Semantic search results",
     "searching_recommendations": "Searching for recommendations...",
-    "finding_more_results": "Finding More Results..."
+    "finding_more_results": "Finding More Results...",
+    "available_online": "Available online across Poland ({count})",
+    "available_online_subtitle": "Remote service — no need to travel",
+    "map_no_pins": "These services are delivered remotely, so they have no location on the map. Switch to the list to see them.",
+    "online_banner": "Available online across Poland: {count}. Jump to them"
   },
   "HeroMap": {
     "places": "{count} places",

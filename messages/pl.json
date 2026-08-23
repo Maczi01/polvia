@@ -29,7 +29,9 @@
       "RemoveFilterMobile": "Usuń filtry kategorii",
       "Remove": "Resetuj",
       "Filters": "Filtry",
-      "AllCategories": "Wszystkie kategorie"
+      "AllCategories": "Wszystkie kategorie",
+      "Online": "Online",
+      "OnlineHint": "Usługi świadczone zdalnie, w całej Polsce"
     },
     "Filters": "Filtry",
     "counties": {
@@ -147,7 +149,8 @@
     "mail": "Email",
     "call": "Zadzwoń",
     "whatsapp": "WhatsApp",
-    "languages": "Mówimy:"
+    "languages": "Mówimy:",
+    "coverage_online": "Online — cała Polska"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
@@ -283,7 +286,6 @@
     "contact": "Napisz do nas",
     "search": "Szukaj według kategorii, nazwy lub lokalizacji",
     "question1": "Co to jest Polvia?",
-    "question1": "Co to jest Polvia?",
     "answer1": "Polvia to nowoczesny katalog firm, który łączy ukraińskich przedsiębiorców w Polsce z klientami. Gromadzimy w jednym miejscu sklepy i specjalistów oferujących obsługę w języku ukraińskim oraz polskim.",
     "question2": "Dla kogo przeznaczony jest ten portal?",
     "answer2": "Dla Ukraińców szukających usług w ojczystym języku, dla Polaków ceniących ukraińskie produkty oraz dla firm (PL i UA), które chcą skutecznie zdobywać nowych klientów.",
@@ -392,7 +394,7 @@
     "descriptionMeta": "Twój adres e-mail został dodany do newslettera. Bądź na bieżąco z ukraińskimi usługami w Polsce.",
     "main": "Strona główna",
     "map": "Zobacz mapę",
-    "join": "Dołącz do naszej społeczności i pomóż promować ukraińskie biznesy w Polsce \uD83C\uDF0D\n\n"
+    "join": "Dołącz do naszej społeczności i pomóż promować ukraińskie biznesy w Polsce 🌍\n\n"
   },
   "Loading": {
     "loading": "Ładowanie...",
@@ -478,7 +480,11 @@
     "based_on": "Na podstawie:",
     "semantic_search_results": "Wyniki wyszukiwania semantycznego",
     "searching_recommendations": "Szukam rekomendacji...",
-    "finding_more_results": "Szukam więcej wyników..."
+    "finding_more_results": "Szukam więcej wyników...",
+    "available_online": "Dostępne online w całej Polsce ({count})",
+    "available_online_subtitle": "Obsługa zdalna — nie musisz nigdzie jechać",
+    "map_no_pins": "Te usługi są świadczone zdalnie, więc nie mają punktu na mapie. Przejdź do listy, żeby je zobaczyć.",
+    "online_banner": "Dostępnych online w całej Polsce: {count}. Przejdź do nich"
   },
   "HeroMap": {
     "places": "{count} miejsc",

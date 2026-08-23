@@ -25,6 +25,26 @@ export const CATEGORY_KEYS = [
 
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
 
+/**
+ * Slug zasiegu w URL-u mapy.
+ *
+ * Zajmuje ten sam slot co wojewodztwo i miasto (`/mapa/online`,
+ * `/mapa/prawne/online`), bo semantycznie jest odpowiedzia na to samo pytanie:
+ * "gdzie". Zamiast "prawne w Pomorskim" mamy "prawne w calej Polsce".
+ *
+ * NIE nalezy do CATEGORY_SLUGS — zasieg nie jest branza. Slug jest identyczny
+ * we wszystkich czterech locale, bo slowo "online" funkcjonuje w kazdym z nich.
+ */
+export const COVERAGE_ONLINE_SLUG = 'online';
+
+/**
+ * Czy segment URL-a oznacza zasieg online.
+ * Sprawdzone: nie koliduje z zadnym slugiem kategorii, wojewodztwa ani miasta.
+ */
+export function isOnlineSlug(segment: string): boolean {
+    return segment.trim().toLowerCase() === COVERAGE_ONLINE_SLUG;
+}
+
 // Category slug mappings by locale
 export const CATEGORY_SLUGS = {
     pl: {

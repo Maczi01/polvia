@@ -1,6 +1,9 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
+import { parseMapSlug } from '@/lib/map-slug-parser';
+import { parseMapPathname } from '@/lib/map-pathname';
+import { localizedMapBasePath } from '@/lib/map-url-builder';
 
 const intlMiddleware = createMiddleware({
     ...routing,
@@ -9,6 +12,31 @@ const intlMiddleware = createMiddleware({
 
 export default function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
+
+    // Walidacja slugu mapy MUSI byc tutaj, nie w page.tsx.
+    //
+    // Strona mapy to opcjonalny catch-all, wiec dopasowuje KAZDY slug i renderuje
+    // shell przez <Suspense>. Kiedy `notFound()` odpala sie w trakcie streamowania,
+    // naglowki sa juz wyslane ze statusem 200 — Next dokleja tresc strony 404, ale
+    // statusu nie zmieni. Efekt: soft-404, czyli indeksowalne smieci dla Google.
+    // Middleware wykonuje sie przed jakimkolwiek renderem, wiec to jedyne miejsce,
+    // gdzie da sie zwrocic prawdziwy status.
+    const mapPath = parseMapPathname(pathname);
+    if (mapPath) {
+        const parsed = parseMapSlug(mapPath.slug, mapPath.locale);
+        if (!parsed.success) {
+            const url = request.nextUrl.clone();
+            url.pathname = localizedMapBasePath(mapPath.locale);
+            url.search = '';
+            // 307 (tymczasowe), NIE 308. Przekierowania trwale sa agresywnie
+            // cache'owane przez przegladarki i Google — gdyby parser kiedykolwiek
+            // zaklasyfikowal POPRAWNY URL jako bledny, uzytkownik dostalby
+            // zapamietane przekierowanie, ktorego nie da sie odwolac bez
+            // cache-bustingu. Efekt SEO jest ten sam (soft-404 znika), a blad
+            // jest odwracalny. Na 308 mozna przejsc po okresie obserwacji.
+            return NextResponse.redirect(url, 307);
+        }
+    }
 
     // Handle localized /mapa/{slug...} URLs for PL locale.
     // next-intl only maps the exact /mapa → /map pathname;

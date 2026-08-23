@@ -108,7 +108,7 @@ describe('<Badge />', () => {
         );
 
         expect(screen.getByText('Index 0')).toHaveClass(
-            'bg-[#FDE8EC] border-[#F9C4CE]',
+            'bg-[#FFF0F0] border-[#F5D0D0]',
         ); // red
         expect(screen.getByText('Index 1')).toHaveClass(
             'bg-[#E6F7EF] border-[#B8E6CC]',

@@ -37,11 +37,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     let titleSuffix = '';
 
     if (parseResult.success) {
-        const { category, county } = parseResult.filters;
+        const { category, county, onlineOnly } = parseResult.filters;
 
         // Build slug path for canonical URL
-        if (category || county) {
-            const slugUrl = buildMapUrl({ category, county }, locale as Locale);
+        if (category || county || onlineOnly) {
+            const slugUrl = buildMapUrl({ category, county, onlineOnly }, locale as Locale);
             canonicalPath = `${localePrefix}${localizeMapPath(slugUrl.pathname, locale as Locale)}`;
 
             // Build title suffix with translations
@@ -50,6 +50,11 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
                 // Capitalize first letter of category for display
                 const categoryKey = category.charAt(0).toUpperCase() + category.slice(1);
                 parts.push(tCategories(categoryKey));
+            }
+            // Zasieg zajmuje ten sam slot sciezki co wojewodztwo, wiec w tytule
+            // stoi na tej samej pozycji: "Prawne, Online" zamiast "Prawne, Pomorskie".
+            if (onlineOnly) {
+                parts.push(tCategories('Online'));
             }
             if (county) {
                 // Counties keys are lowercase with hyphens
@@ -71,10 +76,10 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     };
 
     if (parseResult.success) {
-        const { category, county } = parseResult.filters;
-        if (category || county) {
+        const { category, county, onlineOnly } = parseResult.filters;
+        if (category || county || onlineOnly) {
             for (const loc of locales) {
-                const slugUrl = buildMapUrl({ category, county }, loc);
+                const slugUrl = buildMapUrl({ category, county, onlineOnly }, loc);
                 const prefix = loc === 'pl' ? '' : `/${loc}`;
                 languageUrls[loc] = `${baseUrl}${prefix}${localizeMapPath(slugUrl.pathname, loc)}`;
             }

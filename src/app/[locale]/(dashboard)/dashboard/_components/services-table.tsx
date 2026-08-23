@@ -59,6 +59,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                 <th className="px-4 py-3 text-left font-medium">Slug</th>
                                 <th className="px-4 py-3 text-left font-medium">Name</th>
                                 <th className="px-4 py-3 text-left font-medium">Category</th>
+                                <th className="px-4 py-3 text-left font-medium">Coverage</th>
                                 <th className="px-4 py-3 text-left font-medium">Status</th>
                                 <th className="px-4 py-3 text-left font-medium">City</th>
                                 <th className="px-4 py-3 text-left font-medium">Voivodeship</th>
@@ -71,7 +72,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={10} className="px-4 py-8 text-center text-muted-foreground">
+                                    <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
                                         {services.length === 0 ? 'No services yet. Add your first one!' : 'No services match your search.'}
                                     </td>
                                 </tr>
@@ -82,6 +83,9 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                         <td className="px-4 py-3 font-medium">{service.name}</td>
                                         <td className="px-4 py-3">
                                             <Badge variant={mapCategoryToBadgeColor(service.category) as any} label={service.category} />
+                                        </td>
+                                        <td className="px-4 py-3 text-muted-foreground">
+                                            {service.coverage}
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[service.status] || ''}`}>

@@ -25,6 +25,9 @@ export const MarkerPopup = ({
 }: MarkerPopupProps) => {
     const t = useTranslations('Popup'); // Retaining your translation namespace
     if (isMobile || !selectedService) return null;
+    // Popup jest przypiety do wspolrzednych — bez nich nie ma gdzie go postawic.
+    // Wpis o zasiegu `online` nie ma pinu, wiec i tak nie da sie go tu otworzyc.
+    if (selectedService.latitude == null || selectedService.longitude == null) return null;
 
     const image = selectedService ? `/services/${selectedService.image}` : '/default.png';
 

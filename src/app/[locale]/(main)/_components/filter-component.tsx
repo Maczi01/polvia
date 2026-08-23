@@ -13,7 +13,7 @@ import { ButtonCategory } from '@/app/[locale]/(main)/_components/button-categor
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
-import { buildMapUrl, localizeMapPath } from '@/lib/map-url-builder';
+import { buildMapUrl, localePathPrefix, localizedMapBasePath, localizeMapPath } from '@/lib/map-url-builder';
 import { normalizeCountySlug } from '@/lib/slug-mappings';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import type { Locale } from '@/i18n/config';
@@ -41,6 +41,8 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
     const [selectedCounty, setSelectedCounty] = useState(initialFilters?.county || null);
     const [selectedCity, setSelectedCity] = useState(initialFilters?.city || null);
 
+    const [onlineOnly, setOnlineOnly] = useState(initialFilters?.onlineOnly ?? false);
+
     // Keep query params for search, id, and view
     const [searchInput, setSearchInput] = useQueryState('query', { defaultValue: '' });
     const [selectedId, setSelectedId] = useQueryState('id', { defaultValue: '' });
@@ -58,29 +60,59 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         setSelectedCategory(initialFilters?.category || null);
         setSelectedCounty(initialFilters?.county || null);
         setSelectedCity(initialFilters?.city || null);
-    }, [initialFilters?.category, initialFilters?.county, initialFilters?.city]);
+        setOnlineOnly(initialFilters?.onlineOnly ?? false);
+    }, [
+        initialFilters?.category,
+        initialFilters?.county,
+        initialFilters?.city,
+        initialFilters?.onlineOnly,
+    ]);
 
     // Update URL with new filters WITHOUT navigation (instant, client-side only)
     const navigateWithFilters = useCallback(
-        (category: string | null, county: string | null, city: string | null = null) => {
+        (
+            category: string | null,
+            county: string | null,
+            city: string | null = null,
+            nextOnlineOnly: boolean = onlineOnly,
+        ) => {
+            // Zasieg i lokalizacja dziela jeden slot URL-a — wybor "Online" czysci
+            // wojewodztwo i miasto, zeby stan UI zgadzal sie ze sciezka.
+            const effectiveCounty = nextOnlineOnly ? null : county;
+            const effectiveCity = nextOnlineOnly ? null : city;
+
             // Update local state immediately for instant UI feedback
             setSelectedCategory(category as any);
-            setSelectedCounty(county as any);
-            setSelectedCity(city);
+            setSelectedCounty(effectiveCounty as any);
+            setSelectedCity(effectiveCity);
+            setOnlineOnly(nextOnlineOnly);
 
             // Notify parent component of filter changes
-            onFiltersChange?.({ category: category as any, county: county as any, city });
+            onFiltersChange?.({
+                category: category as any,
+                county: effectiveCounty as any,
+                city: effectiveCity,
+                onlineOnly: nextOnlineOnly,
+            });
 
             // Build the new URL path (localized for browser URL bar)
-            const url = buildMapUrl({ category, county, city }, locale);
+            const url = buildMapUrl(
+                {
+                    category,
+                    county: effectiveCounty,
+                    city: effectiveCity,
+                    onlineOnly: nextOnlineOnly,
+                },
+                locale,
+            );
             const localizedPath = localizeMapPath(url.pathname, locale);
-            const basePath = locale === 'pl' ? '' : '/en';
+            const basePath = localePathPrefix(locale);
             const fullPath = `${basePath}${localizedPath}`;
 
             // Update URL without navigation (instant, no reload)
             window.history.pushState({}, '', fullPath);
         },
-        [locale, onFiltersChange],
+        [locale, onFiltersChange, onlineOnly],
     );
 
     const resetAllFilters = useCallback(() => {
@@ -92,12 +124,13 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         setSelectedCategory(null);
         setSelectedCounty(null);
         setSelectedCity(null);
+        setOnlineOnly(false);
 
         // Notify parent component of filter changes
-        onFiltersChange?.({ category: null, county: null, city: null });
+        onFiltersChange?.({ category: null, county: null, city: null, onlineOnly: false });
 
         // Update URL to base path without navigation
-        const basePath = locale === 'pl' ? '/mapa' : '/en/map';
+        const basePath = localizedMapBasePath(locale);
         window.history.pushState({}, '', basePath);
     }, [setSearchInput, setSelectedId, locale, onFiltersChange]);
 
@@ -105,6 +138,11 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         // Navigate to update URL (state will sync via useEffect)
         navigateWithFilters(null, selectedCounty, selectedCity);
     }, [navigateWithFilters, selectedCounty, selectedCity]);
+
+    // Zasieg to druga, niezalezna os filtrowania — kategoria zostaje bez zmian.
+    const handleOnlineClick = () => {
+        navigateWithFilters(selectedCategory, selectedCounty, selectedCity, !onlineOnly);
+    };
 
     // Category selection handler
     const handleCategoryClick = (category: string) => {
@@ -196,7 +234,8 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         categoryReference.current?.scrollBy({ left: 200, behavior: 'smooth' });
     }, []);
 
-    const hasActiveFilters = selectedCategory || searchInput || selectedCounty || selectedCity;
+    const hasActiveFilters =
+        selectedCategory || searchInput || selectedCounty || selectedCity || onlineOnly;
 
     return (
         <>
@@ -213,6 +252,8 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                 onCountyChange={handleCountyChange}
                 onSearchChange={setSearchInput}
                 searchQuery={searchInput || ''}
+                onlineOnly={onlineOnly}
+                onOnlineToggle={handleOnlineClick}
                 resetAllFilters={resetAllFilters}
                 clearCategories={clearCategories}
             />
@@ -348,6 +389,17 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                 onClick={resetAllFilters}
                                 className="flex-none"
                                 disabled={!hasActiveFilters}
+                            />
+
+                            <ButtonCategory
+                                image={'/icons/online.svg'}
+                                text={t('Categories.Online')}
+                                variant={onlineOnly ? 'aqua' : 'default'}
+                                isSelected={onlineOnly}
+                                onClick={handleOnlineClick}
+                                className="flex-none"
+                                title={t('Categories.OnlineHint')}
+                                aria-pressed={onlineOnly}
                             />
 
                             <div
