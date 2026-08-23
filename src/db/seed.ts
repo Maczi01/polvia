@@ -92,6 +92,8 @@ async function mainSeed() {
         { key: 'road-transport', pl: 'Transport drogowy', uk: 'Автоперевезення', en: 'Road Transport', ru: 'Автоперевозки' },
         { key: 'spedycja', pl: 'Spedycja', uk: 'Експедиція', en: 'Forwarding', ru: 'Экспедиция' },
         { key: 'poland-ukraine', pl: 'Polska-Ukraina', uk: 'Польща-Україна', en: 'Poland-Ukraine', ru: 'Польша-Украина' },
+        { key: 'hr', pl: 'Kadry i płace', uk: 'Кадри та зарплата', en: 'HR & Payroll', ru: 'Кадры и зарплата' },
+        { key: 'consulting', pl: 'Doradztwo', uk: 'Консалтинг', en: 'Consulting', ru: 'Консалтинг' },
         { key: 'international', pl: 'Międzynarodowy', uk: 'Міжнародний', en: 'International', ru: 'Международный' },
         { key: 'ftl', pl: 'FTL', uk: 'FTL', en: 'FTL', ru: 'FTL' },
         { key: 'ltl', pl: 'LTL', uk: 'LTL', en: 'LTL', ru: 'LTL' },
@@ -3464,6 +3466,39 @@ async function mainSeed() {
         webpage: 'https://fotodokarty.com.pl/',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true },
+        ],
+    });
+
+    // 79. Kancelaria konsultingowa Abramczyk & Partnerzy
+    //
+    // Zasieg `online` jest stanem TYMCZASOWYM, nie opisem firmy: kancelaria ma
+    // biuro na Mlocinach, ale wlasnie przenosi siedzibe, wiec nie mamy adresu,
+    // ktory dalby uczciwy pin. Zamiast wskazywac miejsce, ktore niedlugo bedzie
+    // puste, wpis zyje w sekcji uslug zdalnych i jest widoczny w kazdym
+    // wojewodztwie. Po przeprowadzce: zmien na `hybrid` i dodaj street +
+    // wspolrzedne (walidacja w dashboardzie i tak wymusi wtedy wspolrzedne).
+    //
+    // Opis ukrainski uzywa terminologii z ich wlasnej wersji jezykowej
+    // (kancelaria-ap.pl/uk/home-ukr), nie tlumaczenia maszynowego.
+    await seedService({
+        name: 'Kancelaria konsultingowa Abramczyk & Partnerzy',
+        slug: 'kancelaria-ap',
+        category: 'financial',
+        coverage: 'online',
+        image: 'SYGNET_SM.png',
+        ukName: 'Консалтингова канцелярія Abramczyk & Partnerzy',
+        enName: 'Abramczyk & Partnerzy Consulting Office',
+        ruName: 'Консалтинговая канцелярия Abramczyk & Partnerzy',
+        plDesc: 'Kompleksowe wsparcie w prowadzeniu i rozwoju biznesu w Polsce — księgowość, podatki, prawo, kadry, rejestracja firm i biuro wirtualne. Obsługa w języku polskim i ukraińskim.',
+        ukDesc: 'Комплексна підтримка у веденні та розвитку бізнесу в Польщі — бухгалтерський облік, податки, право, кадри та заробітна плата, реєстрація фірм і віртуальний офіс. Консалтинг бухгалтерський, податковий та юридичний. Обслуговування польською та українською мовами.',
+        enDesc: 'Comprehensive support for running and growing a business in Poland — accounting, taxes, law, HR and payroll, company registration and virtual office. Service in Polish and Ukrainian.',
+        ruDesc: 'Комплексная поддержка в ведении и развитии бизнеса в Польше — бухгалтерия, налоги, право, кадры и заработная плата, регистрация фирм и виртуальный офис. Обслуживание на польском и украинском языках.',
+        tags: ['accounting', 'tax', 'legal', 'business-registration', 'documents', 'hr', 'consulting'],
+        languages: ['pl', 'uk'],
+        socials: { facebook: 'https://www.facebook.com/abramczykpartnerzy/' },
+        webpage: 'https://kancelaria-ap.pl/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true, phoneNumber: '+48 794 600 407' },
         ],
     });
 
