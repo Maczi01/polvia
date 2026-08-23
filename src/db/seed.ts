@@ -92,6 +92,8 @@ async function mainSeed() {
         { key: 'road-transport', pl: 'Transport drogowy', uk: 'Автоперевезення', en: 'Road Transport', ru: 'Автоперевозки' },
         { key: 'spedycja', pl: 'Spedycja', uk: 'Експедиція', en: 'Forwarding', ru: 'Экспедиция' },
         { key: 'poland-ukraine', pl: 'Polska-Ukraina', uk: 'Польща-Україна', en: 'Poland-Ukraine', ru: 'Польша-Украина' },
+        { key: 'hr', pl: 'Kadry i płace', uk: 'Кадри та зарплата', en: 'HR & Payroll', ru: 'Кадры и зарплата' },
+        { key: 'consulting', pl: 'Doradztwo', uk: 'Консалтинг', en: 'Consulting', ru: 'Консалтинг' },
         { key: 'international', pl: 'Międzynarodowy', uk: 'Міжнародний', en: 'International', ru: 'Международный' },
         { key: 'ftl', pl: 'FTL', uk: 'FTL', en: 'FTL', ru: 'FTL' },
         { key: 'ltl', pl: 'LTL', uk: 'LTL', en: 'LTL', ru: 'LTL' },
@@ -3001,6 +3003,7 @@ async function mainSeed() {
         enDesc: 'Warsaw-based accounting office specializing in serving Eastern European businesses. Simplified and full accounting, payroll, company registration, tax consulting, VAT refunds and work permits.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на обслуживании бизнеса из Восточной Европы. Упрощённая и полная бухгалтерия, кадры и зарплаты, регистрация фирм, налоговые консультации, возврат НДС и разрешения на работу.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        image: 'ukdn.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://ukdn.pl/',
         locations: [
@@ -3019,6 +3022,7 @@ async function mainSeed() {
         enDesc: 'Warsaw accounting office offering bookkeeping, company registration, foreigner legalization, financial audits, virtual office and comprehensive business support in Ukrainian and Polish.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее бухгалтерию, регистрацию фирм, легализацию пребывания иностранцев, финансовые аудиты, виртуальный офис и комплексную поддержку бизнеса на украинском и польском языках.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        image: 'okservice.png',
         languages: ['pl', 'uk'],
         socials: { instagram: 'https://www.instagram.com/okservice.com.pl/' },
         webpage: 'https://www.okservice.com.pl/',
@@ -3038,6 +3042,7 @@ async function mainSeed() {
         enDesc: 'Accounting office for Ukrainians in Warsaw. Full and simplified bookkeeping, company establishment, document handling, PESEL, trusted profile, residence permits, vehicle registration and taxi licenses.',
         ruDesc: 'Бухгалтерское бюро для украинцев в Варшаве. Полная и упрощённая бухгалтерия, открытие фирм, оформление документов, PESEL, доверенный профиль, разрешения на пребывание, регистрация авто и лицензии такси.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        image: 'bussinesslife.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://biuro-businesslife.pl/',
         locations: [
@@ -3056,6 +3061,7 @@ async function mainSeed() {
         enDesc: 'Nationwide network of accounting offices with over 25 years of experience. Over 40 branches in Poland. Offers accounting services dedicated to Ukrainian clients – business management, tax settlements and advisory.',
         ruDesc: 'Общепольская сеть бухгалтерских бюро с более чем 25-летним опытом. Более 40 отделений в Польше. Предлагает бухгалтерские услуги для клиентов из Украины – ведение фирмы, налоговые расчёты и консультации.',
         tags: ['accounting', 'tax', 'foreigners'],
+        image: 'taxsafe.png',
         languages: ['pl', 'uk'],
         webpage: 'https://taxsafe.pl/',
         socials: { facebook: 'https://www.facebook.com/taxsafepl/' },
@@ -3075,6 +3081,7 @@ async function mainSeed() {
         enDesc: 'Warsaw accounting office offering full bookkeeping, tax declarations, payroll, VAT accounting, company registration, bank account setup and credit/leasing support. Service in Ukrainian, Russian and Polish.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее полную бухгалтерию, налоговые декларации, кадры и зарплаты, расчёты НДС, регистрацию фирм, помощь в открытии банковского счёта и кредитную и лизинговую поддержку. Обслуживание на украинском, русском и польском языках.',
         tags: ['accounting', 'tax', 'business-registration', 'documents'],
+        image: 'wwfinance.png',
         languages: ['pl', 'uk', 'ru', 'en'],
         webpage: 'https://ww-finance.pl/ru/',
         socials: { facebook: 'https://www.facebook.com/profile.php?id=61550059505406' },
@@ -3095,6 +3102,7 @@ async function mainSeed() {
         enDesc: 'Accounting office in central Warsaw. Full bookkeeping for companies and sole traders, tax settlements, payroll, foreigner legalization, 24/7 accounting consultations and outsourcing.',
         ruDesc: 'Бухгалтерское бюро в центре Варшавы. Полная бухгалтерия для компаний и ИП, налоговые расчёты, кадры и зарплаты, легализация пребывания иностранцев, бухгалтерские консультации 24/7 и аутсорсинг бухгалтерии.',
         tags: ['accounting', 'tax', 'foreigners', 'documents'],
+        image: 'buchalter.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://buchalterwarszawa.pl/',
         locations: [
@@ -3132,6 +3140,7 @@ async function mainSeed() {
         enDesc: 'UA Hub division of MDDP law firm offering comprehensive tax and legal advisory for Ukrainian companies and NGOs entering the Polish market. Formal, legal and organizational support.',
         ruDesc: 'Отдел UA Hub канцелярии MDDP, предлагающий комплексное налоговое и юридическое консультирование для украинских компаний и НКО, выходящих на польский рынок. Формально-правовая и организационная поддержка.',
         tags: ['tax', 'legal', 'foreigners', 'documents'],
+        image: 'mddp.png',
         languages: ['pl', 'uk', 'en'],
         socials: { facebook: 'https://www.facebook.com/mddp.kariera', linkedin: 'https://www.linkedin.com/company/mddp/', instagram: 'https://www.instagram.com/mddp.kariera_pl/' },
         webpage: 'https://www.mddp.pl/ua-hub-kompleksowe-doradztwo-podatkowe/',
@@ -3226,6 +3235,7 @@ async function mainSeed() {
         enDesc: 'Accounting office specializing in launching and managing businesses in Poland for Ukrainian entrepreneurs. Company registration, bookkeeping and business consulting.',
         ruDesc: 'Бухгалтерское бюро, специализирующееся на запуске и сопровождении бизнеса в Польше для предпринимателей из Украины. Регистрация фирм, бухгалтерия и бизнес-консультирование.',
         tags: ['accounting', 'business-registration', 'foreigners'],
+        image: 'financeexpert.png',
         languages: ['pl', 'uk', 'ru', 'en'],
         webpage: 'https://finexp.pl/ua/',
         locations: [
@@ -3244,6 +3254,7 @@ async function mainSeed() {
         enDesc: 'Ukrainian-speaking accountant in Warsaw. Full and simplified bookkeeping, VAT/PIT/CIT declarations, payroll, company registration, financial analysis, audits and KSeF support. Specializing in serving Ukrainian entrepreneurs and IT specialists.',
         ruDesc: 'Украиноязычный бухгалтер в Варшаве. Полная и упрощённая бухгалтерия, декларации VAT/PIT/CIT, кадры и зарплаты, регистрация фирм, финансовые анализы, аудиты и обслуживание KSeF. Специализация на обслуживании украинских предпринимателей и IT-специалистов.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
+        image: 'taxanna.png',
         languages: ['pl', 'uk'],
         socials: { instagram: 'https://www.instagram.com/anna.pereriadkina/', facebook: 'https://www.facebook.com/anna.pereriadkina' },
         webpage: 'https://taxanna.pl/',
@@ -3263,6 +3274,7 @@ async function mainSeed() {
         enDesc: 'Company offering comprehensive business services: registration of companies and sole traders, accounting, legalization of stay, insurance, financial services and payroll. Service in Ukrainian and Russian.',
         ruDesc: 'Компания, предлагающая комплексные бизнес-услуги: регистрация компаний и ИП, бухгалтерия, легализация пребывания, страхование, финансовые услуги и кадры и зарплаты. Обслуживание на украинском и русском языках.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        image: 'drogipol.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://biz.drogipol.pl/',
         locations: [
@@ -3300,6 +3312,7 @@ async function mainSeed() {
         enDesc: 'Accounting office in Warsaw offering comprehensive bookkeeping services: tax settlements, VAT and CIT declarations, statistical reports, payroll, company registration, legalization of stay and business consulting. Service in Ukrainian, Russian, Polish and English.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексное бухгалтерское обслуживание: налоговые расчёты, декларации НДС и CIT, статистические отчёты, кадры и зарплаты, регистрация фирм, легализация пребывания и бизнес-консультирование. Обслуживание на украинском, русском, польском и английском языках.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        image: 'bst.png',
         languages: ['pl', 'uk', 'ru', 'en'],
         socials: { instagram: 'https://www.instagram.com/bstgroup.pl/', facebook: 'https://www.facebook.com/bstgrouppl' },
         webpage: 'https://bstgroup.pl/uk/buhgalterske-obslugovuvannya/',
@@ -3319,6 +3332,7 @@ async function mainSeed() {
         enDesc: 'Accounting office in Warsaw specializing in company registration for foreigners. Legal and tax consulting, document preparation, translations, NIP/REGON/KRS acquisition, corporate bank account setup, VAT registration and virtual office.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, специализирующееся на регистрации фирм для иностранцев. Юридическое и налоговое консультирование, подготовка документов, переводы, получение NIP/REGON/KRS, открытие фирменного счёта, регистрация НДС и виртуальный офис.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners', 'documents'],
+        image: 'taxovia.png',
         languages: ['pl', 'uk', 'en', 'de'],
         webpage: 'https://www.taxovia.pl/uslugi/zakladanie-firm-dla-obcokrajowcow',
         locations: [
@@ -3337,6 +3351,7 @@ async function mainSeed() {
         enDesc: 'International consulting firm specializing in organizing and managing accounting in Poland. Servicing new Polish companies, preparing financial reports, accounting corrections and representation before authorities. Service in Ukrainian, English, Russian and Polish.',
         ruDesc: 'Международная консалтинговая компания, специализирующаяся на организации и ведении бухгалтерского учёта в Польше. Обслуживание новых польских компаний, подготовка финансовой отчётности, бухгалтерские корректировки и представительство перед органами власти. Обслуживание на украинском, английском, русском и польском языках.',
         tags: ['accounting', 'tax', 'legal', 'documents'],
+        image: 'romaniuk.png',
         languages: ['pl', 'uk', 'ru', 'en'],
         socials: { facebook: 'https://www.facebook.com/romaniuk.partners', youtube: 'https://www.youtube.com/channel/UCruwnI6GUCNBmT_vzMNKTHw' },
         webpage: 'https://r-partners.pl/uk/orhanizatsiya-vedennya-bukhhalterskoho-obliku-v-polshchi/',
@@ -3357,6 +3372,7 @@ async function mainSeed() {
         enDesc: 'OL-TAX accounting office from Stargard offering bookkeeping for companies and individuals from Ukraine. Business registration, VAT registration, full accounting, individual consultations, training for accountants and business mentoring. Remote service across Poland.',
         ruDesc: 'Бухгалтерское бюро OL-TAX из Старгарда, предлагающее бухгалтерию для фирм и лиц из Украины. Регистрация деятельности, регистрация НДС, полная бухгалтерия, индивидуальные консультации, обучение для бухгалтеров и бизнес-менторство. Дистанционное обслуживание по всей Польше.',
         tags: ['accounting', 'tax', 'business-registration', 'foreigners'],
+        image: 'dobraksiegowa.png',
         languages: ['pl', 'uk', 'ru'],
         webpage: 'https://dobraksiegowa.info/oferta/oferta-dla-osob-z-ukrainy/',
         locations: [
@@ -3376,6 +3392,7 @@ async function mainSeed() {
         enDesc: 'Accounting office in Warsaw offering comprehensive online bookkeeping services: document analysis, tax optimization, payroll, business planning and help with starting a company. Multilingual service.',
         ruDesc: 'Бухгалтерское бюро в Варшаве, предлагающее комплексные онлайн-бухгалтерские услуги: анализ документов, налоговую оптимизацию, кадры и зарплаты, бизнес-планирование и помощь в открытии фирмы. Многоязычное обслуживание.',
         tags: ['accounting', 'tax', 'business-registration'],
+        image: 'nikitas.png',
         languages: ['pl', 'ru'],
         webpage: 'https://www.nikitas.pl/',
         locations: [
@@ -3394,6 +3411,7 @@ async function mainSeed() {
         enDesc: 'Consulting company operating since 2015 offering comprehensive business services: business consulting, company registration, accounting and taxes, payroll, legal office, virtual office, insurance and personal assistance. Service in Polish, Ukrainian, Russian and English.',
         ruDesc: 'Консалтинговая компания, работающая с 2015 года, предлагающая комплексные услуги для бизнеса: бизнес-консультирование, регистрация фирм, бухгалтерия и налоги, кадры и зарплаты, юридическая канцелярия, виртуальный офис, страхование и персональная ассистенция. Обслуживание на польском, украинском, русском и английском языках.',
         tags: ['accounting', 'tax', 'legal', 'business-registration', 'foreigners', 'documents'],
+        image: 'evolution.png',
         languages: ['pl', 'uk', 'ru', 'en'],
         socials: { linkedin: 'https://pl.linkedin.com/company/biz-evolution-pl' },
         webpage: 'https://www.bizevolution.pl/',
@@ -3414,6 +3432,7 @@ async function mainSeed() {
         enDesc: 'Accounting office offering online service across Poland. Bookkeeping for sole traders and companies, company registration, accounting recovery, payroll, trusted profile and help with business relocation to Poland. Service in Russian, Polish and English.',
         ruDesc: 'Бухгалтерское бюро, предлагающее онлайн-обслуживание по всей Польше. Бухгалтерия ИП и компаний, регистрация фирм, восстановление бухгалтерии, кадры и зарплаты, доверенный профиль и помощь в релокации бизнеса в Польшу. Обслуживание на русском, польском и английском языках.',
         tags: ['accounting', 'business-registration', 'foreigners', 'documents'],
+        image: 'ark.png',
         languages: ['pl', 'ru', 'en'],
         socials: { instagram: 'https://www.instagram.com/ark_biuro_rachunkowe/', facebook: 'https://www.facebook.com/ARK.Biuro.Rachunkowe', youtube: 'https://www.youtube.com/@ARK_Biuro_Rachunkowe' },
         webpage: 'https://biuro-ark.pl/',
@@ -3433,6 +3452,7 @@ async function mainSeed() {
         enDesc: 'Accounting office in Warsaw\'s Praga Południe district. Full bookkeeping, payroll services, tax and financial consulting, audits and specialized accounting for foreigners – tax settlements and business registration.',
         ruDesc: 'Бухгалтерское бюро на варшавской Праге Полудне. Полная бухгалтерия, кадрово-зарплатное обслуживание, налоговое и финансовое консультирование, аудиты и специализированная бухгалтерия для иностранцев – налоговые расчёты и регистрация деятельности.',
         tags: ['accounting', 'tax', 'foreigners', 'documents'],
+        image: 'amsalvia.png',
         languages: ['pl'],
         socials: { facebook: 'https://www.facebook.com/amsalviaksiegowosc', instagram: 'https://www.instagram.com/amsalvia_podatki_ksiegowosc/', linkedin: 'https://pl.linkedin.com/company/amsalvia-sp-z-o-o' },
         webpage: 'https://amsalvia.pl/ksiegowosc-dla-cudzoziemcow/',
@@ -3464,6 +3484,39 @@ async function mainSeed() {
         webpage: 'https://fotodokarty.com.pl/',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true },
+        ],
+    });
+
+    // 79. Kancelaria konsultingowa Abramczyk & Partnerzy
+    //
+    // Zasieg `online` jest stanem TYMCZASOWYM, nie opisem firmy: kancelaria ma
+    // biuro na Mlocinach, ale wlasnie przenosi siedzibe, wiec nie mamy adresu,
+    // ktory dalby uczciwy pin. Zamiast wskazywac miejsce, ktore niedlugo bedzie
+    // puste, wpis zyje w sekcji uslug zdalnych i jest widoczny w kazdym
+    // wojewodztwie. Po przeprowadzce: zmien na `hybrid` i dodaj street +
+    // wspolrzedne (walidacja w dashboardzie i tak wymusi wtedy wspolrzedne).
+    //
+    // Opis ukrainski uzywa terminologii z ich wlasnej wersji jezykowej
+    // (kancelaria-ap.pl/uk/home-ukr), nie tlumaczenia maszynowego.
+    await seedService({
+        name: 'Kancelaria konsultingowa Abramczyk & Partnerzy',
+        slug: 'kancelaria-ap',
+        category: 'financial',
+        coverage: 'online',
+        image: 'SYGNET_SM.png',
+        ukName: 'Консалтингова канцелярія Abramczyk & Partnerzy',
+        enName: 'Abramczyk & Partnerzy Consulting Office',
+        ruName: 'Консалтинговая канцелярия Abramczyk & Partnerzy',
+        plDesc: 'Kompleksowe wsparcie w prowadzeniu i rozwoju biznesu w Polsce — księgowość, podatki, prawo, kadry, rejestracja firm i biuro wirtualne. Obsługa w języku polskim i ukraińskim.',
+        ukDesc: 'Комплексна підтримка у веденні та розвитку бізнесу в Польщі — бухгалтерський облік, податки, право, кадри та заробітна плата, реєстрація фірм і віртуальний офіс. Консалтинг бухгалтерський, податковий та юридичний. Обслуговування польською та українською мовами.',
+        enDesc: 'Comprehensive support for running and growing a business in Poland — accounting, taxes, law, HR and payroll, company registration and virtual office. Service in Polish and Ukrainian.',
+        ruDesc: 'Комплексная поддержка в ведении и развитии бизнеса в Польше — бухгалтерия, налоги, право, кадры и заработная плата, регистрация фирм и виртуальный офис. Обслуживание на польском и украинском языках.',
+        tags: ['accounting', 'tax', 'legal', 'business-registration', 'documents', 'hr', 'consulting'],
+        languages: ['pl', 'uk'],
+        socials: { facebook: 'https://www.facebook.com/abramczykpartnerzy/' },
+        webpage: 'https://kancelaria-ap.pl/',
+        locations: [
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true, phoneNumber: '+48 794 600 407' },
         ],
     });
 
