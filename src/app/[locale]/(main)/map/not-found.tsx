@@ -1,87 +1,64 @@
-// pages/404.js
-import Link from 'next/link'
-import Head from 'next/head'
+'use client';
+
+import { MapPin, Search } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+
+import { Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button/button';
-// import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-// import { Button } from '../../../components/ui/button/button'
+import { serviceNameFromCapitalLetter } from '@/lib/consts';
 
-export default function Custom404() {
+/**
+ * Granica 404 dla trasy mapy.
+ *
+ * Po przeniesieniu walidacji slugu do `src/middleware.ts` bledne adresy mapy sa
+ * przekierowywane (307) zanim dotra do renderu, wiec ta strona jest osiagalna
+ * rzadko. Musi jednak byc poprawna: poprzednia wersja byla reliktem po forku
+ * `abroad-services` — pokazywala SVG Irlandii, angielski tekst "businesses
+ * across Ireland" i stopke z nazwa obcej firmy.
+ *
+ * Komponent kliencki, bo `getTranslations()` w granicy `not-found` nie ma
+ * gwarantowanego kontekstu locale; `NextIntlClientProvider` z layoutu ma.
+ */
+export default function MapNotFound() {
+    const t = useTranslations('NotFound');
+
     return (
-        <div className="flex min-h-screen flex-col bg-gray-50">
+        <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#F6F6F7] px-4 py-16 dark:bg-gray-900">
+            <div className="w-full max-w-md space-y-6 text-center">
+                <div className="mx-auto inline-flex size-24 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                    <MapPin className="size-12 text-green-500 dark:text-green-400" />
+                </div>
 
-            {/* Main content */}
-            <main className="flex grow flex-col items-center justify-center p-8">
-                <div className="w-full max-w-md space-y-8 text-center">
-                    <div className="relative mx-auto size-64">
-                        {/* Simplified SVG of Ireland with better proportions */}
-                        <svg
-                            viewBox="0 0 200 300"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="size-full"
+                <div className="space-y-3">
+                    <p className="text-5xl font-extrabold text-green-500 dark:text-green-400">404</p>
+                    <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                        {t('mapHeading')}
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-300">{t('mapDescription')}</p>
+                </div>
+
+                <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+                    <Link href="/map" className="w-full sm:w-auto">
+                        <Button className="w-full rounded-full bg-green-500 px-6 text-white hover:bg-green-600">
+                            <Search className="mr-2 size-4" />
+                            {t('backToMap')}
+                        </Button>
+                    </Link>
+
+                    <Link href="/" className="w-full sm:w-auto">
+                        <Button
+                            variant="outline"
+                            className="w-full rounded-full border-2 border-green-500 px-6 text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
                         >
-                            <path
-                                d="M92.5 19.3c-1.8-0.5-3.7 0.6-4.9 0.5-2.1 0.6-3.7-0.8-5.4-0.7-2.4 1.1-4.8 0-6.5 1.1-3.2 2.1-5.9 3.5-7.7 6.5-1.8 2.8-3.8 3.9-6.1 3.8-1.9 0.9-3.2 0.8-4.6-0.3-2.1-1.9-3.3-0.9-4.2 0.5-1.7 2-3.3 3.3-5.5 3.2-1.9 0.7-3.6-1.1-4.7-1.9-2.8-2.4-3.5 1.7-4.8 3.7-1.1 2.1-2.5 4-4.5 4.2-3.1 1.5-2.5 3.4-2.7 6-0.2 1.5 0.3 3.2-0.9 4.2-1.7 3-6.8 3.3-6.4 6.7-0.5 2.3-0.1 3.9 0.9 6 2.4 1.9 1.7 4.3 1.9 6.7 0.2 3.1 1.3 6.6-1.2 8.9-1.5 2.1-2.3 3.8-3 5.8-0.5 2.6-3.2 4.8-3 7.3-0.1 2.2 0.2 4.3 1.5 6.2-0.5 2.3 0.4 4.7 0.6 7.1 0.3 2.5 1.8 4.3 3.1 6.5 0 2 0.6 3.8 1.2 5.7 1.2 2.1 0.8 4.3 1.9 6.5-0.1 2.2 0 4.6 1.2 6.6 1.1 1.5 3 2.3 3.2 4.2 1 1.7 2.3 3.1 4.1 4.4 1.9 2.2 4.2 4 6.6 5.7 1.4 1.5 3.3 2.3 5 3.6 1.6 0.6 2.9 1.9 4.7 1.7 1.7 0.6 3.2-0.6 4.8-1 1.6-1 3.2-1.8 4.9-2.6 1.9-1.5 4.2-2 6.3-3 2.4-0.4 4.3-2.3 6.6-3.3 2.1-1.2 3.5-3.3 5.6-4.3 2.1-1 3.6-2.5 5.3-3.9 1.6-1.3 3.1-2.6 4.8-3.7 1.8-0.7 3.9-0.9 5.1-2.5 1.9-1.7 3.8-3.4 5.3-5.5 2.7-2.2 3.1-5.7 4.8-8.4 1.4-1.9 2.1-4.6 4.5-5.5 1.8-2.2 1.6-5.1 3.3-7.4 1.5-2.6 0.9-5.4 1.7-8.2 0.6-2.9 0.3-4.7-1.8-6.8-2.6-0.7-1.8-2.9-1.8-4.9-0.7-3.3-2.3-6.2-3.8-9.3-1.1-2.2-3.3-3.9-3.7-6.5-0.9-1.5-2.5-2.5-2.7-4.4-1.7-2.8-4.5-4.6-6.8-6.9-2.3-2.1-4.5-4.3-7.5-5.2-2.2-0.7-4.6-0.9-6.9-0.6-1 1.3-3 0.5-4.3 1-1.7-0.4-3.7 0.7-5.4 1.2z"
-                                fill="#e6f7f1"
-                                stroke="#10b981"
-                                strokeWidth="4"
-                            />
-                            {/* Northern Ireland with slightly lighter color */}
-                            <path
-                                d="M81.2 27.8c1.4-0.7 2.8-0.1 4.2-0.5 1.3-0.9 2.8-0.5 4.2-0.3 1.4-0.3 2.9-1 4.4-0.7 1.6 0.3 3.2-0.5 4.8-0.4 1.5-0.1 2.9 0.7 4.4 0.2 1.3-0.5 2.6-0.7 4-1.1 1.2-0.7 2.4-1.4 3.6-1.9 1.3-0.1 2.3 0.9 3.5 1.2 0.8 0.6 1.5 1.5 2.3 2.1 0.9 0.3 1.9-0.2 2.9-0.2 0.9-0.5 1.6-1.3 2.4-1.9 1-0.2 2 0.3 3 0.4 0.9 0.5 1.7 1.2 2.6 1.8 0.9 0.3 1.9 0.2 2.9 0.4 0.7 0.6 1.3 1.5 2 2.1 0.8 0.4 1.8 0.2 2.7 0.1 0.8-0.5 1.4-1.3 2.2-1.9 0.9-0.3 2 0.3 2.9 0.4 0.8 0.6 1.5 1.3 2.4 1.8 0.9 0.2 1.9 0.3 2.8 0.2 0.7-0.7 1.3-1.7 2.1-2.2 1-0.1 1.9 0.4 2.9 0.6 0.7 0.6 1.2 1.4 1.9 2 1 0.3 2.1 0.1 3.1 0 0.7-0.6 1.4-1.4 2.1-2 0.9-0.1 1.8 0.5 2.7 0.8 0.8 0.5 1.4 1.3 2.1 1.9 0.9 0.3 1.9 0.4 2.9 0.2 0.7-0.7 1.2-1.7 2-2.3 1-0.1 2 0.4 3 0.6 0.8 0.5 1.4 1.3 2.2 1.9 0.9 0.1 1.9 0.2 2.7-0.2 0.7-0.7 1.3-1.7 2.1-2.2 1-0.1 2 0.3 3 0.6 0.8 0.5 1.3 1.3 2.1 1.9 1 0.1 2-0.3 2.9-0.5 0.9-0.4 1.7-1 2.5-1.6 0.8-0.3 1.7 0.3 2.5 0.5-0.2 2.4-0.7 4.7-1.2 7-0.6 1.8-1.6 3.4-2.3 5.1-0.6 1.5-1.9 2.6-2.6 4-0.8 1.3-1.9 2.5-2.6 3.9-0.9 1.6-2.1 3-3.2 4.5-1 1.4-2.2 2.7-3.1 4.2-0.8 1.5-2.1 2.7-3 4.1-1.1 1.7-2.5 3.2-3.7 4.7-1 1.3-2.4 2.3-3.3 3.7-0.9 1.8-2.3 3.1-3.7 4.5-1.5 1.1-3 2.3-4.2 3.7-1.4 1.5-3 2.8-4.6 4-1.4 1-3 1.9-4.3 3-1.5 1.3-3 2.7-4.7 3.9-1.6 0.9-3.3 1.6-4.8 2.6-1.7 1.2-3.5 2.2-5.3 3.2-1.7 0.8-3.5 1.4-5.2 2.3-1.9 1.1-3.8 2.2-5.8 3.1-1.9 0.7-4 1.1-5.9 1.8-2.1 1-4.2 1.9-6.4 2.8-1.9 0.6-4 0.9-6 1.5-0.9-1.2-1.8-2.5-2.5-3.8-0.4-1-0.6-2.1-0.5-3.1 0.6-1.6 1.8-2.9 2.6-4.4 0.6-1.2 1.7-2.1 2.3-3.3 0.7-1.5 1.8-2.8 2.8-4.2 0.8-1.1 1.9-2.1 2.6-3.3 0.9-1.5 2-2.8 3.1-4.1 0.7-1 1.8-1.7 2.5-2.7 0.9-1.5 2-2.9 3.1-4.3 0.8-1 1.8-1.8 2.6-2.9 0.9-1.5 2-2.8 3-4.2 0.3-0.4 0.5-0.9 0.8-1.3-0.9 0-1.8 0.1-2.7 0-0.9-0.5-1.6-1.4-2.5-1.9-1-0.2-2.1-0.2-3.1 0-0.8 0.5-1.5 1.2-2.3 1.8-1.1 0.1-2.3-0.3-3.3-0.7-0.7-0.6-1.3-1.4-2-2-1-0.1-1.9 0.3-2.9 0.4-0.8 0.5-1.5 1.3-2.3 1.7-0.8 0.3-1.8-0.1-2.7-0.2-0.9-0.4-1.6-1.1-2.4-1.7-0.9-0.3-1.9-0.2-2.9-0.3-0.8-0.5-1.5-1.3-2.3-1.9-0.9-0.1-1.9 0.2-2.8 0.4-0.8 0.4-1.4 1.2-2.2 1.7-1 0.1-2-0.4-3-0.5-0.8-0.6-1.5-1.3-2.4-1.8-0.9-0.2-1.9-0.2-2.8 0-0.7 0.6-1.3 1.5-2.1 2-1 0.1-2-0.4-3-0.6-0.8-0.5-1.4-1.2-2.1-1.8-1-0.2-2.1-0.3-3.1 0.1-0.6 0.7-1.1 1.5-1.8 2.2-1 0.2-2.1-0.2-3.1-0.4-0.8-0.5-1.5-1.3-2.3-1.8-0.9-0.3-1.9-0.3-2.8-0.1-0.7 0.6-1.3 1.5-2 2.1-1 0.1-2-0.3-3-0.5-0.8-0.5-1.5-1.2-2.2-1.9-0.9-0.2-1.9-0.1-2.8 0.2-0.8 0.5-1.3 1.3-2 2-1 0.1-2-0.4-3-0.6-0.7-0.6-1.4-1.3-2.1-1.9-0.8-0.3-1.8 0-2.6 0.2-0.8 0.6-1.5 1.3-2.3 1.9-0.9 0.1-1.9-0.4-2.8-0.6-0.8-0.4-1.3-1.1-2-1.8 1-1.7 2.2-3.3 3.3-4.9 1.5-1.7 3.4-3 5-4.6z"
-                                fill="#f0f9f6"
-                                stroke="#10b981"
-                                strokeWidth="2"
-                                opacity="0.7"
-                            />
-
-                            {/* Question mark overlay */}
-                            <text
-                                x="100"
-                                y="160"
-                                fontSize="160"
-                                fontWeight="bold"
-                                fill="#10b981"
-                                textAnchor="middle"
-                                dominantBaseline="middle"
-                            >
-                                ?
-                            </text>
-                        </svg>
-                    </div>
-
-                    <div className="space-y-6">
-                        <h1 className="text-6xl font-extrabold text-emerald-500">404</h1>
-                        <h2 className="text-2xl font-semibold text-gray-700">Page Not Found</h2>
-
-                        {/*<Alert className="bg-emerald-50 border-emerald-200">*/}
-                        {/*    <AlertTitle className="text-emerald-700">We've lost our way</AlertTitle>*/}
-                        {/*    <AlertDescription className="text-gray-600">*/}
-                        {/*        The page you're looking for doesn't exist or has been moved.*/}
-                        {/*    </AlertDescription>*/}
-                        {/*</Alert>*/}
-
-                        <p className="text-gray-500">
-                            Let`&apos;`s get you back on track to discover businesses across Ireland.
-                        </p>
-
-                        <div className="pt-4">
-                            <Link href="/">
-                                <Button className="rounded-full bg-emerald-500 px-6 hover:bg-emerald-600">
-                                    Back to Homepage
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
+                            {t('backHome')}
+                        </Button>
+                    </Link>
                 </div>
-            </main>
+            </div>
 
-            {/* Simple footer */}
-            <footer className="border-t border-gray-200 bg-white py-4">
-                <div className="mx-auto max-w-7xl px-4 text-center text-sm text-gray-500">
-                    © {new Date().getFullYear()} Qolie. All rights reserved.
-                </div>
-            </footer>
+            <p className="mt-12 text-sm text-gray-400 dark:text-gray-500">
+                © {new Date().getFullYear()} {serviceNameFromCapitalLetter}
+            </p>
         </div>
     );
 }

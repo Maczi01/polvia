@@ -62,9 +62,6 @@
       "wielkopolskie": "Greater Poland",
       "zachodniopomorskie": "West Pomeranian"
     },
-    "DropDown": {
-      "BothIrelands": "All voivodeships"
-    },
     "searchInput": "Type name or place",
     "addYourBusiness": "Add",
     "showMap": "Map",
@@ -598,5 +595,11 @@
         }
       }
     }
+  },
+  "NotFound": {
+    "mapHeading": "We could not find this page",
+    "mapDescription": "The address you opened does not match any category or location on the map.",
+    "backToMap": "Go to the map",
+    "backHome": "Home page"
   }
 }

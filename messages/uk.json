@@ -62,9 +62,6 @@
       "wielkopolskie": "Великопольське",
       "zachodniopomorskie": "Західнопоморське"
     },
-    "DropDown": {
-      "BothIrelands": "Усі воєводства"
-    },
     "searchInput": "Введіть назву або місце",
     "addYourBusiness": "Додати",
     "showMap": "Карта",
@@ -597,5 +594,11 @@
         }
       }
     }
+  },
+  "NotFound": {
+    "mapHeading": "Ми не знайшли цю сторінку",
+    "mapDescription": "Адреса, яку ви відкрили, не відповідає жодній категорії чи локації на карті.",
+    "backToMap": "Перейти до карти",
+    "backHome": "Головна сторінка"
   }
 }
