@@ -3453,6 +3453,7 @@ async function mainSeed() {
         slug: 'fotodokarty',
         category: 'others',
         coverage: 'online',
+        image: 'fdk_square_logo_full.png',
         ukName: 'FotoDoKarty', enName: 'FotoDoKarty', ruName: 'FotoDoKarty',
         plDesc: 'Zdjecie biometryczne na karte pobytu online, bez wychodzenia z domu. Wysylasz selfie telefonem, serwis weryfikuje wymogi portalu MOS i odsyla gotowy plik JPG w ciagu ok. 20 sekund. Bez kolejek i bez fotobudki. Obsluga calej Polski.',
         ukDesc: 'Біометричне фото на карту побиту онлайн, не виходячи з дому. Надсилаєте селфі з телефону, сервіс перевіряє вимоги порталу MOS і надсилає готовий файл JPG протягом близько 20 секунд. Без черг і без фотокабіни. Обслуговування по всій Польщі.',
