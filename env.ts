@@ -13,6 +13,7 @@ export const env = createEnv({
         CLARITY_PROJECT_ID: NonEmpty,
         MY_GMAIL: NonEmpty,
         MY_GMAIL_PASSWORD: NonEmpty,
+        RESEND_API_KEY: NonEmpty,
         // Furtka awaryjna dla `db:drop` na zdalnej bazie. Ustawiana swiadomie
         // i na jedno wywolanie, nie w .env — patrz src/db/drop.ts.
         // Schemat jest przepuszczajacy CELOWO: scisle sprawdzenie ('yes') robi
@@ -33,6 +34,7 @@ export const env = createEnv({
         CLARITY_PROJECT_ID: process.env.CLARITY_PROJECT_ID,
         MY_GMAIL: process.env.MY_GMAIL,
         MY_GMAIL_PASSWORD: process.env.MY_GMAIL_PASSWORD,
+        RESEND_API_KEY: process.env.RESEND_API_KEY,
         ALLOW_REMOTE_DROP: process.env.ALLOW_REMOTE_DROP,
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     },

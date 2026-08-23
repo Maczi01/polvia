@@ -2,9 +2,10 @@
 import { MetadataRoute } from 'next';
 import { getPosts } from '@/lib/posts';
 import { CATEGORY_SLUGS, COUNTY_SLUGS, COVERAGE_ONLINE_SLUG } from '@/lib/slug-mappings';
+import { env } from '../../env';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.polvia.pl';
+    const baseUrl = env.NEXT_PUBLIC_SITE_URL;
     const currentDate = new Date().toISOString();
 
     // -------------------------------------------------------
