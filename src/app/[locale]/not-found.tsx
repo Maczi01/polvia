@@ -120,7 +120,6 @@ export default function NotFound() {
             {/*        </div>*/}
 
             {/*        <div className="mt-6 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">*/}
-            {/*            © 2025 Qolie. Wszystkie prawa zastrzeżone.*/}
             {/*        </div>*/}
             {/*    </div>*/}
             {/*</footer>*/}

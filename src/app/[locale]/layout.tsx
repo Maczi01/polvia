@@ -104,16 +104,10 @@ export default async function RootLayout({
                 "description": t('description'),
                 "url": env.NEXT_PUBLIC_SITE_URL,
                 "logo": `${env.NEXT_PUBLIC_SITE_URL}/logo/logo.svg`,
-                "areaServed": [
-                    {
-                        "@type": "Country",
-                        "name": "Ireland"
-                    },
-                    {
-                        "@type": "Country",
-                        "name": "Northern Ireland"
-                    }
-                ],
+                "areaServed": {
+                    "@type": "Country",
+                    "name": "Poland"
+                },
                 "knowsLanguage": ["pl", "en", "ru", "uk"],
                 "mainEntityOfPage": {
                     "@type": "WebPage",
