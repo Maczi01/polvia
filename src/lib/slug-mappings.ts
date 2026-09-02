@@ -20,6 +20,7 @@ export const CATEGORY_KEYS = [
     'real_estate',
     'help_support',
     'education',
+    'it',
     'others',
 ] as const;
 
@@ -61,6 +62,7 @@ export const CATEGORY_SLUGS = {
         real_estate: 'nieruchomosci',
         help_support: 'pomoc-i-wsparcie',
         education: 'edukacja',
+        it: 'it-i-komputery',
         others: 'inne',
     },
     en: {
@@ -77,6 +79,7 @@ export const CATEGORY_SLUGS = {
         real_estate: 'real-estate',
         help_support: 'help-support',
         education: 'education',
+        it: 'it-and-computers',
         others: 'others',
     },
     ru: {
@@ -93,6 +96,7 @@ export const CATEGORY_SLUGS = {
         real_estate: 'nedvizhimost',
         help_support: 'pomoshch-i-podderzhka',
         education: 'obrazovanie',
+        it: 'it-i-kompyutery',
         others: 'drugoe',
     },
     uk: {
@@ -109,6 +113,7 @@ export const CATEGORY_SLUGS = {
         real_estate: 'nerukhomist',
         help_support: 'dopomoha-ta-pidtrymka',
         education: 'osvita',
+        it: 'it-ta-kompyutery',
         others: 'inshe',
     },
 } as const;

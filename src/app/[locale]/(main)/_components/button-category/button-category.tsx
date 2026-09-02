@@ -56,6 +56,9 @@ const buttonVariants = cva(
                 mojito: 'bg-gradient-to-r from-[#1488CC] to-[#2B32B2] text-white ' +
                     'dark:from-[#1488CC] dark:to-[#2B32B2] dark:shadow-lg',
 
+                tech: 'bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] text-white ' +
+                    'dark:from-[#6366F1] dark:to-[#22D3EE] dark:shadow-lg',
+
                 removeFilter: 'bg-red-500 text-white hover:bg-red-600 ' +
                     'dark:bg-red-600 dark:hover:bg-red-500 dark:shadow-lg',
             },

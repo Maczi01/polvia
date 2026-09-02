@@ -19,6 +19,7 @@ const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     en: { src: '/icons/gb.svg', alt: 'English' },
     ru: { src: '/icons/ru.svg', alt: 'Russian' },
     uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
+    be: { src: '/icons/by.svg', alt: 'Belarusian' },
 };
 
 const FacebookIcon = ({ className }: { className?: string }) => (

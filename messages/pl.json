@@ -24,6 +24,7 @@
       "RealEstate": "Nieruchomości",
       "HelpSupport": "Pomoc i wsparcie",
       "Education": "Edukacja",
+      "IT": "IT i komputery",
       "Others": "Inne",
       "RemoveFilter": "Usuń filtry",
       "RemoveFilterMobile": "Usuń filtry kategorii",
@@ -234,6 +235,7 @@
     "RealEstate": "Nieruchomości",
     "HelpSupport": "Pomoc i wsparcie",
     "Education": "Edukacja",
+    "IT": "IT i komputery",
     "Others": "Inne",
     "RemoveFilter": "Usuń filtry",
     "Remove": "Resetuj",
@@ -251,6 +253,7 @@
       "real_estate": "Nieruchomości",
       "help_support": "Pomoc i wsparcie",
       "education": "Edukacja",
+      "it": "IT i komputery",
       "others": "Inne",
       "serviceWrapper": "logo ukraińskiej firmy",
       "fromCategory": "z kategorii ",
@@ -270,6 +273,7 @@
       "RealEstate": "Nieruchomości - ikona kategorii ukraińskich usług nieruchomości",
       "HelpSupport": "Pomoc i wsparcie - ikona kategorii ukraińskiej pomocy i wsparcia",
       "Education": "Edukacja - ikona kategorii ukraińskich szkół i edukacji",
+      "IT": "IT i komputery - ikona kategorii ukraińskich usług IT i komputerowych",
       "Others": "Inne - ikona kategorii innych ukraińskich usług"
     },
     "mapDesc": "Obraz interaktywnej mapy z lokalizacjami ukraińskich firm w Polsce. Kliknij, aby zobaczyć szczegóły."
@@ -466,6 +470,7 @@
       "RealEstate": "Nieruchomości - ikona kategorii ukraińskich usług nieruchomości",
       "HelpSupport": "Pomoc i wsparcie - ikona kategorii ukraińskiej pomocy i wsparcia",
       "Education": "Edukacja - ikona kategorii ukraińskich szkół i edukacji",
+      "IT": "IT i komputery - ikona kategorii ukraińskich usług IT i komputerowych",
       "Others": "Inne - ikona kategorii innych ukraińskich usług"
     }
   },

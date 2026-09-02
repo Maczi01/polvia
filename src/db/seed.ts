@@ -124,6 +124,11 @@ async function mainSeed() {
         { key: 'tax', pl: 'Podatki', uk: 'Податки', en: 'Tax', ru: 'Налоги' },
         { key: 'business-registration', pl: 'Rejestracja firmy', uk: 'Реєстрація фірми', en: 'Business Registration', ru: 'Регистрация фирмы' },
         { key: 'foreigners', pl: 'Cudzoziemcy', uk: 'Іноземці', en: 'Foreigners', ru: 'Иностранцы' },
+        { key: 'web-development', pl: 'Tworzenie stron', uk: 'Створення сайтів', en: 'Web Development', ru: 'Создание сайтов' },
+        { key: 'seo', pl: 'SEO', uk: 'SEO', en: 'SEO', ru: 'SEO' },
+        { key: 'ecommerce', pl: 'Sklepy internetowe', uk: 'Інтернет-магазини', en: 'Online Stores', ru: 'Интернет-магазины' },
+        { key: 'ai', pl: 'Rozwiązania AI', uk: 'AI-рішення', en: 'AI Solutions', ru: 'AI-решения' },
+        { key: 'hosting', pl: 'Hosting', uk: 'Хостинг', en: 'Hosting', ru: 'Хостинг' },
     ];
 
     for (const t of tagsToCreate) {
@@ -3517,6 +3522,46 @@ async function mainSeed() {
         webpage: 'https://kancelaria-ap.pl/',
         locations: [
             { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: {}, isMainLocation: true, phoneNumber: '+48 794 600 407' },
+        ],
+    });
+
+    // Zasieg `online`: web studio obsluguje klientow zdalnie ("dla Europy i swiata"),
+    // wiec nie dostaje pinu na mapie. Adres przy Nowogrodzkiej zapisujemy, bo jest
+    // prawdziwy i buduje zaufanie, ale bez wspolrzednych — pin sugerowalby punkt
+    // obslugi, ktorego nie deklaruja. Gdyby przyjmowali klientow na miejscu:
+    // zmien na `hybrid` i dodaj latitude/longitude.
+    await seedService({
+        name: 'IT Deweloper',
+        slug: 'it-deweloper',
+        category: 'it',
+        coverage: 'online',
+        plDesc: 'Web studio pełnego cyklu z Białegostoku. Tworzenie stron internetowych, sklepów online, portali korporacyjnych i serwisów informacyjnych dla klientów w Polsce, Europie i na świecie. SEO, integracje z księgowością i ekosystemem Google, hosting, bezpieczeństwo i rozwiązania AI.',
+        ukDesc: 'Веб-студія повного циклу з Білостока. Розробка сайтів, інтернет-магазинів, корпоративних порталів і новинних проєктів для клієнтів у Польщі, Європі та світі. SEO, інтеграції з бухгалтерією та екосистемою Google, хостинг, безпека та AI-рішення.',
+        enDesc: 'Full-cycle web studio based in Białystok. Websites, online stores, corporate portals and news projects for clients in Poland, Europe and worldwide. SEO, accounting and Google ecosystem integrations, hosting, security and AI solutions.',
+        ruDesc: 'Веб-студия полного цикла из Белостока. Разработка сайтов, интернет-магазинов, корпоративных порталов и новостных проектов для клиентов в Польше, Европе и мире. SEO, интеграции с бухгалтерией и экосистемой Google, хостинг, безопасность и AI-решения.',
+        tags: ['web-development', 'seo', 'ecommerce', 'ai', 'hosting'],
+        languages: ['pl', 'uk', 'en', 'ru', 'be'],
+        webpage: 'https://it-deweloper.pl/',
+        socials: {
+            facebook: 'https://www.facebook.com/ITdeweloper',
+            linkedin: 'https://www.linkedin.com/company/it-deweloper',
+            telegram: 'https://t.me/+48731190041',
+            whatsapp: 'https://wa.me/48731190041',
+        },
+        whatsappNumber: '+48 731 190 041',
+        locations: [
+            {
+                city: 'Białystok',
+                street: 'Nowogródzka 4A',
+                voivodeship: 'podlaskie',
+                postcode: '15-490',
+                latitude: null,
+                longitude: null,
+                openingHours: {},
+                isMainLocation: true,
+                phoneNumber: '+48 731 190 041',
+                email: 'office@it-deweloper.pl',
+            },
         ],
     });
 

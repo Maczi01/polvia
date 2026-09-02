@@ -106,7 +106,14 @@
       "WebFetch(domain:www.ifc.org)",
       "WebFetch(domain:notesfrompoland.com)",
       "WebFetch(domain:polandinsight.com)",
-      "WebFetch(domain:visitukraine.today)"
+      "WebFetch(domain:visitukraine.today)",
+      "Bash(curl -sI -L https://polvia.pl/)",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Get-CimInstance *)",
+      "PowerShell($c = Get-NetTCPConnection -LocalPort 3000 -State Listen -ErrorAction SilentlyContinue; if \\($null -eq $c\\) { \"Nothing is listening on port 3000\" } else { $c | ForEach-Object { $p = Get-CimInstance Win32_Process -Filter \"ProcessId=$\\($_.OwningProcess\\)\" -ErrorAction SilentlyContinue; [pscustomobject]@{ LocalAddress=$_.LocalAddress; PID=$_.OwningProcess; Name=$p.Name; CommandLine=$p.CommandLine } } | Format-List })",
+      "PowerShell(foreach \\($id in 34700,38596\\) { $cur = $id; $depth = 0; \"--- chain for $id ---\"; while \\($cur -and $depth -lt 5\\) { $p = Get-CimInstance Win32_Process -Filter \"ProcessId=$cur\" -ErrorAction SilentlyContinue; if \\($null -eq $p\\) { break }; \"  [$\\($p.ProcessId\\)] $\\($p.Name\\) :: $\\($p.CommandLine\\)\"; $cur = $p.ParentProcessId; $depth++ } })",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   },
   "enableAllProjectMcpServers": true,

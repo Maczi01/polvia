@@ -26,6 +26,7 @@ const CATEGORY_CONTEXTS: Record<string, string> = {
     gastronomy: 'food, restaurant, dining, cuisine, catering, beverages, cooking, nutrition',
     real_estate: 'real estate, property, housing, apartments, rental, buying, selling, mortgage',
     help_support: 'help, support, assistance, aid, charity, social services, counseling',
+    it: 'it, computers, software, website, web development, web design, seo, online store, e-commerce, hosting, ai, automation, computer repair, laptop repair, programming',
     others: 'general services, miscellaneous, various',
 };
 

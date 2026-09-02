@@ -20,6 +20,7 @@ export const categories = [
     { text: 'RealEstate', key: 'real_estate', image: '/icons/real-estate.svg', variant: 'starfall' as const },
     { text: 'HelpSupport', key: 'help_support', image: '/icons/help-support.svg', variant: 'coral' as const },
     { text: 'Education', key: 'education', image: '/icons/education.svg', variant: 'overworld' as const },
+    { text: 'IT', key: 'it', image: '/icons/it.svg', variant: 'tech' as const },
     { text: 'Others', key: 'others', image: '/icons/others.svg', variant: 'mojito' as const },
 ];
 
@@ -123,6 +124,8 @@ export const mapCategoryToBadgeColor = (category: string) => {
             return 'violet';
         case 'help_support':
             return 'coral';
+        case 'it':
+            return 'tech';
         case 'others':
             return 'others';
         case 'government':

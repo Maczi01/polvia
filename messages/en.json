@@ -24,6 +24,7 @@
       "RealEstate": "Real Estate",
       "HelpSupport": "Help & Support",
       "Education": "Education",
+      "IT": "IT & Computers",
       "Others": "Others",
       "RemoveFilter": "Clear filters",
       "RemoveFilterMobile": "Clear category filter",
@@ -234,6 +235,7 @@
     "RealEstate": "Real Estate",
     "HelpSupport": "Help & Support",
     "Education": "Education",
+    "IT": "IT & Computers",
     "Others": "Others",
     "RemoveFilter": "Clear filters",
     "Categories": {
@@ -250,6 +252,7 @@
       "real_estate": "Real Estate",
       "help_support": "Help & Support",
       "education": "Education",
+      "it": "IT & Computers",
       "others": "Others",
       "serviceWrapper": "logo of Ukrainian company",
       "fromCategory": "from category ",
@@ -269,6 +272,7 @@
       "RealEstate": "Real Estate - icon of Ukrainian real estate services",
       "HelpSupport": "Help & Support - icon of Ukrainian help and support services",
       "Education": "Education - icon of Ukrainian schools and education services",
+      "IT": "IT & Computers - icon of Ukrainian IT and computer services",
       "Others": "Others - icon of other Ukrainian services"
     },
     "mapDesc": "Image with map of Poland showing locations of Ukrainian businesses and services"
@@ -465,6 +469,7 @@
       "RealEstate": "Real Estate - Ukrainian real estate category icon",
       "HelpSupport": "Help & Support - Ukrainian help and support category icon",
       "Education": "Education - Ukrainian schools and education category icon",
+      "IT": "IT & Computers - Ukrainian IT and computer services category icon",
       "Others": "Other - Other Ukrainian services category icon"
     },
     "serviceWrapper": " logo of Ukrainian company "

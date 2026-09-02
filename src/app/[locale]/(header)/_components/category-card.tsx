@@ -36,6 +36,7 @@ const categoryCardVariants = cva(
                 oversky: 'bg-gradient-to-br from-[#3D0DAF] to-[#0998A2] text-white hover:from-[#3D0DAF]/90 hover:to-[#0998A2]/90',
                 coral: 'bg-gradient-to-br from-[#2563EB] to-[#FACC15] text-white hover:from-[#2563EB]/90 hover:to-[#FACC15]/90',
                 mojito: 'bg-gradient-to-br from-[#eb3349] to-[#f45c43] text-white hover:from-[#eb3349]/90 hover:to-[#f45c43]/90',
+                tech: 'bg-gradient-to-br from-[#4F46E5] to-[#06B6D4] text-white hover:from-[#4F46E5]/90 hover:to-[#06B6D4]/90',
                 removeFilter: 'bg-red-500 text-white hover:bg-red-600',
             },
             isSelected: {
