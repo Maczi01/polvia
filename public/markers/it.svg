@@ -1,0 +1,17 @@
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M44.4188 19.4188C44.4188 34.9681 26.865 49.3689 26.865 49.3689C25.8393 50.2104 24.1607 50.2104 23.135 49.3689C23.135 49.3689 5.58116 34.9681 5.58116 19.4188C5.58136 8.69406 14.2754 0 25 0C35.7247 0 44.4188 8.69406 44.4188 19.4188Z" fill="url(#paint0_linear_it)"/>
+<circle cx="25" cy="19" r="13.5" fill="white"/>
+<g transform="translate(25 19) scale(0.8) translate(-12 -12)">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M2 5.5A2.5 2.5 0 0 1 4.5 3h15A2.5 2.5 0 0 1 22 5.5v9a2.5 2.5 0 0 1-2.5 2.5h-15A2.5 2.5 0 0 1 2 14.5v-9Zm2.5-.5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-15Z" fill="#4F46E5"/>
+<path d="M10 17h4v2.5h3a.75.75 0 0 1 0 1.5H7a.75.75 0 0 1 0-1.5h3V17Z" fill="#4F46E5"/>
+<path d="M9.53 7.47a.75.75 0 0 1 0 1.06L8.06 10l1.47 1.47a.75.75 0 1 1-1.06 1.06l-2-2a.75.75 0 0 1 0-1.06l2-2a.75.75 0 0 1 1.06 0Z" fill="#4F46E5"/>
+<path d="M14.47 7.47a.75.75 0 0 1 1.06 0l2 2a.75.75 0 0 1 0 1.06l-2 2a.75.75 0 1 1-1.06-1.06L15.94 10l-1.47-1.47a.75.75 0 0 1 0-1.06Z" fill="#4F46E5"/>
+<path d="M13.16 6.79a.75.75 0 0 1 .55.9l-1.5 6a.75.75 0 1 1-1.46-.36l1.5-6a.75.75 0 0 1 .91-.54Z" fill="#4F46E5"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_it" x1="25" y1="0" x2="25" y2="50" gradientUnits="userSpaceOnUse">
+<stop stop-color="#4F46E5"/>
+<stop offset="1" stop-color="#0E7490"/>
+</linearGradient>
+</defs>
+</svg>

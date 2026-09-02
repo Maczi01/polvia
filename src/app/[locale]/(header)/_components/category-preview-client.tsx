@@ -27,6 +27,7 @@ type CategoryPreviewClientProps = {
             | 'oversky'
             | 'coral'
             | 'mojito'
+            | 'tech'
             | 'removeFilter'
             | null
             | undefined;

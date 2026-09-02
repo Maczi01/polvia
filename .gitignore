@@ -36,8 +36,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # .env files (can opt-in for committing if needed)
-.env
-.env.local
+# Wzorzec szeroki: waskie reguly (.env, .env.local) przepuszczaly .env.e2e / .env.correct itp.
+.env*
+!.env.example
 
 # vercel
 .vercel
@@ -52,3 +53,11 @@ next-env.d.ts
 .idea
 ./.idea
 ideas
+
+# Claude Code (lokalne / generowane)
+.claude/settings.local.json
+.claude/tsc-cache/
+.autopilot-state.json
+
+# artefakty narzedzi
+eslint-output.json

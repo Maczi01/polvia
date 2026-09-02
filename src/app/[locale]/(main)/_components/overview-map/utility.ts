@@ -27,6 +27,8 @@ export const categoryImage = (category: string) => {
             return '/markers/real-estate.svg';
         case 'help_support':
             return '/markers/help-support.svg';
+        case 'it':
+            return '/markers/it.svg';
         case 'others':
             return '/markers/others.svg';
         case 'cluster':

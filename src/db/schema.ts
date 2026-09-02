@@ -30,6 +30,7 @@ export const categoryEnum = pgEnum('category', [
     'health',
     'real_estate',
     'help_support',
+    'it',
 ]);
 
 export const voivodeshipEnum = pgEnum('voivodeship', [
@@ -117,6 +118,7 @@ export const serviceLocationsTable = pgTable('service_locations', {
         telegram?: string;
         tiktok?: string;
         facebook?: string;
+        linkedin?: string;
         youtube?: string;
         viber?: string;
         whatsapp?: string;

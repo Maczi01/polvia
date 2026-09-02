@@ -12,9 +12,10 @@ import OpenAI from 'openai';
 import { and, eq, sql, desc, gt } from 'drizzle-orm';
 import { PartialService } from '@/types';
 import { db } from '@/db';
+import { env } from '../../../../env';
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: env.OPENAI_API_KEY,
 });
 
 // Category context mapping for better embeddings
@@ -31,6 +32,7 @@ const CATEGORY_CONTEXTS = {
     real_estate: "real estate, property, housing, apartments, rental, buying, selling, mortgage, nieruchomości",
     help_support: "help, support, assistance, aid, charity, social services, counseling, pomoc, wsparcie",
     education: "education, learning, training, courses, schools, tutoring, skills development",
+    it: "it, computers, software, website, web development, web design, seo, online store, e-commerce, hosting, ai, automation, computer repair, laptop repair, programming, informatyka, komputery, strony internetowe, naprawa komputerow",
     others: "general services, miscellaneous, various, other categories"
 } as const;
 
@@ -100,18 +102,12 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        if (!process.env.OPENAI_API_KEY) {
-            return NextResponse.json(
-                { error: 'OpenAI API key not configured' },
-                { status: 500 }
-            );
-        }
+        // Obecnosc OPENAI_API_KEY gwarantuje walidacja Zod w env.ts przy starcie —
+        // osobny guard w handlerze bylby martwym kodem.
 
         const startTime = Date.now();
-        console.log(`Embedding search for: "${query}" in category: "${category || 'any'}" (excluding ${excludeIds.length} IDs)`);
 
         const contextualQuery = createContextualQuery(query.trim(), category);
-        console.log(`Contextual query: "${contextualQuery}"`);
 
         const response = await openai.embeddings.create({
             model: 'text-embedding-3-small',
@@ -255,15 +251,8 @@ export async function GET(request: NextRequest) {
             .sort((a, b) => b.boostedScore - a.boostedScore)
             .slice(0, limit);
 
+        // `executionTime` wraca w odpowiedzi (nizej), wiec liczymy je nadal.
         const executionTime = Date.now() - startTime;
-        console.log(`Embedding search completed: ${services.length} results (${executionTime}ms)`);
-
-        if (services.length > 0) {
-            console.log('Top embedding results:');
-            services.slice(0, 3).forEach((service, index) => {
-                console.log(`  ${index + 1}. ${service.name} (${service.category}) - Score: ${service.boostedScore.toFixed(4)} (base: ${service.relevanceScore.toFixed(4)})`);
-            });
-        }
 
         const finalServices = services.map(({ relevanceScore, boostedScore, ...service }) => service);
 
