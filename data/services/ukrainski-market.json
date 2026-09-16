@@ -1,0 +1,57 @@
+{
+    "name": "Ukrainski Market",
+    "category": "grocery",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Ukraiński sklep spożywczy na warszawskim Ursusie, na osiedlu Szamoty przy Herbu Oksza 6. W ofercie produkty z Ukrainy i innych krajów: salo i kiełbasy, ryby świeże, wędzone oraz suszone, pielmieni, cukierki i inne słodycze, a także piwo lane z beczki. Sklep występuje również pod ukraińską nazwą Продукти з батьківщини. Czynne od poniedziałku do soboty w godzinach 10:00–22:00, w niedziele 11:00–21:00. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Український продуктовий магазин у варшавському районі Урсус, на житловому масиві Шамоти, вулиця Herbu Oksza 6. В асортименті продукти з України та інших країн: сало й ковбаси, риба свіжа, копчена та в'ялена, пельмені, цукерки й інші солодощі, а також розливне пиво з бочки. Магазин відомий також як «Продукти з батьківщини». Працює з понеділка по суботу з 10:00 до 22:00, у неділю з 11:00 до 21:00. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Ukrainian grocery shop in Warsaw's Ursus district, on the Szamoty estate at Herbu Oksza 6. The range covers products from Ukraine and other countries: salo and sausages, fresh, smoked and dried fish, pelmeni, sweets and confectionery, plus draught beer from the keg. The shop also goes by its Ukrainian name, Продукти з батьківщини. Open Monday to Saturday 10:00–22:00 and Sunday 11:00–21:00. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Украинский продуктовый магазин в варшавском районе Урсус, в жилом квартале Шамоты, улица Herbu Oksza 6. В ассортименте продукты из Украины и других стран: сало и колбасы, рыба свежая, копчёная и вяленая, пельмени, конфеты и другие сладости, а также разливное пиво из бочки. Магазин известен также под украинским названием «Продукти з батьківщини». Работает с понедельника по субботу с 10:00 до 22:00, в воскресенье с 11:00 до 21:00. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Wędliny", "uk": "Ковбаси", "en": "Cold cuts", "ru": "Колбасы" },
+        { "pl": "Ryby", "uk": "Риба", "en": "Fish", "ru": "Рыба" },
+        { "pl": "Pielmieni", "uk": "Пельмені", "en": "Pelmeni", "ru": "Пельмени" },
+        { "pl": "Słodycze", "uk": "Солодощі", "en": "Sweets", "ru": "Сладости" },
+        { "pl": "Piwo z beczki", "uk": "Розливне пиво", "en": "Draught beer", "ru": "Разливное пиво" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Herbu Oksza 6",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-495",
+            "latitude": 52.1998093,
+            "longitude": 20.8876478,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "22:00" },
+                "tuesday": { "open": "10:00", "close": "22:00" },
+                "wednesday": { "open": "10:00", "close": "22:00" },
+                "thursday": { "open": "10:00", "close": "22:00" },
+                "friday": { "open": "10:00", "close": "22:00" },
+                "saturday": { "open": "10:00", "close": "22:00" },
+                "sunday": { "open": "11:00", "close": "21:00" }
+            },
+            "socials": {
+                "instagram": "https://www.instagram.com/_ukr_market/",
+                "tiktok": "https://www.tiktok.com/@_ukr_market"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

@@ -1,0 +1,63 @@
+{
+    "name": "Kresowe Smaki Valentyny",
+    "category": "gastronomy",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Bistro z tradycyjną kuchnią ukraińską przy ulicy Siennej 89 na warszawskim Mirowie. W karcie pierogi, naleśniki podawane o każdej porze dnia, śniadania oraz dania wegetariańskie, do tego świeżo parzona kawa i gorąca herbata. Lokal jest klimatyzowany: można zjeść na miejscu, odebrać zamówienie na wynos albo skorzystać z dostawy do domu. Płatność gotówką, kartą i zbliżeniowo. Czynne od poniedziałku do piątku w godzinach 10.00–19.00."
+        },
+        "uk": {
+            "description": "Бістро з традиційною українською кухнею на вулиці Сенній, 89, у варшавському Мірові. У меню вареники, млинці, які подають протягом усього дня, сніданки та вегетаріанські страви, а також свіжозварена кава і гарячий чай. Зал із кондиціонером: можна поїсти на місці, забрати замовлення на виніс або скористатися доставкою додому. Оплата готівкою, карткою та безконтактно. Працює з понеділка до п'ятниці, з 10.00 до 19.00."
+        },
+        "en": {
+            "description": "A bistro serving traditional Ukrainian food at Sienna 89 in Warsaw's Mirów district. The menu covers pierogi, pancakes served at any time of day, breakfasts and vegetarian dishes, alongside freshly brewed coffee and hot tea. The dining room is air-conditioned; orders can also be picked up as takeaway or sent out for home delivery. Cash, card and contactless payments accepted. Open Monday to Friday, 10.00–19.00."
+        },
+        "ru": {
+            "description": "Бистро с традиционной украинской кухней на улице Сенной, 89, в варшавском районе Мирув. В меню вареники, блины, которые подают в любое время дня, завтраки и вегетарианские блюда, а также свежесваренный кофе и горячий чай. Зал с кондиционером: можно поесть на месте, забрать заказ навынос или воспользоваться доставкой на дом. Оплата наличными, картой и бесконтактно. Работает с понедельника по пятницу, с 10.00 до 19.00."
+        }
+    },
+
+    "tags": [
+        { "pl": "Pierogi", "uk": "Вареники", "en": "Pierogi", "ru": "Вареники" },
+        { "pl": "Naleśniki", "uk": "Млинці", "en": "Pancakes", "ru": "Блины" },
+        { "pl": "Śniadania", "uk": "Сніданки", "en": "Breakfast", "ru": "Завтраки" },
+        {
+            "pl": "Dania wegetariańskie",
+            "uk": "Вегетаріанські страви",
+            "en": "Vegetarian dishes",
+            "ru": "Вегетарианские блюда"
+        },
+        { "pl": "Dostawa", "uk": "Доставка", "en": "Delivery", "ru": "Доставка" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Sienna 89",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-815",
+            "latitude": 52.2297137,
+            "longitude": 20.9915487,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "19:00" },
+                "tuesday": { "open": "10:00", "close": "19:00" },
+                "wednesday": { "open": "10:00", "close": "19:00" },
+                "thursday": { "open": "10:00", "close": "19:00" },
+                "friday": { "open": "10:00", "close": "19:00" }
+            },
+            "phoneNumber": "+48 796 820 030",
+            "email": "witoldgortat@gmail.com",
+            "webpage": "https://kresowe-smaki-valentyny-sienna89.eatbu.com",
+            "socials": {
+                "facebook": "https://www.facebook.com/pages/Kresowe-Smaki-Walentyny/157643074689529",
+                "tripadvisor": "https://www.tripadvisor.com/Restaurant_Review-g274856-d12005947-Reviews-Kresowe_Smaki_Walentyny-Warsaw_Mazovia_Province_Central_Poland.html"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

@@ -123,6 +123,8 @@ export const serviceLocationsTable = pgTable('service_locations', {
         viber?: string;
         whatsapp?: string;
         tripadvisor?: string;
+        /** Dawniej Twitter. Klucz `x`, bo taka jest dzis nazwa serwisu i domena. */
+        x?: string;
     }>(),
     whatsappNumber: varchar('whatsapp_number', { length: 20 }),
     isMainLocation: boolean('is_main_location').notNull().default(false),

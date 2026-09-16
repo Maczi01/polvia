@@ -1,0 +1,59 @@
+{
+    "name": "U Sióstr",
+    "category": "gastronomy",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Restauracja z kuchnią ukraińską w centrum Warszawy, przy ulicy Złotej 63A na Woli. W dwóch salach serwuje dania domowe: barszcz ukraiński, solankę, ręcznie lepione pierogi na słono i na słodko, pielmieni, placki ziemniaczane, gałuszki, kotlet po kijowsku, a także naleśniki i desery. W karcie jest osobna część dla dzieci. Stolik można zarezerwować; lokal obsługuje gości wyłącznie na miejscu, codziennie od 9:00 do 22:00. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Ресторан української кухні в центрі Варшави, на вулиці Злота, 63А (район Воля). У двох залах подають домашні страви: український борщ, солянку, ліплені вручну вареники — солоні й солодкі, пельмені, деруни, галушки, котлету по-київськи, а також млинці та десерти. У меню є окремий дитячий розділ. Столик можна забронювати; заклад обслуговує лише на місці, щодня з 9:00 до 22:00. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Ukrainian restaurant in central Warsaw, at Złota 63A in the Wola district. Its two dining rooms serve home-style dishes: Ukrainian borscht, solyanka, hand-made dumplings in savoury and sweet versions, pelmeni, potato pancakes, halushky and chicken Kyiv, alongside crepes and desserts. The menu has a separate children's section. Tables can be booked in advance; the restaurant serves guests on site only, daily from 9:00 to 22:00. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Ресторан украинской кухни в центре Варшавы, на улице Злота, 63А (район Воля). В двух залах подают домашние блюда: украинский борщ, солянку, вареники ручной лепки — солёные и сладкие, пельмени, драники, галушки, котлету по-киевски, а также блины и десерты. В меню есть отдельный детский раздел. Столик можно забронировать; заведение обслуживает только на месте, ежедневно с 9:00 до 22:00. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Kuchnia ukraińska", "uk": "Українська кухня", "en": "Ukrainian cuisine", "ru": "Украинская кухня" },
+        { "pl": "Pierogi", "uk": "Вареники", "en": "Dumplings", "ru": "Вареники" },
+        { "pl": "Placki ziemniaczane", "uk": "Деруни", "en": "Potato pancakes", "ru": "Драники" },
+        { "pl": "Barszcz ukraiński", "uk": "Український борщ", "en": "Ukrainian borscht", "ru": "Украинский борщ" },
+        { "pl": "Naleśniki", "uk": "Млинці", "en": "Crepes", "ru": "Блины" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Złota 63A",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-819",
+            "latitude": 52.2299882,
+            "longitude": 20.998757,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "22:00" },
+                "tuesday": { "open": "09:00", "close": "22:00" },
+                "wednesday": { "open": "09:00", "close": "22:00" },
+                "thursday": { "open": "09:00", "close": "22:00" },
+                "friday": { "open": "09:00", "close": "22:00" },
+                "saturday": { "open": "09:00", "close": "22:00" },
+                "sunday": { "open": "09:00", "close": "22:00" }
+            },
+            "phoneNumber": "+48 888 769 423",
+            "email": "usiostr@gmail.com",
+            "webpage": "https://usiostr.choiceqr.com",
+            "socials": {
+                "facebook": "https://www.facebook.com/usester/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

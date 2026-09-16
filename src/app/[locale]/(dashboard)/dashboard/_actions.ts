@@ -106,6 +106,7 @@ export type ServiceEditData = {
         youtube?: string;
         viber?: string;
         whatsapp?: string;
+        x?: string;
     };
     coverage: string;
     city: string;

@@ -58,6 +58,8 @@ export type Socials = {
     whatsapp?: string;
     tripadvisor?: string;
     linkedin?: string;
+    /** Dawniej Twitter. Klucz `x`, bo taka jest dzis nazwa serwisu i domena. */
+    x?: string;
 };
 
 export type Service = {

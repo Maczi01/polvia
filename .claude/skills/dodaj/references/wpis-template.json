@@ -1,0 +1,73 @@
+{
+    "_uwaga": "PRZYKLAD, nie szablon do wypelnienia w miejscu. Skopiuj strukture do data/services/<slug>.json, wpisz prawdziwe dane i USUN ten klucz oraz kazde pole, ktorego nie potwierdziles w zrodle. Schemat jest strict: nieznany klucz (w tym ten) to blad walidacji.",
+
+    "name": "Kancelaria Prawna Wschod",
+    "category": "law",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "kancelaria-prawna-wschod.png",
+    "languages": ["pl", "uk", "ru"],
+
+    "translations": {
+        "pl": {
+            "description": "Kancelaria prawna w Warszawie specjalizujaca sie w legalizacji pobytu i pracy cudzoziemcow: karty pobytu, zezwolenia na prace, obywatelstwo, odwolania od decyzji urzedu wojewodzkiego. Prowadzi rowniez sprawy rodzinne i gospodarcze. Konsultacje stacjonarne w biurze na Woli oraz online dla klientow z calej Polski. Obsluga po polsku, ukrainsku i rosyjsku."
+        },
+        "uk": {
+            "description": "Юридична фірма у Варшаві, що спеціалізується на легалізації перебування та роботи іноземців: карти побиту, дозволи на роботу, громадянство, оскарження рішень воєводського управління. Веде також сімейні та господарські справи. Консультації в офісі на Волі та онлайн для клієнтів з усієї Польщі. Обслуговування польською, українською та російською."
+        },
+        "en": {
+            "description": "Law firm in Warsaw specialising in residence and work legalisation for foreigners: residence cards, work permits, citizenship, and appeals against voivodeship office decisions. Also handles family and commercial cases. Consultations at the Wola office and online for clients across Poland. Service in Polish, Ukrainian and Russian."
+        },
+        "ru": {
+            "description": "Юридическая фирма в Варшаве, специализирующаяся на легализации пребывания и работы иностранцев: карты побыта, разрешения на работу, гражданство, обжалование решений воеводского управления. Ведёт также семейные и хозяйственные дела. Консультации в офисе на Воле и онлайн для клиентов со всей Польши. Обслуживание на польском, украинском и русском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Zezwolenie na prace", "uk": "Дозвіл на роботу", "en": "Work permit", "ru": "Разрешение на работу" },
+        { "pl": "Obywatelstwo", "uk": "Громадянство", "en": "Citizenship", "ru": "Гражданство" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Prosta 51",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-838",
+            "latitude": 52.2319,
+            "longitude": 20.9843,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "17:00" },
+                "tuesday": { "open": "09:00", "close": "17:00" },
+                "wednesday": { "open": "09:00", "close": "17:00" },
+                "thursday": { "open": "09:00", "close": "17:00" },
+                "friday": { "open": "09:00", "close": "15:00" }
+            },
+            "phoneNumber": "+48 22 100 20 30",
+            "email": "kontakt@przyklad.pl",
+            "webpage": "https://www.przyklad.pl",
+            "nip": "5252525252",
+            "whatsappNumber": "+48 501 502 503",
+            "socials": {
+                "facebook": "https://www.facebook.com/przyklad",
+                "instagram": "https://www.instagram.com/przyklad"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Kraków",
+            "street": "ul. Długa 12",
+            "voivodeship": "malopolskie",
+            "postcode": "31-147",
+            "latitude": 50.0704,
+            "longitude": 19.9376,
+            "openingHours": {
+                "tuesday": { "open": "10:00", "close": "16:00" },
+                "thursday": { "open": "10:00", "close": "16:00" }
+            },
+            "phoneNumber": "+48 12 100 20 30"
+        }
+    ]
+}

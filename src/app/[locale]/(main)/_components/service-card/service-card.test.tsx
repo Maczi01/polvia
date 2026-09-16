@@ -170,8 +170,49 @@ describe('<ServiceCard /> — wpis bez wspolrzednych', () => {
     });
 });
 
+describe('<ServiceCard /> — social media', () => {
+    it('renderuje link do X z nazwa dostepna i poprawnym href', () => {
+        renderCard({ socials: { x: 'https://x.com/ifiora_Warsaw' } });
+
+        const link = screen.getByRole('link', { name: 'X' });
+        expect(link).toHaveAttribute('href', 'https://x.com/ifiora_Warsaw');
+    });
+
+    it('nie renderuje sekcji social media, gdy socials jest null', () => {
+        renderCard({ socials: null });
+
+        expect(screen.queryByRole('link', { name: 'X' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Facebook' })).not.toBeInTheDocument();
+    });
+
+    // Regresja: bramka `hasSocials` wymieniala tylko facebook/instagram/tiktok,
+    // wiec wpis z samym LinkedInem albo samym X-em nie pokazywal ikony wcale.
+    it.each([
+        ['linkedin', 'LinkedIn', 'https://linkedin.com/company/ifiora'],
+        ['x', 'X', 'https://x.com/ifiora_Warsaw'],
+    ])('pokazuje %s, gdy jest jedyna siecia wpisu', (key, label, href) => {
+        renderCard({ socials: { [key]: href } });
+
+        expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', href);
+    });
+});
+
 describe('<ServiceCard /> — dostepnosc', () => {
     const warianty: Coverage[] = ['local', 'online', 'hybrid'];
+
+    it('przechodzi asercje jest-axe z wyrenderowanymi socialami', async () => {
+        const { container } = renderCard({
+            socials: {
+                facebook: 'https://facebook.com/ifiorawarsaw',
+                instagram: 'https://instagram.com/ifiora_warsaw',
+                linkedin: 'https://linkedin.com/company/ifiora',
+                x: 'https://x.com/ifiora_Warsaw',
+            },
+        });
+
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+    });
 
     for (const coverage of warianty) {
         it(`przechodzi asercje jest-axe dla zasiegu ${coverage}`, async () => {

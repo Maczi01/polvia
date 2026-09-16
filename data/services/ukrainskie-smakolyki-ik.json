@@ -1,0 +1,50 @@
+{
+    "name": "Ukraińskie Smakołyki",
+    "slug": "ukrainskie-smakolyki-ik",
+    "category": "grocery",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "smakolyki.png",
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Ukraiński sklep spożywczy w Raciborzu przy ulicy Opawskiej 21a. W ofercie wędliny: kiełbasy, serdelki, parówki, wędzone żeberka i salo, a także ryby suszone i wędzone oraz przekąski rybne. Do tego słodycze, chipsy i sucharki, a z alkoholi lwowska wódka i nalewki. O kolejnych świeżych dostawach sklep informuje na swoim profilu na Facebooku, który prowadzi po ukraińsku. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Український продуктовий магазин у Раціборжі на вулиці Опавській 21а. В асортименті ковбаси, сардельки, сосиски, копчені реберця та сало, а також сушена й копчена риба та рибні снеки. Крім того солодощі, чіпси й сухарики, з алкоголю — львівська горілка та наливки. Про кожну свіжу доставку магазин повідомляє на своїй сторінці у Facebook. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Ukrainian grocery shop in Racibórz at Opawska 21a. The range covers cured meats — sausages, frankfurters, wieners, smoked ribs and salo — along with dried and smoked fish and fish snacks. There are also sweets, crisps and rusks, plus Lviv vodka and nalewka liqueurs. The shop announces each fresh delivery on its Facebook page, which it runs in Ukrainian. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Украинский продуктовый магазин в Рациборже на улице Опавской 21а. В ассортименте колбасы, сардельки, сосиски, копчёные рёбрышки и сало, а также сушёная и копчёная рыба и рыбные снеки. Кроме того сладости, чипсы и сухарики, из алкоголя — львовская водка и наливки. О каждой свежей поставке магазин сообщает на своей странице в Facebook. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Wędliny", "uk": "Ковбаси", "en": "Cold cuts", "ru": "Колбасы" },
+        { "pl": "Ryby", "uk": "Риба", "en": "Fish", "ru": "Рыба" },
+        { "pl": "Słodycze", "uk": "Солодощі", "en": "Sweets", "ru": "Сладости" },
+        { "pl": "Alkohol", "uk": "Алкоголь", "en": "Alcohol", "ru": "Алкоголь" },
+        { "pl": "Ukraina", "uk": "Україна", "en": "Ukraine", "ru": "Украина" }
+    ],
+
+    "locations": [
+        {
+            "city": "Racibórz",
+            "street": "ul. Opawska 21a",
+            "voivodeship": "slaskie",
+            "postcode": "47-400",
+            "latitude": 50.0870845,
+            "longitude": 18.2154761,
+            "phoneNumber": "+48 663 133 770",
+            "email": "ukr.sklep@gmail.com",
+            "socials": {
+                "facebook": "https://www.facebook.com/p/Ukrai%C5%84skie-Smako%C5%82yki-ik-61560575001579/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

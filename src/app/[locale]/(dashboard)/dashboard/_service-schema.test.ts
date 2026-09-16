@@ -45,6 +45,7 @@ function buildFormData(overrides: Record<string, string | null> = {}): FormData 
         'socials.youtube': '',
         'socials.viber': '',
         'socials.whatsapp': '',
+        'socials.x': '',
     };
 
     const merged: Record<string, string | null> = { ...base, ...overrides };
@@ -185,5 +186,22 @@ describe('serviceSchema — zasieg obslugi', () => {
                 expect(result.success).toBe(true);
             }
         });
+    });
+});
+
+describe('serviceSchema — social media', () => {
+    it('przepuszcza link do X do sparsowanych danych', () => {
+        const result = parse({ 'socials.x': 'https://x.com/ifiora_Warsaw' });
+
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.socials?.x).toBe('https://x.com/ifiora_Warsaw');
+        }
+    });
+
+    it('puste pole X jest dozwolone i nie blokuje zapisu', () => {
+        const result = parse({ 'socials.x': '' });
+
+        expect(result.success).toBe(true);
     });
 });

@@ -48,6 +48,12 @@ const TikTokIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+const XIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+);
+
 type CardProps = {
     className?: string;
     index: number;
@@ -87,15 +93,19 @@ const getTodayHours = (
 
 const SocialLink = ({
     href,
+    label,
     children,
     className,
 }: {
     href: string;
+    /** Wymagany: w srodku jest samo SVG, wiec bez tego link nie ma nazwy dostepnej. */
+    label: string;
     children: React.ReactNode;
     className?: string;
 }) => (
     <Link
         href={href}
+        aria-label={label}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
@@ -360,7 +370,15 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         // wnioskowac z opisu, ze nie trzeba nikad jechac (R10).
         const servesRemotely = coverage === 'online' || coverage === 'hybrid';
 
-        const hasSocials = socials && (socials.facebook || socials.instagram || socials.tiktok);
+        // Bramka MUSI wymieniac kazda siec renderowana nizej. Wczesniej pomijala
+        // `linkedin`, wiec firma majaca wylacznie LinkedIna nie pokazywala go wcale.
+        const hasSocials =
+            socials &&
+            (socials.facebook ||
+                socials.instagram ||
+                socials.tiktok ||
+                socials.linkedin ||
+                socials.x);
 
         const actionButtonCount = [phoneNumber, whatsappLink, hasCoordinates].filter(Boolean)
             .length;
@@ -590,23 +608,28 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         {hasSocials && (
                             <div className="flex gap-3">
                                 {socials.facebook && (
-                                    <SocialLink href={socials.facebook} className="bg-[#1877F2]">
+                                    <SocialLink href={socials.facebook} label="Facebook" className="bg-[#1877F2]">
                                         <FacebookIcon />
                                     </SocialLink>
                                 )}
                                 {socials.instagram && (
-                                    <SocialLink href={socials.instagram} className="bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]">
+                                    <SocialLink href={socials.instagram} label="Instagram" className="bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]">
                                         <InstagramIcon className="text-white" />
                                     </SocialLink>
                                 )}
                                 {socials.tiktok && (
-                                    <SocialLink href={socials.tiktok} className="bg-black dark:bg-gray-900">
+                                    <SocialLink href={socials.tiktok} label="TikTok" className="bg-black dark:bg-gray-900">
                                         <TikTokIcon />
                                     </SocialLink>
                                 )}
                                 {socials?.linkedin && (
-                                    <SocialLink href={socials.linkedin} className="bg-[#0A66C2]">
+                                    <SocialLink href={socials.linkedin} label="LinkedIn" className="bg-[#0A66C2]">
                                         <LinkedInIcon />
+                                    </SocialLink>
+                                )}
+                                {socials.x && (
+                                    <SocialLink href={socials.x} label="X" className="bg-black dark:bg-gray-900">
+                                        <XIcon />
                                     </SocialLink>
                                 )}
                             </div>

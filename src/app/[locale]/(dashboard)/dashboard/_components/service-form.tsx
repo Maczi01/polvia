@@ -561,6 +561,10 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <Label htmlFor="socials.whatsapp">WhatsApp</Label>
                         <Input id="socials.whatsapp" name="socials.whatsapp" placeholder="https://wa.me/..." defaultValue={d?.socials?.whatsapp} />
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="socials.x">X</Label>
+                        <Input id="socials.x" name="socials.x" placeholder="https://x.com/..." defaultValue={d?.socials?.x} />
+                    </div>
                 </div>
             </section>
 

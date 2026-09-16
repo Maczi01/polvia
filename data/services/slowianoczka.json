@@ -1,0 +1,131 @@
+{
+    "name": "Slowianoczka",
+    "category": "grocery",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Sieć delikatesów wschodnich Slowianoczka, prowadzona przez Continental Group PI. Osiem sklepów stacjonarnych: trzy w Poznaniu, dwa w Bydgoszczy oraz po jednym w Szczecinie, Chojnicach i Wrocławiu. W ofercie wędliny i słonina, ryby wędzone na zimno, suszone i marynowane, kawior, konserwy mięsne i rybne, słodycze, zefiry, chałwa słonecznikowa, kwas chlebowy, przetwory warzywne, kasze, kawa i herbata. Sklep internetowy wysyła zamówienia do paczkomatów i kurierem InPost na terenie całej Polski. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Мережа магазинів східних делікатесів Slowianoczka, яку веде Continental Group PI. Вісім стаціонарних магазинів: три в Познані, два в Бидгощі та по одному в Щецині, Хойницях і Вроцлаві. В асортименті ковбаси й сало, риба холодного копчення, в'ялена та маринована, ікра, м'ясні та рибні консерви, солодощі, зефір, соняшникова халва, хлібний квас, овочеві консерви, крупи, кава й чай. Інтернет-магазин надсилає замовлення до поштоматів і кур'єром InPost по всій Польщі. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Slowianoczka is a chain of Eastern European delicatessens run by Continental Group PI. Eight brick-and-mortar shops: three in Poznań, two in Bydgoszcz, and one each in Szczecin, Chojnice and Wrocław. The range covers cured meats and salo, cold-smoked, dried and marinated fish, caviar, meat and fish preserves, sweets, zefir, sunflower halva, kvass, pickled vegetables, groats, coffee and tea. The online shop ships anywhere in Poland to InPost parcel lockers or by courier. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Сеть магазинов восточных деликатесов Slowianoczka, которую ведёт Continental Group PI. Восемь стационарных магазинов: три в Познани, два в Быдгоще и по одному в Щецине, Хойницах и Вроцлаве. В ассортименте колбасы и сало, рыба холодного копчения, вяленая и маринованная, икра, мясные и рыбные консервы, сладости, зефир, подсолнечная халва, хлебный квас, овощные консервы, крупы, кофе и чай. Интернет-магазин отправляет заказы в постаматы и курьером InPost по всей Польше. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Wędliny", "uk": "Ковбаси", "en": "Cold cuts", "ru": "Колбасы" },
+        { "pl": "Słodycze", "uk": "Солодощі", "en": "Sweets", "ru": "Сладости" },
+        { "pl": "Ryby", "uk": "Риба", "en": "Fish", "ru": "Рыба" },
+        { "pl": "Importowane", "uk": "Імпорт", "en": "Imported", "ru": "Импорт" },
+        { "pl": "Dostawa", "uk": "Доставка", "en": "Delivery", "ru": "Доставка" }
+    ],
+
+    "locations": [
+        {
+            "city": "Poznań",
+            "street": "ul. Dąbrowskiego 29 U4C",
+            "voivodeship": "wielkopolskie",
+            "postcode": "60-840",
+            "latitude": 52.4119988,
+            "longitude": 16.9084008,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "19:00" },
+                "tuesday": { "open": "10:00", "close": "19:00" },
+                "wednesday": { "open": "10:00", "close": "19:00" },
+                "thursday": { "open": "10:00", "close": "19:00" },
+                "friday": { "open": "10:00", "close": "16:00" },
+                "saturday": { "open": "10:00", "close": "16:00" },
+                "sunday": { "open": "10:00", "close": "16:00" }
+            },
+            "phoneNumber": "+48 690 029 891",
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl",
+            "nip": "7773358078",
+            "socials": {
+                "facebook": "https://www.facebook.com/slowianoczkapoznan/",
+                "instagram": "https://www.instagram.com/slowianoczka/"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Poznań",
+            "street": "ul. Bukowska 156",
+            "voivodeship": "wielkopolskie",
+            "postcode": "60-198",
+            "latitude": 52.4109605,
+            "longitude": 16.8613236,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Poznań",
+            "street": "rondo Solidarności 47",
+            "voivodeship": "wielkopolskie",
+            "postcode": "61-696",
+            "latitude": 52.4376018,
+            "longitude": 16.9179664,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Bydgoszcz",
+            "street": "ul. Dworcowa 19",
+            "voivodeship": "kujawsko-pomorskie",
+            "postcode": "85-010",
+            "latitude": 53.1269315,
+            "longitude": 18.0006195,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Bydgoszcz",
+            "street": "al. Wojska Polskiego 1",
+            "voivodeship": "kujawsko-pomorskie",
+            "postcode": "85-171",
+            "latitude": 53.1156865,
+            "longitude": 18.0106903,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Szczecin",
+            "street": "al. Niepodległości 28",
+            "voivodeship": "zachodniopomorskie",
+            "postcode": "70-412",
+            "latitude": 53.4272092,
+            "longitude": 14.5524557,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Chojnice",
+            "street": "ul. Gdańska 1a",
+            "voivodeship": "pomorskie",
+            "postcode": "89-600",
+            "latitude": 53.6948482,
+            "longitude": 17.5678394,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        },
+        {
+            "city": "Wrocław",
+            "street": "ul. Borowska 12",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-530",
+            "latitude": 51.094465,
+            "longitude": 17.0334071,
+            "email": "slowianoczka.sklep@gmail.com",
+            "webpage": "https://slowianoczka.pl"
+        }
+    ]
+}

@@ -49,6 +49,7 @@ export const serviceSchema = z
                 youtube: z.string().optional().or(z.literal('')),
                 viber: z.string().optional().or(z.literal('')),
                 whatsapp: z.string().optional().or(z.literal('')),
+                x: z.string().optional().or(z.literal('')),
             })
             .optional(),
         // Location
@@ -126,6 +127,7 @@ export function parseRawServiceData(formData: FormData) {
             youtube: formData.get('socials.youtube') as string,
             viber: formData.get('socials.viber') as string,
             whatsapp: formData.get('socials.whatsapp') as string,
+            x: formData.get('socials.x') as string,
         },
         city: formData.get('city') as string,
         street: formData.get('street') as string,

@@ -1,0 +1,60 @@
+{
+    "name": "IFIORA",
+    "slug": "ifiora",
+    "category": "others",
+    "coverage": "local",
+    "status": "active",
+    "verified": true,
+    "image": "ifiora.png",
+    "languages": ["pl", "ru", "en"],
+
+    "translations": {
+        "pl": {
+            "description": "Kwiaciarnia premium na warszawskim Mokotowie. Bukiety układane ręcznie, róże, flower boxy i kosze kwiatowe, kompozycje ślubne i pogrzebowe, rośliny doniczkowe oraz upominki. Dostawa na terenie całej Warszawy w 3–4 godziny, tego samego dnia przy zamówieniu potwierdzonym do 16:00. Obsługa po polsku, rosyjsku i angielsku."
+        },
+        "uk": {
+            "description": "Преміальна квіткарня у варшавському районі Мокотув. Букети ручної роботи, троянди, флаворбокси та квіткові кошики, весільні й траурні композиції, кімнатні рослини та подарунки. Доставка по всій Варшаві за 3–4 години, того ж дня за умови підтвердження замовлення до 16:00. Обслуговування польською, російською та англійською."
+        },
+        "en": {
+            "description": "Premium florist in Warsaw's Mokotów district. Hand-arranged bouquets, roses, flower boxes and baskets, wedding and funeral arrangements, potted plants and gifts. Delivery across Warsaw within 3–4 hours, same day when the order is confirmed by 4 PM. Service in Polish, Russian and English."
+        },
+        "ru": {
+            "description": "Премиальный цветочный салон в варшавском районе Мокотув. Букеты ручной сборки, розы, флаворбоксы и цветочные корзины, свадебные и траурные композиции, комнатные растения и подарки. Доставка по всей Варшаве за 3–4 часа, в день заказа при подтверждении до 16:00. Обслуживание на польском, русском и английском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Kwiaty", "uk": "Квіти", "en": "Flowers", "ru": "Цветы" },
+        { "pl": "Bukiety", "uk": "Букети", "en": "Bouquets", "ru": "Букеты" },
+        { "pl": "Prezenty", "uk": "Подарунки", "en": "Gifts", "ru": "Подарки" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "al. Polski Walczącej 30, lok. U3/A",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-712",
+            "latitude": 52.20411802595646,
+            "longitude": 21.066673125436427,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "17:00" },
+                "tuesday": { "open": "10:00", "close": "17:00" },
+                "wednesday": { "open": "10:00", "close": "17:00" },
+                "thursday": { "open": "10:00", "close": "17:00" },
+                "friday": { "open": "10:00", "close": "17:00" },
+                "saturday": { "open": "10:00", "close": "17:00" }
+            },
+            "phoneNumber": "+48 883 338 113",
+            "email": "info@ifiora.com",
+            "webpage": "https://www.ifiora.com",
+            "socials": {
+                "facebook": "https://www.facebook.com/ifiorawarsaw/",
+                "instagram": "https://www.instagram.com/ifiora_warsaw/",
+                "x": "https://x.com/ifiora_Warsaw"
+            },
+            "whatsappNumber": "+48 883 338 113",
+            "isMainLocation": true
+        }
+    ]
+}

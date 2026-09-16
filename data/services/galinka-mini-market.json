@@ -1,0 +1,79 @@
+{
+    "name": "Galinka Mini Market",
+    "category": "grocery",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Ukraiński sklep spożywczy na warszawskiej Woli, prowadzony przez Galinka Sp. z o.o. Dwa punkty: przy Kolejowej 49A i przy Kasprzaka 31. W ofercie wędliny i salo, śledzie oraz ryby wędzone i suszone, kawior, pielmieni i wareniki, nabiał, kasza gryczana, lawasz, warzywa konserwowe, zaprawy do barszczu, słodycze wschodnie, mleko kondensowane, a także kwas chlebowy, soki, wina i piwo, w tym lane z beczki. Dowóz po Warszawie przez Wolt. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Український продуктовий магазин у варшавському районі Воля, який веде Galinka Sp. z o.o. Два магазини: на вулиці Kolejowa 49A та на Kasprzaka 31. В асортименті ковбаси й сало, оселедець, копчена та в'ялена риба, ікра, пельмені й вареники, молочні продукти, гречана крупа, лаваш, овочеві консерви, заправки для борщу, східні солодощі, згущене молоко, а також хлібний квас, соки, вина й пиво, зокрема розливне. Доставка по Варшаві через Wolt. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Ukrainian grocery shop in Warsaw's Wola district, run by Galinka Sp. z o.o. Two shops: at Kolejowa 49A and at Kasprzaka 31. The range covers cured meats and salo, herring, smoked and dried fish, caviar, pelmeni and varenyky, dairy, buckwheat groats, lavash, pickled vegetables, borshch concentrates, Eastern European sweets and condensed milk, plus kvass, juices, wine and beer plus draught beer. Delivery across Warsaw via Wolt. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Украинский продуктовый магазин в варшавском районе Воля, который ведёт Galinka Sp. z o.o. Два магазина: на улице Kolejowa 49A и на Kasprzaka 31. В ассортименте колбасы и сало, сельдь, копчёная и вяленая рыба, икра, пельмени и вареники, молочные продукты, гречневая крупа, лаваш, овощные консервы, заправки для борща, восточные сладости, сгущённое молоко, а также хлебный квас, соки, вина и пиво, в том числе разливное. Доставка по Варшаве через Wolt. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Wędliny", "uk": "Ковбаси", "en": "Cold cuts", "ru": "Колбасы" },
+        { "pl": "Ryby", "uk": "Риба", "en": "Fish", "ru": "Рыба" },
+        { "pl": "Pielmieni", "uk": "Пельмені", "en": "Pelmeni", "ru": "Пельмени" },
+        { "pl": "Słodycze", "uk": "Солодощі", "en": "Sweets", "ru": "Сладости" },
+        { "pl": "Kwas chlebowy", "uk": "Хлібний квас", "en": "Kvass", "ru": "Хлебный квас" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Kolejowa 49A lok. U7",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-210",
+            "latitude": 52.2278616,
+            "longitude": 20.9837563,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "22:00" },
+                "tuesday": { "open": "10:00", "close": "22:00" },
+                "wednesday": { "open": "10:00", "close": "22:00" },
+                "thursday": { "open": "10:00", "close": "22:00" },
+                "friday": { "open": "10:00", "close": "22:00" },
+                "saturday": { "open": "10:00", "close": "22:00" },
+                "sunday": { "open": "10:00", "close": "22:00" }
+            },
+            "phoneNumber": "+48 797 040 898",
+            "socials": {
+                "instagram": "https://www.instagram.com/galinka.mini.market/",
+                "facebook": "https://www.facebook.com/p/Galinka-Mini-Market-61561033385368/"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Marcina Kasprzaka 31 lok. U9",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-234",
+            "latitude": 52.2274297,
+            "longitude": 20.954237,
+            "openingHours": {
+                "monday": { "open": "10:30", "close": "21:30" },
+                "tuesday": { "open": "10:30", "close": "21:30" },
+                "wednesday": { "open": "10:30", "close": "21:30" },
+                "thursday": { "open": "10:30", "close": "21:30" },
+                "friday": { "open": "10:30", "close": "21:30" },
+                "saturday": { "open": "10:30", "close": "21:30" },
+                "sunday": { "open": "10:30", "close": "21:30" }
+            },
+            "phoneNumber": "+48 518 805 415",
+            "socials": {
+                "instagram": "https://www.instagram.com/galinka.mini.market/"
+            }
+        }
+    ]
+}
