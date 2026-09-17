@@ -8,27 +8,14 @@ import {
     tagsTranslationsTable,
 } from '../db/schema';
 import { db } from '../db';
+import { CATEGORY_CONTEXTS, isCategory } from '../lib/category-contexts';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-const CATEGORY_CONTEXTS: Record<string, string> = {
-    transport: 'transportation, travel, vehicles, logistics, shipping, delivery, public transport, taxi, rideshare',
-    health: 'healthcare, medical, wellness, fitness, pharmacy, therapy, mental health, dental',
-    beauty: 'beauty, cosmetics, skincare, haircare, spa, wellness, aesthetics, grooming',
-    education: 'education, learning, training, courses, schools, tutoring, skills development',
-    financial: 'finance, banking, insurance, investment, accounting, loans, financial planning',
-    law: 'legal services, lawyers, attorneys, legal advice, court, litigation, contracts',
-    mechanics: 'automotive repair, machinery, technical services, maintenance, engineering',
-    renovation: 'construction, home improvement, building, repair, maintenance, contractors',
-    grocery: 'grocery, supermarket, food shopping, retail, convenience store, market',
-    gastronomy: 'food, restaurant, dining, cuisine, catering, beverages, cooking, nutrition',
-    real_estate: 'real estate, property, housing, apartments, rental, buying, selling, mortgage',
-    help_support: 'help, support, assistance, aid, charity, social services, counseling',
-    it: 'it, computers, software, website, web development, web design, seo, online store, e-commerce, hosting, ai, automation, computer repair, laptop repair, programming',
-    others: 'general services, miscellaneous, various',
-};
+// Mapa mieszka w `src/lib/category-contexts.ts` — ten sam tekst musi opisywac
+// kategorie po stronie dokumentu i po stronie zapytania w /api/services.
 
 async function generateEmbedding(text: string): Promise<number[]> {
     const response = await openai.embeddings.create({
@@ -49,8 +36,12 @@ function buildSearchableText(
         `Category: ${service.category}`,
     ];
 
-    const ctx = CATEGORY_CONTEXTS[service.category];
-    if (ctx) parts.push(`Context: ${ctx}`);
+    // `service.category` przychodzi z bazy jako `string`, wiec przed indeksowaniem
+    // mapy musi przejsc przez straznika — inaczej literowka w kolumnie cicho dawalaby
+    // dokument bez kontekstu kategorii.
+    if (isCategory(service.category)) {
+        parts.push(`Context: ${CATEGORY_CONTEXTS[service.category]}`);
+    }
 
     if (location.city) parts.push(`City: ${location.city}`);
     if (location.voivodeship) parts.push(`Voivodeship: ${location.voivodeship}`);

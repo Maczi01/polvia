@@ -7,59 +7,26 @@ import {
     servicesTagsTable,
     servicesTranslationsTable,
     tagsTranslationsTable,
+    voivodeshipEnum,
 } from '@/db/schema';
 import OpenAI from 'openai';
 import { and, eq, sql, desc, gt } from 'drizzle-orm';
 import { PartialService } from '@/types';
 import { db } from '@/db';
+import { createContextualQuery, isCategory } from '@/lib/category-contexts';
+import { RELEVANCE_FLOOR, selectRelevant } from '@/lib/search-relevance';
 import { env } from '../../../../env';
 
 const openai = new OpenAI({
     apiKey: env.OPENAI_API_KEY,
 });
 
-// Category context mapping for better embeddings
-const CATEGORY_CONTEXTS = {
-    grocery: "grocery, supermarket, food shopping, retail, convenience store, market food, restaurant, dining, cuisine, catering, grocery, beverages, cooking, nutrition",
-    transport: "transportation, travel, vehicles, logistics, shipping, delivery, public transport, taxi, rideshare, automotive services",
-    financial: "finance, banking, insurance, investment, accounting, loans, financial planning",
-    renovation: "construction, home improvement, building, repair, maintenance, contractors",
-    law: "legal services, lawyers, attorneys, legal advice, court, litigation, contracts",
-    beauty: "beauty, cosmetics, skincare, haircare, spa, wellness, aesthetics, grooming",
-    government: "government services, public administration, civic services, municipal, local government, public sector",
-    health: "healthcare, medical, wellness, fitness, pharmacy, therapy, mental health, dental",
-    mechanics: "automotive repair, machinery, technical services, maintenance, engineering",
-    real_estate: "real estate, property, housing, apartments, rental, buying, selling, mortgage, nieruchomości",
-    help_support: "help, support, assistance, aid, charity, social services, counseling, pomoc, wsparcie",
-    education: "education, learning, training, courses, schools, tutoring, skills development",
-    it: "it, computers, software, website, web development, web design, seo, online store, e-commerce, hosting, ai, automation, computer repair, laptop repair, programming, informatyka, komputery, strony internetowe, naprawa komputerow",
-    others: "general services, miscellaneous, various, other categories"
-} as const;
+type Voivodeship = (typeof voivodeshipEnum.enumValues)[number];
 
-// Relevance threshold for filtering out low-quality matches
-const RELEVANCE_THRESHOLD = 0.8;
+const VOIVODESHIPS: ReadonlySet<string> = new Set<string>(voivodeshipEnum.enumValues);
 
-function createContextualQuery(query: string, category?: string | undefined | null): string {
-    if (!category || !CATEGORY_CONTEXTS[category as keyof typeof CATEGORY_CONTEXTS]) {
-        return query;
-    }
-    const categoryContext = CATEGORY_CONTEXTS[category as keyof typeof CATEGORY_CONTEXTS];
-    return `${query} in the context of ${category}: ${categoryContext}`;
-}
-
-function calculateRelevanceBoost(service: any, query: string, category?: string | undefined | null): number {
-    let boost = 1;
-
-    if (category && service.category === category) {
-        boost += 0.3;
-    }
-
-    const queryTerms = query.toLowerCase().split(' ');
-    const serviceName = service.name.toLowerCase();
-    const matchingTerms = queryTerms.filter(term => serviceName.includes(term));
-    boost += (matchingTerms.length / queryTerms.length) * 0.2;
-
-    return boost;
+function isVoivodeship(value: string | null | undefined): value is Voivodeship {
+    return value !== null && value !== undefined && VOIVODESHIPS.has(value);
 }
 
 export async function GET(request: NextRequest) {
@@ -123,17 +90,36 @@ export async function GET(request: NextRequest) {
             whereConditions.push(sql`${servicesTable.id} NOT IN (${sql.join(excludeIds.map(id => sql`${id}`), sql`, `)})`);
         }
 
-        if (category) {
-            const validCategories = ['others', 'education', 'renovation', 'financial', 'beauty', 'grocery', 'transport', 'law', 'mechanics', 'health'] as const;
-            if (validCategories.includes(category as any)) {
-                whereConditions.push(eq(servicesTable.category, category as any));
-            }
+        // Lista dozwolonych kategorii pochodzi z `categoryEnum`, a nie z recznej
+        // tablicy. Poprzednia wersja wyliczala dziesiec z czternastu wartosci, wiec
+        // filtr po `gastronomy`, `real_estate`, `help_support` i `it` byl po cichu
+        // ignorowany — uzytkownik zawezal kategorie i dostawal wyniki ze wszystkich.
+        if (isCategory(category)) {
+            whereConditions.push(eq(servicesTable.category, category));
         }
 
-        whereConditions.push(sql`${serviceLocationsTable.embedding} IS NOT NULL`);
+        if (isVoivodeship(voivodeship)) {
+            whereConditions.push(eq(serviceLocationsTable.voivodeship, voivodeship));
+        }
 
+        // Drugi warunek liczy prog juz w SQL, zeby `DISTINCT ON` nizej pracowal na
+        // garstce wierszy, a nie na calej tabeli. Autorytatywne odsianie i tak robi
+        // `selectRelevant` — to jest zawezenie zbioru, nie druga regula.
+        whereConditions.push(
+            sql`${serviceLocationsTable.embedding} IS NOT NULL`,
+            sql`1 - (${serviceLocationsTable.embedding} <=> ${embeddingVector}::vector) >= ${RELEVANCE_FLOOR}`,
+        );
+
+        // `DISTINCT ON (services.id)` zwraca najlepiej dopasowana lokalizacje KAZDEJ
+        // firmy, po jednej. Bez tego firma z wieloma oddzialami zjadala cala liste:
+        // zapytanie o sklep zwracalo trzy razy ten sam sklep w trzech miastach zamiast
+        // trzech roznych. Powiekszenie puli tego nie zalatwia — najwieksze wpisy maja
+        // po 32 lokalizacje, wiec kazdy staly mnoznik da sie zaglodzic.
+        //
+        // Postgres wymaga, by ORDER BY zaczynal sie od wyrazenia z DISTINCT ON, wiec
+        // wiersze wracaja uporzadkowane po id; kolejnosc wynikowa ustawia `selectRelevant`.
         const results = await db
-            .select({
+            .selectDistinctOn([servicesTable.id], {
                 id: serviceLocationsTable.id,
                 serviceId: servicesTable.id,
                 slug: serviceLocationsTable.slug,
@@ -165,11 +151,11 @@ export async function GET(request: NextRequest) {
             .leftJoin(totalClicks, eq(servicesTable.id, totalClicks.serviceId))
             .where(and(...whereConditions))
             .orderBy(
+                servicesTable.id,
                 desc(sql`1 - (${serviceLocationsTable.embedding} <=> ${embeddingVector}::vector)`),
-                desc(sql`priority`),
-                desc(sql`clicks`)
-            )
-            .limit(limit * 2);
+                desc(sql`COALESCE(${activePromotions.priority}, 0)`),
+                desc(sql`COALESCE(${totalClicks.clicks}, 0)`)
+            );
 
         const serviceIds = results.map(r => r.serviceId);
 
@@ -195,7 +181,7 @@ export async function GET(request: NextRequest) {
                 .where(sql`${servicesTagsTable.serviceId} IN (${sql.join(serviceIds.map(id => sql`${id}`), sql`, `)})`)
             : [];
 
-        const services: (PartialService & { relevanceScore: number; boostedScore: number })[] = results
+        const candidates: (PartialService & { relevanceScore: number })[] = results
             .map(service => {
                 const serviceTranslations = translations.filter(t => t.serviceId === service.serviceId);
                 const preferredTranslation = serviceTranslations.find(t => t.languageCode === locale)
@@ -205,9 +191,6 @@ export async function GET(request: NextRequest) {
                     .filter(t => t.serviceId === service.serviceId && t.languageCode === locale)
                     .map(t => t.tagName)
                     .filter(Boolean);
-
-                const relevanceBoost = calculateRelevanceBoost(service, query, category);
-                const boostedScore = service.relevanceScore * relevanceBoost;
 
                 return {
                     id: service.id,
@@ -234,27 +217,21 @@ export async function GET(request: NextRequest) {
                     description: preferredTranslation?.description || null,
                     tags: serviceTags,
                     relevanceScore: service.relevanceScore,
-                    boostedScore
                 };
-            })
-            .filter(service => {
-                if (service.relevanceScore < RELEVANCE_THRESHOLD) {
-                    return false;
-                }
+            });
 
-                if (category && service.category !== category) {
-                    return service.relevanceScore > 0.85;
-                }
-
-                return true;
-            })
-            .sort((a, b) => b.boostedScore - a.boostedScore)
-            .slice(0, limit);
+        // Odsianie wynikow spoza wybranej kategorii robi juz `whereConditions` w SQL,
+        // wiec nie ma tu drugiej reguly na to samo. Poprzednia wersja miala warunek
+        // `relevanceScore > 0.85` dla innej kategorii — martwy kod przy zapytaniu
+        // z kategoria i nieosiagalny prog bez niej.
+        const services = selectRelevant(candidates, query, category, limit);
 
         // `executionTime` wraca w odpowiedzi (nizej), wiec liczymy je nadal.
         const executionTime = Date.now() - startTime;
 
-        const finalServices = services.map(({ relevanceScore, boostedScore, ...service }) => service);
+        // Wyniki punktowe sluza tylko do odsiania i ustawienia kolejnosci — na zewnatrz
+        // nie wychodza. Podkreslenie w nazwie, bo to celowo odrzucone pola.
+        const finalServices = services.map(({ relevanceScore: _score, boostedScore: _boosted, ...service }) => service);
 
         return NextResponse.json({
             success: true,
@@ -269,7 +246,7 @@ export async function GET(request: NextRequest) {
             },
             count: finalServices.length,
             executionTime,
-            relevanceThreshold: RELEVANCE_THRESHOLD,
+            relevanceThreshold: RELEVANCE_FLOOR,
             timestamp: new Date().toISOString()
         });
     } catch (error) {
