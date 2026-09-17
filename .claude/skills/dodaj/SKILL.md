@@ -152,10 +152,31 @@ npm run db:add -- data/services/<slug>.json
 npm run db:embeddings
 ```
 
-Potem sprawdz wpis w aplikacji. URL karty to `/mapa/<slug-kategorii-pl>/<slug-lokalizacji>`,
-gdzie slug kategorii bierze sie ze `src/lib/slug-mappings.ts` (np. `beauty` → `uroda`,
-`health` → `zdrowie`). Jesli dev server nie chodzi, uruchom go dopiero teraz i tylko jeden —
-rownolegly `npm run build` nadpisuje ten sam `.next` i wszystkie strony zaczynaja zwracac 500.
+Potem sprawdz wpis w aplikacji. Sciezka mapy przyjmuje **najwyzej dwa segmenty**
+(`{kategoria}/{powiat|miasto|online}`) — nie ma segmentu na wpis. Do konkretnej karty prowadzi
+query param `place`:
+
+```
+/mapa/<slug-kategorii-pl>?place=<slug-lokalizacji>
+```
+
+Slug kategorii bierze sie ze `src/lib/slug-mappings.ts` (np. `beauty` → `uroda`, `health` →
+`zdrowie`), a URL buduje `buildServiceUrl` w `src/lib/map-url-builder.ts`.
+
+**Nie weryfikuj samym kodem HTTP.** Trzeci segment (`/mapa/prawne/<slug-lokalizacji>`) nie jest
+404 — `src/middleware.ts` odbija go przez 307 na `/mapa`, wiec `curl -L` pokazuje 200 i wpis,
+ktory nigdy nie trafil do bazy, wyglada na dodany. Mierz status **bez** `-L`
+(`curl -s -o /dev/null -w '%{http_code} %{redirect_url}'`) i dodatkowo znajdz nazwe wpisu
+w HTML-u. Uwaga: `place` steruje stanem po stronie klienta, wiec lista kategorii renderuje ten
+sam SSR z nim i bez niego — grep po nazwie potwierdza, ze wpis jest w bazie i w wynikach, a nie
+ze karta sie otwiera. To ostatnie sprawdz w przegladarce.
+
+Jesli dev server nie chodzi, uruchom go dopiero teraz i tylko jeden — rownolegly `npm run build`
+nadpisuje ten sam `.next` i wszystkie strony zaczynaja zwracac 500. `TaskStop` ubija opakowanie
+`npx`, ale potrafi zostawic zywy proces Next: zanim uznasz port za wolny, sprawdz
+`Get-NetTCPConnection -State Listen -LocalPort <port>`. Drugi `next dev` na zajetym porcie
+wywala sie na `EADDRINUSE` juz po naruszeniu `.next` — wtedy stary serwer zwraca 500 i pomiary
+sa bezwartosciowe.
 
 Zglos userowi: id wpisu, slugi, URL do sprawdzenia, tagi utworzone jako nowe.
 

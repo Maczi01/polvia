@@ -1,0 +1,62 @@
+{
+    "name": "Alisa Hasiak – Tłumacz przysięgły języka ukraińskiego",
+    "slug": "alisa-hasiak",
+    "category": "law",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "hasiak.png",
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Alisa Hasiak jest tłumaczem przysięgłym języka ukraińskiego. Wykonuje pisemne tłumaczenia poświadczone: aktów urodzenia i małżeństwa, praw jazdy, świadectw szkolnych, dyplomów i suplementów, zaświadczeń o niekaralności, umów i pełnomocnictw. Tłumaczy też ustnie podczas czynności w urzędach, sądach, USC i kancelariach notarialnych — przy ślubach, podpisywaniu umów i spotkaniach biznesowych. Dokumenty wysyłasz mailem jako skan, wycenę i termin dostajesz w ciągu godziny, gotowe tłumaczenie odbierasz osobiście lub pocztą. Pracuje z Wrocławia, obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Alisa Hasiak — присяжний перекладач української мови в Польщі. Виконує письмові засвідчені переклади: свідоцтв про народження та шлюб, водійських посвідчень, шкільних атестатів, дипломів і додатків до них, довідок про несудимість, договорів і довіреностей. Перекладає також усно під час дій в установах, судах, РАЦСі та в нотаріальних конторах — на весіллях, при підписанні договорів і на ділових зустрічах. Документи надсилаєте на пошту сканами, вартість і термін дізнаєтесь протягом години, готовий переклад отримуєте особисто або поштою. Працює з Вроцлава, обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Alisa Hasiak is a sworn translator of Ukrainian working in Poland. She does certified written translations of birth and marriage certificates, driving licences, school certificates, diplomas and their supplements, criminal record certificates, contracts and powers of attorney. She also interprets at public offices, courts, registry offices and notaries — at weddings, contract signings and business meetings. You send documents by email as scans, receive a quote and a deadline within an hour, and collect the translation in person or by post. Based in Wrocław; service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Alisa Hasiak — присяжный переводчик украинского языка в Польше. Выполняет письменные заверенные переводы: свидетельств о рождении и браке, водительских удостоверений, школьных аттестатов, дипломов и приложений к ним, справок о несудимости, договоров и доверенностей. Переводит также устно в учреждениях, судах, ЗАГСе и нотариальных конторах — на свадьбах, при подписании договоров и на деловых встречах. Документы отправляете на почту сканами, стоимость и срок узнаёте в течение часа, готовый перевод получаете лично или по почте. Работает из Вроцлава, обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        {
+            "pl": "Tłumaczenia przysięgłe",
+            "uk": "Присяжні переклади",
+            "en": "Sworn translations",
+            "ru": "Присяжные переводы"
+        },
+        {
+            "pl": "Tłumaczenia ustne",
+            "uk": "Усні переклади",
+            "en": "Interpreting",
+            "ru": "Устные переводы"
+        },
+        {
+            "pl": "Język ukraiński",
+            "uk": "Українська мова",
+            "en": "Ukrainian language",
+            "ru": "Украинский язык"
+        },
+        { "pl": "Dokumenty", "uk": "Документи", "en": "Documents", "ru": "Документы" }
+    ],
+
+    "locations": [
+        {
+            "city": "Wrocław",
+            "voivodeship": "dolnoslaskie",
+            "phoneNumber": "+48 575 233 504",
+            "email": "tlumacz.alisahasiak@gmail.com",
+            "webpage": "https://alisahasiak.pl",
+            "socials": {
+                "instagram": "https://www.instagram.com/ukr.tlumacz/",
+                "facebook": "https://www.facebook.com/profile.php?id=61578208707605"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
