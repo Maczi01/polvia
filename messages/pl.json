@@ -148,6 +148,9 @@
     "call": "Zadzwoń",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
+    "copyEmail": "Kopiuj adres e-mail",
+    "emailCopied": "Mail skopiowany",
+    "emailCopyFailed": "Nie udało się skopiować",
     "languages": "Mówimy:",
     "coverage_online": "Online — cała Polska"
   },

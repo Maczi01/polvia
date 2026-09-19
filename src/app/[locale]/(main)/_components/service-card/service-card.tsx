@@ -13,6 +13,7 @@ import { Clock, Globe, Mail, MapPin, Phone, MessageCircle, Navigation, Send } fr
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
+import { CopyEmailButton } from '@/app/[locale]/(main)/_components/copy-email-button/copy-email-button';
 
 /**
  * Siatka przyciskow akcji wedlug ich liczby. Cztery przyciski wracaja do dwoch
@@ -587,16 +588,19 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
                                 {/* Email */}
                                 {email && (
-                                    <a
-                                        href={`mailto:${email}`}
-                                        className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
-                                        onClick={e => e.stopPropagation()}
-                                    >
-                                        <Mail size={16} className="shrink-0 text-gray-400" />
-                                        <span className="break-all text-gray-700 dark:text-gray-300">
-                                            {email}
-                                        </span>
-                                    </a>
+                                    <div className="flex items-center gap-1.5 text-sm">
+                                        <a
+                                            href={`mailto:${email}`}
+                                            className="flex min-w-0 items-center gap-2.5 transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+                                            onClick={e => e.stopPropagation()}
+                                        >
+                                            <Mail size={16} className="shrink-0 text-gray-400" />
+                                            <span className="break-all text-gray-700 dark:text-gray-300">
+                                                {email}
+                                            </span>
+                                        </a>
+                                        <CopyEmailButton email={email} />
+                                    </div>
                                 )}
                             </div>
 

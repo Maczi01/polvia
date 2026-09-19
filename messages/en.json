@@ -147,6 +147,9 @@
     "call": "Call",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
+    "copyEmail": "Copy email address",
+    "emailCopied": "Email copied",
+    "emailCopyFailed": "Could not copy",
     "languages": "We speak:",
     "coverage_online": "Online — all of Poland"
   },

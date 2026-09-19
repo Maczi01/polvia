@@ -147,6 +147,9 @@
     "call": "Позвонить",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
+    "copyEmail": "Скопировать адрес эл. почты",
+    "emailCopied": "Почта скопирована",
+    "emailCopyFailed": "Не удалось скопировать",
     "languages": "Говорим:",
     "coverage_online": "Онлайн — вся Польша"
   },
