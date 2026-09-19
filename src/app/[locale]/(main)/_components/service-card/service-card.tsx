@@ -9,10 +9,22 @@ import Link from 'next/link';
 import { cn } from '@/lib/utilities';
 import { Button } from '@/components/ui/button/button';
 import { mapCategoryToBadgeColor, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
-import { Clock, Globe, MapPin, Phone, MessageCircle, Navigation } from 'lucide-react';
+import { Clock, Globe, Mail, MapPin, Phone, MessageCircle, Navigation, Send } from 'lucide-react';
 import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
+
+/**
+ * Siatka przyciskow akcji wedlug ich liczby. Cztery przyciski wracaja do dwoch
+ * kolumn (uklad 2x2), bo karta stoi w waskiej liscie przy mapie — cztery kolumny
+ * scisnelyby etykiety do nieczytelnych skrotow.
+ */
+const ACTION_GRID_COLUMNS: Record<number, string> = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-2',
+};
 
 const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     pl: { src: '/icons/pl.svg', alt: 'Polish' },
@@ -380,8 +392,18 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 socials.linkedin ||
                 socials.x);
 
-        const actionButtonCount = [phoneNumber, whatsappLink, hasCoordinates].filter(Boolean)
-            .length;
+        // Telegram nie jest tu ikona obok Facebooka, tylko przyciskiem akcji obok
+        // WhatsAppa — dla czesci wpisow (np. firm bez biura w Polsce) to glowny,
+        // a czasem jedyny kanal kontaktu. Tak samo potraktowany jest WhatsApp,
+        // ktorego rowniez nie ma w rzedzie ikon.
+        const telegramLink = socials?.telegram ?? null;
+
+        const actionButtonCount = [
+            phoneNumber,
+            whatsappLink,
+            telegramLink,
+            hasCoordinates,
+        ].filter(Boolean).length;
 
         return (
             <Card
@@ -562,6 +584,20 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                         </span>
                                     </Link>
                                 )}
+
+                                {/* Email */}
+                                {email && (
+                                    <a
+                                        href={`mailto:${email}`}
+                                        className="flex items-center gap-2.5 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100"
+                                        onClick={e => e.stopPropagation()}
+                                    >
+                                        <Mail size={16} className="shrink-0 text-gray-400" />
+                                        <span className="break-all text-gray-700 dark:text-gray-300">
+                                            {email}
+                                        </span>
+                                    </a>
+                                )}
                             </div>
 
                             {/* Languages - top right */}
@@ -639,11 +675,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         <div
                             className={cn(
                                 'grid gap-2 pt-2',
-                                actionButtonCount === 3
-                                    ? 'grid-cols-3'
-                                    : actionButtonCount === 2
-                                      ? 'grid-cols-2'
-                                      : 'grid-cols-1',
+                                ACTION_GRID_COLUMNS[actionButtonCount] ?? 'grid-cols-1',
                             )}
                         >
                             {phoneNumber && (
@@ -676,6 +708,24 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                     >
                                         <MessageCircle size={18} />
                                         {t('whatsapp')}
+                                    </button>
+                                </Link>
+                            )}
+
+                            {telegramLink && (
+                                <Link
+                                    href={telegramLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={e => e.stopPropagation()}
+                                    className="block"
+                                >
+                                    <button
+                                        type="button"
+                                        className="flex w-full items-center justify-center gap-2 rounded-full border border-[#229ed9] bg-[#eff9fd] px-3 py-2.5 text-sm font-medium text-[#1b7fad] transition-colors hover:bg-[#d7eefa] dark:border-[#1b7fad] dark:bg-[#082f3f]/20 dark:text-[#5ec3e8] dark:hover:bg-[#082f3f]/40"
+                                    >
+                                        <Send size={18} />
+                                        {t('telegram')}
                                     </button>
                                 </Link>
                             )}

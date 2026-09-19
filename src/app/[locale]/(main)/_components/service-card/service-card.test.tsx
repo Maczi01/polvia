@@ -195,6 +195,75 @@ describe('<ServiceCard /> — social media', () => {
 
         expect(screen.getByRole('link', { name: label })).toHaveAttribute('href', href);
     });
+
+    // Telegram nie nalezy do rzedu ikon — jest kanalem kontaktu, wiec siedzi
+    // w przyciskach akcji obok WhatsAppa. Ten sam wybor co dla WhatsAppa,
+    // ktorego tez nie ma wsrod ikon.
+    it('nie renderuje Telegrama jako ikony social media', () => {
+        const { container } = renderCard({ socials: { telegram: 'https://t.me/workupeu' } });
+
+        expect(container.querySelector('a[aria-label="Telegram"]')).not.toBeInTheDocument();
+    });
+});
+
+describe('<ServiceCard /> — dane kontaktowe', () => {
+    it('renderuje adres e-mail jako link mailto', () => {
+        renderCard({ email: 'work-up@ukr.net' });
+
+        expect(screen.getByRole('link', { name: 'work-up@ukr.net' })).toHaveAttribute(
+            'href',
+            'mailto:work-up@ukr.net',
+        );
+    });
+
+    it('nie renderuje wiersza e-mail, gdy wpis go nie ma', () => {
+        const { container } = renderCard({ email: null });
+
+        expect(container.querySelector('a[href^="mailto:"]')).not.toBeInTheDocument();
+    });
+
+    it('przechodzi asercje jest-axe z pelnym blokiem kontaktowym', async () => {
+        const { container } = renderCard({
+            phoneNumber: '+380 67 895 31 05',
+            email: 'work-up@ukr.net',
+            webpage: 'https://workup.com.ua',
+        });
+
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+    });
+});
+
+describe('<ServiceCard /> — przyciski akcji', () => {
+    it('renderuje przycisk Telegram z linkiem z socials', () => {
+        renderCard({ socials: { telegram: 'https://t.me/workupeu' } });
+
+        expect(screen.getByRole('button', { name: 'telegram' })).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'telegram' })).toHaveAttribute(
+            'href',
+            'https://t.me/workupeu',
+        );
+    });
+
+    // Telegram jest czwartym przyciskiem w rzedzie, ktory wczesniej mial najwyzej
+    // trzy. Asercja pilnuje, ze zaden z pozostalych nie wypadl przy zmianie siatki.
+    it('renderuje wszystkie cztery akcje naraz', () => {
+        renderCard({
+            phoneNumber: '+48 22 100 20 30',
+            whatsappNumber: '+48 501 502 503',
+            socials: { telegram: 'https://t.me/workupeu' },
+        });
+
+        for (const label of ['call', 'whatsapp', 'telegram', 'navigate']) {
+            expect(screen.getByRole('button', { name: label })).toBeInTheDocument();
+        }
+    });
+
+    it('nie renderuje przycisku Telegram, gdy wpis nie ma linku', () => {
+        renderCard({ socials: { facebook: 'https://facebook.com/ifiorawarsaw' } });
+
+        expect(screen.queryByRole('button', { name: 'telegram' })).not.toBeInTheDocument();
+    });
 });
 
 describe('<ServiceCard /> — dostepnosc', () => {
@@ -207,6 +276,7 @@ describe('<ServiceCard /> — dostepnosc', () => {
                 instagram: 'https://instagram.com/ifiora_warsaw',
                 linkedin: 'https://linkedin.com/company/ifiora',
                 x: 'https://x.com/ifiora_Warsaw',
+                telegram: 'https://t.me/workupeu',
             },
         });
 
