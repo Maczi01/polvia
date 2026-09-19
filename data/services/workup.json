@@ -1,0 +1,53 @@
+{
+    "name": "WorkUp",
+    "category": "help_support",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": ["uk", "ru", "en", "pl"],
+
+    "translations": {
+        "pl": {
+            "description": "WorkUp to ukraiński serwis pośrednictwa pracy, który pomaga Ukraińcom znaleźć oficjalne zatrudnienie w Polsce, Niemczech, Czechach, Niderlandach, na Litwie i w innych krajach Europy. Dobiera wakaty w magazynach, na produkcji, w logistyce, budownictwie, agrosektorze i usługach, objaśnia warunki oferty i pomaga przygotować dokumenty. Wspiera też pracodawców w rekrutacji pracowników z Ukrainy. Obsługa wyłącznie zdalna — firma ma siedzibę w Kijowie i nie prowadzi biura obsługi w Polsce. Kontakt po ukraińsku, rosyjsku, angielsku i polsku."
+        },
+        "uk": {
+            "description": "WorkUp — український сервіс працевлаштування, який допомагає українцям знайти офіційну роботу в Польщі, Німеччині, Чехії, Нідерландах, Литві та інших країнах Європи. Підбирає вакансії на складах, виробництві, у логістиці, будівництві, агросекторі та сфері сервісу, пояснює умови пропозиції та допомагає підготувати документи. Також супроводжує роботодавців у наборі працівників з України. Обслуговування лише дистанційне — компанія зареєстрована в Києві й не має офісу обслуговування в Польщі. Спілкування українською, російською, англійською та польською."
+        },
+        "en": {
+            "description": "WorkUp is a Ukrainian job placement service helping Ukrainians find official employment in Poland, Germany, Czechia, the Netherlands, Lithuania and other European countries. It matches candidates with vacancies in warehousing, manufacturing, logistics, construction, agriculture and the service sector, explains the terms of each offer and helps prepare the paperwork. It also supports employers recruiting staff from Ukraine. Service is remote only — the company is based in Kyiv and has no walk-in office in Poland. Contact in Ukrainian, Russian, English and Polish."
+        },
+        "ru": {
+            "description": "WorkUp — украинский сервис трудоустройства, который помогает украинцам найти официальную работу в Польше, Германии, Чехии, Нидерландах, Литве и других странах Европы. Подбирает вакансии на складах, производстве, в логистике, строительстве, агросекторе и сфере сервиса, объясняет условия предложения и помогает подготовить документы. Также сопровождает работодателей при наборе сотрудников из Украины. Обслуживание только дистанционное — компания зарегистрирована в Киеве и не имеет офиса обслуживания в Польше. Общение на украинском, русском, английском и польском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Oferty pracy", "uk": "Вакансії", "en": "Job offers", "ru": "Вакансии" },
+        {
+            "pl": "Praca za granicą",
+            "uk": "Робота за кордоном",
+            "en": "Work abroad",
+            "ru": "Работа за границей"
+        },
+        { "pl": "Rekrutacja", "uk": "Рекрутинг", "en": "Recruitment", "ru": "Рекрутинг" },
+        { "pl": "Dokumenty", "uk": "Документи", "en": "Documents", "ru": "Документы" },
+        { "pl": "Pracodawcy", "uk": "Роботодавці", "en": "Employers", "ru": "Работодатели" }
+    ],
+
+    "locations": [
+        {
+            "city": "Kijów",
+            "street": "bul. Łesi Ukrainki 34",
+            "phoneNumber": "+380 67 895 31 05",
+            "email": "work-up@ukr.net",
+            "webpage": "https://workup.com.ua",
+            "socials": {
+                "telegram": "https://t.me/workupeu",
+                "instagram": "https://www.instagram.com/workup_2026/",
+                "tiktok": "https://www.tiktok.com/@workupeu"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
