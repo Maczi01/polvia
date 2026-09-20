@@ -5,7 +5,9 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useCallback, type ReactElement } from 'react';
 
+import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
+import { mapCategoryToBadgeColor } from '@/lib/consts';
 import { cn } from '@/lib/utilities';
 import type { PartialService } from '@/types';
 
@@ -38,6 +40,11 @@ export function ServiceGroupCard({
     const logo = services.find(service => service.image)?.image;
     const logoSrc = logo ? `/services/${logo.trimEnd()}` : '/default.png';
 
+    // Nazwa, opis, tagi i kategoria sa cechami FIRMY — kazdy czlonek grupy niesie
+    // te same wartosci, wiec bierzemy je z pierwszego, ktory je ma.
+    const tags = services.find(service => service.tags?.length)?.tags ?? [];
+    const badgeColor = mapCategoryToBadgeColor(services[0]?.category ?? '');
+
     const handleMouseEnter = useCallback(() => onHover(serviceIds), [onHover, serviceIds]);
     const handleMouseLeave = useCallback(() => onHover(null), [onHover]);
 
@@ -62,16 +69,16 @@ export function ServiceGroupCard({
                 <Image
                     src={logoSrc}
                     alt=""
-                    width={44}
-                    height={44}
-                    className="size-11 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 object-cover dark:border-gray-600"
+                    width={56}
+                    height={56}
+                    className="size-14 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 object-cover dark:border-gray-600"
                 />
 
                 <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold text-gray-900 dark:text-gray-100">
                         {name}
                     </span>
-                    <span className="mt-0.5 flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
+                    <span className="mt-0.5 flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300">
                         <MapPin size={14} className="shrink-0" />
                         {/*
                          * Liczby pochodza z `services` i `cities`, czyli z lokalizacji
@@ -83,6 +90,19 @@ export function ServiceGroupCard({
                             cities: cities.length,
                         })}
                     </span>
+
+                    {tags.length > 0 && (
+                        <span className="mt-2 flex flex-wrap gap-1.5">
+                            {tags.slice(0, 3).map((tag, index) => (
+                                <Badge
+                                    key={index}
+                                    label={tag?.toString() || ''}
+                                    color="gray"
+                                    variant={badgeColor}
+                                />
+                            ))}
+                        </span>
+                    )}
                 </span>
 
                 <ChevronDown

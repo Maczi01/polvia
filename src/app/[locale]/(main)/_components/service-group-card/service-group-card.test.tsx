@@ -141,6 +141,38 @@ describe('<ServiceGroupCard />', () => {
         );
     });
 
+    /**
+     * Firma z wieloma punktami dostawala SLABSZA karte niz jednopunktowa: mniejsze
+     * logo i zero tagow. Zasieg to atut, wiec karta grupy ma byc co najmniej tak
+     * mocna jak zwykla — te same 56 px logo i ta sama liczba tagow.
+     */
+    it('pokazuje tagi firmy', () => {
+        renderCard({
+            services: MEMBERS.map(
+                m => ({ ...m, tags: ['Produkty', 'Wedliny', 'Slodycze'] }) as PartialService,
+            ),
+        });
+
+        expect(screen.getByText('Produkty')).toBeInTheDocument();
+        expect(screen.getByText('Wedliny')).toBeInTheDocument();
+    });
+
+    it('ogranicza tagi do trzech, tak jak zwykla karta', () => {
+        renderCard({
+            services: MEMBERS.map(
+                m => ({ ...m, tags: ['A', 'B', 'C', 'D', 'E'] }) as PartialService,
+            ),
+        });
+
+        expect(screen.queryByText('D')).not.toBeInTheDocument();
+    });
+
+    it('ma logo tej samej wielkosci co zwykla karta', () => {
+        const { container } = renderCard();
+
+        expect(container.querySelector('img')).toHaveAttribute('width', '56');
+    });
+
     it('przechodzi asercje jest-axe', async () => {
         const { container } = renderCard();
 
