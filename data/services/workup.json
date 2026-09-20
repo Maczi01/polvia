@@ -4,7 +4,7 @@
     "coverage": "online",
     "status": "active",
     "verified": false,
-    "image": null,
+    "image": "workup.png",
     "languages": ["uk", "ru", "en", "pl"],
 
     "translations": {
