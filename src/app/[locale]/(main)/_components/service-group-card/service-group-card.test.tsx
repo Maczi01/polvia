@@ -113,6 +113,34 @@ describe('<ServiceGroupCard />', () => {
         expect(onHover).toHaveBeenLastCalledWith(null);
     });
 
+    /**
+     * Zwinieta grupa stoi w liscie obok zwyklych kart, ktore pokazuja logo firmy.
+     * Ikona zastepcza wyrozniala ja wizualnie bez powodu — logo jest na poziomie
+     * firmy, wiec wystarczy wziac je z dowolnej lokalizacji grupy.
+     */
+    // Zapytanie po elemencie, nie po roli: logo ma `alt=""`, bo nazwa firmy stoi
+    // tuz obok i czytnik ekranu nie powinien czytac jej dwa razy. Obrazek jest
+    // wiec swiadomie dekoracyjny i roli `img` nie ma.
+    it('pokazuje logo firmy, gdy wpis je ma', () => {
+        const { container } = renderCard({
+            services: MEMBERS.map(m => ({ ...m, image: 'best-market.png' }) as PartialService),
+        });
+
+        expect(container.querySelector('img')).toHaveAttribute(
+            'src',
+            expect.stringContaining('best-market.png'),
+        );
+    });
+
+    it('spada na obrazek domyslny, gdy firma nie ma logo', () => {
+        const { container } = renderCard();
+
+        expect(container.querySelector('img')).toHaveAttribute(
+            'src',
+            expect.stringContaining('default.png'),
+        );
+    });
+
     it('przechodzi asercje jest-axe', async () => {
         const { container } = renderCard();
 

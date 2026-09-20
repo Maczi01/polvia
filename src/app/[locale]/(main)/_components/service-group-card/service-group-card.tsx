@@ -1,6 +1,7 @@
 'use client';
 
-import { ChevronDown, MapPin, Store } from 'lucide-react';
+import { ChevronDown, MapPin } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { useCallback, type ReactElement } from 'react';
 
@@ -31,6 +32,12 @@ export function ServiceGroupCard({
 
     const serviceIds = services.map(service => service.id);
 
+    // Logo jest cecha FIRMY, nie oddzialu, wiec dowolny czlonek grupy je niesie.
+    // Ta sama konstrukcja sciezki i ten sam fallback co w `service-card.tsx` —
+    // zwinieta grupa stoi w liscie obok zwyklych kart i ma wygladac jak one.
+    const logo = services.find(service => service.image)?.image;
+    const logoSrc = logo ? `/services/${logo.trimEnd()}` : '/default.png';
+
     const handleMouseEnter = useCallback(() => onHover(serviceIds), [onHover, serviceIds]);
     const handleMouseLeave = useCallback(() => onHover(null), [onHover]);
 
@@ -52,9 +59,13 @@ export function ServiceGroupCard({
                 aria-expanded={isExpanded}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-green-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:hover:bg-green-900/10"
             >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300">
-                    <Store size={18} />
-                </span>
+                <Image
+                    src={logoSrc}
+                    alt=""
+                    width={44}
+                    height={44}
+                    className="size-11 shrink-0 overflow-hidden rounded-full border-2 border-gray-200 object-cover dark:border-gray-600"
+                />
 
                 <span className="min-w-0 flex-1">
                     <span className="block truncate font-semibold text-gray-900 dark:text-gray-100">
