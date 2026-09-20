@@ -1,0 +1,47 @@
+{
+    "name": "Slovguide",
+    "category": "help_support",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "slovguide.png",
+    "languages": ["uk", "ru"],
+
+    "translations": {
+        "pl": {
+            "description": "Slovguide to internetowy przewodnik o życiu na Słowacji, prowadzony z Bratysławy i adresowany do Ukraińców: osób relokujących się, uchodźców, studentów i kupujących nieruchomości. Zbiera praktyczne poradniki o legalizacji pobytu, wynajmie i zakupie mieszkania, pracy i samozatrudnieniu, edukacji, sprawach samochodowych, finansach, medycynie i transporcie. Prowadzi też katalog specjalistów, słownik pojęć i dział aktualności. Materiały mają charakter informacyjny i nie są konsultacją prawną. Redakcja odpowiada po ukraińsku i rosyjsku, wyłącznie zdalnie."
+        },
+        "uk": {
+            "description": "Slovguide — онлайн-довідник про життя у Словаччині, який ведуть із Братислави для українців: тих, хто переїжджає, біженців, студентів і покупців нерухомості. Тут зібрані практичні гайди про легалізацію перебування, оренду та купівлю житла, роботу й підприємництво, освіту, авто, фінанси, медицину і транспорт. Є також каталог спеціалістів, словник термінів і новини. Матеріали сайту — довідкова інформація, а не юридична консультація. Редакція відповідає українською та російською, лише дистанційно."
+        },
+        "en": {
+            "description": "Slovguide is an online guide to life in Slovakia, run from Bratislava for Ukrainians: people relocating, refugees, students and property buyers. It gathers practical guides on residence legalisation, renting and buying a home, work and self-employment, education, car matters, finance, healthcare and transport. It also runs a specialist directory, a glossary of terms and a news section. The material is reference information, not legal advice. The editorial team replies in Ukrainian and Russian, remotely only."
+        },
+        "ru": {
+            "description": "Slovguide — онлайн-справочник о жизни в Словакии, который ведут из Братиславы для украинцев: тех, кто переезжает, беженцев, студентов и покупателей недвижимости. Здесь собраны практические гайды о легализации пребывания, аренде и покупке жилья, работе и предпринимательстве, образовании, авто, финансах, медицине и транспорте. Есть также каталог специалистов, словарь терминов и новости. Материалы сайта — справочная информация, а не юридическая консультация. Редакция отвечает на украинском и русском, только дистанционно."
+        }
+    },
+
+    "tags": [
+        { "pl": "Poradnik", "uk": "Довідник", "en": "Guide", "ru": "Справочник" },
+        { "pl": "Słowacja", "uk": "Словаччина", "en": "Slovakia", "ru": "Словакия" },
+        { "pl": "Relokacja", "uk": "Релокація", "en": "Relocation", "ru": "Релокация" },
+        { "pl": "Dokumenty", "uk": "Документи", "en": "Documents", "ru": "Документы" },
+        { "pl": "Cudzoziemcy", "uk": "Іноземці", "en": "Foreigners", "ru": "Иностранцы" }
+    ],
+
+    "locations": [
+        {
+            "city": "Bratysława",
+            "street": "Mlynské nivy 5",
+            "postcode": "821 09",
+            "email": "redakcia@slovguide.sk",
+            "webpage": "https://slovguide.sk",
+            "socials": {
+                "telegram": "https://t.me/slovguide",
+                "facebook": "https://www.facebook.com/profile.php?id=61591671966782"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
