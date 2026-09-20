@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { env } from '../../../../env';
 import { redis } from '@/lib/redis';
+import { getClientIp } from '@/lib/rate-limit';
 import { getTranslations } from 'next-intl/server';
 import { serviceName } from '@/lib/consts';
 
@@ -17,18 +18,6 @@ const CONTACT_RATE_LIMIT = {
     ipWindowSeconds: 24 * 60 * 60, // 24h
     emailCooldownSeconds: 6 * 60 * 60, // 6h
 };
-
-function getClientIP(request: Request): string {
-    const forwarded = request.headers.get('x-forwarded-for');
-    const realIP = request.headers.get('x-real-ip');
-    const cfConnectingIP = request.headers.get('cf-connecting-ip');
-
-    if (forwarded) {
-        return forwarded.split(',')[0].trim();
-    }
-
-    return realIP || cfConnectingIP || '127.0.0.1';
-}
 
 async function checkContactRateLimit(ip: string) {
     const ipKey = `contact_ip:${ip}`;
@@ -55,7 +44,7 @@ async function incrementContactRateLimit(ip: string) {
 export type ContactFormData = z.infer<typeof ContactFormSchema>;
 
 export async function POST(req: Request) {
-    const ip = getClientIP(req);
+    const ip = getClientIp(req);
 
     const t = await getTranslations('contact');
 

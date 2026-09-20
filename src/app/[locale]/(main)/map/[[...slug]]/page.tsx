@@ -10,6 +10,7 @@ import { parseMapSlug, extractFiltersFromQueryParams } from '@/lib/map-slug-pars
 import { buildMapUrl, stringifyMapUrl, localizeMapPath } from '@/lib/map-url-builder';
 import { redirect, notFound } from 'next/navigation';
 import { locales, type Locale } from '@/i18n/config';
+import { CATEGORY_MESSAGE_KEYS } from '@/lib/slug-mappings';
 
 type PageProps = {
     params: Promise<{ locale: string; slug?: string[] }>;
@@ -47,9 +48,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
             // Build title suffix with translations
             const parts: string[] = [];
             if (category) {
-                // Capitalize first letter of category for display
-                const categoryKey = category.charAt(0).toUpperCase() + category.slice(1);
-                parts.push(tCategories(categoryKey));
+                parts.push(tCategories(CATEGORY_MESSAGE_KEYS[category]));
             }
             // Zasieg zajmuje ten sam slot sciezki co wojewodztwo, wiec w tytule
             // stoi na tej samej pozycji: "Prawne, Online" zamiast "Prawne, Pomorskie".

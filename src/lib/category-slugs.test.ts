@@ -1,5 +1,16 @@
 import { locales, type Locale } from '@/i18n/config';
-import { CATEGORY_KEYS, CATEGORY_SLUGS, getCategoryFromSlug, getSlugFromCategory, isOnlineSlug } from '@/lib/slug-mappings';
+import {
+    CATEGORY_KEYS,
+    CATEGORY_MESSAGE_KEYS,
+    CATEGORY_SLUGS,
+    getCategoryFromSlug,
+    getSlugFromCategory,
+    isOnlineSlug,
+} from '@/lib/slug-mappings';
+import enMessages from '../../messages/en.json';
+import plMessages from '../../messages/pl.json';
+import ruMessages from '../../messages/ru.json';
+import ukMessages from '../../messages/uk.json';
 
 /**
  * Kategoria zyje w kilkunastu miejscach naraz (enum w bazie, `categories`
@@ -57,4 +68,49 @@ describe('kategoria `it`', () => {
         expect(getCategoryFromSlug(CATEGORY_SLUGS.pl.it, 'en')).toBeNull();
         expect(getCategoryFromSlug(CATEGORY_SLUGS.en.it, 'pl')).toBeNull();
     });
+});
+
+/**
+ * Warstwa kluczy tlumaczen — druga po slugach. Tytul strony mapy budowany byl
+ * przez kapitalizacje pierwszej litery (`help_support` -> `Help_support`), co
+ * dziala tylko dla kategorii jednowyrazowych. Dla `help_support`, `real_estate`
+ * i `it` klucz nie istnial i w `<title>` ladowal surowy `MapPage.Categories.*`,
+ * widoczny dla Google. Ten blok sprawdza mape wobec PRAWDZIWYCH plikow
+ * tlumaczen, a nie wobec wlasnych zalozen.
+ */
+describe('CATEGORY_MESSAGE_KEYS — kompletnosc wobec plikow messages', () => {
+    const MESSAGES: Record<string, Record<string, string>> = {
+        pl: plMessages.MapPage.Categories,
+        en: enMessages.MapPage.Categories,
+        ru: ruMessages.MapPage.Categories,
+        uk: ukMessages.MapPage.Categories,
+    };
+
+    it('ma klucz dla kazdej kategorii', () => {
+        for (const key of CATEGORY_KEYS) {
+            expect(CATEGORY_MESSAGE_KEYS[key]).toBeTruthy();
+        }
+    });
+
+    it.each(locales)('locale %s tlumaczy kazdy klucz kategorii', locale => {
+        const categories = MESSAGES[locale];
+
+        for (const key of CATEGORY_KEYS) {
+            const messageKey = CATEGORY_MESSAGE_KEYS[key];
+
+            expect(categories[messageKey]).toBeTruthy();
+        }
+    });
+
+    // Asercja negatywna: nazwa kategorii nie moze przeciekac do tytulu jako
+    // surowy klucz. Gdyby ktos wrocil do kapitalizacji, te trzy wysypia sie tu.
+    it.each(['help_support', 'real_estate', 'it'] as const)(
+        'kategoria %s ma klucz inny niz naiwna kapitalizacja',
+        key => {
+            const naive = key.charAt(0).toUpperCase() + key.slice(1);
+
+            expect(CATEGORY_MESSAGE_KEYS[key]).not.toBe(naive);
+            expect(MESSAGES.pl[naive]).toBeUndefined();
+        },
+    );
 });

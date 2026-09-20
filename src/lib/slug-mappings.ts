@@ -27,6 +27,38 @@ export const CATEGORY_KEYS = [
 export type CategoryKey = (typeof CATEGORY_KEYS)[number];
 
 /**
+ * Klucz kategorii -> klucz w `MapPage.Categories` w plikach `messages/`.
+ *
+ * Wczesniej klucz tlumaczenia wyliczalo sie kapitalizacja pierwszej litery
+ * (`category.charAt(0).toUpperCase() + category.slice(1)`). Dziala to dla
+ * kategorii jednowyrazowych, ale nie dla `help_support` -> `HelpSupport`,
+ * `real_estate` -> `RealEstate` ani `it` -> `IT`. Dla tych trzech next-intl
+ * rzucalo MISSING_MESSAGE, a do `<title>` trafial surowy klucz
+ * (`Mapa Uslug - Polvia - MapPage.Categories.Help_support`) — widoczny dla
+ * Google, nie tylko dla uzytkownika.
+ *
+ * `Record<CategoryKey, string>` zamiast zwyklego obiektu pilnuje kompletnosci:
+ * nowa kategoria w `CATEGORY_KEYS` nie skompiluje sie bez dopisania klucza tutaj.
+ */
+export const CATEGORY_MESSAGE_KEYS: Record<CategoryKey, string> = {
+    grocery: 'Grocery',
+    gastronomy: 'Gastronomy',
+    transport: 'Transport',
+    financial: 'Financial',
+    renovation: 'Renovation',
+    law: 'Law',
+    beauty: 'Beauty',
+    government: 'Government',
+    health: 'Health',
+    mechanics: 'Mechanics',
+    real_estate: 'RealEstate',
+    help_support: 'HelpSupport',
+    education: 'Education',
+    it: 'IT',
+    others: 'Others',
+};
+
+/**
  * Slug zasiegu w URL-u mapy.
  *
  * Zajmuje ten sam slot co wojewodztwo i miasto (`/mapa/online`,
