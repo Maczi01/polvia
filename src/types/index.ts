@@ -94,7 +94,16 @@ export type Service = {
 
 export type ScrollableListHandle = {
     scrollToTop: () => void;
-    scrollToIndex: (index: number) => void;
+    /**
+     * Adresowanie po id uslugi, nie po indeksie. Lista ma dwie numeracje —
+     * karty (`cardRefs`) i dzieci `VList` (karty ORAZ naglowki sekcji) — a
+     * wolajacy z zewnatrz nie ma jak wiedziec, ktorej akurat potrzeba.
+     * Rozwiazanie obu nalezy do listy, bo tylko ona zna swoj uklad wierszy.
+     */
+    scrollToService: (
+        serviceId: string,
+        options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean },
+    ) => void;
 };
 
 export type Post = {

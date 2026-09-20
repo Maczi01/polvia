@@ -51,6 +51,7 @@ type Overrides = {
     onlineResults?: PartialService[];
     embeddingResults?: PartialService[];
     isLoadingEmbeddings?: boolean;
+    cardToExpand?: string | null;
 };
 
 function renderList(overrides: Overrides = {}) {
@@ -69,7 +70,7 @@ function renderList(overrides: Overrides = {}) {
             handleHoverPlace={jest.fn()}
             cardRefs={cardRefs}
             setCardToExpand={jest.fn()}
-            cardToExpand={null}
+            cardToExpand={overrides.cardToExpand ?? null}
             scrollToTop={jest.fn()}
             setPopup={jest.fn()}
         />,
@@ -228,5 +229,69 @@ describe('<MapList /> — sekcja uslug online', () => {
 
         const results = await axe(container);
         expect(results).toHaveNoViolations();
+    });
+});
+
+/**
+ * Zwijanie firm wielooddzialowych. Test najwazniejszy dla wypuszczenia to ostatni:
+ * `?place=` i klik w pin trafiaja do lokalizacji przez `cardToExpand`, a ta moze
+ * byc schowana w zwinietej grupie. Bez automatycznego rozwiniecia kazdy juz
+ * udostepniony link do oddzialu duzej firmy przestalby dzialac.
+ */
+describe('<MapList /> — firmy wielooddzialowe', () => {
+    function company(count: number): PartialService[] {
+        return Array.from({ length: count }, () =>
+            service({ serviceId: 'best-market', name: 'Best Market' }),
+        );
+    }
+
+    it('zwija firme wielooddzialowa do jednego wiersza', () => {
+        renderList({ frontendFilteredServices: company(4) });
+
+        expect(screen.getAllByText('Best Market')).toHaveLength(1);
+        expect(screen.getByRole('button', { name: /Best Market/ })).toHaveAttribute(
+            'aria-expanded',
+            'false',
+        );
+    });
+
+    it('rozwija grupe po kliknieciu', async () => {
+        renderList({ frontendFilteredServices: company(4) });
+
+        await userEvent.click(screen.getByRole('button', { name: /Best Market/ }));
+
+        expect(screen.getByRole('button', { name: /Best Market/ })).toHaveAttribute(
+            'aria-expanded',
+            'true',
+        );
+    });
+
+    it('rozwija grupe, gdy cardToExpand wskazuje schowana lokalizacje', async () => {
+        const members = company(4);
+
+        renderList({ frontendFilteredServices: members, cardToExpand: members[2].id });
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Best Market/ })).toHaveAttribute(
+                'aria-expanded',
+                'true',
+            );
+        });
+    });
+
+    it('nie rusza grup, gdy cardToExpand wskazuje widoczna karte', async () => {
+        const pojedyncza = service({ name: 'Solo' });
+
+        renderList({
+            frontendFilteredServices: [pojedyncza, ...company(4)],
+            cardToExpand: pojedyncza.id,
+        });
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Best Market/ })).toHaveAttribute(
+                'aria-expanded',
+                'false',
+            );
+        });
     });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PartialService, View } from '@/types';
+import { PartialService, ScrollableListHandle, View } from '@/types';
 import { MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapList } from './map-list/map-list';
@@ -65,13 +65,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const [cardToExpand, setCardToExpand] = useState<string | null>(null);
     const mapRef = useRef<MapRef>(null);
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const mapListRef = useRef<{
-        scrollToTop: () => void;
-        scrollToIndex: (
-            index: number,
-            options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean },
-        ) => void;
-    }>(null);
+    const mapListRef = useRef<ScrollableListHandle>(null);
 
     const previousSelectedCellName = useRef('');
 
@@ -106,7 +100,6 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                     params.set('excludeIds', excludeIds.join(','));
                 }
 
-                console.log(`🔍 Semantic search: "${query}" in category: ${category || 'any'}`);
 
                 const response = await fetch(`/api/services?${params}`, {
                     signal: AbortSignal.timeout(8000),
@@ -119,7 +112,6 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 const data = await response.json();
 
                 if (data.success) {
-                    console.log(`✅ Semantic search returned ${data.services.length} results`);
                     setEmbeddingResults(data.services);
 
                     // Enhanced metadata with all available information
@@ -132,7 +124,14 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                         category: data.filters?.category,
                     });
                 } else {
-                    console.warn('❌ Semantic search failed:', data.message);
+                    // Zostaje jako `error`, nie `log`: to jedyna sciezka, w ktorej
+                    // wyszukiwanie semantyczne cicho oddaje pusta liste. Bez tego
+                    // brak wynikow jest nieodroznialny od braku dopasowan.
+                    console.error('Semantic search failed', {
+                        query,
+                        category: category ?? null,
+                        message: data.message,
+                    });
                     setEmbeddingResults([]);
                     setEmbeddingMeta(null);
                 }
@@ -276,6 +275,41 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         [filteredServices, popup],
     );
 
+    /**
+     * Rozwiniecie firmy wielooddzialowej pokazuje na mapie caly jej zasieg.
+     * Punkty bez wspolrzednych (wpisy `online`) sa pomijane — `fitBounds` na
+     * pustym zbiorze rzucilby bledem.
+     */
+    /**
+     * Piny firmy, nad ktorej zwinieta karta stoi kursor. Zbior, bo zwinieta grupa
+     * odpowiada N punktom — popup pojedynczego pinu nie mialby tu sensu (ktory z
+     * osmiu?), wiec zamiast niego podswietlamy komplet.
+     */
+    const [highlightedGroupIds, setHighlightedGroupIds] = useState<ReadonlySet<string>>(
+        () => new Set<string>(),
+    );
+
+    const handleHoverGroup = useCallback((serviceIds: string[] | null) => {
+        setHighlightedGroupIds(serviceIds ? new Set(serviceIds) : new Set<string>());
+    }, []);
+
+    const handleGroupExpand = useCallback((services: PartialService[]) => {
+        if (!mapRef.current) return;
+
+        const withCoordinates = services.filter(
+            service => service.latitude != null && service.longitude != null,
+        );
+        if (withCoordinates.length === 0) return;
+
+        const bounds = calculateServicesBounds(withCoordinates) as LngLatBoundsLike;
+        if (!bounds) return;
+
+        mapRef.current.fitBounds(bounds, {
+            duration: 800,
+            padding: { top: 60, bottom: 60, left: 60, right: 60 },
+        });
+    }, []);
+
     const handlePopupStateChange = useCallback((popup: PopupMarkerData) => {
         setPopup(popup);
         if (!popup) {
@@ -297,10 +331,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 setPendingScrollAfterViewChange(true);
             } else {
                 // For desktop, scroll immediately if we're showing the list
-                const cardIndex = filteredServices.findIndex(s => s.id === id);
-                if (mapListRef.current && cardIndex !== -1) {
-                    mapListRef.current.scrollToIndex(cardIndex, { smooth: true, align: 'center' });
-                }
+                mapListRef.current?.scrollToService(id, { smooth: true, align: 'center' });
             }
         },
         [filteredServices, isMobile],
@@ -372,7 +403,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
 
     const scrollToTop = useCallback(() => {
         if (mapListRef.current) {
-            mapListRef.current.scrollToIndex(0, { smooth: true });
+            mapListRef.current.scrollToTop();
         }
     }, []);
 
@@ -474,13 +505,11 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         const servicesBounds = calculateServicesBounds(locationServices) as LngLatBoundsLike;
 
         if (servicesBounds && locationServices.length > 0) {
-            console.log(`Zooming to ${locationServices.length} services in ${selectedCity || selectedCounty}`);
             mapRef.current.fitBounds(servicesBounds, {
                 duration: 1000,
                 padding: { top: 50, bottom: 50, left: 50, right: 50 },
             });
         } else {
-            console.log(`No services found in ${selectedCity || selectedCounty} - showing whole Poland`);
             // Show whole Poland when no services in selected location
             mapRef.current.fitBounds(
                 [
@@ -513,12 +542,10 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 const scrollDelay = isMobile ? 100 : 50;
 
                 const scrollToCard = () => {
-                    if (mapListRef.current) {
-                        mapListRef.current.scrollToIndex(index, {
-                            smooth: true,
-                            align: 'start',
-                        });
-                    }
+                    mapListRef.current?.scrollToService(cardToExpand, {
+                        smooth: true,
+                        align: 'start',
+                    });
                     setPendingScrollAfterViewChange(false);
                 };
 
@@ -619,6 +646,8 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                             <MapList
                                 ref={mapListRef}
                                 handleHoverPlace={handleHoverPlace}
+                                onGroupExpand={handleGroupExpand}
+                                handleHoverGroup={handleHoverGroup}
                                 resetMap={resetMap}
                                 handleFlyTo={handleFlyTo}
                                 frontendFilteredServices={localResults}
@@ -657,6 +686,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                     <OverviewMap
                         ref={mapRef}
                         selectedService={selectedService}
+                        highlightedServiceIds={highlightedGroupIds}
                         services={filteredServices}
                         handleClickedPlace={handleClickedPlace}
                         resetMap={resetMap}

@@ -479,6 +479,7 @@
     "serviceWrapper": " logo of Ukrainian company "
   },
   "MapList": {
+    "group_locations": "{locations, plural, one {# location} other {# locations}} in {cities, plural, one {# city} other {# cities}}",
     "no_exact_matches": "No exact matches found for your search",
     "check_recommendations": "Check the recommendations below",
     "also_recommended": "Also Recommended",

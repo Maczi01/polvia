@@ -21,6 +21,11 @@ import { MapControls } from '@/app/[locale]/(main)/_components/overview-map/map-
 type OverviewMapProps = {
     services: PartialService[];
     selectedService: PartialService | null;
+    /**
+     * Punkty podswietlone jako komplet — uzywane przy najechaniu na zwinieta
+     * karte firmy wielooddzialowej, ktorej odpowiada N pinow naraz.
+     */
+    highlightedServiceIds?: ReadonlySet<string>;
     resetMap: () => void;
     handleClickedPlace: (id: string) => void;
     scrollToTop: () => void;
@@ -47,6 +52,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
     ({
          services,
          selectedService,
+         highlightedServiceIds,
          resetMap,
          handleClickedPlace,
          scrollToTop,
@@ -146,7 +152,9 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                         map.setStyle(mapTheme);
                     }
                 } catch (error) {
-                    console.warn('Error updating map style:', error);
+                    // `error`, nie `warn`: przestylowanie mapy sie nie udalo i
+                    // wchodzi fallback ponizej — to blad, ktory ktos ma zobaczyc.
+                    console.error('Map style update failed', { theme: mapTheme, error });
                     // Fallback: just set the style
                     mapRef.current.getMap().setStyle(mapTheme);
                 }
@@ -296,7 +304,10 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                         longitude={longitude}
                         latitude={latitude}
                         category={item.category}
-                        isSelected={selectedService?.id === item.id}
+                        isSelected={
+                            selectedService?.id === item.id ||
+                            (highlightedServiceIds?.has(item.id) ?? false)
+                        }
                         onClick={() => {
                             if (handleOpenPopup) {
                                 handleOpenPopup({
@@ -316,7 +327,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     />
                 );
             });
-        }, [clusters, selectedService, expandCluster, popup, handleOpenPopup, handleClickedPlace, handleFlyTo]);
+        }, [clusters, selectedService, highlightedServiceIds, expandCluster, popup, handleOpenPopup, handleClickedPlace, handleFlyTo]);
 
         const handleReset = () => {
             resetMap();

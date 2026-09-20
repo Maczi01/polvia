@@ -480,6 +480,7 @@
   },
   "serviceWrapper": " logo ukraińskiej firmy ",
   "MapList": {
+    "group_locations": "{locations, plural, one {# punkt} few {# punkty} many {# punktów} other {# punktu}} w {cities, plural, one {# mieście} few {# miastach} many {# miastach} other {# miasta}}",
     "no_exact_matches": "Nie znaleziono dokładnych wyników dla Twojego wyszukiwania",
     "check_recommendations": "Sprawdź poniższe rekomendacje",
     "also_recommended": "Sprawdź również",

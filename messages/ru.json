@@ -479,6 +479,7 @@
     "serviceWrapper": " логотип украинской компании "
   },
   "MapList": {
+    "group_locations": "{locations, plural, one {# точка} few {# точки} many {# точек} other {# точки}} в {cities, plural, one {# городе} few {# городах} many {# городах} other {# города}}",
     "no_exact_matches": "Точных совпадений не найдено",
     "check_recommendations": "Посмотрите рекомендации ниже",
     "also_recommended": "Также рекомендуем",

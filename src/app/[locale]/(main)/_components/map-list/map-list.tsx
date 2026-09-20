@@ -1,5 +1,13 @@
 import { PartialService, ScrollableListHandle } from '@/types';
 import {
+    buildListRows,
+    findCardIndex,
+    findCollapsedGroupKey,
+    findRowIndex,
+    onlineHeaderRowIndex,
+} from '@/lib/map-list-rows';
+import { ServiceGroupCard } from '@/app/[locale]/(main)/_components/service-group-card/service-group-card';
+import {
     forwardRef, JSX,
     RefObject,
     useCallback,
@@ -11,7 +19,6 @@ import {
 } from 'react';
 import { ServiceCard } from '../service-card/service-card';
 import { VList, VListHandle } from 'virtua';
-import { useScrollableListHandle } from '@/hooks/use-scrollable-list-handle';
 import { ArrowDown, ArrowUp, Globe, Sparkles, Search } from 'lucide-react';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -39,6 +46,10 @@ type MapListProps = {
     handleFlyTo: (latitude: number, longitude: number) => void;
     resetMap: () => void;
     handleHoverPlace: (id: string | null) => void;
+    /** Dopasowanie widoku mapy do punktow rozwijanej firmy. */
+    onGroupExpand?: (services: PartialService[]) => void;
+    /** Podswietlenie kompletu pinow firmy przy najechaniu na zwinieta karte. */
+    handleHoverGroup?: (serviceIds: string[] | null) => void;
     cardRefs: RefObject<(HTMLDivElement | null)[]>;
     setCardToExpand: (id: string | null) => void;
     cardToExpand: string | null;
@@ -90,6 +101,8 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             handleFlyTo,
             resetMap,
             handleHoverPlace,
+            onGroupExpand,
+            handleHoverGroup,
             cardRefs,
             setCardToExpand,
             cardToExpand,
@@ -117,16 +130,90 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             [frontendFilteredServices, onlineResults, embeddingResults],
         );
 
-        useScrollableListHandle(ref, containerRef, virtuaListRef, allServices);
+        /**
+         * Jedyne zrodlo ukladu listy. Renderer iteruje po tym, a nie buduje
+         * wlasnej kolejnosci — dzieki temu numeracja kart i numeracja dzieci
+         * `VList` nie moga sie juz rozjechac.
+         */
+        /**
+         * Grupy rozwiniete przez uzytkownika. Domyslnie wszystkie zwiniete.
+         *
+         * SWIADOMIE bez akordeonu: zwiniecie grupy stojacej NAD viewportem usuwa
+         * wiersze powyzej i tresc podskakuje uzytkownikowi pod palcami. Rozwijanie
+         * jest bezpieczne, bo wstawia wiersze pod klikniętym naglowkiem, ktory z
+         * definicji jest widoczny.
+         */
+        const [expandedGroups, setExpandedGroups] = useState<ReadonlySet<string>>(
+            () => new Set<string>(),
+        );
+
+        const toggleGroup = useCallback(
+            (key: string, services: PartialService[]) => {
+                // Decyzja PRZED `setExpandedGroups`, nie w jego funkcji aktualizujacej.
+                // React wykonuje updater w trakcie renderu, wiec `onGroupExpand`
+                // wywolany w srodku ustawialby stan mapy podczas renderowania listy
+                // ("Cannot update a component while rendering a different component").
+                const willExpand = !expandedGroups.has(key);
+
+                setExpandedGroups(previous => {
+                    const next = new Set(previous);
+                    if (next.has(key)) next.delete(key);
+                    else next.add(key);
+                    return next;
+                });
+
+                // Dopasowanie widoku tylko przy ROZWIJANIU. Przy zwijaniu
+                // przestawianie mapy byloby ruchem, o ktory nikt nie prosil.
+                if (willExpand) onGroupExpand?.(services);
+            },
+            [expandedGroups, onGroupExpand],
+        );
+
+        /**
+         * Zwinieta grupa odpowiada N pinom, wiec nie ma jednego, nad ktorym mialby
+         * stanac popup. Zamiast popupu podswietlamy komplet punktow firmy, a sam
+         * popup czyscimy — inaczej zostalby wiszacy nad przypadkowym pinem.
+         */
+        const handleGroupHover = useCallback(
+            (serviceIds: string[] | null) => {
+                handleHoverPlace(null);
+                handleHoverGroup?.(serviceIds);
+            },
+            [handleHoverPlace, handleHoverGroup],
+        );
+
+        const rows = useMemo(
+            () =>
+                buildListRows({
+                    main: frontendFilteredServices,
+                    online: onlineResults,
+                    embedding: embeddingResults,
+                    isLoadingEmbeddings,
+                    expandedGroups,
+                }),
+            [frontendFilteredServices, onlineResults, embeddingResults, isLoadingEmbeddings, expandedGroups],
+        );
 
         // Improved scroll behavior for mobile
-        const scrollToIndex = useCallback(
-            (index: number, options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean }) => {
+        /**
+         * Skok do WIERSZA listy. Przyjmuje OBA numery, bo kazda sciezka potrzebuje
+         * innego: mobile siega do `cardRefs` (numeracja samych kart), a desktop
+         * oddaje numer do `virtua` (numeracja wszystkich dzieci `VList`, razem
+         * z naglowkami sekcji). Wczesniej obie dostawaly ten sam numer, wiec na
+         * desktopie karty sekcji online i embedding byly chybiane o liczbe
+         * naglowkow stojacych wyzej.
+         */
+        const scrollToRow = useCallback(
+            (
+                rowIndex: number,
+                cardIndex: number,
+                options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean },
+            ) => {
                 if (scrollTimeoutRef.current) {
                     clearTimeout(scrollTimeoutRef.current);
                 }
 
-                const target = cardRefs.current?.[index];
+                const target = cardIndex >= 0 ? cardRefs.current?.[cardIndex] : null;
                 if (isMobile && target) {
                     scrollTimeoutRef.current = setTimeout(() => {
                         target.scrollIntoView({
@@ -135,14 +222,22 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                             inline: 'nearest'
                         });
                     }, 50);
-                } else if (virtuaListRef.current) {
-                    virtuaListRef.current.scrollToIndex(index, {
+                } else if (virtuaListRef.current && rowIndex >= 0) {
+                    virtuaListRef.current.scrollToIndex(rowIndex, {
                         align: options?.align || 'start',
                         smooth: options?.smooth || false,
                     });
                 }
             },
             [cardRefs, isMobile],
+        );
+
+        /** Skok do karty konkretnej uslugi — oba numery wylicza model wierszy. */
+        const scrollToService = useCallback(
+            (serviceId: string, options?: { align?: 'start' | 'center' | 'end'; smooth?: boolean }) => {
+                scrollToRow(findRowIndex(rows, serviceId), findCardIndex(rows, serviceId), options);
+            },
+            [rows, scrollToRow],
         );
 
         /**
@@ -162,7 +257,10 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
          * niepuste, wiec EmptyState nie przesuwa tu numeracji.
          */
         const scrollToOnlineSection = useCallback(() => {
-            scrollToIndex(frontendFilteredServices.length, { align: 'start', smooth: false });
+            // Indeks naglowka bierze sie z modelu wierszy, a nie z dlugosci tablicy.
+            // Arytmetyka na `frontendFilteredServices.length` trafiala tu przypadkiem
+            // i przestawala dzialac przy kazdej zmianie ukladu sekcji.
+            scrollToRow(onlineHeaderRowIndex(rows), -1, { align: 'start', smooth: false });
 
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
@@ -172,7 +270,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                     });
                 });
             });
-        }, [scrollToIndex, frontendFilteredServices.length]);
+        }, [scrollToRow, rows]);
 
         useEffect(() => {
             const handleScroll = () => {
@@ -193,7 +291,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         useImperativeHandle(
             ref,
             () => ({
-                scrollToIndex,
+                scrollToService,
                 scrollToTop: () => {
                     if (isMobile && containerRef.current) {
                         containerRef.current.scrollTo({
@@ -208,7 +306,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                     }
                 },
             }),
-            [scrollToIndex, isMobile],
+            [scrollToService, isMobile],
         );
 
         useEffect(() => {
@@ -217,17 +315,30 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                 return;
             }
 
-            const idx = allServices.findIndex((s) => s.id === cardToExpand);
-            if (idx === -1) {
+            /**
+             * Lokalizacja moze byc schowana w zwinietej grupie — tak wchodzi kazdy
+             * link `?place=<slug>` do oddzialu firmy wielooddzialowej oraz klik w
+             * pin na mapie. Najpierw rozwijamy grupe; zmiana `rows` odpala ten
+             * efekt ponownie i wtedy jest juz do czego przewijac.
+             */
+            const collapsedGroupKey = findCollapsedGroupKey(rows, cardToExpand);
+            if (collapsedGroupKey) {
+                setExpandedGroups(previous => new Set(previous).add(collapsedGroupKey));
+                return;
+            }
+
+            const cardIdx = findCardIndex(rows, cardToExpand);
+            if (cardIdx === -1) {
                 prevExpandedIndex.current = null;
                 return;
             }
 
-            prevExpandedIndex.current = idx;
+            const rowIdx = findRowIndex(rows, cardToExpand);
+            prevExpandedIndex.current = cardIdx;
 
             if (isMobile) {
                 const scrollTimeout = setTimeout(() => {
-                    const target = cardRefs.current?.[idx];
+                    const target = cardRefs.current?.[cardIdx];
                     if (target) {
                         const rect = target.getBoundingClientRect();
                         if (rect.top > 100) {
@@ -242,153 +353,123 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
 
                 return () => clearTimeout(scrollTimeout);
             } else {
-                requestAnimationFrame(() => scrollToIndex(idx));
+                requestAnimationFrame(() => scrollToRow(rowIdx, cardIdx));
 
+                // Drugi strzal po ustaniu animacji rozwijania. `virtua` szacuje
+                // pozycje z niezmierzonych elementow, wiec pierwszy celuje w stara
+                // wysokosc karty; ten koryguje po zmierzeniu nowej.
                 const settleDelay = CARD_COLLAPSE_MS + 50;
                 const timeout = setTimeout(() => {
-                    scrollToIndex(idx);
+                    scrollToRow(rowIdx, cardIdx);
                 }, settleDelay);
 
                 return () => clearTimeout(timeout);
             }
-        }, [cardToExpand, allServices, scrollToIndex, isMobile, cardRefs]);
+        }, [cardToExpand, rows, scrollToRow, isMobile, cardRefs]);
 
-        // Create service cards with proper indexing
+        /**
+         * Renderer iteruje po `rows` i NIE liczy wlasnych indeksow. Wczesniej
+         * numeracja powstawala tutaj (`cardIndex++`) rownolegle do `allServices`,
+         * a ich zgodnosci pilnowal wylacznie komentarz.
+         */
         const renderServiceCards = () => {
-            const cards: JSX.Element[] = [];
-            let cardIndex = 0;
+            const embeddingSubtitle = embeddingMeta?.contextualQuery
+                ? `${t('based_on')} "${embeddingMeta.contextualQuery.slice(0, 50)}${embeddingMeta.contextualQuery.length > 50 ? '...' : ''}"`
+                : t('semantic_search_results');
 
-            // Main results section - no header for regular results
-            frontendFilteredServices.forEach((service, index) => {
-                cards.push(
-                    <div key={`main-${service.id}`} className="mb-2 md:mb-4">
-                        <ServiceCard
-                            ref={element => {
-                                if (cardRefs.current) {
-                                    cardRefs.current[cardIndex] = element;
-                                }
-                            }}
-                            handleFlyTo={handleFlyTo}
-                            index={cardIndex}
-                            resetMap={resetMap}
-                            setCardToExpand={setCardToExpand}
-                            cardToExpand={cardToExpand}
-                            handleHoverPlace={handleHoverPlace}
-                            setPopup={setPopup}
-                            {...service}
-                        />
-                    </div>
-                );
-                cardIndex++;
+            return rows.map(row => {
+                switch (row.kind) {
+                    case 'card': {
+                        const service = row.service!;
+                        const cardIndex = row.cardIndex!;
+
+                        return (
+                            <div key={row.key} className="mb-2 md:mb-4">
+                                <ServiceCard
+                                    ref={element => {
+                                        if (cardRefs.current) {
+                                            cardRefs.current[cardIndex] = element;
+                                        }
+                                    }}
+                                    handleFlyTo={handleFlyTo}
+                                    index={cardIndex}
+                                    resetMap={resetMap}
+                                    setCardToExpand={setCardToExpand}
+                                    cardToExpand={cardToExpand}
+                                    handleHoverPlace={handleHoverPlace}
+                                    setPopup={setPopup}
+                                    {...service}
+                                />
+                            </div>
+                        );
+                    }
+
+                    case 'group': {
+                        const group = row.group!;
+
+                        return (
+                            <ServiceGroupCard
+                                key={row.key}
+                                name={group.name}
+                                services={group.services}
+                                cities={group.cities}
+                                isExpanded={row.isExpanded ?? false}
+                                onToggle={() => toggleGroup(row.key, group.services)}
+                                onHover={handleGroupHover}
+                            />
+                        );
+                    }
+
+                    case 'empty':
+                        return (
+                            <div key={row.key}>
+                                <EmptyState
+                                    message={t('no_exact_matches')}
+                                    icon={Search}
+                                    isLoadingRecommendations={isLoadingEmbeddings}
+                                    hasRecommendations={
+                                        onlineResults.length > 0 || embeddingResults.length > 0
+                                    }
+                                />
+                            </div>
+                        );
+
+                    // Sekcja online jest widoczna niezaleznie od filtra geograficznego
+                    // (R4) — wpisy bez pinu na mapie zyja wylacznie tutaj.
+                    case 'onlineHeader':
+                        return (
+                            <div key={row.key} ref={onlineSectionRef}>
+                                <SectionHeader
+                                    icon={Globe}
+                                    title={t('available_online', { count: onlineResults.length })}
+                                    subtitle={t('available_online_subtitle')}
+                                />
+                            </div>
+                        );
+
+                    case 'embeddingHeader':
+                        return (
+                            <SectionHeader
+                                key={row.key}
+                                icon={Sparkles}
+                                title={t('also_recommended')}
+                                subtitle={embeddingSubtitle}
+                            />
+                        );
+
+                    case 'loading':
+                        return (
+                            <div key={row.key} className="mt-6">
+                                <SectionHeader
+                                    icon={Sparkles}
+                                    title={t('finding_more_results')}
+                                    subtitle={t('searching_recommendations')}
+                                />
+                                <LoadingSkeleton />
+                            </div>
+                        );
+                }
             });
-
-            // No main results - use single EmptyState component for all scenarios
-            if (frontendFilteredServices.length === 0) {
-                cards.push(
-                    <div key="no-main-results">
-                        <EmptyState
-                            message={t("no_exact_matches")}
-                            icon={Search}
-                            isLoadingRecommendations={isLoadingEmbeddings}
-                            hasRecommendations={onlineResults.length > 0 || embeddingResults.length > 0}
-                        />
-                    </div>
-                );
-            }
-
-            // Online coverage section — zawsze widoczna, niezaleznie od filtra
-            // geograficznego (R4). Wpisy bez pinu na mapie zyja wylacznie tutaj.
-            if (onlineResults.length > 0) {
-                cards.push(
-                    <div key="online-header" ref={onlineSectionRef}>
-                        <SectionHeader
-                            icon={Globe}
-                            title={t('available_online', { count: onlineResults.length })}
-                            subtitle={t('available_online_subtitle')}
-                        />
-                    </div>
-                );
-
-                onlineResults.forEach((service) => {
-                    cards.push(
-                        <div key={`online-${service.id}`} className="mb-2 md:mb-4">
-                            <ServiceCard
-                                ref={element => {
-                                    if (cardRefs.current) {
-                                        cardRefs.current[cardIndex] = element;
-                                    }
-                                }}
-                                handleFlyTo={handleFlyTo}
-                                index={cardIndex}
-                                resetMap={resetMap}
-                                setCardToExpand={setCardToExpand}
-                                cardToExpand={cardToExpand}
-                                handleHoverPlace={handleHoverPlace}
-                                setPopup={setPopup}
-                                {...service}
-                            />
-                        </div>
-                    );
-                    cardIndex++;
-                });
-            }
-
-            // Embedding results section
-            if (embeddingResults.length > 0) {
-                const subtitle = embeddingMeta?.contextualQuery
-                    ? `${t("based_on")} "${embeddingMeta.contextualQuery.slice(0, 50)}${embeddingMeta.contextualQuery.length > 50 ? '...' : ''}"`
-                    : `${t("semantic_search_results")}`;
-
-                cards.push(
-                    <SectionHeader
-                        key="embedding-header"
-                        icon={Sparkles}
-                        title= {t("also_recommended")}
-                        // count={embeddingResults.length}
-                        subtitle={subtitle}
-                    />
-                );
-
-                embeddingResults.forEach((service) => {
-                    cards.push(
-                        <div key={`embedding-${service.id}`} className="mb-2 md:mb-4">
-                            <ServiceCard
-                                ref={element => {
-                                    if (cardRefs.current) {
-                                        cardRefs.current[cardIndex] = element;
-                                    }
-                                }}
-                                handleFlyTo={handleFlyTo}
-                                index={cardIndex}
-                                resetMap={resetMap}
-                                setCardToExpand={setCardToExpand}
-                                cardToExpand={cardToExpand}
-                                handleHoverPlace={handleHoverPlace}
-                                setPopup={setPopup}
-                                {...service}
-                            />
-                        </div>
-                    );
-                    cardIndex++;
-                });
-            }
-
-            // Loading state for embedding results (only show if we have main results)
-            if (isLoadingEmbeddings && frontendFilteredServices.length > 0) {
-                cards.push(
-                    <div key="loading-embeddings" className="mt-6">
-                        <SectionHeader
-                            icon={Sparkles}
-                            title={t("finding_more_results")}
-                            // count={0}
-                            subtitle={t("searching_recommendations")}
-                        />
-                        <LoadingSkeleton />
-                    </div>
-                );
-            }
-
-            return cards;
         };
 
         const handleScrollToTop = () => {
