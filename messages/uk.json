@@ -478,6 +478,7 @@
     "serviceWrapper": " логотип української компанії "
   },
   "MapList": {
+    "multi_location": "Кілька точок",
     "group_locations": "{locations, plural, one {# точка} few {# точки} many {# точок} other {# точки}} у {cities, plural, one {# місті} few {# містах} many {# містах} other {# міста}}",
     "no_exact_matches": "Точних збігів не знайдено",
     "check_recommendations": "Перегляньте рекомендації нижче",

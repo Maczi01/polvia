@@ -173,6 +173,12 @@ describe('<ServiceGroupCard />', () => {
         expect(container.querySelector('img')).toHaveAttribute('width', '56');
     });
 
+    it('oznacza firme jako wielolokalizacyjna', () => {
+        renderCard();
+
+        expect(screen.getByText('multi_location')).toBeInTheDocument();
+    });
+
     it('przechodzi asercje jest-axe', async () => {
         const { container } = renderCard();
 
