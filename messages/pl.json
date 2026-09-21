@@ -492,7 +492,8 @@
     "available_online": "Dostępne online w całej Polsce ({count})",
     "available_online_subtitle": "Obsługa zdalna — nie musisz nigdzie jechać",
     "map_no_pins": "Te usługi są świadczone zdalnie, więc nie mają punktu na mapie. Przejdź do listy, żeby je zobaczyć.",
-    "online_banner": "Dostępnych online w całej Polsce: {count}. Przejdź do nich"
+    "online_banner": "Dostępnych online w całej Polsce: {count}. Przejdź do nich",
+    "scroll_to_top": "Wróć na górę listy"
   },
   "HeroMap": {
     "places": "{count} miejsc",

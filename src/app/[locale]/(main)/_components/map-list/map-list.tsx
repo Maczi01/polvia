@@ -26,6 +26,10 @@ import { useTranslations } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { EmptyState } from '@/app/[locale]/(main)/_components/map-list/empty-state';
 import { LoadingSkeleton } from '@/app/[locale]/(main)/_components/map-list/loading-skeleton';
+import { Button } from '@/components/ui/button/button';
+
+/** Ile pikseli trzeba przewinac liste, zanim pojawi sie strzalka powrotu na gore. */
+const SCROLL_TO_TOP_THRESHOLD_PX = 300;
 
 type EmbeddingMeta = {
     executionTime?: number;
@@ -275,7 +279,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         useEffect(() => {
             const handleScroll = () => {
                 if (!containerRef.current) return;
-                setShowScrollButton(containerRef.current.scrollTop > 300);
+                setShowScrollButton(containerRef.current.scrollTop > SCROLL_TO_TOP_THRESHOLD_PX);
             };
             const container = containerRef.current;
             container?.addEventListener('scroll', handleScroll);
@@ -288,25 +292,39 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             };
         }, []);
 
+        /**
+         * Powrot na gore listy. Na mobile przewija sie `containerRef`, na desktopie
+         * wlasny scroller `VList`. Desktop swiadomie bez `smooth`: `virtua` szacuje
+         * pozycje z niezmierzonych elementow, wiec plynny skok przez dziesiatki kart
+         * nie dojezdza do celu (ten sam wniosek jest przy `scrollToOnlineSection`).
+         */
+        const handleScrollToTop = useCallback(() => {
+            if (isMobile && containerRef.current) {
+                containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                virtuaListRef.current?.scrollToIndex(0, { align: 'start', smooth: false });
+            }
+        }, [isMobile]);
+
+        /**
+         * Zmiana liczby wynikow przestawia liste na gore: `VList` dostaje nowy `key`
+         * i montuje sie od zera, a kontener mobilny zostaje przyciety do nowej
+         * wysokosci. Zadne z tych przewiniec nie emituje zdarzenia `scroll`, wiec
+         * widocznosc strzalki trzeba przeliczyc recznie — inaczej zostaje wisiec
+         * nad lista, ktora jest juz na samej gorze.
+         */
+        useEffect(() => {
+            const offset = isMobile ? (containerRef.current?.scrollTop ?? 0) : 0;
+            setShowScrollButton(offset > SCROLL_TO_TOP_THRESHOLD_PX);
+        }, [allServices.length, isMobile]);
+
         useImperativeHandle(
             ref,
             () => ({
                 scrollToService,
-                scrollToTop: () => {
-                    if (isMobile && containerRef.current) {
-                        containerRef.current.scrollTo({
-                            top: 0,
-                            behavior: 'smooth',
-                        });
-                    } else if (virtuaListRef.current) {
-                        virtuaListRef.current.scrollToIndex(0, {
-                            align: 'start',
-                            smooth: false,
-                        });
-                    }
-                },
+                scrollToTop: handleScrollToTop,
             }),
-            [scrollToService, isMobile],
+            [scrollToService, handleScrollToTop],
         );
 
         useEffect(() => {
@@ -472,20 +490,6 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
             });
         };
 
-        const handleScrollToTop = () => {
-            if (isMobile && containerRef.current) {
-                containerRef.current.scrollTo({
-                    top: 0,
-                    behavior: 'smooth',
-                });
-            } else if (virtuaListRef.current) {
-                virtuaListRef.current.scrollToIndex(0, {
-                    align: 'start',
-                    smooth: false,
-                });
-            }
-        };
-
         // Show empty state when no results at all
         if (frontendFilteredServices.length === 0 && onlineResults.length === 0 && embeddingResults.length === 0 && !isLoadingEmbeddings) {
             return (
@@ -499,51 +503,69 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         }
 
         return (
-            <div
-                ref={containerRef}
-                className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800
-                hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500
-                    scroll-padding relative flex flex-col
-                    bg-[#F6F6F7] px-2 dark:bg-gray-900 md:pl-0 md:pr-2"
-                style={{
-                    height: '100%',
-                    overflowY: 'auto',
-                    paddingTop: isMobile ? '8px' : '0px',
-                    WebkitOverflowScrolling: 'touch',
-                    transform: 'translate3d(0,0,0)',
-                }}
-            >
-                {onlineResults.length > 0 && frontendFilteredServices.length > 0 && (
-                    <button
-                        type="button"
-                        onClick={scrollToOnlineSection}
-                        className="mb-2 flex w-full items-center gap-2 rounded-lg border border-aqua/40 bg-aqua/10
-                            px-4 py-2.5 text-left text-sm text-gray-700 transition-colors
-                            hover:bg-aqua/20 focus-visible:outline-none focus-visible:ring-2
-                            focus-visible:ring-ring dark:text-gray-200 md:mb-4"
-                    >
-                        <Globe className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
-                        <span className="flex-1">
-                            {t('online_banner', { count: onlineResults.length })}
-                        </span>
-                        <ArrowDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
-                    </button>
-                )}
+            <div className="relative h-full">
+                <div
+                    ref={containerRef}
+                    className="scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800
+                    hover:scrollbar-thumb-gray-500 dark:hover:scrollbar-thumb-gray-500
+                        scroll-padding relative flex flex-col
+                        bg-[#F6F6F7] px-2 dark:bg-gray-900 md:pl-0 md:pr-2"
+                    style={{
+                        height: '100%',
+                        overflowY: 'auto',
+                        paddingTop: isMobile ? '8px' : '0px',
+                        WebkitOverflowScrolling: 'touch',
+                        transform: 'translate3d(0,0,0)',
+                    }}
+                >
+                    {onlineResults.length > 0 && frontendFilteredServices.length > 0 && (
+                        <button
+                            type="button"
+                            onClick={scrollToOnlineSection}
+                            className="mb-2 flex w-full items-center gap-2 rounded-lg border border-aqua/40 bg-aqua/10
+                                px-4 py-2.5 text-left text-sm text-gray-700 transition-colors
+                                hover:bg-aqua/20 focus-visible:outline-none focus-visible:ring-2
+                                focus-visible:ring-ring dark:text-gray-200 md:mb-4"
+                        >
+                            <Globe className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                            <span className="flex-1">
+                                {t('online_banner', { count: onlineResults.length })}
+                            </span>
+                            <ArrowDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
+                        </button>
+                    )}
 
-                {isMobile ? (
-                    <div className="size-full pb-8" style={{ minHeight: 'fit-content' }}>
-                        {renderServiceCards()}
-                    </div>
-                ) : (
-                    <VList
-                        key={allServices.length}
-                        ref={virtuaListRef}
-                        className="size-full"
-                        overscan={40}
-                        shift={false}
+                    {isMobile ? (
+                        <div className="size-full pb-8" style={{ minHeight: 'fit-content' }}>
+                            {renderServiceCards()}
+                        </div>
+                    ) : (
+                        <VList
+                            key={allServices.length}
+                            ref={virtuaListRef}
+                            className="size-full"
+                            overscan={40}
+                            shift={false}
+                            onScroll={offset =>
+                                setShowScrollButton(offset > SCROLL_TO_TOP_THRESHOLD_PX)
+                            }
+                        >
+                            {renderServiceCards()}
+                        </VList>
+                    )}
+                </div>
+
+                {showScrollButton && (
+                    <Button
+                        type="button"
+                        variant="green"
+                        onClick={handleScrollToTop}
+                        aria-label={t('scroll_to_top')}
+                        className="absolute bottom-4 right-4 z-10 text-white shadow-lg
+                            transition-transform duration-150 active:scale-90"
                     >
-                        {renderServiceCards()}
-                    </VList>
+                        <ArrowUp />
+                    </Button>
                 )}
             </div>
         );

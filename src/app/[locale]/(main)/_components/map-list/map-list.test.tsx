@@ -1,5 +1,5 @@
 import { createRef } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
@@ -293,5 +293,136 @@ describe('<MapList /> — firmy wielooddzialowe', () => {
                 'false',
             );
         });
+    });
+});
+
+/**
+ * Strzalka powrotu na gore listy. Testy ida sciezka mobilna (stub `matchMedia`
+ * zwraca `matches: true`), gdzie przewija sie kontener listy — na desktopie
+ * scrollerem jest wnetrze `virtua`, ktore w jsdom ma zerowa wysokosc i nigdy
+ * nie wyemitowaloby przewiniecia.
+ */
+describe('<MapList /> — strzalka powrotu na gore', () => {
+    beforeEach(() => {
+        window.matchMedia = jest.fn().mockImplementation(query => ({
+            matches: true,
+            media: query,
+            onchange: null,
+            addEventListener: jest.fn(),
+            removeEventListener: jest.fn(),
+            addListener: jest.fn(),
+            removeListener: jest.fn(),
+            dispatchEvent: jest.fn(),
+        }));
+    });
+
+    /**
+     * Kontener przewijania rozpoznajemy po tym, co faktycznie robi (`overflow-y`),
+     * a nie po klasie Tailwinda. Rzucamy, zamiast zwracac `null` — cichy `null`
+     * zamienilby ten test w asercje bez pokrycia.
+     */
+    function scrollContainer(root: HTMLElement): HTMLElement {
+        const element = root.querySelector<HTMLElement>('[style*="overflow-y: auto"]');
+        if (!element) throw new Error('Nie znaleziono kontenera przewijania listy');
+        return element;
+    }
+
+    function scrollTo(element: HTMLElement, top: number) {
+        Object.defineProperty(element, 'scrollTop', { configurable: true, value: top });
+        fireEvent.scroll(element);
+    }
+
+    it('jest ukryta, dopoki lista nie zostanie przewinieta', () => {
+        renderList({ frontendFilteredServices: [service(), service()] });
+
+        expect(screen.queryByRole('button', { name: 'scroll_to_top' })).not.toBeInTheDocument();
+    });
+
+    it('nie pojawia sie przy przewinieciu ponizej progu', () => {
+        const { container } = renderList({ frontendFilteredServices: [service(), service()] });
+
+        scrollTo(scrollContainer(container), 299);
+
+        expect(screen.queryByRole('button', { name: 'scroll_to_top' })).not.toBeInTheDocument();
+    });
+
+    it('pojawia sie po przewinieciu listy', () => {
+        const { container } = renderList({ frontendFilteredServices: [service(), service()] });
+
+        scrollTo(scrollContainer(container), 400);
+
+        expect(screen.getByRole('button', { name: 'scroll_to_top' })).toBeInTheDocument();
+    });
+
+    it('chowa sie z powrotem po powrocie na gore', () => {
+        const { container } = renderList({ frontendFilteredServices: [service(), service()] });
+        const scroller = scrollContainer(container);
+
+        scrollTo(scroller, 400);
+        scrollTo(scroller, 0);
+
+        expect(screen.queryByRole('button', { name: 'scroll_to_top' })).not.toBeInTheDocument();
+    });
+
+    it('klikniecie przewija kontener listy na gore', async () => {
+        // jsdom nie implementuje Element.prototype.scrollTo — bez szpiega klik
+        // rzucilby "Not implemented" i nie dalo sie sprawdzic argumentow.
+        const scrollToSpy = jest.fn();
+        const original = Element.prototype.scrollTo;
+        Element.prototype.scrollTo = scrollToSpy;
+
+        try {
+            const { container } = renderList({
+                frontendFilteredServices: [service(), service()],
+            });
+
+            scrollTo(scrollContainer(container), 400);
+            await userEvent.click(screen.getByRole('button', { name: 'scroll_to_top' }));
+
+            expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+        } finally {
+            Element.prototype.scrollTo = original;
+        }
+    });
+
+    it('zmiana liczby wynikow nie chowa strzalki, gdy lista zostala przewinieta', () => {
+        const { container, rerender } = renderList({
+            frontendFilteredServices: [service(), service()],
+        });
+        const scroller = scrollContainer(container);
+
+        scrollTo(scroller, 400);
+        // Filtr zawezil wyniki: `allServices.length` sie zmienia, wiec odpala sie
+        // przeliczenie widocznosci. Kontener nadal jest przewiniety, wiec strzalka
+        // ma zostac — twarde `false` byloby regresja.
+        rerender(
+            <MapList
+                ref={createRef<ScrollableListHandle>()}
+                frontendFilteredServices={[service()]}
+                onlineResults={[]}
+                embeddingResults={[]}
+                isLoadingEmbeddings={false}
+                embeddingMeta={null}
+                handleFlyTo={jest.fn()}
+                resetMap={jest.fn()}
+                handleHoverPlace={jest.fn()}
+                cardRefs={{ current: [] }}
+                setCardToExpand={jest.fn()}
+                cardToExpand={null}
+                scrollToTop={jest.fn()}
+                setPopup={jest.fn()}
+            />,
+        );
+
+        expect(screen.getByRole('button', { name: 'scroll_to_top' })).toBeInTheDocument();
+    });
+
+    it('przechodzi asercje dostepnosci, gdy strzalka jest widoczna', async () => {
+        const { container } = renderList({ frontendFilteredServices: [service(), service()] });
+
+        scrollTo(scrollContainer(container), 400);
+
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
     });
 });
