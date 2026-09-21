@@ -294,15 +294,18 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
 
         /**
          * Powrot na gore listy. Na mobile przewija sie `containerRef`, na desktopie
-         * wlasny scroller `VList`. Desktop swiadomie bez `smooth`: `virtua` szacuje
-         * pozycje z niezmierzonych elementow, wiec plynny skok przez dziesiatki kart
-         * nie dojezdza do celu (ten sam wniosek jest przy `scrollToOnlineSection`).
+         * wlasny scroller `VList`.
+         *
+         * `smooth` dziala tu w OBU sciezkach, inaczej niz przy `scrollToOnlineSection`.
+         * Tamten skok idzie w DOL, do kart jeszcze niezmierzonych, wiec `virtua` celuje
+         * w oszacowanie i nie dojezdza. Tutaj celem jest offset `0`, a karty powyzej sa
+         * juz zmierzone — bledne oszacowanie nie ma czego zepsuc.
          */
         const handleScrollToTop = useCallback(() => {
             if (isMobile && containerRef.current) {
                 containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                virtuaListRef.current?.scrollToIndex(0, { align: 'start', smooth: false });
+                virtuaListRef.current?.scrollToIndex(0, { align: 'start', smooth: true });
             }
         }, [isMobile]);
 
