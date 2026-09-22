@@ -6,11 +6,20 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { env } from '../../../../../../env';
 import { Metadata } from 'next';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
-import { parseMapSlug, extractFiltersFromQueryParams } from '@/lib/map-slug-parser';
-import { buildMapUrl, stringifyMapUrl, localizeMapPath } from '@/lib/map-url-builder';
+import { buildMapMetadataPath, buildMapTitleSuffix } from '@/lib/map-metadata';
+import {
+    extractFiltersFromQueryParams,
+    type MapFilters,
+    parseMapSlug,
+} from '@/lib/map-slug-parser';
+import {
+    buildMapUrl,
+    localizedMapBasePath,
+    localizeMapPath,
+    stringifyMapUrl,
+} from '@/lib/map-url-builder';
 import { redirect, notFound } from 'next/navigation';
 import { locales, type Locale } from '@/i18n/config';
-import { CATEGORY_MESSAGE_KEYS } from '@/lib/slug-mappings';
 
 type PageProps = {
     params: Promise<{ locale: string; slug?: string[] }>;
@@ -27,62 +36,22 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
     const tCounties = await getTranslations('MapPage.counties');
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
-    // Handle the localized path
-    const mapPath = locale === 'pl' ? 'mapa' : 'map';
-    const localePrefix = locale === 'pl' ? '' : `/${locale}`;
+    const parseResult = parseMapSlug(slug, locale as Locale, localizedMapBasePath(locale as Locale));
+    const filters: MapFilters = parseResult.success
+        ? parseResult.filters
+        : { category: null, county: null, city: null, onlineOnly: false };
 
-    // Parse slug to get filters
-    const parseResult = parseMapSlug(slug, locale as Locale, `${localePrefix}/${mapPath}`);
-
-    let canonicalPath = `${localePrefix}/${mapPath}`;
-    let titleSuffix = '';
-
-    if (parseResult.success) {
-        const { category, county, onlineOnly } = parseResult.filters;
-
-        // Build slug path for canonical URL
-        if (category || county || onlineOnly) {
-            const slugUrl = buildMapUrl({ category, county, onlineOnly }, locale as Locale);
-            canonicalPath = `${localePrefix}${localizeMapPath(slugUrl.pathname, locale as Locale)}`;
-
-            // Build title suffix with translations
-            const parts: string[] = [];
-            if (category) {
-                parts.push(tCategories(CATEGORY_MESSAGE_KEYS[category]));
-            }
-            // Zasieg zajmuje ten sam slot sciezki co wojewodztwo, wiec w tytule
-            // stoi na tej samej pozycji: "Prawne, Online" zamiast "Prawne, Pomorskie".
-            if (onlineOnly) {
-                parts.push(tCategories('Online'));
-            }
-            if (county) {
-                // Counties keys are lowercase with hyphens
-                const countyTranslation = tCounties(county, { defaultValue: county });
-                parts.push(countyTranslation);
-            }
-            titleSuffix = parts.length > 0 ? ` - ${parts.join(', ')}` : '';
-        }
-    }
-
-    const canonicalUrl = `${baseUrl}${canonicalPath}`;
+    const canonicalUrl = `${baseUrl}${buildMapMetadataPath(filters, locale as Locale)}`;
+    const titleSuffix = buildMapTitleSuffix(filters, {
+        category: key => tCategories(key),
+        online: tCategories('Online'),
+        location: key => tCounties(key),
+    });
 
     // Build language alternates with proper slug translations
-    const languageUrls: Record<string, string> = {
-        pl: `${baseUrl}/mapa`,
-        en: `${baseUrl}/en/map`,
-        ru: `${baseUrl}/ru/map`,
-        uk: `${baseUrl}/uk/map`,
-    };
-
-    if (parseResult.success) {
-        const { category, county, onlineOnly } = parseResult.filters;
-        if (category || county || onlineOnly) {
-            for (const loc of locales) {
-                const slugUrl = buildMapUrl({ category, county, onlineOnly }, loc);
-                const prefix = loc === 'pl' ? '' : `/${loc}`;
-                languageUrls[loc] = `${baseUrl}${prefix}${localizeMapPath(slugUrl.pathname, loc)}`;
-            }
-        }
+    const languageUrls: Record<string, string> = {};
+    for (const loc of locales) {
+        languageUrls[loc] = `${baseUrl}${buildMapMetadataPath(filters, loc)}`;
     }
 
     return {
