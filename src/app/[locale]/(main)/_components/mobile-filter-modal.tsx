@@ -1,11 +1,32 @@
 // components/MobileFilterModal.tsx
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { categories, lockScroll, unlockScroll } from '@/lib/consts';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { ButtonCategory } from './button-category/button-category';
+
+const FOCUSABLE_SELECTOR =
+    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// Tab na ostatniej kontrolce wraca na pierwszą, Shift+Tab na pierwszej — na ostatnią.
+const trapTabKey = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+    const focusable = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)];
+    const first = focusable.at(0);
+    const last = focusable.at(-1);
+    if (!first || !last) return;
+
+    if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+        return;
+    }
+    if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+    }
+};
 
 interface MobileFilterModalProps {
     isOpen: boolean;
@@ -38,6 +59,8 @@ export const MobileFilterModal = ({
                                   }: MobileFilterModalProps) => {
     const t = useTranslations('MapPage');
     const containerRef = useRef<HTMLDivElement>(null);
+    const backButtonRef = useRef<HTMLButtonElement>(null);
+    const titleId = useId();
 
     // Lock background scroll when open
     useEffect(() => {
@@ -45,6 +68,20 @@ export const MobileFilterModal = ({
         else unlockScroll();
         return () => { unlockScroll(); };
     }, [isOpen]);
+
+    // Move focus into the dialog so Escape and the Tab trap work right away
+    useEffect(() => {
+        if (isOpen) backButtonRef.current?.focus();
+    }, [isOpen]);
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+        if (event.key === 'Escape') {
+            event.stopPropagation();
+            onClose();
+            return;
+        }
+        if (event.key === 'Tab') trapTabKey(event);
+    };
 
     // Toggle category
     const handleCategoryClick = (category: string) => {
@@ -65,11 +102,18 @@ export const MobileFilterModal = ({
         ${isOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}
       `}
             onClick={onClose}
+            // Closed modal stays mounted for the opacity transition — inert removes it
+            // from the Tab order and the accessibility tree, pointer-events only stops the mouse
+            inert={!isOpen}
         >
             <div
                 // The actual modal—stops clicks from bubbling up to the overlay
                 ref={containerRef}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
                 onClick={e => e.stopPropagation()}
+                onKeyDown={handleKeyDown}
                  // eslint-disable-next-line tailwindcss/no-contradicting-classname
                 className={`
           relative mx-auto my-4 w-11/12 max-w-md rounded-lg
@@ -83,13 +127,17 @@ export const MobileFilterModal = ({
                 <div className="flex-none items-center gap-3 border-b border-slate-200 p-4 dark:border-gray-600">
                     <div className="flex items-center gap-3">
                         <button
+                            ref={backButtonRef}
                             onClick={onClose}
                             aria-label="Go Back"
                             className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
                         >
                             <ArrowLeft size={20} />
                         </button>
-                        <h2 className="text-lg font-medium text-slate-800 dark:text-gray-100">
+                        <h2
+                            id={titleId}
+                            className="text-lg font-medium text-slate-800 dark:text-gray-100"
+                        >
                             {t('Filters')}
                         </h2>
                     </div>
