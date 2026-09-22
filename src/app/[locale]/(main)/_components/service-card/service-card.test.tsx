@@ -295,3 +295,50 @@ describe('<ServiceCard /> — dostepnosc', () => {
         });
     }
 });
+
+describe('<ServiceCard /> — tagi zwinietej karty', () => {
+    const tagi = ['tag-a', 'tag-b', 'tag-c', 'tag-d'];
+    const pierwotnaSzerokosc = window.innerWidth;
+
+    function ustawSzerokoscOkna(szerokosc: number) {
+        Object.defineProperty(window, 'innerWidth', { configurable: true, value: szerokosc });
+    }
+
+    // Rozwinieta sekcja karty tez listuje tagi (wszystkie), wiec asercje dotycza
+    // kontenera zwinietej karty — pierwszego w DOM rodzica badge'a z tagiem.
+    function kontenerTagowZwinietejKarty(): HTMLElement {
+        const kontener = screen.getAllByText('Tag-a')[0].parentElement;
+        if (!kontener) throw new Error('Brak kontenera tagow zwinietej karty');
+        return kontener;
+    }
+
+    afterEach(() => ustawSzerokoscOkna(pierwotnaSzerokosc));
+
+    // Regresja: liczba tagow zalezala od `window.innerWidth` czytanego w renderze.
+    // Serwer (bez `window`) dawal 3 badge, klient ponizej 768px — 2, wiec React
+    // odrzucal hydratacje calej listy wynikow. HTML musi byc identyczny przy
+    // kazdej szerokosci, a o widocznosci trzeciego tagu decyduje CSS.
+    it.each([390, 1440])('renderuje ten sam zestaw tagow przy szerokosci %ipx', szerokosc => {
+        ustawSzerokoscOkna(szerokosc);
+        renderCard({ tags: tagi });
+
+        const wyrenderowane = Array.from(kontenerTagowZwinietejKarty().children);
+        expect(wyrenderowane.map(el => el.textContent)).toEqual(['Tag-a', 'Tag-b', 'Tag-c']);
+        expect(wyrenderowane[2]).toHaveClass('hidden', 'md:inline-flex');
+        expect(wyrenderowane[0]).not.toHaveClass('hidden');
+        expect(wyrenderowane[1]).not.toHaveClass('hidden');
+    });
+
+    it('HTML tagow jest identyczny przy 390px i 1440px', () => {
+        ustawSzerokoscOkna(390);
+        const { unmount } = renderCard({ id: 'stale-id', tags: tagi });
+        const htmlWaski = kontenerTagowZwinietejKarty().outerHTML;
+        unmount();
+
+        ustawSzerokoscOkna(1440);
+        renderCard({ id: 'stale-id', tags: tagi });
+        const htmlSzeroki = kontenerTagowZwinietejKarty().outerHTML;
+
+        expect(htmlWaski).toBe(htmlSzeroki);
+    });
+});

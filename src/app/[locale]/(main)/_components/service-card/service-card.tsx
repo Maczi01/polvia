@@ -27,6 +27,20 @@ const ACTION_GRID_COLUMNS: Record<number, string> = {
     4: 'grid-cols-2',
 };
 
+/** Breakpoint `md` z Tailwinda — ponizej karta zachowuje sie jak na telefonie. */
+const MOBILE_BREAKPOINT_PX = 768;
+
+/**
+ * Zwinieta karta pokazuje trzy tagi, a ponizej `md` dwa. Trzeci jest renderowany
+ * zawsze i chowany CSS-em, bo liczba liczona z `window` rozjezdza HTML serwera
+ * z klientem i wywraca hydratacje.
+ */
+const COLLAPSED_TAG_LIMIT = 3;
+const MOBILE_COLLAPSED_TAG_LIMIT = 2;
+
+/** Czytaj wylacznie w event handlerach — nigdy w renderze. */
+const isMobileViewport = (): boolean => window.innerWidth < MOBILE_BREAKPOINT_PX;
+
 const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     pl: { src: '/icons/pl.svg', alt: 'Polish' },
     en: { src: '/icons/gb.svg', alt: 'English' },
@@ -176,7 +190,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const tCounties = useTranslations('MapPage.counties');
 
         const COLLAPSE_MS = 300;
-        const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
         const translatedVoivodeship = useMemo(() => {
             if (!voivodeship) return '';
@@ -287,7 +300,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                         }
                         handleHoverPlace(id);
 
-                        if (isMobile && cardRef.current) {
+                        if (isMobileViewport() && cardRef.current) {
                             setTimeout(() => {
                                 if (cardRef.current) {
                                     const cardRect = cardRef.current.getBoundingClientRect();
@@ -322,7 +335,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 }
                 handleHoverPlace(id);
 
-                if (isMobile && cardRef.current) {
+                if (isMobileViewport() && cardRef.current) {
                     setTimeout(() => {
                         if (cardRef.current) {
                             cardRef.current.scrollIntoView({
@@ -348,7 +361,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                 setPopup,
                 handleHoverPlace,
                 setCardToExpand,
-                isMobile,
                 COLLAPSE_MS,
                 serviceId,
             ],
@@ -490,12 +502,15 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                     {/* Tags when collapsed */}
                     {!expanded && tags && tags.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1.5">
-                            {tags.slice(0, isMobile ? 2 : 3).map((tag, idx) => (
+                            {tags.slice(0, COLLAPSED_TAG_LIMIT).map((tag, idx) => (
                                 <Badge
                                     label={tag?.toString() || ''}
                                     key={idx}
                                     color="gray"
                                     variant={badgeColor}
+                                    className={cn(
+                                        idx >= MOBILE_COLLAPSED_TAG_LIMIT && 'hidden md:inline-flex',
+                                    )}
                                 />
                             ))}
                         </div>
