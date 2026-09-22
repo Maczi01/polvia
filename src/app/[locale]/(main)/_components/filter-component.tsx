@@ -51,9 +51,20 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
     const [isPending, startTransition] = useTransition();
 
     const categoryReference = useRef<HTMLDivElement>(null);
+    const filterButtonReference = useRef<HTMLButtonElement>(null);
+    const wasMobileFilterOpenReference = useRef(false);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(true);
     const [isScrollable, setIsScrollable] = useState(false);
+
+    // The "Filters" button unmounts while the modal is open, so focus is returned
+    // to its remounted instance after close — otherwise it falls to <body>
+    useEffect(() => {
+        if (wasMobileFilterOpenReference.current && !isMobileFilterOpen) {
+            filterButtonReference.current?.focus();
+        }
+        wasMobileFilterOpenReference.current = isMobileFilterOpen;
+    }, [isMobileFilterOpen]);
 
     // Sync state when URL changes (browser back/forward or direct navigation)
     useEffect(() => {
@@ -315,6 +326,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                                 )}
 
                                                 <Button
+                                                    ref={filterButtonReference}
                                                     variant="slate"
                                                     className={`h-10 ${hasActiveFilters ? 'w-1/2' : 'w-full'} text-white`}
                                                     onClick={() => setIsMobileFilterOpen(true)}
