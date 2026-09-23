@@ -120,8 +120,9 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
             const basePath = localePathPrefix(locale);
             const fullPath = `${basePath}${localizedPath}`;
 
-            // Update URL without navigation (instant, no reload)
-            window.history.pushState({}, '', fullPath);
+            // Update URL without navigation (instant, no reload). Query string
+            // (view, query, id) nalezy do innych kontrolek — filtr go nie rusza.
+            window.history.pushState({}, '', `${fullPath}${window.location.search}`);
         },
         [locale, onFiltersChange, onlineOnly],
     );
@@ -141,8 +142,9 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
         onFiltersChange?.({ category: null, county: null, city: null, onlineOnly: false });
 
         // Update URL to base path without navigation
+        // query i id czysci nuqs wyzej; zostaje reszta, np. view
         const basePath = localizedMapBasePath(locale);
-        window.history.pushState({}, '', basePath);
+        window.history.pushState({}, '', `${basePath}${window.location.search}`);
     }, [setSearchInput, setSelectedId, locale, onFiltersChange]);
 
     const clearCategories = useCallback(() => {
