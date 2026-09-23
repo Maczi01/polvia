@@ -1,4 +1,6 @@
-import { locales, type Locale } from '@/i18n/config';
+import { type Locale, locales } from '@/i18n/config';
+import { type MapFilters, parseMapSlug } from '@/lib/map-slug-parser';
+import { localizedMapBasePath } from '@/lib/map-url-builder';
 
 /**
  * Rozbior sciezki URL mapy na locale i segmenty slugu.
@@ -32,4 +34,26 @@ export function parseMapPathname(pathname: string): MapPathname | null {
     }
 
     return null;
+}
+
+const NO_FILTERS: MapFilters = { category: null, county: null, city: null, onlineOnly: false };
+
+/**
+ * Odtwarza filtry mapy z adresu przegladarki (`window.location.pathname`).
+ *
+ * Potrzebne po `popstate`: filtry zmieniaja adres przez `history.pushState`,
+ * wiec przy Wstecz/Naprzod serwer nie przysyla nowych `initialFilters` —
+ * jedynym zrodlem prawdy jest sam adres.
+ *
+ * Sciezka spoza mapy danego locale albo z nieprawidlowym slugiem daje brak
+ * filtrow — tak samo jak serwer, ktory takie adresy odrzuca.
+ */
+export function mapFiltersFromPathname(pathname: string, locale: Locale): MapFilters {
+    const basePath = localizedMapBasePath(locale);
+    if (pathname === basePath) return NO_FILTERS;
+    if (!pathname.startsWith(`${basePath}/`)) return NO_FILTERS;
+
+    const slug = pathname.slice(basePath.length + 1).split('/');
+    const result = parseMapSlug(slug, locale, basePath);
+    return result.success ? result.filters : NO_FILTERS;
 }

@@ -1,4 +1,4 @@
-import { parseMapPathname } from '@/lib/map-pathname';
+import { mapFiltersFromPathname, parseMapPathname } from '@/lib/map-pathname';
 
 describe('parseMapPathname — rozbior sciezki mapy', () => {
     it('rozpoznaje /mapa/{slug} jako locale pl', () => {
@@ -38,5 +38,78 @@ describe('parseMapPathname — rozbior sciezki mapy', () => {
     it('nie myli /mapa z podobnymi sciezkami', () => {
         expect(parseMapPathname('/mapamania/cos')).toBeNull();
         expect(parseMapPathname('/en/mapping/law')).toBeNull();
+    });
+});
+
+describe('mapFiltersFromPathname — filtry z adresu przegladarki', () => {
+    const noFilters = { category: null, county: null, city: null, onlineOnly: false };
+
+    it('sciezka bazowa daje brak filtrow we wszystkich locale', () => {
+        expect(mapFiltersFromPathname('/mapa', 'pl')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/en/map', 'en')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/ru/map', 'ru')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/uk/map', 'uk')).toEqual(noFilters);
+    });
+
+    it('rozpoznaje sama kategorie w slugu wlasciwym dla locale', () => {
+        const grocery = { ...noFilters, category: 'grocery' };
+        expect(mapFiltersFromPathname('/mapa/spozywcze', 'pl')).toEqual(grocery);
+        expect(mapFiltersFromPathname('/en/map/grocery', 'en')).toEqual(grocery);
+        expect(mapFiltersFromPathname('/ru/map/produkty', 'ru')).toEqual(grocery);
+        expect(mapFiltersFromPathname('/uk/map/produkty', 'uk')).toEqual(grocery);
+    });
+
+    it('rozpoznaje samo wojewodztwo', () => {
+        expect(mapFiltersFromPathname('/mapa/malopolskie', 'pl')).toEqual({
+            ...noFilters,
+            county: 'malopolskie',
+        });
+    });
+
+    it('rozpoznaje samo miasto i oddaje jego nazwe', () => {
+        expect(mapFiltersFromPathname('/uk/map/krakow', 'uk')).toEqual({
+            ...noFilters,
+            city: 'kraków',
+        });
+    });
+
+    it('rozpoznaje zasieg online', () => {
+        expect(mapFiltersFromPathname('/mapa/online', 'pl')).toEqual({
+            ...noFilters,
+            onlineOnly: true,
+        });
+    });
+
+    it('rozpoznaje kategorie z wojewodztwem', () => {
+        expect(mapFiltersFromPathname('/mapa/prawne/malopolskie', 'pl')).toEqual({
+            ...noFilters,
+            category: 'law',
+            county: 'malopolskie',
+        });
+    });
+
+    it('segment smieciowy daje brak filtrow zamiast bledu', () => {
+        expect(mapFiltersFromPathname('/mapa/xyz-nie-istnieje', 'pl')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/mapa/prawne/xyz', 'pl')).toEqual(noFilters);
+    });
+
+    it('slug kategorii z innego locale nie jest rozpoznawany', () => {
+        expect(mapFiltersFromPathname('/mapa/grocery', 'pl')).toEqual(noFilters);
+    });
+
+    it('nie rozpoznaje mapy pod prefiksem innego locale — tylko en nosi /en', () => {
+        // Zadne locale poza en nie moze przyjac sciezki z '/en'
+        expect(mapFiltersFromPathname('/en/map/online', 'pl')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/en/map/online', 'ru')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/en/map/online', 'uk')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/en/map/online', 'en')).toEqual({
+            ...noFilters,
+            onlineOnly: true,
+        });
+    });
+
+    it('nie myli mapy z podobnymi sciezkami', () => {
+        expect(mapFiltersFromPathname('/mapamania/online', 'pl')).toEqual(noFilters);
+        expect(mapFiltersFromPathname('/blog/online', 'pl')).toEqual(noFilters);
     });
 });
