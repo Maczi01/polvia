@@ -15,8 +15,10 @@ export const StackedServicesList = ({ services, onSelect }: StackedServicesListP
     const headingId = useId();
 
     return (
-        <div className="flex max-h-72 w-64 flex-col text-black">
-            <p id={headingId} className="px-3 pb-2 pt-3 text-sm font-semibold text-gray-600">
+        // Tlo nadaje komponent, nie Mapbox: globals.css ustawia wszystkim popupom
+        // `background-color: transparent` (tak samo robi MarkerPopup).
+        <div className="flex max-h-72 w-full flex-col bg-white text-black">
+            <p id={headingId} className="py-3 pl-3 pr-12 text-sm font-semibold text-gray-600">
                 {t('stackedHeader', { count: services.length })}
             </p>
             <ul aria-labelledby={headingId} className="overflow-y-auto pb-1">
