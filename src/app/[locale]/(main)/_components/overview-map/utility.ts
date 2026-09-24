@@ -1,3 +1,4 @@
+import type Supercluster from 'supercluster';
 import { PointFeature } from 'supercluster';
 import { ItemPointClusterProperties, ItemPointFeatureProperties, PartialService } from '@/types';
 
@@ -98,4 +99,20 @@ export function reduceCluster(
     properties: ItemPointClusterProperties,
 ): void {
     memo.items = memo.items.concat(properties.items);
+}
+
+/** Najwiekszy zoom, do jakiego przybliza mapa (przycisk `+`). */
+export const MAX_MAP_ZOOM = 20;
+
+/**
+ * Klaster, ktorego nie rozdzieli zadne przyblizenie — wpisy stoja pod tym samym
+ * adresem (jeden budynek albo zastepczy adres w centrum miasta). Klikniecie
+ * takiego klastra musi pokazac liste wpisow, bo `fitBounds` na obszar zerowej
+ * wielkosci przybliza mape do oporu, a licznik zostaje.
+ */
+export function isStackedCluster(
+    index: Supercluster<ItemPointFeatureProperties, ItemPointClusterProperties>,
+    clusterId: number,
+): boolean {
+    return index.getClusterExpansionZoom(clusterId) > MAX_MAP_ZOOM;
 }

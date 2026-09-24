@@ -452,7 +452,8 @@
     "map": "Map",
     "list": "Details",
     "close": "Close",
-    "viewInList": "View in list"
+    "viewInList": "View in list",
+    "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address"
   },
   "contact": {
     "rateLimitExceeded": "Message limit exceeded. Please try again later."

@@ -453,7 +453,8 @@
     "map": "Mapa",
     "list": "Szczegóły",
     "close": "Zamknij",
-    "viewInList": "Zobacz na liście"
+    "viewInList": "Zobacz na liście",
+    "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem"
   },
   "contact": {
     "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej."

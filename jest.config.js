@@ -14,6 +14,9 @@ const customJestConfig = {
         // transformIgnorePatterns z tego pliku). Kierujemy Jesta na build CJS
         // samej biblioteki — ikony renderuja sie normalnie, bez stubowania.
         '^lucide-react$': '<rootDir>/node_modules/lucide-react/dist/cjs/lucide-react.js',
+        // supercluster publikuje tylko ESM (`index.js`); build UMD z `dist/` ma
+        // wbudowany kdbush, wiec testy klastrowania ida na prawdziwej bibliotece.
+        '^supercluster$': '<rootDir>/node_modules/supercluster/dist/supercluster.js',
     },
 };
 

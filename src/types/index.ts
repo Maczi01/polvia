@@ -29,9 +29,9 @@ export type MarkerData = Coordinates & {
     category: string;
 };
 
+/** Klaster wpisow pod jednym adresem, otwarty jako lista w dymku. */
 export type MarkerDataCluster = Coordinates & {
-    name: string;
-    array: PartialService[];
+    services: PartialService[];
 };
 
 export type ItemPointFeatureProperties = PointFeatureProperties<{
