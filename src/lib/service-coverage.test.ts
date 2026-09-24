@@ -258,6 +258,53 @@ describe('splitServicesByCoverage', () => {
             expect(localResults).toHaveLength(0);
         });
 
+        it('zapytanie wielowyrazowe dopasowuje slowa niezaleznie od kolejnosci i pola', () => {
+            const szkola = service({ name: 'Lingua City', description: 'Kursy języka polskiego' });
+            const bezDopasowania = service({ name: 'Polski Sklep', description: 'Artykuły' });
+
+            const { localResults } = splitServicesByCoverage([szkola, bezDopasowania], {
+                ...NO_FILTERS,
+                query: 'polskiego  kurs',
+            });
+
+            expect(ids(localResults)).toEqual([szkola.id]);
+        });
+
+        it('zapytanie wielowyrazowe wymaga dopasowania kazdego slowa', () => {
+            const tylkoJedno = service({ name: 'Szkoła językowa' });
+
+            const { localResults } = splitServicesByCoverage([tylkoJedno], {
+                ...NO_FILTERS,
+                query: 'szkola jazdy',
+            });
+
+            expect(localResults).toHaveLength(0);
+        });
+
+        it('slowo w mianowniku trafia w inne formy fleksyjne', () => {
+            const ubezpieczenia = service({ name: 'Doradca', description: 'Ubezpieczenia OC i AC' });
+            const ubezpieczen = service({ name: 'Porównywarka ubezpieczeń' });
+            const bezDopasowania = service({ name: 'Fryzjer' });
+
+            const { localResults } = splitServicesByCoverage(
+                [ubezpieczenia, ubezpieczen, bezDopasowania],
+                { ...NO_FILTERS, query: 'ubezpieczenie' },
+            );
+
+            expect(ids(localResults)).toEqual([ubezpieczenia.id, ubezpieczen.id]);
+        });
+
+        it('nie obcina koncowki, gdy zostalby zbyt krotki rdzen', () => {
+            const barber = service({ name: 'Barber Shop' });
+
+            const { localResults } = splitServicesByCoverage([barber], {
+                ...NO_FILTERS,
+                query: 'bary',
+            });
+
+            expect(localResults).toHaveLength(0);
+        });
+
         it('zachowuje kolejnosc wejsciowa — sortowanie pochodzi z zapytania', () => {
             const pierwszy = service({ coverage: 'online' });
             const drugi = service({ coverage: 'online' });
