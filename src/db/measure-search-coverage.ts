@@ -29,6 +29,14 @@ import type { PartialService } from '@/types';
 
 const LOCALE = 'pl';
 
+/** Pomiar bez oceny trafnosci liczylby stary ranking i wygladal na poprawny. */
+class RelevanceCheckUnavailableError extends Error {
+    constructor(query: string) {
+        super(`Ocena trafnosci niedostepna dla zapytania "${query}" — pomiar przerwany`);
+        this.name = 'RelevanceCheckUnavailableError';
+    }
+}
+
 // Zestaw odniesienia z pomiaru 2026-09-22. Pary z diakrytykami i bez sa celowe —
 // obnazaja wrazliwosc na diakrytyki. Nie redukowac do jednej formy.
 const QUERIES = [
@@ -106,12 +114,13 @@ async function measureQuery(services: PartialService[], query: string): Promise<
     }
 
     // Bez filtrow w URL-u zawezenie `filteredEmbeddingResults` w komponencie niczego nie odsiewa.
-    const { services: semanticResults } = await searchServicesSemantic({
+    const { services: semanticResults, relevanceCheck } = await searchServicesSemantic({
         query: query.trim(),
         locale: LOCALE,
         limit: DEFAULT_SEMANTIC_LIMIT,
         excludeIds: lexical.localResults.map(service => service.serviceId),
     });
+    if (relevanceCheck === 'unavailable') throw new RelevanceCheckUnavailableError(query);
 
     // Sekcja online odejmuje wyniki semantyczne — drugie wywolanie, jak w komponencie.
     const { onlineResults } = splitServicesByCoverage(services, { query }, semanticResults);
@@ -121,9 +130,9 @@ async function measureQuery(services: PartialService[], query: string): Promise<
 }
 
 /**
- * Liczba wynikow semantycznych nie mowi nic o trafnosci — prog `RELEVANCE_FLOOR`
- * przepuszcza tez slabe dopasowania ("pralnia" → firmy remontowe). Nazwy sa po to,
- * zeby kazdy wiersz "razem" dalo sie ocenic okiem, zanim uzna sie go za sukces.
+ * Wyniki semantyczne przeszly ocene modelu (`semantic-relevance-judge`), ale model tez
+ * sie myli. Nazwy i podobienstwo sa po to, zeby kazdy wiersz "razem" dalo sie
+ * sprawdzic okiem, zanim uzna sie go za sukces.
  */
 function printSemanticResults(rows: QueryMeasurement[]): void {
     console.log('\nWyniki semantyczne do oceny trafnosci:');
@@ -167,7 +176,7 @@ async function measureSearchCoverage(): Promise<void> {
     console.log(`\nWyszukiwan semantycznych (embeddingow OpenAI): ${semanticCalls}`);
     console.log(`Bez wynikow tekstowych: ${formatShare(lexicalZero, rows.length)}`);
     console.log(`Bez wynikow na ekranie: ${formatShare(totalZero, rows.length)}`);
-    console.log('"Na ekranie" liczy wyniki, nie trafnosc — sprawdz liste wynikow semantycznych.');
+    console.log('Wyniki semantyczne ocenione przez model — sprawdz liste powyzej.');
 }
 
 // Pakiet jest CJS (brak "type": "module"), wiec tsx nie przepusci top-level await.

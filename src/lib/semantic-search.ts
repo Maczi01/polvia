@@ -15,6 +15,7 @@ import {
 } from '@/db/schema';
 import { createContextualQuery, isCategory } from '@/lib/category-contexts';
 import { RELEVANCE_FLOOR, selectRelevant } from '@/lib/search-relevance';
+import { judgeRelevance, RelevanceJudgeError } from '@/lib/semantic-relevance-judge';
 import { PartialService } from '@/types';
 
 import { env } from '../../env';
@@ -35,6 +36,12 @@ const EMBEDDING_MODEL = 'text-embedding-3-small';
 
 /** Tyle wynikow dostaje ekran mapy — klient nie przekazuje `limit` do `/api/services`. */
 export const DEFAULT_SEMANTIC_LIMIT = 3;
+
+/**
+ * Tylu najlepszych kandydatow ocenia model. Wiecej niz `limit`, bo odrzuceni zwalniaja
+ * miejsca: przed ocena trafny wynik z pozycji 4 przegrywal z nietrafnym z pozycji 1.
+ */
+const JUDGE_POOL_SIZE = 10;
 
 type Voivodeship = (typeof voivodeshipEnum.enumValues)[number];
 
@@ -59,9 +66,16 @@ type Candidate = PartialService & { relevanceScore: number };
 /** Wynik z punktacja — publiczny endpoint ja odcina, skrypt pomiaru ja wypisuje. */
 export type SemanticMatch = Candidate & { boostedScore: number };
 
+/**
+ * `passed` — wyniki ocenil model. `unavailable` — ocena zawiodla i wyniki sa
+ * nieocenionym rankingiem podobienstwa (patrz `keepJudgedRelevant`).
+ */
+export type RelevanceCheck = 'passed' | 'unavailable';
+
 export type SemanticSearchResult = {
     services: SemanticMatch[];
     contextualQuery: string;
+    relevanceCheck: RelevanceCheck;
 };
 
 async function embedQuery(contextualQuery: string): Promise<string> {
@@ -257,7 +271,26 @@ export async function searchServicesSemantic(
 
     // Odsianie wynikow spoza wybranej kategorii robi juz `buildWhereConditions` w SQL,
     // wiec nie ma tu drugiej reguly na to samo.
-    const services = selectRelevant(candidates, query, category, limit);
+    const ranked = selectRelevant(candidates, query, category, Math.max(limit, JUDGE_POOL_SIZE));
+    const judged = await keepJudgedRelevant(query, ranked, limit);
 
-    return { services, contextualQuery };
+    return { ...judged, contextualQuery };
+}
+
+async function keepJudgedRelevant(
+    query: string,
+    ranked: SemanticMatch[],
+    limit: number,
+): Promise<Omit<SemanticSearchResult, 'contextualQuery'>> {
+    try {
+        const relevantIds = await judgeRelevance(openai, query, ranked);
+        const services = ranked.filter(match => relevantIds.has(match.id)).slice(0, limit);
+        return { services, relevanceCheck: 'passed' };
+    } catch (error) {
+        if (!(error instanceof RelevanceJudgeError)) throw error;
+        // Bez oceny ekran dostaje ranking jak przed wprowadzeniem modelu — slabszy, ale
+        // pusta sekcja przy awarii OpenAI bylaby gorsza. Stan wraca do wolajacego.
+        console.error('Relevance judge unavailable', { code: error.code, message: error.message });
+        return { services: ranked.slice(0, limit), relevanceCheck: 'unavailable' };
+    }
 }

@@ -18,8 +18,9 @@ import { isCategory } from './category-contexts';
  *
  * 0.3 przepuszcza wszystkie zmierzone zapytania trafne i odcina te zdegenerowane
  * (losowe znaki, pytania spoza domeny katalogu). Zapytania z odlegla, ale prawdziwa
- * zbieznoscia tematyczna przejda — na to prog jest zlym narzedziem i trzeba innego
- * mechanizmu (np. bramki leksykalnej przed semantyka).
+ * zbieznoscia tematyczna przejda — na to prog jest zlym narzedziem. Tym zajmuje sie
+ * `semantic-relevance-judge.ts` (pomiar 2026-09-24: nietrafne "apteka" → przychodnia
+ * 0.406 mialo wyzsze podobienstwo niz trafne "prawnik" → kancelaria 0.369).
  *
  * Podnoszac te wartosc sprawdz najpierw, ile wynosi top1 dla "fryzjer".
  */
