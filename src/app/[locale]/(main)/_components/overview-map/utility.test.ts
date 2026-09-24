@@ -1,5 +1,8 @@
-import { createPoints } from './utility';
-import type { PartialService } from '@/types';
+import Supercluster from 'supercluster';
+
+import type { ItemPointClusterProperties, ItemPointFeatureProperties, PartialService } from '@/types';
+
+import { createPoints, isStackedCluster, mapFeature, reduceCluster } from './utility';
 
 let counter = 0;
 
@@ -97,5 +100,37 @@ describe('createPoints — mapa pokazuje tylko to, co mozna odwiedzic', () => {
         const points = createPoints([pierwszy, drugi, trzeci]);
 
         expect(points.map(point => point.id)).toEqual([pierwszy.id, drugi.id, trzeci.id]);
+    });
+});
+
+describe('isStackedCluster — klaster, ktorego nie da sie rozdzielic przyblizeniem', () => {
+    function clusterOf(services: PartialService[]) {
+        const index = new Supercluster<ItemPointFeatureProperties, ItemPointClusterProperties>({
+            map: mapFeature,
+            reduce: reduceCluster,
+            extent: 512,
+            minZoom: 0,
+            maxZoom: 24,
+            radius: 75,
+        });
+        index.load(createPoints(services));
+        const [feature] = index.getClusters([-180, -85, 180, 85], 5);
+        if (!feature?.properties.cluster) throw new Error('Fixture nie utworzyl klastra');
+        return { index, clusterId: feature.properties.cluster_id };
+    }
+
+    it('wpisy pod identycznym adresem (zastepczy adres w centrum miasta) to stos', () => {
+        const { index, clusterId } = clusterOf([service(), service(), service()]);
+
+        expect(isStackedCluster(index, clusterId)).toBe(true);
+    });
+
+    it('wpisy w roznych czesciach miasta NIE sa stosem — przyblizenie je rozdzieli', () => {
+        const { index, clusterId } = clusterOf([
+            service({ latitude: 52.2297, longitude: 21.0122 }),
+            service({ latitude: 52.2, longitude: 20.95 }),
+        ]);
+
+        expect(isStackedCluster(index, clusterId)).toBe(false);
     });
 });

@@ -7,8 +7,14 @@ import { MarkerPopup } from '../marker-popup';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
-import { ClusterPopup } from '../cluster-popup';
-import { createPoints, initialViewState, mapFeature, reduceCluster } from './utility';
+import { ClusterPopup } from '../cluster-popup/cluster-popup';
+import {
+    createPoints,
+    initialViewState,
+    isStackedCluster,
+    mapFeature,
+    reduceCluster,
+} from './utility';
 import { Marker } from './marker';
 import MapNoSsr from './map-no-ssr';
 import { ControlButtons } from './control-buttons';
@@ -250,6 +256,32 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
             });
         }, [mapRef, isMobile]);
 
+        const selectService = useCallback(
+            (item: PartialService, longitude: number, latitude: number) => {
+                handleOpenPopup?.({
+                    id: item.id,
+                    name: item.name,
+                    latitude,
+                    longitude,
+                    image: item.image ?? '',
+                    category: item.category,
+                    place: item.city ?? '',
+                });
+                handleClickedPlace(item.id);
+                handleFlyTo(longitude, latitude);
+            },
+            [handleOpenPopup, handleClickedPlace, handleFlyTo],
+        );
+
+        const handleSelectStacked = useCallback(
+            (item: PartialService) => {
+                if (item.latitude == null || item.longitude == null) return;
+                setPopupCluster(null);
+                selectService(item, item.longitude, item.latitude);
+            },
+            [selectService],
+        );
+
         const clusterElements = useMemo(() => {
             return clusters.map(feature => {
                 const [longitude, latitude] = feature.geometry.coordinates;
@@ -283,6 +315,13 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                             isSelected={isActiveInCluster}
                             category={clusterCategory}
                             onClick={() => {
+                                // Wpisy pod jednym adresem nie rozejda sie przy zadnym
+                                // zoomie — zamiast przyblizac, pokazujemy ich liste.
+                                if (supercluster && isStackedCluster(supercluster, cluster_id)) {
+                                    setPopup(null);
+                                    setPopupCluster({ longitude, latitude, services: items });
+                                    return;
+                                }
                                 expandCluster(cluster_id, { longitude, latitude });
                                 setPopupCluster(null);
                             }}
@@ -308,26 +347,12 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                             selectedService?.id === item.id ||
                             (highlightedServiceIds?.has(item.id) ?? false)
                         }
-                        onClick={() => {
-                            if (handleOpenPopup) {
-                                handleOpenPopup({
-                                    id: item.id,
-                                    name: item.name,
-                                    latitude,
-                                    longitude,
-                                    image: item.image,
-                                    category: item.category,
-                                    place: item.city,
-                                });
-                            }
-                            handleClickedPlace(item.id);
-                            handleFlyTo(longitude, latitude);
-                        }}
+                        onClick={() => selectService(item, longitude, latitude)}
                         aria-label={`Marker for ${item.name}`}
                     />
                 );
             });
-        }, [clusters, selectedService, highlightedServiceIds, expandCluster, popup, handleOpenPopup, handleClickedPlace, handleFlyTo]);
+        }, [clusters, selectedService, highlightedServiceIds, expandCluster, popup, supercluster, setPopup, selectService]);
 
         const handleReset = () => {
             resetMap();
@@ -466,6 +491,8 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     } : true}
                     onZoomStart={() => {
                         setPopupFlag(false);
+                        // Po zmianie zoomu klastry sa przeliczane — lista w dymku bylaby nieaktualna.
+                        setPopupCluster(null);
                         if (!isZoomingToMarker) {
                             setIsZoomingToMarker(true);
                         }
@@ -503,6 +530,13 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     keyboard={false}
                 >
                     {clusterElements}
+                    {popupCluster && (
+                        <ClusterPopup
+                            cluster={popupCluster}
+                            onSelect={handleSelectStacked}
+                            onClose={() => setPopupCluster(null)}
+                        />
+                    )}
                     {popup && popupFlag && zoom >= 12 && (
                         <MarkerPopup
                             longitude={popup.longitude}

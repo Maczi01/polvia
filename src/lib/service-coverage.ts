@@ -28,16 +28,71 @@ export type CoverageBuckets = {
     onlineResults: PartialService[];
 };
 
-/** Semantyka przeniesiona 1:1 z poprzedniego `frontendFilteredServices`. */
-function matchesQuery(item: PartialService, query: string): boolean {
-    if (!query) return true;
-    return (
-        item.name.toLowerCase().includes(query) ||
-        (item.description?.toLowerCase().includes(query) ?? false) ||
-        (item.city?.toLowerCase().includes(query) ?? false) ||
-        (item.category?.toLowerCase().includes(query) ?? false) ||
-        (item.tags?.some(tag => tag.toLowerCase().includes(query)) ?? false)
+/**
+ * Male litery bez polskich znakow — uzytkownik pisze raz "ksiegowa", raz "księgowa",
+ * a dane sa niespojne w obie strony. `ł` nie rozklada sie w NFD, stad osobna zamiana.
+ */
+function foldForSearch(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/ł/g, 'l');
+}
+
+/**
+ * Koncowki fleksyjne rzeczownikow i przymiotnikow (juz bez polskich znakow), najdluzsze
+ * pierwsze. Swiadomie tylko odmiana, nie slowotworstwo: "prawnik" nie trafi w
+ * "radca prawny" — to synonim, nie forma tego samego slowa.
+ */
+const INFLECTION_SUFFIXES = [
+    'ami',
+    'ach',
+    'ego',
+    'emu',
+    'ych',
+    'ymi',
+    'owi',
+    'iem',
+    'ie',
+    'ia',
+    'iu',
+    'ow',
+    'om',
+    'em',
+    'y',
+    'a',
+    'e',
+    'i',
+    'u',
+    'o',
+];
+
+/** Krotszy rdzen trafialby przypadkowo: "bary" → "bar" lapaloby "Barber". */
+const MIN_STEM_LENGTH = 4;
+
+/** "ubezpieczenie" → "ubezpieczen", zeby trafic tez "ubezpieczenia" i "ubezpieczeń". */
+function stripInflection(term: string): string {
+    const suffix = INFLECTION_SUFFIXES.find(
+        ending => term.endsWith(ending) && term.length - ending.length >= MIN_STEM_LENGTH,
     );
+    return suffix ? term.slice(0, -suffix.length) : term;
+}
+
+/**
+ * Slowa zapytania szukane osobno: "kurs polskiego" musi trafic we wpis "Kursy języka
+ * polskiego", a jako jeden ciag znakow nie trafial w nic.
+ */
+function toSearchTerms(query: string): string[] {
+    return foldForSearch(query).split(/\s+/).filter(Boolean).map(stripInflection);
+}
+
+/**
+ * Pola przeszukiwane jak w poprzednim `frontendFilteredServices`. Kazde slowo musi
+ * trafic w ktores pole — jedno trafione slowo z dwoch nie wystarcza.
+ */
+function matchesQuery(item: PartialService, terms: string[]): boolean {
+    if (terms.length === 0) return true;
+    const fields = [item.name, item.description, item.city, item.category, ...(item.tags ?? [])]
+        .filter(field => field != null)
+        .map(foldForSearch);
+    return terms.every(term => fields.some(field => field.includes(term)));
 }
 
 function matchesCategory(item: PartialService, category: string): boolean {
@@ -70,14 +125,14 @@ export function splitServicesByCoverage(
     filters: CoverageFilters,
     alreadyShown: PartialService[] = [],
 ): CoverageBuckets {
-    const query = filters.query ? filters.query.toLowerCase().trim() : '';
+    const terms = toSearchTerms(filters.query ?? '');
     const category = filters.category ?? '';
     const county = filters.county ?? '';
     const city = filters.city ?? '';
 
     // Kategoria i tekst dzialaja na OBA kubelki — zasieg jest ortogonalny (R2, R7).
     const matching = services.filter(
-        item => matchesQuery(item, query) && matchesCategory(item, category),
+        item => matchesQuery(item, terms) && matchesCategory(item, category),
     );
 
     // Lista lokalna: tylko wpisy, ktore mozna odwiedzic, i tylko w wybranym miejscu.

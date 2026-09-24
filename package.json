@@ -14,6 +14,7 @@
     "drizzle:push": "drizzle-kit push",
     "db:seed": "node --require dotenv/config --import tsx src/db/seed.ts",
     "db:add": "node --require dotenv/config --import tsx src/db/add-service.ts",
+    "db:measure-search": "node --require dotenv/config --conditions=react-server --import tsx src/db/measure-search-coverage.ts",
     "db:reset": "npm run db:drop && npm run drizzle:push && npm run db:seed",
     "drop-migrate-seed": "npm run db:drop && npm run drizzle:generate && npm run db:seed",
     "db:embeddings": "node --require dotenv/config --import tsx src/db/generate-embeddings.ts"

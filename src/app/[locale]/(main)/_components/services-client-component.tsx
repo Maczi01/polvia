@@ -13,6 +13,7 @@ import { useLocale } from 'next-intl';
 import { calculateServicesBounds } from '@/lib/map-utils';
 import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
+import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
 import { splitServicesByCoverage } from '@/lib/service-coverage';
 
 type Props = {
@@ -93,7 +94,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 const params = new URLSearchParams();
                 params.set('query', query);
                 if (category) params.set('category', category);
-                if (county) params.set('county', county);
+                // `/api/services` czyta `voivodeship` — pod `county` filtr byl po cichu
+                // ignorowany, a limit 3 zapelnialy wyniki z innych wojewodztw.
+                if (county) params.set('voivodeship', county);
                 params.set('locale', locale);
                 params.set('semanticOnly', 'true');
                 if (excludeIds.length > 0) {
@@ -147,11 +150,8 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     );
 
     useEffect(() => {
-        const minResults = 3;
         const debounceMs = 800;
-        const minQueryLength = 3;
 
-        const hasQuery = searchInput && searchInput.trim().length >= minQueryLength;
         const currentSearchParams = `${searchInput}-${selectedCategory}-${selectedCounty}`;
 
         if (debounceTimeoutRef.current) {
@@ -161,37 +161,16 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         setEmbeddingResults([]);
         setEmbeddingMeta(null);
 
-        // Enhanced conditions for triggering embedding search
-        const shouldTriggerEmbeddingSearch = () => {
-            // Must have a query
-            if (!hasQuery) return false;
+        // Te same parametry nie odpytuja API drugi raz; reszte reguly dzieli ze skryptem pomiaru.
+        const shouldTriggerEmbeddingSearch =
+            currentSearchParams !== lastSearchParamsRef.current &&
+            shouldRunSemanticSearch({
+                query: searchInput,
+                localResultsCount: localResults.length,
+                category: selectedCategory,
+            });
 
-            // Don't search if we already searched with same params
-            if (currentSearchParams === lastSearchParamsRef.current) return false;
-
-            // Trigger if we have too few results
-            if (localResults.length < minResults) return true;
-
-            // Also trigger if we have a category filter and query seems semantic
-            // (contains multiple words or non-exact matches)
-            if (selectedCategory && searchInput.trim().includes(' ')) {
-                // Check if the query might be semantic (not just simple keyword matching)
-                const queryWords = searchInput.toLowerCase().trim().split(/\s+/);
-                const hasSemanticIndicators = queryWords.some(
-                    word =>
-                        word.length > 4 || // Longer words might be semantic
-                        ['near', 'close', 'good', 'best', 'cheap', 'expensive', 'quality'].includes(
-                            word,
-                        ),
-                );
-
-                if (hasSemanticIndicators) return true;
-            }
-
-            return false;
-        };
-
-        if (shouldTriggerEmbeddingSearch()) {
+        if (shouldTriggerEmbeddingSearch) {
             setIsLoadingEmbeddings(true);
 
             debounceTimeoutRef.current = setTimeout(() => {

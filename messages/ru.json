@@ -452,7 +452,8 @@
     "map": "Карта",
     "list": "Подробности",
     "close": "Закрыть",
-    "viewInList": "Показать в списке"
+    "viewInList": "Показать в списке",
+    "stackedHeader": "{count, plural, one {# компания} few {# компании} many {# компаний} other {# компании}} по этому адресу"
   },
   "contact": {
     "rateLimitExceeded": "Превышен лимит сообщений. Попробуйте позже."

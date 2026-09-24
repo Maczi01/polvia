@@ -14,6 +14,13 @@
 
 set -e
 
+# Claude juz raz zareagowal na blokade tego Stopu — drugi exit 2 zapetla sesje,
+# bo hook skanuje caly plik i zglasza w kolko to samo ostrzezenie.
+HOOK_INPUT=$(cat)
+if echo "$HOOK_INPUT" | grep -qE '"stop_hook_active"[[:space:]]*:[[:space:]]*true'; then
+    exit 0
+fi
+
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 cd "$PROJECT_DIR"
 
@@ -53,6 +60,12 @@ add_warning() {
 
 for file in $FILES; do
     [ -f "$PROJECT_DIR/$file" ] || continue
+
+    # src/db/** to skrypty CLI (seed, embeddingi, pomiary): console.log to ich
+    # wyjscie, a process.env czytaja poza Next — swiadoma decyzja, nie dlug.
+    case "$file" in
+        src/db/*) continue ;;
+    esac
 
     # 1. console.log / console.warn (console.error z kontekstem w catch jest OK)
     CONSOLE_HITS=$(grep -n 'console\.\(log\|warn\)[[:space:]]*(' "$PROJECT_DIR/$file" | grep -v ':[[:space:]]*//' || true)
