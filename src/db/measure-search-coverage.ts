@@ -1,6 +1,10 @@
 import { db } from '@/db';
 import { getServices } from '@/lib/queries';
-import { DEFAULT_SEMANTIC_LIMIT, searchServicesSemantic } from '@/lib/semantic-search';
+import {
+    DEFAULT_SEMANTIC_LIMIT,
+    type SemanticMatch,
+    searchServicesSemantic,
+} from '@/lib/semantic-search';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
 import { splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
@@ -83,7 +87,7 @@ type QueryMeasurement = {
     /** Lista lokalna + sekcja online, bez embeddingow. */
     lexical: number;
     /** `null` = UI nie odpala wyszukiwania semantycznego dla tego zapytania. */
-    semantic: PartialService[] | null;
+    semantic: SemanticMatch[] | null;
     /** Wszystko, co ekran pokazuje: tak jak `filteredServices` w komponencie mapy. */
     total: number;
 };
@@ -125,7 +129,9 @@ function printSemanticResults(rows: QueryMeasurement[]): void {
     console.log('\nWyniki semantyczne do oceny trafnosci:');
     for (const { query, semantic } of rows) {
         if (semantic === null) continue;
-        const names = semantic.map(service => `${service.name} [${service.category}]`);
+        const names = semantic.map(
+            service => `${service.name} [${service.category}] ${service.relevanceScore.toFixed(3)}`,
+        );
         console.log(`  ${query}: ${names.length > 0 ? names.join(' | ') : '(brak)'}`);
     }
 }

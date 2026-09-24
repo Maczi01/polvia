@@ -97,7 +97,10 @@ export async function GET(request: NextRequest) {
         const excludeIdsParam = parsed.data.excludeIds;
 
         const excludeIds: string[] = excludeIdsParam
-            ? excludeIdsParam.split(',').map(id => id.trim()).filter(Boolean)
+            ? excludeIdsParam
+                  .split(',')
+                  .map(id => id.trim())
+                  .filter(Boolean)
             : [];
 
         // Obecnosc OPENAI_API_KEY gwarantuje walidacja Zod w env.ts przy starcie —
@@ -105,7 +108,7 @@ export async function GET(request: NextRequest) {
 
         const startTime = Date.now();
 
-        const { services: finalServices, contextualQuery } = await searchServicesSemantic({
+        const { services, contextualQuery } = await searchServicesSemantic({
             query,
             category,
             voivodeship,
@@ -117,6 +120,12 @@ export async function GET(request: NextRequest) {
         // `executionTime` wraca w odpowiedzi (nizej), wiec liczymy je nadal.
         const executionTime = Date.now() - startTime;
 
+        // Wyniki punktowe sluza tylko do odsiania i ustawienia kolejnosci — na zewnatrz
+        // nie wychodza. Podkreslenie w nazwie, bo to celowo odrzucone pola.
+        const finalServices = services.map(
+            ({ relevanceScore: _score, boostedScore: _boosted, ...service }) => service,
+        );
+
         return NextResponse.json({
             success: true,
             services: finalServices,
@@ -126,12 +135,12 @@ export async function GET(request: NextRequest) {
             excludedIds: excludeIds,
             filters: {
                 category,
-                voivodeship
+                voivodeship,
             },
             count: finalServices.length,
             executionTime,
             relevanceThreshold: RELEVANCE_FLOOR,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         });
     } catch (error) {
         console.error('Embedding search API error:', error);
@@ -140,9 +149,9 @@ export async function GET(request: NextRequest) {
             {
                 success: false,
                 error: 'Embedding search failed',
-                message: error instanceof Error ? error.message : 'Unknown error'
+                message: error instanceof Error ? error.message : 'Unknown error',
             },
-            { status: 500 }
+            { status: 500 },
         );
     }
 }

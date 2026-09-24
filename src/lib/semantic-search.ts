@@ -54,12 +54,15 @@ export type SemanticSearchParams = {
     excludeIds: string[];
 };
 
+type Candidate = PartialService & { relevanceScore: number };
+
+/** Wynik z punktacja — publiczny endpoint ja odcina, skrypt pomiaru ja wypisuje. */
+export type SemanticMatch = Candidate & { boostedScore: number };
+
 export type SemanticSearchResult = {
-    services: PartialService[];
+    services: SemanticMatch[];
     contextualQuery: string;
 };
-
-type Candidate = PartialService & { relevanceScore: number };
 
 async function embedQuery(contextualQuery: string): Promise<string> {
     const response = await openai.embeddings.create({
@@ -254,13 +257,7 @@ export async function searchServicesSemantic(
 
     // Odsianie wynikow spoza wybranej kategorii robi juz `buildWhereConditions` w SQL,
     // wiec nie ma tu drugiej reguly na to samo.
-    const relevant = selectRelevant(candidates, query, category, limit);
-
-    // Wyniki punktowe sluza tylko do odsiania i ustawienia kolejnosci — na zewnatrz
-    // nie wychodza. Podkreslenie w nazwie, bo to celowo odrzucone pola.
-    const services = relevant.map(
-        ({ relevanceScore: _score, boostedScore: _boosted, ...service }) => service,
-    );
+    const services = selectRelevant(candidates, query, category, limit);
 
     return { services, contextualQuery };
 }
