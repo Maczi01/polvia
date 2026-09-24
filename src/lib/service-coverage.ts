@@ -28,16 +28,19 @@ export type CoverageBuckets = {
     onlineResults: PartialService[];
 };
 
-/** Semantyka przeniesiona 1:1 z poprzedniego `frontendFilteredServices`. */
+/**
+ * Male litery bez polskich znakow — uzytkownik pisze raz "ksiegowa", raz "księgowa",
+ * a dane sa niespojne w obie strony. `ł` nie rozklada sie w NFD, stad osobna zamiana.
+ */
+function foldForSearch(text: string): string {
+    return text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/ł/g, 'l');
+}
+
+/** Pola przeszukiwane jak w poprzednim `frontendFilteredServices`; oba boki bez znakow. */
 function matchesQuery(item: PartialService, query: string): boolean {
     if (!query) return true;
-    return (
-        item.name.toLowerCase().includes(query) ||
-        (item.description?.toLowerCase().includes(query) ?? false) ||
-        (item.city?.toLowerCase().includes(query) ?? false) ||
-        (item.category?.toLowerCase().includes(query) ?? false) ||
-        (item.tags?.some(tag => tag.toLowerCase().includes(query)) ?? false)
-    );
+    const fields = [item.name, item.description, item.city, item.category, ...(item.tags ?? [])];
+    return fields.some(field => field != null && foldForSearch(field).includes(query));
 }
 
 function matchesCategory(item: PartialService, category: string): boolean {
@@ -70,7 +73,7 @@ export function splitServicesByCoverage(
     filters: CoverageFilters,
     alreadyShown: PartialService[] = [],
 ): CoverageBuckets {
-    const query = filters.query ? filters.query.toLowerCase().trim() : '';
+    const query = filters.query ? foldForSearch(filters.query.trim()) : '';
     const category = filters.category ?? '';
     const county = filters.county ?? '';
     const city = filters.city ?? '';

@@ -213,6 +213,51 @@ describe('splitServicesByCoverage', () => {
             expect(ids(localResults)).toEqual([poNazwie.id, poTagu.id]);
         });
 
+        it('szukanie tekstowe ignoruje polskie znaki w danych', () => {
+            const zeZnakami = service({ name: 'Biuro Tłumaczeń', description: 'Księgowość' });
+            const bezDopasowania = service({ name: 'Fryzjer' });
+
+            const poTlumaczu = splitServicesByCoverage([zeZnakami, bezDopasowania], {
+                ...NO_FILTERS,
+                query: 'tlumacz',
+            });
+            const poKsiegowej = splitServicesByCoverage([zeZnakami, bezDopasowania], {
+                ...NO_FILTERS,
+                query: 'ksiegowo',
+            });
+
+            expect(ids(poTlumaczu.localResults)).toEqual([zeZnakami.id]);
+            expect(ids(poKsiegowej.localResults)).toEqual([zeZnakami.id]);
+        });
+
+        it('szukanie tekstowe ignoruje polskie znaki w zapytaniu', () => {
+            const bezZnakow = service({ name: 'Wynajem samochodow', tags: ['sprzatanie'] });
+            const bezDopasowania = service({ name: 'Fryzjer' });
+
+            const poSamochodzie = splitServicesByCoverage([bezZnakow, bezDopasowania], {
+                ...NO_FILTERS,
+                query: 'SAMOCHÓD',
+            });
+            const poSprzataniu = splitServicesByCoverage([bezZnakow, bezDopasowania], {
+                ...NO_FILTERS,
+                query: 'sprzątanie',
+            });
+
+            expect(ids(poSamochodzie.localResults)).toEqual([bezZnakow.id]);
+            expect(ids(poSprzataniu.localResults)).toEqual([bezZnakow.id]);
+        });
+
+        it('ignorowanie polskich znakow nie rozluznia dopasowania innych liter', () => {
+            const masaz = service({ name: 'Salon masażu' });
+
+            const { localResults } = splitServicesByCoverage([masaz], {
+                ...NO_FILTERS,
+                query: 'masas',
+            });
+
+            expect(localResults).toHaveLength(0);
+        });
+
         it('zachowuje kolejnosc wejsciowa — sortowanie pochodzi z zapytania', () => {
             const pierwszy = service({ coverage: 'online' });
             const drugi = service({ coverage: 'online' });
