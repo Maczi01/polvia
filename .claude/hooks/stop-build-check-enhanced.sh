@@ -14,6 +14,13 @@
 
 set -e
 
+# Claude juz raz zareagowal na blokade tego Stopu — drugi exit 2 zapetla sesje,
+# gdy bledu nie da sie naprawic w tej turze.
+HOOK_INPUT=$(cat)
+if echo "$HOOK_INPUT" | grep -qE '"stop_hook_active"[[:space:]]*:[[:space:]]*true'; then
+    exit 0
+fi
+
 # Konfiguracja
 ERROR_THRESHOLD=3
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
