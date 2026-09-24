@@ -94,7 +94,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                 const params = new URLSearchParams();
                 params.set('query', query);
                 if (category) params.set('category', category);
-                if (county) params.set('county', county);
+                // `/api/services` czyta `voivodeship` — pod `county` filtr byl po cichu
+                // ignorowany, a limit 3 zapelnialy wyniki z innych wojewodztw.
+                if (county) params.set('voivodeship', county);
                 params.set('locale', locale);
                 params.set('semanticOnly', 'true');
                 if (excludeIds.length > 0) {
