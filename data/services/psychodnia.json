@@ -1,0 +1,57 @@
+{
+    "name": "Psychodnia",
+    "category": "health",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "psychodnia.png",
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Lecznica weterynaryjna na warszawskich Bielanach, przy ul. Heroldów. Zajmuje się profilaktyką, chorobami wewnętrznymi, chirurgią (także laparoskopową) i ortopedią zwierząt. Prowadzi rehabilitację z bieżnią wodną i terapią INDIBA, a na miejscu ma laboratorium, USG, RTG (także stomatologiczne) i echo serca. Przyjmuje od poniedziałku do piątku w godzinach 9:00–21:00 i w soboty 10:00–15:00. Strona lecznicy ma wersję ukraińską."
+        },
+        "uk": {
+            "description": "Ветеринарна лікарня на варшавських Бєлянах, на вулиці Heroldów. Профілактика, внутрішні хвороби, хірургія (зокрема лапароскопічна) та ортопедія тварин. Реабілітація з водною доріжкою та терапією INDIBA; на місці лабораторія, УЗД, рентген (також стоматологічний) і ехокардіографія. Працює з понеділка по п'ятницю з 9:00 до 21:00 і в суботу з 10:00 до 15:00. Сайт має українську версію; мову обслуговування варто уточнити телефоном."
+        },
+        "en": {
+            "description": "Veterinary hospital on Heroldów Street in Warsaw's Bielany district. It covers preventive care, internal medicine, surgery (including laparoscopy) and orthopaedics for animals, and offers rehabilitation with an underwater treadmill and INDIBA therapy. On site: laboratory, ultrasound, X-ray (including dental) and echocardiography. Open Monday to Friday 9:00–21:00 and Saturday 10:00–15:00. The website has a Ukrainian version."
+        },
+        "ru": {
+            "description": "Ветеринарная лечебница на варшавских Белянах, на улице Heroldów. Профилактика, внутренние болезни, хирургия (в том числе лапароскопическая) и ортопедия животных. Реабилитация с водной дорожкой и терапией INDIBA; на месте лаборатория, УЗИ, рентген (в том числе стоматологический) и эхокардиография. Работает с понедельника по пятницу с 9:00 до 21:00 и в субботу с 10:00 до 15:00. У сайта есть украинская версия; язык обслуживания стоит уточнить по телефону."
+        }
+    },
+
+    "tags": [
+        { "pl": "Weterynarz", "uk": "Ветеринар", "en": "Veterinarian", "ru": "Ветеринар" },
+        { "pl": "Rehabilitacja zwierząt", "uk": "Реабілітація тварин", "en": "Animal rehabilitation", "ru": "Реабилитация животных" },
+        { "pl": "Diagnostyka", "uk": "Діагностика", "en": "Diagnostics", "ru": "Диагностика" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Heroldów 6",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-991",
+            "latitude": 52.3054905,
+            "longitude": 20.9314528,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "21:00" },
+                "tuesday": { "open": "09:00", "close": "21:00" },
+                "wednesday": { "open": "09:00", "close": "21:00" },
+                "thursday": { "open": "09:00", "close": "21:00" },
+                "friday": { "open": "09:00", "close": "21:00" },
+                "saturday": { "open": "10:00", "close": "15:00" }
+            },
+            "phoneNumber": "+48 22 833 26 24",
+            "email": "psychodnia@psychodnia.pl",
+            "webpage": "https://psychodnia.pl/",
+            "socials": {
+                "facebook": "https://www.facebook.com/Psychodnia",
+                "instagram": "https://www.instagram.com/psychodnia_lecznica"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

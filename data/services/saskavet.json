@@ -1,0 +1,49 @@
+{
+    "name": "SASKAVET",
+    "category": "health",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "saskavet.png",
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Przychodnia weterynaryjna na Saskiej Kępie w Warszawie, przy al. Waszyngtona. Zajmuje się chirurgią tkanek miękkich, dermatologią, stomatologią, rozrodem, kardiologią, okulistyką i ortopedią zwierząt, wykonuje USG, RTG i endoskopię. Leczy także zwierzęta egzotyczne, prowadzi grooming i konsultacje behawioralne. Strona przychodni jest dostępna także po ukraińsku."
+        },
+        "uk": {
+            "description": "Ветеринарна клініка на Саській Кемпі у Варшаві, на алеї Вашингтона. Хірургія м'яких тканин, дерматологія, стоматологія, репродукція, кардіологія, офтальмологія та ортопедія тварин; УЗД, рентген і ендоскопія. Лікує також екзотичних тварин, пропонує грумінг і консультації з поведінки. Сайт клініки доступний також українською; мову обслуговування варто уточнити телефоном."
+        },
+        "en": {
+            "description": "Veterinary clinic in Warsaw's Saska Kępa district, on Waszyngtona Avenue. It covers soft-tissue surgery, dermatology, dentistry, reproduction, cardiology, ophthalmology and orthopaedics for animals, with ultrasound, X-ray and endoscopy on site. It also treats exotic animals and offers grooming and behavioural consultations. The clinic's website is also available in Ukrainian."
+        },
+        "ru": {
+            "description": "Ветеринарная клиника на Саской Кемпе в Варшаве, на аллее Вашингтона. Хирургия мягких тканей, дерматология, стоматология, репродукция, кардиология, офтальмология и ортопедия животных; УЗИ, рентген и эндоскопия. Лечит также экзотических животных, предлагает груминг и консультации по поведению. Сайт клиники доступен также на украинском; язык обслуживания стоит уточнить по телефону."
+        }
+    },
+
+    "tags": [
+        { "pl": "Weterynarz", "uk": "Ветеринар", "en": "Veterinarian", "ru": "Ветеринар" },
+        { "pl": "Zwierzęta egzotyczne", "uk": "Екзотичні тварини", "en": "Exotic animals", "ru": "Экзотические животные" },
+        { "pl": "Grooming", "uk": "Грумінг", "en": "Grooming", "ru": "Груминг" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "al. Jerzego Waszyngtona 2a",
+            "voivodeship": "mazowieckie",
+            "postcode": "03-910",
+            "latitude": 52.2377903,
+            "longitude": 21.0529003,
+            "phoneNumber": "+48 515 160 202",
+            "email": "kontakt@saskavet.pl",
+            "webpage": "https://saskavet.pl/uk/",
+            "socials": {
+                "facebook": "https://www.facebook.com/saskavet",
+                "instagram": "https://www.instagram.com/saskavet"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

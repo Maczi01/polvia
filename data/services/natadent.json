@@ -1,0 +1,108 @@
+{
+    "name": "NATADENT",
+    "category": "health",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "natadent.png",
+    "languages": ["uk", "pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Sieć klinik stomatologicznych z ukraińskimi lekarzami, z gabinetami w Warszawie (Bielany, Wola, Targówek) i we Wrocławiu (Krzyki, centrum). Przyjęcia odbywają się po ukraińsku i po polsku. W ofercie stomatologia zachowawcza, profilaktyka i diagnostyka, stomatologia dziecięca, protetyka, ortodoncja, leczenie kanałowe, chirurgia i implanty. Klinika działa od 2016 roku i ma własne laboratorium protetyczne w Warszawie."
+        },
+        "uk": {
+            "description": "Мережа стоматологічних клінік з українськими лікарями: кабінети у Варшаві (Бєляни, Воля, Таргувек) і у Вроцлаві (Крики, центр). Прийом ведеться українською та польською мовами. Терапевтична стоматологія, профілактика й діагностика, дитяча стоматологія, протезування, ортодонтія, лікування каналів, хірургія та імплантація. Клініка працює з 2016 року і має власну зуботехнічну лабораторію у Варшаві."
+        },
+        "en": {
+            "description": "Chain of dental clinics with Ukrainian dentists, with practices in Warsaw (Bielany, Wola, Targówek) and Wrocław (Krzyki, city centre). Appointments are conducted in Ukrainian and Polish. Services cover general and preventive dentistry, diagnostics, paediatric dentistry, prosthodontics, orthodontics, root canal treatment, oral surgery and implants. Operating since 2016, the clinic runs its own dental laboratory in Warsaw."
+        },
+        "ru": {
+            "description": "Сеть стоматологических клиник с украинскими врачами: кабинеты в Варшаве (Беляны, Воля, Таргувек) и во Вроцлаве (Крыки, центр). Приём ведётся на украинском и польском. Терапевтическая стоматология, профилактика и диагностика, детская стоматология, протезирование, ортодонтия, лечение каналов, хирургия и имплантация. Клиника работает с 2016 года и имеет собственную зуботехническую лабораторию в Варшаве."
+        }
+    },
+
+    "tags": [
+        { "pl": "Dentysta", "uk": "Стоматолог", "en": "Dentist", "ru": "Стоматолог" },
+        { "pl": "Ortodoncja", "uk": "Ортодонтія", "en": "Orthodontics", "ru": "Ортодонтия" },
+        { "pl": "Implanty", "uk": "Імплантація", "en": "Dental implants", "ru": "Имплантация" },
+        { "pl": "Obsługa po ukraińsku", "uk": "Обслуговування українською", "en": "Service in Ukrainian", "ru": "Обслуживание на украинском" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Perzyńskiego 20",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-883",
+            "latitude": 52.2751023,
+            "longitude": 20.9538231,
+            "phoneNumber": "+48 575 558 303",
+            "email": "kontakt_bielany@natadent.pl",
+            "webpage": "https://natadent.pl/ua/",
+            "nip": "5272790243",
+            "whatsappNumber": "+48575558303",
+            "socials": {
+                "facebook": "https://www.facebook.com/natadentstomatologia/",
+                "instagram": "https://www.instagram.com/natadent_stomatologia/",
+                "telegram": "https://t.me/+48575558303"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Karolkowa 30",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-207",
+            "latitude": 52.2317751,
+            "longitude": 20.9781904,
+            "phoneNumber": "+48 575 558 303",
+            "email": "kontakt_wola@natadent.pl",
+            "webpage": "https://natadent.pl/ua/"
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Siedmiogrodzka 1",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-202",
+            "latitude": 52.2318663,
+            "longitude": 20.9773171,
+            "phoneNumber": "+48 575 558 303",
+            "email": "kontakt_wola@natadent.pl",
+            "webpage": "https://natadent.pl/ua/"
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Ossowskiego 11",
+            "voivodeship": "mazowieckie",
+            "postcode": "03-542",
+            "latitude": 52.2695993,
+            "longitude": 21.0487725,
+            "phoneNumber": "+48 575 558 303",
+            "email": "kontakt_targowek@natadent.pl",
+            "webpage": "https://natadent.pl/ua/"
+        },
+        {
+            "city": "Wrocław",
+            "street": "ul. Pułaskiego 16",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-446",
+            "latitude": 51.1013895,
+            "longitude": 17.046481,
+            "phoneNumber": "+48 578 555 528",
+            "email": "kontakt_krzyki@natadent.pl",
+            "webpage": "https://natadent.pl/ua/"
+        },
+        {
+            "city": "Wrocław",
+            "street": "ul. Świętokrzyska 35/U3",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-327",
+            "latitude": 51.1174839,
+            "longitude": 17.0450867,
+            "phoneNumber": "+48 578 555 528",
+            "email": "kontakt_srodmiescie@natadent.pl",
+            "webpage": "https://natadent.pl/ua/"
+        }
+    ]
+}

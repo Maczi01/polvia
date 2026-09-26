@@ -1,0 +1,61 @@
+{
+    "name": "WaDental",
+    "category": "health",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "wadental.png",
+    "languages": ["pl", "uk", "ru"],
+
+    "translations": {
+        "pl": {
+            "description": "Klinika stomatologiczna w Warszawie, przy ul. Pokornej, w której dentyści mówią po polsku, ukraińsku i rosyjsku. W ofercie odbudowa zębów, implanty, protetyka, leczenie kanałowe, leczenie dziąseł, chirurgia, ortodoncja, higienizacja oraz stomatologia dziecięca. Klinika przyjmuje pacjentów codziennie, także w weekendy, w godzinach 9:00–21:00."
+        },
+        "uk": {
+            "description": "Стоматологічна клініка у Варшаві, на вулиці Pokorna, де стоматологи розмовляють польською, українською та російською. Відновлення зубів, імплантація, протезування, лікування каналів, лікування ясен, хірургія, ортодонтія, професійна гігієна та дитяча стоматологія. Клініка приймає щодня, зокрема у вихідні, з 9:00 до 21:00."
+        },
+        "en": {
+            "description": "Dental clinic on Pokorna Street in Warsaw, where dentists speak Polish, Ukrainian and Russian. Treatments include tooth restoration, implants, prosthodontics, root canal treatment, gum treatment, oral surgery, orthodontics, hygiene and paediatric dentistry. The clinic sees patients every day, weekends included, from 9:00 to 21:00."
+        },
+        "ru": {
+            "description": "Стоматологическая клиника в Варшаве, на улице Pokorna, где стоматологи говорят на польском, украинском и русском. Восстановление зубов, имплантация, протезирование, лечение каналов, лечение дёсен, хирургия, ортодонтия, профессиональная гигиена и детская стоматология. Клиника принимает ежедневно, включая выходные, с 9:00 до 21:00."
+        }
+    },
+
+    "tags": [
+        { "pl": "Dentysta", "uk": "Стоматолог", "en": "Dentist", "ru": "Стоматолог" },
+        { "pl": "Implanty", "uk": "Імплантація", "en": "Dental implants", "ru": "Имплантация" },
+        { "pl": "Ortodoncja", "uk": "Ортодонтія", "en": "Orthodontics", "ru": "Ортодонтия" },
+        { "pl": "Obsługa po ukraińsku", "uk": "Обслуговування українською", "en": "Service in Ukrainian", "ru": "Обслуживание на украинском" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Pokorna 2",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-199",
+            "latitude": 52.2550268,
+            "longitude": 20.9947465,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "21:00" },
+                "tuesday": { "open": "09:00", "close": "21:00" },
+                "wednesday": { "open": "09:00", "close": "21:00" },
+                "thursday": { "open": "09:00", "close": "21:00" },
+                "friday": { "open": "09:00", "close": "21:00" },
+                "saturday": { "open": "09:00", "close": "21:00" },
+                "sunday": { "open": "09:00", "close": "21:00" }
+            },
+            "phoneNumber": "+48 459 567 523",
+            "email": "info@wadental.pl",
+            "webpage": "https://wadental.pl/uk/",
+            "nip": "9522230577",
+            "socials": {
+                "facebook": "https://www.facebook.com/profile.php?id=61558080239455",
+                "instagram": "https://www.instagram.com/mas_stomatology/",
+                "tiktok": "https://www.tiktok.com/@wadental.pl"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

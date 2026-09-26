@@ -1,0 +1,51 @@
+{
+    "name": "Skyway Group",
+    "category": "law",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "skyway-group.png",
+    "languages": ["uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Biuro w centrum Warszawy pomagające cudzoziemcom, głównie Ukraińcom, w sprawach urzędowych. Pomaga uzyskać numer PESEL i adres do zameldowania (meldunek), potrzebny do złożenia wniosku o kartę pobytu. Prowadzi sprawy kart pobytu, rejestracji samochodu, wymiany prawa jazdy, rejestracji konsularnej, dokumentów do pracy oraz zakładania i prowadzenia firmy. Obsługa po ukraińsku."
+        },
+        "uk": {
+            "description": "Бюро в центрі Варшави, яке допомагає іноземцям, передусім українцям, з офіційними справами. Допомагає отримати номер PESEL та адресу для прописки (meldunek), необхідну для подачі на карту побиту. Займається картами побиту, реєстрацією авто, заміною посвідчення водія, консульським обліком, документами для роботи, а також відкриттям і веденням бізнесу. Обслуговування українською."
+        },
+        "en": {
+            "description": "Office in central Warsaw helping foreigners, mainly Ukrainians, with official paperwork. It helps obtain a PESEL number and an address for residence registration (meldunek), which is required to apply for a residence card. It also handles residence cards, car registration, driving licence exchange, consular registration, work documents, and setting up and running a business. Service in Ukrainian."
+        },
+        "ru": {
+            "description": "Бюро в центре Варшавы, помогающее иностранцам, прежде всего украинцам, с официальными делами. Помогает получить номер PESEL и адрес для прописки (meldunek), необходимой для подачи на карту побыта. Занимается картами побыта, регистрацией авто, заменой водительского удостоверения, консульским учётом, документами для работы, а также открытием и ведением бизнеса. Обслуживание на украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Meldunek", "uk": "Прописка", "en": "Residence registration", "ru": "Прописка" },
+        { "pl": "PESEL", "uk": "PESEL", "en": "PESEL", "ru": "PESEL" },
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Cudzoziemcy", "uk": "Іноземці", "en": "Foreigners", "ru": "Иностранцы" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Srebrna 16 lok. 16",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-810",
+            "latitude": 52.227261,
+            "longitude": 20.9880916,
+            "phoneNumber": "+48 797 899 895",
+            "webpage": "https://skyway-group.pl/",
+            "nip": "5273003595",
+            "socials": {
+                "facebook": "https://www.facebook.com/skyway.grp",
+                "instagram": "https://www.instagram.com/skyway.grp",
+                "tiktok": "https://www.tiktok.com/@skyway.grp"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

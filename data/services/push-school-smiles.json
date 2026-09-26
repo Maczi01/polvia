@@ -1,0 +1,52 @@
+{
+    "name": "Садочок Smiles – Push School",
+    "category": "education",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "push-school-smiles.png",
+    "languages": ["uk"],
+
+    "translations": {
+        "pl": {
+            "name": "Przedszkole Smiles – Push School",
+            "description": "Ukraińskie przedszkole w Markach pod Warszawą, prowadzone przez Push School we współpracy z Fundacją Educational Center Children of Ukraine. Przyjmuje dzieci w wieku 3–6 lat i łączy ukraińskie podejście do edukacji z europejskim otoczeniem: rozwój przez sztukę, język i zabawę. Push School prowadzi też szkoły w Charkowie, Połtawie i Winnicy; placówka w Markach jest jedyną w Polsce."
+        },
+        "uk": {
+            "description": "Український садочок у Марках під Варшавою, який веде Push School у партнерстві з фундацією Educational Center Children of Ukraine. Приймає дітей 3–6 років і поєднує українські освітні підходи з європейським середовищем: розвиток через мистецтво, мову та гру. Push School має також школи в Харкові, Полтаві та Вінниці; заклад у Марках — єдиний у Польщі."
+        },
+        "en": {
+            "name": "Smiles Kindergarten – Push School",
+            "description": "Ukrainian kindergarten in Marki near Warsaw, run by Push School in partnership with the Educational Center Children of Ukraine Foundation. It takes children aged 3–6 and combines Ukrainian educational approaches with a European environment: development through art, language and play. Push School also runs schools in Kharkiv, Poltava and Vinnytsia; the Marki branch is its only one in Poland."
+        },
+        "ru": {
+            "name": "Детский сад Smiles – Push School",
+            "description": "Украинский детский сад в Марках под Варшавой, который ведёт Push School в партнёрстве с фондом Educational Center Children of Ukraine. Принимает детей 3–6 лет и сочетает украинские образовательные подходы с европейской средой: развитие через искусство, язык и игру. У Push School есть также школы в Харькове, Полтаве и Виннице; учреждение в Марках — единственное в Польше."
+        }
+    },
+
+    "tags": [
+        { "pl": "Przedszkole", "uk": "Дитячий садок", "en": "Kindergarten", "ru": "Детский сад" },
+        { "pl": "Język ukraiński", "uk": "Українська мова", "en": "Ukrainian language", "ru": "Украинский язык" },
+        { "pl": "Zajęcia dla dzieci", "uk": "Заняття для дітей", "en": "Activities for children", "ru": "Занятия для детей" }
+    ],
+
+    "locations": [
+        {
+            "city": "Marki",
+            "street": "ul. Stanisława Wyspiańskiego 2",
+            "voivodeship": "mazowieckie",
+            "postcode": "05-270",
+            "latitude": 52.3247904,
+            "longitude": 21.1100937,
+            "email": "pushschool.warsaw@gmail.com",
+            "webpage": "https://push-school.com/schools/sadochok-pushschool-v-varshavi/",
+            "nip": "6862615996",
+            "socials": {
+                "instagram": "https://www.instagram.com/push_school/",
+                "facebook": "https://www.facebook.com/PUSHschooliscool/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

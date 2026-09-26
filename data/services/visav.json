@@ -1,0 +1,62 @@
+{
+    "name": "Visav.pl",
+    "category": "law",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "visav.png",
+    "languages": ["uk", "en"],
+
+    "translations": {
+        "pl": {
+            "description": "Agencja legalizacyjna z biurami we Wrocławiu i Warszawie, pomagająca Ukraińcom zalegalizować pobyt w Polsce. Załatwia numer PESEL (osobiście lub zdalnie), meldunek, status UKR i kartę CUKR, a także karty pobytu z tytułu pracy, studiów, działalności gospodarczej i łączenia rodzin, Niebieską Kartę UE, pobyt stały, rezydenta długoterminowego UE i obywatelstwo. Pomaga też w odnowieniu ukraińskiego prawa jazdy i w tłumaczeniach przysięgłych. Pierwsza konsultacja jest bezpłatna."
+        },
+        "uk": {
+            "description": "Агенція з легалізації з офісами у Вроцлаві та Варшаві, яка допомагає українцям легалізувати перебування в Польщі. Оформлює PESEL (особисто або дистанційно), прописку, статус UKR і карту CUKR, а також карти побиту на підставі роботи, навчання, бізнесу та возз'єднання сім'ї, Блакитну карту ЄС, постійне проживання, резидента ЄС і громадянство. Допомагає також із відновленням українського посвідчення водія та присяжними перекладами. Перша консультація безкоштовна."
+        },
+        "en": {
+            "description": "Legalisation agency with offices in Wrocław and Warsaw, helping Ukrainians legalise their stay in Poland. It arranges PESEL numbers (in person or remotely), residence registration (meldunek), UKR status and the CUKR card, as well as residence cards based on work, study, business and family reunification, the EU Blue Card, permanent residence, EU long-term residence and citizenship. It also helps with renewing Ukrainian driving licences and with sworn translations. The first consultation is free."
+        },
+        "ru": {
+            "description": "Агентство по легализации с офисами во Вроцлаве и Варшаве, помогающее украинцам легализовать пребывание в Польше. Оформляет PESEL (лично или дистанционно), прописку, статус UKR и карту CUKR, а также карты побыта на основании работы, учёбы, бизнеса и воссоединения семьи, Голубую карту ЕС, постоянное проживание, резидента ЕС и гражданство. Помогает также с восстановлением украинского водительского удостоверения и присяжными переводами. Первая консультация бесплатна."
+        }
+    },
+
+    "tags": [
+        { "pl": "Meldunek", "uk": "Прописка", "en": "Residence registration", "ru": "Прописка" },
+        { "pl": "PESEL", "uk": "PESEL", "en": "PESEL", "ru": "PESEL" },
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Obywatelstwo", "uk": "Громадянство", "en": "Citizenship", "ru": "Гражданство" }
+    ],
+
+    "locations": [
+        {
+            "city": "Wrocław",
+            "street": "ul. Wita Stwosza 3/223",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-148",
+            "latitude": 51.110285,
+            "longitude": 17.03413,
+            "phoneNumber": "+48 530 175 566",
+            "email": "Visa.pl.33@gmail.com",
+            "webpage": "https://visav.pl/",
+            "socials": {
+                "instagram": "https://www.instagram.com/visav.pl",
+                "tiktok": "https://www.tiktok.com/@visav_pl",
+                "youtube": "https://www.youtube.com/@visavpl"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Warszawa",
+            "street": "Al. Jana Pawła II 70, 7 piętro, pokój 12",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-175",
+            "latitude": 52.2499515,
+            "longitude": 20.9875482,
+            "phoneNumber": "+48 530 175 566",
+            "email": "Visa.pl.33@gmail.com",
+            "webpage": "https://visav.pl/"
+        }
+    ]
+}

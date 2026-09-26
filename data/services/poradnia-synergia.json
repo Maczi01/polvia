@@ -1,0 +1,52 @@
+{
+    "name": "Poradnia Synergia",
+    "category": "health",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "poradnia-synergia.png",
+    "languages": ["uk", "ru", "pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Poradnia psychologiczna na warszawskim Mokotowie, udzielająca pomocy psychologicznej po ukraińsku i rosyjsku. Prowadzi konsultacje i terapię indywidualną, terapię rodzinną i par oraz mediacje. Zna specyfikę pracy z migrantami i ich problemy: adaptację w nowym kraju, pracę i barierę językową. Poradnia przyjmuje od poniedziałku do piątku w godzinach 10:00–21:00 i ma osobny numer telefonu dla osób, które nie mówią po polsku."
+        },
+        "uk": {
+            "description": "Психологічна консультація на варшавському Мокотові, що надає психологічну допомогу українською та російською. Консультації та індивідуальна терапія, сімейна терапія і терапія пар, медіації. Спеціалізується на питаннях мігрантів зі Східної Європи: адаптація в новій країні, робота, мовний бар'єр. Приймає з понеділка по п'ятницю з 10:00 до 21:00; для тих, хто не говорить польською, є окремий номер телефону."
+        },
+        "en": {
+            "description": "Psychological counselling practice in Warsaw's Mokotów district providing psychological help in Ukrainian and Russian. It offers consultations and individual therapy, family and couples therapy, and mediation, specialising in the issues migrants from Eastern Europe face: adapting to a new country, work and the language barrier. Open Monday to Friday, 10:00–21:00, with a separate phone line for people who do not speak Polish."
+        },
+        "ru": {
+            "description": "Психологическая консультация на варшавском Мокотове, оказывающая психологическую помощь на украинском и русском. Консультации и индивидуальная терапия, семейная терапия и терапия пар, медиации. Специализируется на вопросах мигрантов из Восточной Европы: адаптация в новой стране, работа, языковой барьер. Принимает с понедельника по пятницу с 10:00 до 21:00; для тех, кто не говорит по-польски, есть отдельный номер телефона."
+        }
+    },
+
+    "tags": [
+        { "pl": "Psycholog", "uk": "Психолог", "en": "Psychologist", "ru": "Психолог" },
+        { "pl": "Psychoterapia", "uk": "Психотерапія", "en": "Psychotherapy", "ru": "Психотерапия" },
+        { "pl": "Terapia par", "uk": "Терапія пар", "en": "Couples therapy", "ru": "Терапия пар" },
+        { "pl": "Obsługa po ukraińsku", "uk": "Обслуговування українською", "en": "Service in Ukrainian", "ru": "Обслуживание на украинском" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Madalińskiego 20 m. 22",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-513",
+            "latitude": 52.2051974,
+            "longitude": 21.0180888,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "21:00" },
+                "tuesday": { "open": "10:00", "close": "21:00" },
+                "wednesday": { "open": "10:00", "close": "21:00" },
+                "thursday": { "open": "10:00", "close": "21:00" },
+                "friday": { "open": "10:00", "close": "21:00" }
+            },
+            "phoneNumber": "+48 453 305 502",
+            "webpage": "https://poradnia-synergia.pl/",
+            "isMainLocation": true
+        }
+    ]
+}
