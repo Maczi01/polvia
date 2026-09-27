@@ -6,6 +6,7 @@ import {
     findRowIndex,
     onlineHeaderRowIndex,
 } from '@/lib/map-list-rows';
+import { countListCards } from '@/lib/result-counts';
 import { ServiceGroupCard } from '@/app/[locale]/(main)/_components/service-group-card/service-group-card';
 import {
     forwardRef, JSX,
@@ -126,6 +127,9 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
         const CARD_COLLAPSE_MS = 300;
 
         // Combine services for internal logic (refs, scrolling, etc.)
+        // Firmy, nie lokalizacje: siec z osmioma punktami to jedna karta, a nie "(8)".
+        const onlineCardCount = useMemo(() => countListCards(onlineResults), [onlineResults]);
+
         // KOLEJNOSC MUSI ODPOWIADAC kolejnosci renderowania sekcji w renderServiceCards(),
         // bo `cardIndex` i `cardRefs` sa wspolne dla wszystkich sekcji. Rozjechanie
         // tego psuje scrollowanie i rozwijanie kart.
@@ -462,7 +466,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                             <div key={row.key} ref={onlineSectionRef}>
                                 <SectionHeader
                                     icon={Globe}
-                                    title={t('available_online', { count: onlineResults.length })}
+                                    title={t('available_online', { count: onlineCardCount })}
                                     subtitle={t('available_online_subtitle')}
                                 />
                             </div>
@@ -532,7 +536,7 @@ export const MapList = forwardRef<ScrollableListHandle, MapListProps>(
                         >
                             <Globe className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
                             <span className="flex-1">
-                                {t('online_banner', { count: onlineResults.length })}
+                                {t('online_banner', { count: onlineCardCount })}
                             </span>
                             <ArrowDown className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />
                         </button>

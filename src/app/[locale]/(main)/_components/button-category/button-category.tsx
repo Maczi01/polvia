@@ -83,26 +83,31 @@ export interface ButtonProps
     asChild?: boolean;
     text: string;
     image: string;
+    /** Przelacznik: wartosc trafia do `aria-pressed`. Pominiete = zwykly przycisk. */
     isSelected?: boolean;
+    /** Liczba wynikow po wybraniu filtra. Czesc widocznego tekstu, wiec i nazwy dostepnej. */
+    count?: number;
 }
 
 const ButtonCategory = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, asChild = false, text, image, isSelected, ...props }, ref) => {
+    ({ className, variant, size, asChild = false, text, image, isSelected, count, ...props }, ref) => {
         const Comp = asChild ? Slot : 'button';
         return (
             <Comp
                 className={cn(buttonVariants({ variant, size, isSelected, className }))}
                 ref={ref}
+                aria-pressed={isSelected}
                 {...props}
             >
                 <Image
                     src={image}
-                    alt="icon"
+                    alt=""
                     width={16}
                     height={16}
                     className={cn('transition-all duration-200')}
                 />
                 <span className={cn('transition-colors')}>{text}</span>
+                {count !== undefined && <span className="tabular-nums">({count})</span>}
             </Comp>
         );
     },

@@ -41,6 +41,8 @@ interface MobileFilterModalProps {
     onOnlineToggle: () => void;
     resetAllFilters: () => void;
     clearCategories: () => void;
+    /** Liczba kart na kategorie przy pozostalych aktywnych filtrach. */
+    categoryCounts?: Record<string, number>;
 }
 
 export const MobileFilterModal = ({
@@ -55,7 +57,8 @@ export const MobileFilterModal = ({
                                       onlineOnly,
                                       onOnlineToggle,
                                       resetAllFilters,
-                                      clearCategories
+                                      clearCategories,
+                                      categoryCounts,
                                   }: MobileFilterModalProps) => {
     const t = useTranslations('MapPage');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -157,7 +160,6 @@ export const MobileFilterModal = ({
                                     ? 'removeFilter'
                                     : 'default'
                             }
-                            isSelected={false}
                             onClick={clearCategories}
                             disabled={
                                 !selectedCategory &&
@@ -173,28 +175,25 @@ export const MobileFilterModal = ({
                             variant={onlineOnly ? 'aqua' : 'default'}
                             isSelected={onlineOnly}
                             onClick={onOnlineToggle}
-                            aria-pressed={onlineOnly}
                         />
 
-                        {categories.map(({ text, key, image, variant }) => (
-                            <ButtonCategory
-                                key={text}
-                                image={image}
-                                text={t(`Categories.${text}`)}
-                                variant={
-                                    selectedCategory
-                                        ? key === selectedCategory.toLowerCase()
-                                            ? variant
-                                            : 'default'
-                                        : variant
-                                }
-                                isSelected={
-                                    !!selectedCategory &&
-                                    key === selectedCategory.toLowerCase()
-                                }
-                                onClick={() => handleCategoryClick(key)}
-                            />
-                        ))}
+                        {categories.map(({ text, key, image, variant }) => {
+                            const isSelected = key === selectedCategory.toLowerCase();
+                            // Pusta kategoria zostaje klikalna, ale gasnie jak niewybrana.
+                            const isEmpty = categoryCounts?.[key] === 0;
+                            const isColored = isSelected || (!selectedCategory && !isEmpty);
+                            return (
+                                <ButtonCategory
+                                    key={text}
+                                    image={image}
+                                    text={t(`Categories.${text}`)}
+                                    count={categoryCounts?.[key]}
+                                    variant={isColored ? variant : 'default'}
+                                    isSelected={isSelected}
+                                    onClick={() => handleCategoryClick(key)}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             </div>
