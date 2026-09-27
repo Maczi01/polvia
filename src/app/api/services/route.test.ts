@@ -45,6 +45,47 @@ describe('GET /api/services', () => {
         expect(body.count).toBe(0);
     });
 
+    describe('limit', () => {
+        function searchedLimit(): number | undefined {
+            return jest.mocked(searchServicesSemantic).mock.calls[0]?.[0].limit;
+        }
+
+        beforeEach(() => {
+            jest.mocked(searchServicesSemantic).mockReset().mockResolvedValue({
+                services: [],
+                contextualQuery: 'prawnik',
+                relevanceCheck: 'passed',
+            });
+        });
+
+        it('respektuje limit podany przez klienta', async () => {
+            await GET(new NextRequest('https://www.polvia.pl/api/services?query=prawnik&limit=10'));
+
+            expect(searchedLimit()).toBe(10);
+        });
+
+        it('bez parametru stosuje limit domyslny', async () => {
+            await GET(request('prawnik'));
+
+            expect(searchedLimit()).toBe(3);
+        });
+
+        it('pusty parametr traktuje jak brak parametru', async () => {
+            await GET(new NextRequest('https://www.polvia.pl/api/services?query=prawnik&limit='));
+
+            expect(searchedLimit()).toBe(3);
+        });
+
+        it('odrzuca limit powyzej gornej granicy', async () => {
+            const response = await GET(
+                new NextRequest('https://www.polvia.pl/api/services?query=prawnik&limit=51'),
+            );
+
+            expect(response.status).toBe(400);
+            expect(searchServicesSemantic).not.toHaveBeenCalled();
+        });
+    });
+
     describe('awaria wyszukiwania', () => {
         it('zwraca 500 ze stalym kodem bledu', async () => {
             jest.mocked(searchServicesSemantic).mockRejectedValue(new Error(UPSTREAM_MESSAGE));

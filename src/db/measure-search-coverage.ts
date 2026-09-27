@@ -1,10 +1,7 @@
 import { db } from '@/db';
 import { getServices } from '@/lib/queries';
-import {
-    DEFAULT_SEMANTIC_LIMIT,
-    type SemanticMatch,
-    searchServicesSemantic,
-} from '@/lib/semantic-search';
+import { type SemanticMatch, searchServicesSemantic } from '@/lib/semantic-search';
+import { SEMANTIC_RECOMMENDATIONS_LIMIT } from '@/lib/semantic-search-request';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
 import { splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
@@ -117,7 +114,7 @@ async function measureQuery(services: PartialService[], query: string): Promise<
     const { services: semanticResults, relevanceCheck } = await searchServicesSemantic({
         query: query.trim(),
         locale: LOCALE,
-        limit: DEFAULT_SEMANTIC_LIMIT,
+        limit: SEMANTIC_RECOMMENDATIONS_LIMIT,
         excludeIds: lexical.localResults.map(service => service.serviceId),
     });
     if (relevanceCheck === 'unavailable') throw new RelevanceCheckUnavailableError(query);

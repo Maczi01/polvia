@@ -34,12 +34,17 @@ const openai = new OpenAI({
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
 
-/** Tyle wynikow dostaje ekran mapy — klient nie przekazuje `limit` do `/api/services`. */
+/**
+ * Limit `/api/services`, gdy konsument go nie poda. Ekran mapy podaje wlasny
+ * (`SEMANTIC_RECOMMENDATIONS_LIMIT`).
+ */
 export const DEFAULT_SEMANTIC_LIMIT = 3;
 
 /**
  * Tylu najlepszych kandydatow ocenia model. Wiecej niz `limit`, bo odrzuceni zwalniaja
  * miejsca: przed ocena trafny wynik z pozycji 4 przegrywal z nietrafnym z pozycji 1.
+ * Ekran mapy prosi o tyle samo — zmieniajac te wartosc, sprawdz
+ * `SEMANTIC_RECOMMENDATIONS_LIMIT`.
  */
 const JUDGE_POOL_SIZE = 10;
 
