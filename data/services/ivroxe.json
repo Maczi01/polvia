@@ -1,0 +1,356 @@
+{
+    "name": "IVROXE",
+    "category": "beauty",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "ivroxe.png",
+    "languages": [
+        "pl"
+    ],
+    "translations": {
+        "pl": {
+            "description": "Sieć salonów masażu w Warszawie (Mokotów, Wola), Krakowie, Łodzi, Poznaniu, Gdańsku i Wrocławiu, czynne codziennie w godzinach 9:00–21:00. W ofercie masaż klasyczny, sportowy, relaksacyjny, bańkami, gorącymi kamieniami, na cztery ręce i Kobido, a także drenaż limfatyczny, masaż antycellulitowy, presoterapia i fitobeczka. Strona salonów jest dostępna także po ukraińsku i rosyjsku."
+        },
+        "uk": {
+            "description": "Мережа масажних салонів у Варшаві (Мокотів, Воля), Кракові, Лодзі, Познані, Гданську та Вроцлаві, працюють щодня з 9:00 до 21:00. Класичний, спортивний, релаксаційний масаж, масаж банками, гарячим камінням, у чотири руки та Кобідо, а також лімфодренаж, антицелюлітний масаж, пресотерапія та фітобочка. Сайт салонів доступний також українською та російською; мову обслуговування варто уточнити телефоном."
+        },
+        "en": {
+            "description": "Chain of massage salons in Warsaw (Mokotów, Wola), Kraków, Łódź, Poznań, Gdańsk and Wrocław, open every day from 9:00 to 21:00. Treatments include classic, sports and relaxation massage, cupping, hot stone, four-hand and Kobido massage, as well as lymphatic drainage, anti-cellulite massage, pressotherapy and a herbal steam barrel. The salons' website is also available in Ukrainian and Russian."
+        },
+        "ru": {
+            "description": "Сеть массажных салонов в Варшаве (Мокотув, Воля), Кракове, Лодзи, Познани, Гданьске и Вроцлаве, работают ежедневно с 9:00 до 21:00. Классический, спортивный, релаксационный массаж, массаж банками, горячими камнями, в четыре руки и Кобидо, а также лимфодренаж, антицеллюлитный массаж, прессотерапия и фитобочка. Сайт салонов доступен также на украинском и русском; язык обслуживания стоит уточнить по телефону."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Masaż",
+            "uk": "Масаж",
+            "en": "Massage",
+            "ru": "Массаж"
+        },
+        {
+            "pl": "Drenaż limfatyczny",
+            "uk": "Лімфодренаж",
+            "en": "Lymphatic drainage",
+            "ru": "Лимфодренаж"
+        },
+        {
+            "pl": "Masaż sportowy",
+            "uk": "Спортивний масаж",
+            "en": "Sports massage",
+            "ru": "Спортивный массаж"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Postępu 10 lok. 88",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-676",
+            "latitude": 52.1751962,
+            "longitude": 20.9951547,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 733 661 128",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/mokotow/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_warszawa/"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Wrocław",
+            "street": "ul. Księcia Witolda 44 lok. 6",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-202",
+            "latitude": 51.1152694,
+            "longitude": 17.0255211,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 510 776 910",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/wroclaw/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_wroclaw/"
+            }
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Ogrodowa 65 lok. 33",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-876",
+            "latitude": 52.2368434,
+            "longitude": 20.9822509,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 880 861 128",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/wola/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_warszawa/"
+            }
+        },
+        {
+            "city": "Kraków",
+            "street": "ul. Kielecka 3 lok. 2",
+            "voivodeship": "malopolskie",
+            "postcode": "31-526",
+            "latitude": 50.06666,
+            "longitude": 19.9628238,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 506 000 190",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/krakow/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_krakow/"
+            }
+        },
+        {
+            "city": "Łódź",
+            "street": "ul. Rewolucji 1905 roku 32 lok. 14",
+            "voivodeship": "lodzkie",
+            "postcode": "90-207",
+            "latitude": 51.7750611,
+            "longitude": 19.4609721,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 798 434 684",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/lodz/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_lodz/"
+            }
+        },
+        {
+            "city": "Poznań",
+            "street": "ul. Głogowska 41",
+            "voivodeship": "wielkopolskie",
+            "postcode": "60-736",
+            "latitude": 52.3988059,
+            "longitude": 16.9042442,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 577 753 170",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/poznan/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_poznan/"
+            }
+        },
+        {
+            "city": "Gdańsk",
+            "street": "ul. Wały Piastowskie 1 lok. 227",
+            "voivodeship": "pomorskie",
+            "postcode": "80-855",
+            "latitude": 54.3587415,
+            "longitude": 18.6468244,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                },
+                "sunday": {
+                    "open": "09:00",
+                    "close": "21:00"
+                }
+            },
+            "phoneNumber": "+48 780 640 828",
+            "email": "info@ivroxe.com",
+            "webpage": "https://ivroxe.com/gdansk/uk/",
+            "socials": {
+                "instagram": "https://www.instagram.com/ivroxe_masaz_gdansk/"
+            }
+        }
+    ]
+}

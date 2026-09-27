@@ -1,0 +1,60 @@
+{
+    "name": "Kalina – Przestrzeń Psychoterapii i Rozwoju",
+    "category": "health",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "kalina-terapia.png",
+    "languages": ["uk", "ru", "pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Gabinet psychoterapii na warszawskich Bielanach, prowadzący konsultacje psychologiczne i psychoterapię po ukraińsku i rosyjsku — stacjonarnie w Warszawie oraz online. W ofercie terapia indywidualna, terapia par, rodzin i grupowa, diagnoza psychologiczna oraz pomoc dla dzieci i młodzieży. Zespół pracuje m.in. z lękiem, wypaleniem, traumą i trudnościami adaptacyjnymi po migracji. Pierwsza krótka rozmowa pomaga dobrać specjalistę."
+        },
+        "uk": {
+            "description": "Кабінет психотерапії на варшавських Бєлянах: психологічні консультації та психотерапія українською і російською — у Варшаві або онлайн. Індивідуальна терапія, терапія пар, сімейна та групова, психологічна діагностика, допомога дітям і підліткам. Команда працює з тривогою, вигоранням, травмою та труднощами адаптації після міграції. Коротка перша розмова допомагає підібрати фахівця."
+        },
+        "en": {
+            "description": "Psychotherapy practice in Warsaw's Bielany district offering psychological consultations and psychotherapy in Ukrainian and Russian, in person in Warsaw or online. Services include individual, couples, family and group therapy, psychological assessment and support for children and teenagers. The team works with anxiety, burnout, trauma and the difficulties of adapting after migration. A short first conversation helps match you with the right specialist."
+        },
+        "ru": {
+            "description": "Кабинет психотерапии на варшавских Белянах: психологические консультации и психотерапия на украинском и русском — в Варшаве или онлайн. Индивидуальная терапия, терапия пар, семейная и групповая, психологическая диагностика, помощь детям и подросткам. Команда работает с тревогой, выгоранием, травмой и трудностями адаптации после миграции. Короткий первый разговор помогает подобрать специалиста."
+        }
+    },
+
+    "tags": [
+        { "pl": "Psycholog", "uk": "Психолог", "en": "Psychologist", "ru": "Психолог" },
+        { "pl": "Psychoterapia", "uk": "Психотерапія", "en": "Psychotherapy", "ru": "Психотерапия" },
+        { "pl": "Terapia par", "uk": "Терапія пар", "en": "Couples therapy", "ru": "Терапия пар" },
+        { "pl": "Obsługa po ukraińsku", "uk": "Обслуговування українською", "en": "Service in Ukrainian", "ru": "Обслуживание на украинском" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Podleśna 40/33",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-673",
+            "latitude": 52.2829948,
+            "longitude": 20.9624023,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "20:00" },
+                "tuesday": { "open": "10:00", "close": "20:00" },
+                "wednesday": { "open": "10:00", "close": "20:00" },
+                "thursday": { "open": "10:00", "close": "20:00" },
+                "friday": { "open": "10:00", "close": "20:00" }
+            },
+            "phoneNumber": "+48 792 822 294",
+            "email": "kontakt@kalinaterapia.pl",
+            "webpage": "https://www.kalinaterapia.pl/pl/",
+            "whatsappNumber": "+48792822294",
+            "socials": {
+                "instagram": "https://www.instagram.com/kalina_terapia/",
+                "facebook": "https://www.facebook.com/profile.php?id=61574673694553",
+                "youtube": "https://www.youtube.com/@kalinaterapia",
+                "telegram": "https://t.me/kalinaterapia"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

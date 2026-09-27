@@ -1,0 +1,70 @@
+{
+    "name": "Kuku Kids",
+    "category": "education",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "kuku-kids.png",
+    "languages": [
+        "uk",
+        "pl"
+    ],
+    "translations": {
+        "pl": {
+            "description": "Żłobek i przedszkole we Wrocławiu, które przedstawiają się jako pierwsze ukraińskojęzyczne licencjonowane przedszkole, stworzone dla małych Ukraińców. Zajęcia z dziećmi prowadzone są po ukraińsku, a w programie jest adaptacyjny kurs języka polskiego dla dzieci z Ukrainy oraz szeroka oferta zajęć dodatkowych. Placówka przy bulwarze Dedala działa jako żłobek i przedszkole; kontakt po ukraińsku pod numerem podanym na ukraińskiej wersji strony."
+        },
+        "uk": {
+            "description": "Ясла та дитячий садочок у Вроцлаві, які називають себе першим україномовним ліцензованим дитячим садочком, створеним для маленьких українців. Заняття з дітьми проходять українською, у програмі — адаптаційний курс польської мови для дітей з України та широка пропозиція додаткових занять. Заклад на бульварі Дедала працює як ясла і садочок; зв'язок українською — за номером з української версії сайту."
+        },
+        "en": {
+            "description": "Nursery and kindergarten in Wrocław that describes itself as the first Ukrainian-language licensed kindergarten, created for young Ukrainian children. Activities are run in Ukrainian, and the programme includes an adaptation course in Polish for children from Ukraine plus a wide range of extra activities. The site on Dedala Boulevard operates as both a nursery and a kindergarten; contact in Ukrainian via the number on the Ukrainian version of the website."
+        },
+        "ru": {
+            "description": "Ясли и детский сад во Вроцлаве, которые называют себя первым украиноязычным лицензированным детским садом, созданным для маленьких украинцев. Занятия с детьми проходят на украинском, в программе — адаптационный курс польского языка для детей из Украины и широкий выбор дополнительных занятий. Учреждение на бульваре Дедала работает как ясли и детский сад; связь на украинском — по номеру с украинской версии сайта."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Przedszkole",
+            "uk": "Дитячий садок",
+            "en": "Kindergarten",
+            "ru": "Детский сад"
+        },
+        {
+            "pl": "Żłobek",
+            "uk": "Ясла",
+            "en": "Nursery",
+            "ru": "Ясли"
+        },
+        {
+            "pl": "Język ukraiński",
+            "uk": "Українська мова",
+            "en": "Ukrainian language",
+            "ru": "Украинский язык"
+        },
+        {
+            "pl": "Kursy polskiego",
+            "uk": "Курси польської",
+            "en": "Polish courses",
+            "ru": "Курсы польского"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Wrocław",
+            "street": "bulw. Dedala 6a",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "54-130",
+            "latitude": 51.1264227,
+            "longitude": 16.9676031,
+            "phoneNumber": "+48 799 366 817",
+            "webpage": "https://kuku.kids/ua",
+            "socials": {
+                "facebook": "https://www.facebook.com/ku.ku.kids",
+                "instagram": "https://www.instagram.com/ku.ku.kids.wro/",
+                "tiktok": "https://www.tiktok.com/@kuku_kids.wro"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

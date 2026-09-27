@@ -1,0 +1,57 @@
+{
+    "name": "Mimosa Brooklyn Pizza Warsaw",
+    "category": "gastronomy",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "mimosa-warsaw.png",
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Pizzeria w stylu brooklyńskim przy ul. Chmielnej w centrum Warszawy — warszawski lokal ukraińskiej marki Mimosa, założonej w Kijowie w 2017 roku. Poza pizzą w karcie m.in. vitello tonnato, bruschetta i fettuccine z krewetkami. Lokal przyjmuje rezerwacje i zamówienia z odbiorem osobistym. Czynny od poniedziałku do czwartku w godzinach 11:00–23:00, w piątki i soboty 10:00–24:00, w niedziele 10:00–23:00."
+        },
+        "uk": {
+            "description": "Піцерія в бруклінському стилі на вулиці Chmielna в центрі Варшави — варшавський заклад української мережі Mimosa, заснованої в Києві у 2017 році. Окрім піци, у меню, зокрема, вітелло тоннато, брускета та феттучіні з креветками. Приймає бронювання та замовлення на самовивіз. Працює з понеділка по четвер з 11:00 до 23:00, у п'ятницю та суботу з 10:00 до 24:00, у неділю з 10:00 до 23:00."
+        },
+        "en": {
+            "description": "Brooklyn-style pizzeria on Chmielna Street in central Warsaw, the Warsaw branch of the Ukrainian Mimosa brand founded in Kyiv in 2017. Besides pizza, the menu features vitello tonnato, bruschetta and shrimp fettuccine, among other dishes. Table reservations and takeaway orders are available. Open Monday to Thursday 11:00–23:00, Friday and Saturday 10:00–24:00, and Sunday 10:00–23:00."
+        },
+        "ru": {
+            "description": "Пиццерия в бруклинском стиле на улице Chmielna в центре Варшавы — варшавское заведение украинской сети Mimosa, основанной в Киеве в 2017 году. Помимо пиццы, в меню, в частности, вителло тоннато, брускетта и феттучини с креветками. Принимает бронирования и заказы на самовывоз. Работает с понедельника по четверг с 11:00 до 23:00, в пятницу и субботу с 10:00 до 24:00, в воскресенье с 10:00 до 23:00."
+        }
+    },
+
+    "tags": [
+        { "pl": "Pizza", "uk": "Піца", "en": "Pizza", "ru": "Пицца" },
+        { "pl": "Kuchnia włoska", "uk": "Італійська кухня", "en": "Italian cuisine", "ru": "Итальянская кухня" },
+        { "pl": "Ukraina", "uk": "Україна", "en": "Ukraine", "ru": "Украина" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Chmielna 28",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-020",
+            "latitude": 52.2321813,
+            "longitude": 21.0131671,
+            "openingHours": {
+                "monday": { "open": "11:00", "close": "23:00" },
+                "tuesday": { "open": "11:00", "close": "23:00" },
+                "wednesday": { "open": "11:00", "close": "23:00" },
+                "thursday": { "open": "11:00", "close": "23:00" },
+                "friday": { "open": "10:00", "close": "00:00" },
+                "saturday": { "open": "10:00", "close": "00:00" },
+                "sunday": { "open": "10:00", "close": "23:00" }
+            },
+            "phoneNumber": "+48 882 505 053",
+            "email": "mimosa.warsaw@gmail.com",
+            "webpage": "https://mimosawarsaw.choiceqr.com/",
+            "socials": {
+                "instagram": "https://www.instagram.com/mimosa_warsaw/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
