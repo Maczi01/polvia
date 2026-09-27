@@ -20,4 +20,14 @@ describe('foldForSearch', () => {
     it('zostawia cyrylice czytelna do dopasowania', () => {
         expect(foldForSearch('Стоматолог')).toBe('стоматолог');
     });
+
+    it('sklada й, ї i ё do liter bazowych — swiadoma decyzja, patrz komentarz funkcji', () => {
+        expect(foldForSearch('Київ')).toBe(foldForSearch('Киів'));
+        expect(foldForSearch('Йога')).toBe('иога');
+        expect(foldForSearch('ёлка')).toBe('елка');
+    });
+
+    it('nie zmienia liter cyrylicy bez znakow laczacych', () => {
+        expect(foldForSearch('ґанок іспит щ')).toBe('ґанок іспит щ');
+    });
 });
