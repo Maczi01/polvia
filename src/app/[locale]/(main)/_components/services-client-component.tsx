@@ -133,7 +133,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                     console.error('Semantic search failed', {
                         query,
                         category: category ?? null,
-                        message: data.message,
+                        code: data.error?.code,
                     });
                     setEmbeddingResults([]);
                     setEmbeddingMeta(null);

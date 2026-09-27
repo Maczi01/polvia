@@ -143,14 +143,12 @@ export async function GET(request: NextRequest) {
             timestamp: new Date().toISOString(),
         });
     } catch (error) {
+        // Szczegoly tylko w logach serwera. Komunikat OpenAI zdradzal klientowi dostawce,
+        // typ i koncowke klucza — 401 z 2026-09 lecial w odpowiedzi publicznego endpointu.
         console.error('Embedding search API error:', error);
 
         return NextResponse.json(
-            {
-                success: false,
-                error: 'Embedding search failed',
-                message: error instanceof Error ? error.message : 'Unknown error',
-            },
+            { success: false, error: { code: 'SEARCH_FAILED', message: 'Search failed' } },
             { status: 500 },
         );
     }
