@@ -8,6 +8,8 @@ import { formatDate, serviceNameFromCapitalLetter } from '@/lib/consts';
 import { MDXContent } from '@/app/[locale]/blog/_components/mdx-content';
 import { setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
+import { blogPath } from '@/lib/blog-urls';
+import { tagLink } from '@/app/[locale]/blog/_components/tag-styles';
 import { env } from '../../../../../env';
 import { imgAlt, imgSrc } from '@/lib/utilities';
 
@@ -44,11 +46,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
         }
 
         const baseUrl = env.NEXT_PUBLIC_SITE_URL;
-        const postUrl = `${baseUrl}/${locale}/blog/${slug}`;
+        const postUrl = `${baseUrl}${blogPath(locale, slug)}`;
 
         const availableLocales = await getAvailableTranslations(slug);
         const languagesMap: Record<string, string> = {
-            ...Object.fromEntries(availableLocales.map(l => [l, `${baseUrl}/${l}/blog/${slug}`])),
+            ...Object.fromEntries(availableLocales.map(l => [l, `${baseUrl}${blogPath(l, slug)}`])),
             'x-default': baseUrl,
         };
 
@@ -167,12 +169,11 @@ export default async function Post({ params }: PostPageProps) {
             },
             mainEntityOfPage: {
                 '@type': 'WebPage',
-                '@id': `${env.NEXT_PUBLIC_SITE_URL}/${locale}/blog/${slug}`,
+                '@id': `${env.NEXT_PUBLIC_SITE_URL}${blogPath(locale, slug)}`,
             },
         };
 
         const hero = imgSrc(metadata.coverImage) || imgSrc(metadata.image); // ⬅️ fallback
-        const toTag = (t: string) => `/${locale}/blog?tag=${encodeURIComponent(t)}`;
 
 
         return (
@@ -192,7 +193,7 @@ export default async function Post({ params }: PostPageProps) {
                             {/* Navigation */}
                             <div className="mb-8 flex flex-col gap-4 sm:mb-12 sm:flex-row sm:items-center sm:justify-between">
                                 <Link
-                                    href={`/${locale}/blog`}
+                                    href={blogPath(locale)}
                                     className="group inline-flex w-fit items-center gap-3 rounded-full bg-green px-4 py-2.5 text-sm
                   font-medium text-white backdrop-blur-sm transition-all duration-200 hover:bg-green-800
                   hover:text-white hover:shadow-md"
@@ -208,7 +209,7 @@ export default async function Post({ params }: PostPageProps) {
                                             {availableTranslations.map((l) => (
                                                 <Link
                                                     key={l}
-                                                    href={`/${l}/blog/${slug}`}
+                                                    href={blogPath(l, slug)}
                                                     className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
                                                         l === locale
                                                             ? 'bg-primary text-primary-foreground shadow-sm'
@@ -266,7 +267,7 @@ export default async function Post({ params }: PostPageProps) {
                                     {metadata.tags.map((t) => (
                                         <Link
                                             key={t}
-                                            href={toTag(t)}
+                                            href={tagLink(locale, t)}
                                             style={{
                                                 padding: '6px 12px',
                                                 borderRadius: 999,
@@ -313,7 +314,7 @@ export default async function Post({ params }: PostPageProps) {
                         <div className="mt-12 border-t pt-6 sm:mt-16 sm:pt-8">
                             <div className="text-center">
                                 <Link
-                                    href={`/${locale}/blog`}
+                                    href={blogPath(locale)}
                                     className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 sm:w-auto"
                                 >
                                     <ArrowLeftIcon className="size-4" />
