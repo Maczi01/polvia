@@ -13,6 +13,7 @@ import { useLocale } from 'next-intl';
 import { calculateServicesBounds } from '@/lib/map-utils';
 import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
+import { buildSemanticSearchParams } from '@/lib/semantic-search-request';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
 import { splitServicesByCoverage } from '@/lib/service-coverage';
 
@@ -91,18 +92,15 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const fetchEmbeddingResults = useCallback(
         async (query: string, category?: string, county?: string, excludeIds: string[] = []) => {
             try {
-                const params = new URLSearchParams();
-                params.set('query', query);
-                if (category) params.set('category', category);
                 // `/api/services` czyta `voivodeship` — pod `county` filtr byl po cichu
-                // ignorowany, a limit 3 zapelnialy wyniki z innych wojewodztw.
-                if (county) params.set('voivodeship', county);
-                params.set('locale', locale);
-                params.set('semanticOnly', 'true');
-                if (excludeIds.length > 0) {
-                    params.set('excludeIds', excludeIds.join(','));
-                }
-
+                // ignorowany, a limit zapelnialy wyniki z innych wojewodztw.
+                const params = buildSemanticSearchParams({
+                    query,
+                    locale,
+                    category,
+                    voivodeship: county,
+                    excludeIds,
+                });
 
                 const response = await fetch(`/api/services?${params}`, {
                     signal: AbortSignal.timeout(8000),
