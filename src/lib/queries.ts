@@ -13,6 +13,7 @@ import { servicesTranslationsAlias } from '@/db/aliases';
 import { and, desc, eq, gt, sql } from 'drizzle-orm';
 import { isNotNull } from 'drizzle-orm';
 import 'server-only';
+import { type FeaturedService, pickFeaturedServices } from '@/lib/featured-services';
 import { Service } from '@/types';
 
 export async function getServices(locale: string = 'en') {
@@ -111,6 +112,68 @@ export async function getVoivodeshipStats(): Promise<VoivodeshipStats[]> {
         ))
         .where(isNotNull(serviceLocationsTable.voivodeship))
         .groupBy(serviceLocationsTable.voivodeship) as unknown as VoivodeshipStats[];
+}
+
+export type CatalogStats = {
+    companiesCount: number;
+    citiesCount: number;
+};
+
+export async function getCatalogStats(): Promise<CatalogStats> {
+    const [row] = await db
+        .select({
+            companiesCount: sql<number>`COUNT(DISTINCT ${servicesTable.id})::int`,
+            citiesCount: sql<number>`COUNT(DISTINCT LOWER(NULLIF(TRIM(${serviceLocationsTable.city}), '')))::int`,
+        })
+        .from(servicesTable)
+        .leftJoin(serviceLocationsTable, eq(serviceLocationsTable.serviceId, servicesTable.id))
+        .where(eq(servicesTable.status, 'active'));
+
+    return row ?? { companiesCount: 0, citiesCount: 0 };
+}
+
+const FEATURED_CANDIDATES_LIMIT = 3;
+
+function selectFeaturedCandidates(locale: string) {
+    return db
+        .select({
+            serviceId: servicesTable.id,
+            name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`,
+            category: servicesTable.category,
+            city: sql<string | null>`
+              (
+                SELECT ${serviceLocationsTable.city}
+                FROM ${serviceLocationsTable}
+                WHERE ${serviceLocationsTable.serviceId} = ${servicesTable.id}
+                ORDER BY ${serviceLocationsTable.isMainLocation} DESC
+                LIMIT 1
+              )
+            `,
+        })
+        .from(servicesTable)
+        .leftJoin(
+            servicesTranslationsAlias,
+            and(
+                eq(servicesTranslationsAlias.serviceId, servicesTable.id),
+                eq(servicesTranslationsAlias.languageCode, locale),
+            ),
+        )
+        .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
+        .where(eq(servicesTable.status, 'active'))
+        .$dynamic();
+}
+
+export async function getFeaturedServices(locale: string): Promise<FeaturedService[]> {
+    const [popular, newest] = await Promise.all([
+        selectFeaturedCandidates(locale)
+            .orderBy(desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`))
+            .limit(FEATURED_CANDIDATES_LIMIT),
+        selectFeaturedCandidates(locale)
+            .orderBy(desc(servicesTable.createdAt))
+            .limit(FEATURED_CANDIDATES_LIMIT),
+    ]);
+
+    return pickFeaturedServices(popular, newest);
 }
 
 export async function addEmailToNewsletter(email: string) {

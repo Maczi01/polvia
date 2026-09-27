@@ -1,8 +1,9 @@
 import React from 'react';
-import { Search, ScrollText, CircleEllipsis, MapPinPlus, Rocket } from 'lucide-react';
+import { CircleEllipsis, MapPin, MapPinPlus, Rocket, ScrollText } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { serviceName, serviceNameFromCapitalLetter } from '@/lib/consts';
+import { categories, serviceName, serviceNameFromCapitalLetter } from '@/lib/consts';
+import { formatDisplayCount } from '@/lib/display-count';
 
 type StatDef = {
     id: string;
@@ -12,33 +13,38 @@ type StatDef = {
     description: string;
 };
 
-export const StatsBar = async () => {
+type StatsBarProps = {
+    companiesCount: number;
+    citiesCount: number;
+};
+
+export const StatsBar = async ({ companiesCount, citiesCount }: StatsBarProps) => {
     const t = await getTranslations('StatsBar');
 
     const stats: StatDef[] = [
         {
-            id: 'search',
-            icon: Search,
-            value: '5000+',
+            id: 'cities',
+            icon: MapPin,
+            value: formatDisplayCount(citiesCount),
             label: t('Card5.title'),
             description: t('Card5.description'),
         },
         {
             id: 'docs',
             icon: ScrollText,
-            value: '100+',
+            value: formatDisplayCount(companiesCount),
             label: t('Card1.title'),
             description: t('Card1.description'),
         },
         {
             id: 'categories',
             icon: CircleEllipsis,
-            value: '12',
+            value: String(categories.length),
             label: t('Card3.title'),
             description: t('Card3.description'),
         },
         {
-            id: 'cities',
+            id: 'country',
             icon: MapPinPlus,
             value: '1',
             label: t('Card2.title'),

@@ -8,10 +8,15 @@ import { HowItWorks } from '@/app/[locale]/(header)/_components/how-it-works';
 import ScrollToTopButton from '@/app/[locale]/(header)/_components/scroll-to-top-button';
 import { BlogSection } from './_components/blog-section';
 import { TrustSection } from '@/app/[locale]/(header)/_components/trust-section';
-import { getVoivodeshipStats } from '@/lib/queries';
+import { getCatalogStats, getFeaturedServices, getVoivodeshipStats } from '@/lib/queries';
 
-export default async function HomePage({ params }: { params: any }) {
-    const voivodeshipStats = await getVoivodeshipStats();
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
+    const [voivodeshipStats, catalogStats, featuredServices] = await Promise.all([
+        getVoivodeshipStats(),
+        getCatalogStats(),
+        getFeaturedServices(locale),
+    ]);
 
     return (
         <div className="flex flex-col">
@@ -19,8 +24,14 @@ export default async function HomePage({ params }: { params: any }) {
             <HowItWorks />
             <CategoryPreviewServer />
             <PopularServices params={params} />
-            <TrustSection />
-            <StatsBar />
+            <TrustSection
+                companiesCount={catalogStats.companiesCount}
+                featured={featuredServices}
+            />
+            <StatsBar
+                companiesCount={catalogStats.companiesCount}
+                citiesCount={catalogStats.citiesCount}
+            />
             <Faq />
             <BlogSection params={params} />
             <ScrollToTopButton />
