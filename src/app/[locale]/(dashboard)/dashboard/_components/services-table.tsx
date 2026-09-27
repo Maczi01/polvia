@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input/input';
 import { Badge } from '@/components/ui/badge/badge';
 import { Trash2, ExternalLink, Search, Pencil } from 'lucide-react';
 import { type DashboardService, deleteService } from '../_actions';
+import { filterDashboardServices } from './filter-dashboard-services';
 import { mapCategoryToBadgeColor } from '@/lib/consts';
 import Link from 'next/link';
 
@@ -19,13 +20,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
     const [search, setSearch] = useState('');
     const [isPending, startTransition] = useTransition();
 
-    const filtered = services.filter((s) =>
-        s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.slug?.toLowerCase().includes(search.toLowerCase()) ||
-        s.category?.toLowerCase().includes(search.toLowerCase()) ||
-        s.city?.toLowerCase().includes(search.toLowerCase()) ||
-        s.nip?.includes(search)
-    );
+    const filtered = filterDashboardServices(services, search);
 
     const handleDelete = (id: string, name: string) => {
         if (!confirm(`Are you sure you want to delete "${name}"?`)) return;

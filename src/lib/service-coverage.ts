@@ -1,3 +1,4 @@
+import { foldForSearch } from '@/lib/search-text';
 import type { PartialService } from '@/types';
 
 /**
@@ -27,14 +28,6 @@ export type CoverageBuckets = {
     /** Wpisy dostepne zdalnie, ktorych NIE ma juz na innej liscie tego ekranu. */
     onlineResults: PartialService[];
 };
-
-/**
- * Male litery bez polskich znakow — uzytkownik pisze raz "ksiegowa", raz "księgowa",
- * a dane sa niespojne w obie strony. `ł` nie rozklada sie w NFD, stad osobna zamiana.
- */
-function foldForSearch(text: string): string {
-    return text.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/ł/g, 'l');
-}
 
 /**
  * Koncowki fleksyjne rzeczownikow i przymiotnikow (juz bez polskich znakow), najdluzsze
