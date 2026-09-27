@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useParallaxHover } from '@/hooks/use-parallax-hover';
 import { tagChipStyle, tagLink, tagRowStyle } from '@/app/[locale]/blog/_components/tag-styles';
 import { useTranslations } from 'next-intl';
+import { blogPath } from '@/lib/blog-urls';
 
 // Small helper for line clamp without Tailwind slash tokens
 const clamp = (lines: number): React.CSSProperties => ({
@@ -34,7 +35,7 @@ export default function PostCard({ post, locale }: { post: PostMetadata; locale:
 
     return (
         <Link
-            href={`/${locale}/blog/${post.slug}`}
+            href={blogPath(locale, post.slug)}
             className="block"
             style={{ display: 'block', height: '100%' }}
         >
