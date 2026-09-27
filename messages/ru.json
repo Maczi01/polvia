@@ -494,7 +494,8 @@
     "places": "{count} мест",
     "viewOnMap": "Смотреть на карте",
     "exampleCities": "напр. {cities}",
-    "autoTooltip": "{count} компаний в {categories} категориях"
+    "autoTooltip": "{count} компаний в {categories} категориях",
+    "emptyTooltip": "В этом воеводстве пока нет компаний"
   },
   "TrustSection": {
     "badge": "Почему стоит выбрать Polvia",

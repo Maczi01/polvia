@@ -495,7 +495,8 @@
     "places": "{count} miejsc",
     "viewOnMap": "Zobacz na mapie",
     "exampleCities": "np. {cities}",
-    "autoTooltip": "{count} firm w {categories} kategoriach"
+    "autoTooltip": "{count} firm w {categories} kategoriach",
+    "emptyTooltip": "Jeszcze brak firm w tym województwie"
   },
   "TrustSection": {
     "badge": "Dlaczego warto wybrać Polvia",

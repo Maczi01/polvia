@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useIsMobile } from '@/hooks/use-is-mobile';
-import { HERO_PINS, HERO_PIN_MAP, type HeroPin } from './hero-map-data';
+import { HERO_PINS, type HeroPin, withVoivodeshipStats } from './hero-map-data';
 import { HeroMapTooltip } from './hero-map-tooltip';
 import type { VoivodeshipStats } from '@/lib/queries';
 
@@ -23,23 +23,14 @@ type Props = {
 export function HeroMapInteractive({ ariaLabel, voivodeshipStats }: Props) {
     const isMobile = useIsMobile({ breakpoint: 768 });
 
-    // Merge DB stats into static pin data
-    const enrichedPinMap = useMemo(() => {
-        const statsMap = new Map(voivodeshipStats.map((s) => [s.voivodeship, s]));
-        const map = new Map<string, HeroPin>();
-        for (const pin of HERO_PINS) {
-            const stats = statsMap.get(pin.voivodeshipKey);
-            map.set(pin.svgLabel, stats
-                ? { ...pin, placesCount: stats.companiesCount, categoriesCount: stats.categoriesCount }
-                : pin,
-            );
-        }
-        return map;
-    }, [voivodeshipStats]);
-
     const enrichedPins = useMemo(
-        () => HERO_PINS.map((p) => enrichedPinMap.get(p.svgLabel) ?? p),
-        [enrichedPinMap],
+        () => withVoivodeshipStats(HERO_PINS, voivodeshipStats),
+        [voivodeshipStats],
+    );
+
+    const enrichedPinMap = useMemo(
+        () => new Map<string, HeroPin>(enrichedPins.map(pin => [pin.svgLabel, pin])),
+        [enrichedPins],
     );
 
     const containerRef = useRef<HTMLDivElement>(null);
