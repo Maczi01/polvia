@@ -2,7 +2,8 @@
 
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { memo, useCallback, useEffect, useRef, useState, useTransition } from 'react';
-import { categories, counties } from '@/lib/consts';
+import { counties } from '@/lib/consts';
+import { CATEGORIES } from '@/lib/categories';
 import { useTranslations } from 'next-intl';
 import { SelectScrollable } from '@/components/ui/select/select-scrollable';
 import { ButtonCategory } from '../button-category/button-category';
@@ -148,7 +149,7 @@ export const Filter = memo(
                                 disabled={!hasActiveFilters}
                             />
 
-                            {categories.map(({ text, key, image, variant }) => (
+                            {CATEGORIES.map(({ text, key, image, variant }) => (
                                 <ButtonCategory
                                     key={text}
                                     image={image}

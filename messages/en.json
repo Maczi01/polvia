@@ -13,7 +13,6 @@
     "Categories": {
       "Grocery": "Grocery",
       "Gastronomy": "Gastronomy",
-      "Government": "Government",
       "Transport": "Transport",
       "Financial": "Financial",
       "Renovation": "Renovation",
@@ -228,7 +227,6 @@
     "popularCompanies": "Popular companies",
     "Grocery": "Grocery",
     "Gastronomy": "Gastronomy",
-    "Government": "Government",
     "Transport": "Transport",
     "Financial": "Financial",
     "Renovation": "Renovation",
@@ -245,7 +243,6 @@
     "Categories": {
       "grocery": "Grocery",
       "gastronomy": "Gastronomy",
-      "government": "Government",
       "transport": "Transport",
       "financial": "Financial",
       "renovation": "Renovation",
@@ -265,7 +262,6 @@
     "categoriesAlt": {
       "Grocery": "Grocery - icon of Ukrainian grocery stores",
       "Gastronomy": "Gastronomy - icon of Ukrainian gastronomy services",
-      "Government": "Government - icon of Ukrainian government services",
       "Transport": "Transport - icon of Ukrainian transport services",
       "Financial": "Financial - icon of Ukrainian financial services",
       "Renovation": "Renovation - icon of Ukrainian renovation services",
@@ -463,7 +459,6 @@
     "categories": {
       "Grocery": "Grocery - Ukrainian grocery stores category icon",
       "Gastronomy": "Gastronomy - Ukrainian gastronomy category icon",
-      "Government": "Government - Ukrainian government services category icon",
       "Transport": "Transport - Ukrainian transport services category icon",
       "Financial": "Financial - Ukrainian financial services category icon",
       "Renovation": "Renovation - Ukrainian renovation services category icon",

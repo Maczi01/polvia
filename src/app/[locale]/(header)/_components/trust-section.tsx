@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { categories } from '@/lib/consts';
+import { getCategoryMessageKey } from '@/lib/categories';
 import { formatDisplayCount } from '@/lib/display-count';
 import type { FeaturedService } from '@/lib/featured-services';
 
@@ -8,10 +8,6 @@ type TrustSectionProps = {
     companiesCount: number;
     featured: FeaturedService[];
 };
-
-function categoryLabelKey(category: string): string {
-    return categories.find(entry => entry.key === category)?.text ?? 'Others';
-}
 
 export async function TrustSection({ companiesCount, featured }: TrustSectionProps) {
     const t = await getTranslations('TrustSection');
@@ -115,7 +111,7 @@ export async function TrustSection({ companiesCount, featured }: TrustSectionPro
                                                 {company.name}
                                             </div>
                                             <div className="mt-1 text-sm text-slate-600 dark:text-gray-300">
-                                                {tCategories(categoryLabelKey(company.category))}
+                                                {tCategories(getCategoryMessageKey(company.category))}
                                             </div>
                                         </div>
                                         {company.city && (

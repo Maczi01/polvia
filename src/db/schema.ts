@@ -16,22 +16,9 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-export const categoryEnum = pgEnum('category', [
-    'others',
-    'education',
-    'renovation',
-    'financial',
-    'grocery',
-    'beauty',
-    'gastronomy',
-    'transport',
-    'law',
-    'mechanics',
-    'health',
-    'real_estate',
-    'help_support',
-    'it',
-]);
+import { CATEGORY_VALUES } from '../lib/categories';
+
+export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
 
 export const voivodeshipEnum = pgEnum('voivodeship', [
     'dolnoslaskie',

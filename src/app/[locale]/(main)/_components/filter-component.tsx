@@ -5,7 +5,8 @@ import { useTranslations, useLocale } from 'next-intl';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input/input';
 import { SelectScrollable } from '@/components/ui/select/select-scrollable';
-import { categories, counties } from '@/lib/consts';
+import { counties } from '@/lib/consts';
+import { CATEGORIES } from '@/lib/categories';
 import { useQueryState } from 'nuqs';
 import { ViewSwitcher } from '@/app/[locale]/(main)/_components/view-switcher/view-switcher';
 import { Button } from '@/components/ui/button/button';
@@ -425,7 +426,7 @@ export function FilterComponent({
                                 ref={categoryReference}
                                 className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden pr-4"
                             >
-                                {categories.map(({ text, key, image, variant }) => {
+                                {CATEGORIES.map(({ text, key, image, variant }) => {
                                     const isSelected = key === selectedCategory?.toLowerCase();
                                     // Pusta kategoria zostaje klikalna, ale gasnie jak niewybrana.
                                     const isEmpty = categoryCounts?.[key] === 0;

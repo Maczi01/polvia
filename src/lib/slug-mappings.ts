@@ -5,58 +5,11 @@
 
 import type { Locale } from '@/i18n/config';
 
-// Category name constants (normalized keys used internally)
-export const CATEGORY_KEYS = [
-    'grocery',
-    'gastronomy',
-    'transport',
-    'financial',
-    'renovation',
-    'law',
-    'beauty',
-    'government',
-    'health',
-    'mechanics',
-    'real_estate',
-    'help_support',
-    'education',
-    'it',
-    'others',
-] as const;
+import type { Category } from '@/lib/categories';
 
-export type CategoryKey = (typeof CATEGORY_KEYS)[number];
-
-/**
- * Klucz kategorii -> klucz w `MapPage.Categories` w plikach `messages/`.
- *
- * Wczesniej klucz tlumaczenia wyliczalo sie kapitalizacja pierwszej litery
- * (`category.charAt(0).toUpperCase() + category.slice(1)`). Dziala to dla
- * kategorii jednowyrazowych, ale nie dla `help_support` -> `HelpSupport`,
- * `real_estate` -> `RealEstate` ani `it` -> `IT`. Dla tych trzech next-intl
- * rzucalo MISSING_MESSAGE, a do `<title>` trafial surowy klucz
- * (`Mapa Uslug - Polvia - MapPage.Categories.Help_support`) — widoczny dla
- * Google, nie tylko dla uzytkownika.
- *
- * `Record<CategoryKey, string>` zamiast zwyklego obiektu pilnuje kompletnosci:
- * nowa kategoria w `CATEGORY_KEYS` nie skompiluje sie bez dopisania klucza tutaj.
- */
-export const CATEGORY_MESSAGE_KEYS: Record<CategoryKey, string> = {
-    grocery: 'Grocery',
-    gastronomy: 'Gastronomy',
-    transport: 'Transport',
-    financial: 'Financial',
-    renovation: 'Renovation',
-    law: 'Law',
-    beauty: 'Beauty',
-    government: 'Government',
-    health: 'Health',
-    mechanics: 'Mechanics',
-    real_estate: 'RealEstate',
-    help_support: 'HelpSupport',
-    education: 'Education',
-    it: 'IT',
-    others: 'Others',
-};
+// Nazwy zachowane dla istniejacych importow; zrodlem jest `@/lib/categories`.
+export { CATEGORY_VALUES as CATEGORY_KEYS } from '@/lib/categories';
+export type { Category as CategoryKey } from '@/lib/categories';
 
 /**
  * Slug zasiegu w URL-u mapy.
@@ -78,7 +31,7 @@ export function isOnlineSlug(segment: string): boolean {
     return segment.trim().toLowerCase() === COVERAGE_ONLINE_SLUG;
 }
 
-// Category slug mappings by locale
+// Slug kategorii per locale; `satisfies` wymusza komplet i blokuje kategorie spoza enuma.
 export const CATEGORY_SLUGS = {
     pl: {
         grocery: 'spozywcze',
@@ -88,7 +41,6 @@ export const CATEGORY_SLUGS = {
         renovation: 'remonty',
         law: 'prawne',
         beauty: 'uroda',
-        government: 'urzedowe',
         health: 'zdrowie',
         mechanics: 'mechanik',
         real_estate: 'nieruchomosci',
@@ -105,7 +57,6 @@ export const CATEGORY_SLUGS = {
         renovation: 'renovation',
         law: 'law',
         beauty: 'beauty',
-        government: 'government',
         health: 'health',
         mechanics: 'mechanics',
         real_estate: 'real-estate',
@@ -122,7 +73,6 @@ export const CATEGORY_SLUGS = {
         renovation: 'remont',
         law: 'pravovye',
         beauty: 'krasota',
-        government: 'gosuslugi',
         health: 'zdorovye',
         mechanics: 'mehanik',
         real_estate: 'nedvizhimost',
@@ -139,7 +89,6 @@ export const CATEGORY_SLUGS = {
         renovation: 'remont',
         law: 'pravovi',
         beauty: 'krasa',
-        government: 'derzhavni',
         health: 'zdorovya',
         mechanics: 'mehanik',
         real_estate: 'nerukhomist',
@@ -148,7 +97,7 @@ export const CATEGORY_SLUGS = {
         it: 'it-ta-kompyutery',
         others: 'inshe',
     },
-} as const;
+} as const satisfies Record<Locale, Record<Category, string>>;
 
 // County slugs (same across all locales, kebab-case)
 export const COUNTY_SLUGS = [
@@ -190,20 +139,20 @@ export type CitySlug = 'warszawa' | 'krakow' | 'lodz' | 'wroclaw' | 'poznan' | '
 
 // Reverse lookup maps (built at runtime for performance)
 const reverseCategoryMaps = {
-    pl: null as Record<string, CategoryKey> | null,
-    en: null as Record<string, CategoryKey> | null,
-    ru: null as Record<string, CategoryKey> | null,
-    uk: null as Record<string, CategoryKey> | null,
+    pl: null as Record<string, Category> | null,
+    en: null as Record<string, Category> | null,
+    ru: null as Record<string, Category> | null,
+    uk: null as Record<string, Category> | null,
 };
 
-function buildReverseCategoryMap(locale: Locale): Record<string, CategoryKey> {
+function buildReverseCategoryMap(locale: Locale): Record<string, Category> {
     if (reverseCategoryMaps[locale]) {
         return reverseCategoryMaps[locale]!;
     }
 
-    const map: Record<string, CategoryKey> = {};
+    const map: Record<string, Category> = {};
     for (const [key, slug] of Object.entries(CATEGORY_SLUGS[locale])) {
-        map[slug] = key as CategoryKey;
+        map[slug] = key as Category;
     }
 
     reverseCategoryMaps[locale] = map;
@@ -216,7 +165,7 @@ function buildReverseCategoryMap(locale: Locale): Record<string, CategoryKey> {
  * @param locale - Current locale
  * @returns Category key or null if invalid
  */
-export function getCategoryFromSlug(slug: string, locale: Locale): CategoryKey | null {
+export function getCategoryFromSlug(slug: string, locale: Locale): Category | null {
     const reverseMap = buildReverseCategoryMap(locale);
     return reverseMap[slug.toLowerCase()] || null;
 }
@@ -228,7 +177,7 @@ export function getCategoryFromSlug(slug: string, locale: Locale): CategoryKey |
  * @returns URL slug or null if invalid
  */
 export function getSlugFromCategory(category: string, locale: Locale): string | null {
-    const normalizedCategory = category.toLowerCase() as CategoryKey;
+    const normalizedCategory = category.toLowerCase() as Category;
     return CATEGORY_SLUGS[locale][normalizedCategory] || null;
 }
 
@@ -261,8 +210,8 @@ export function normalizeCountySlug(county: string): string {
  * @param category - Potential category key
  * @returns True if valid category key
  */
-// export function isValidCategoryKey(category: string): category is CategoryKey {
-//     return CATEGORY_KEYS.includes(category.toLowerCase() as CategoryKey);
+// export function isValidCategoryKey(category: string): category is Category {
+//     return CATEGORY_KEYS.includes(category.toLowerCase() as Category);
 // }
 
 /**

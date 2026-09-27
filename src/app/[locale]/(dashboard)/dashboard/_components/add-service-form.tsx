@@ -13,11 +13,7 @@ import {
     SelectValue,
 } from '@/components/ui/select/select';
 import { createService, createTag, type ActionResult, type Tag } from '../_actions';
-
-const categories = [
-    'others', 'education', 'renovation', 'financial', 'beauty', 'gastronomy',
-    'grocery', 'transport', 'law', 'mechanics', 'health', 'real_estate', 'help_support', 'it',
-] as const;
+import { CATEGORY_VALUES } from '@/lib/categories';
 
 const statuses = ['active', 'inactive', 'pending'] as const;
 
@@ -108,7 +104,7 @@ export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
-                                {categories.map((cat) => (
+                                {CATEGORY_VALUES.map((cat) => (
                                     <SelectItem key={cat} value={cat}>
                                         {cat.charAt(0).toUpperCase() + cat.slice(1)}
                                     </SelectItem>

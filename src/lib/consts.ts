@@ -6,23 +6,7 @@ export function formatDate(date: string) {
     })
 }import { z } from 'zod';
 
-export const categories = [
-    { text: 'Grocery', key: 'grocery', image: '/icons/grocery.svg', variant: 'red' as const },
-    { text: 'Gastronomy', key: 'gastronomy', image: '/icons/gastronomy.svg', variant: 'oversky' as const },
-    { text: 'Transport', key: 'transport', image: '/icons/transport.svg', variant: 'green' as const },
-    { text: 'Financial', key: 'financial', image: '/icons/financial.svg', variant: 'orange' as const },
-    { text: 'Renovation', key: 'renovation', image: '/icons/renovation.svg', variant: 'blue' as const },
-    { text: 'Law', key: 'law', image: '/icons/law.svg', variant: 'gold' as const },
-    { text: 'Beauty', key: 'beauty', image: '/icons/beauty.svg', variant: 'violet' as const },
-    { text: 'Government', key: 'government', image: '/icons/gov.svg', variant: 'aqua' as const },
-    { text: 'Health', key: 'health', image: '/icons/health.svg', variant: 'lightblue' as const },
-    { text: 'Mechanics', key: 'mechanics', image: '/icons/mechanic.svg', variant: 'darkviolet' as const },
-    { text: 'RealEstate', key: 'real_estate', image: '/icons/real-estate.svg', variant: 'starfall' as const },
-    { text: 'HelpSupport', key: 'help_support', image: '/icons/help-support.svg', variant: 'coral' as const },
-    { text: 'Education', key: 'education', image: '/icons/education.svg', variant: 'overworld' as const },
-    { text: 'IT', key: 'it', image: '/icons/it.svg', variant: 'tech' as const },
-    { text: 'Others', key: 'others', image: '/icons/others.svg', variant: 'mojito' as const },
-];
+import { CATEGORY_DEFINITIONS, type CategoryDefinition, isCategory } from '@/lib/categories';
 
 export const counties = {
     cities: {
@@ -96,44 +80,8 @@ export const ROUTES = {
     },
 } as const;
 
-export const mapCategoryToBadgeColor = (category: string) => {
-    switch (category) {
-        case 'grocery':
-            return 'red';
-        case 'gastronomy':
-            return 'oversky';
-        case 'education':
-            return 'sapphire';
-        case 'law':
-            return 'gold';
-        case 'transport':
-            return 'green';
-        case 'mechanics':
-            return 'darkviolet';
-        case 'beauty':
-            return 'pinkred';
-        case 'financial':
-            return 'orange';
-        case 'health':
-            return 'aqua';
-        case 'renovation':
-            return 'lightblue';
-        case 'gov':
-            return 'starfall';
-        case 'real_estate':
-            return 'violet';
-        case 'help_support':
-            return 'coral';
-        case 'it':
-            return 'tech';
-        case 'others':
-            return 'others';
-        case 'government':
-            return 'antricot';
-        default:
-            return 'default';
-    }
-}
+export const mapCategoryToBadgeColor = (category: string): CategoryDefinition['badgeColor'] | 'default' =>
+    isCategory(category) ? CATEGORY_DEFINITIONS[category].badgeColor : 'default';
 
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 

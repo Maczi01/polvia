@@ -81,7 +81,7 @@ describe('countCardsByCategory', () => {
 
         const counts = countCardsByCategory(catalog, filters);
 
-        for (const category of ['beauty', 'law', 'financial', 'government']) {
+        for (const category of ['beauty', 'law', 'financial', 'education']) {
             expect(counts[category]).toBe(renderedCardCount(catalog, { ...filters, category }));
         }
     });
@@ -113,6 +113,6 @@ describe('countCardsByCategory', () => {
     it('kategoria bez wpisow dostaje zero, a nie brak klucza', () => {
         const counts = countCardsByCategory(catalog, NO_FILTERS);
 
-        expect(counts.government).toBe(0);
+        expect(counts.education).toBe(0);
     });
 });

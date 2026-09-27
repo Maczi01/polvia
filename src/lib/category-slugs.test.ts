@@ -1,7 +1,7 @@
 import { locales, type Locale } from '@/i18n/config';
+import { getCategoryMessageKey } from '@/lib/categories';
 import {
     CATEGORY_KEYS,
-    CATEGORY_MESSAGE_KEYS,
     CATEGORY_SLUGS,
     getCategoryFromSlug,
     getSlugFromCategory,
@@ -78,7 +78,7 @@ describe('kategoria `it`', () => {
  * widoczny dla Google. Ten blok sprawdza mape wobec PRAWDZIWYCH plikow
  * tlumaczen, a nie wobec wlasnych zalozen.
  */
-describe('CATEGORY_MESSAGE_KEYS — kompletnosc wobec plikow messages', () => {
+describe('getCategoryMessageKey — kompletnosc wobec plikow messages', () => {
     const MESSAGES: Record<string, Record<string, string>> = {
         pl: plMessages.MapPage.Categories,
         en: enMessages.MapPage.Categories,
@@ -88,7 +88,7 @@ describe('CATEGORY_MESSAGE_KEYS — kompletnosc wobec plikow messages', () => {
 
     it('ma klucz dla kazdej kategorii', () => {
         for (const key of CATEGORY_KEYS) {
-            expect(CATEGORY_MESSAGE_KEYS[key]).toBeTruthy();
+            expect(getCategoryMessageKey(key)).toBeTruthy();
         }
     });
 
@@ -96,7 +96,7 @@ describe('CATEGORY_MESSAGE_KEYS — kompletnosc wobec plikow messages', () => {
         const categories = MESSAGES[locale];
 
         for (const key of CATEGORY_KEYS) {
-            const messageKey = CATEGORY_MESSAGE_KEYS[key];
+            const messageKey = getCategoryMessageKey(key);
 
             expect(categories[messageKey]).toBeTruthy();
         }
@@ -109,7 +109,7 @@ describe('CATEGORY_MESSAGE_KEYS — kompletnosc wobec plikow messages', () => {
         key => {
             const naive = key.charAt(0).toUpperCase() + key.slice(1);
 
-            expect(CATEGORY_MESSAGE_KEYS[key]).not.toBe(naive);
+            expect(getCategoryMessageKey(key)).not.toBe(naive);
             expect(MESSAGES.pl[naive]).toBeUndefined();
         },
     );

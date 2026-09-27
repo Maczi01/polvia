@@ -13,6 +13,7 @@ import { useSearchParams } from 'next/navigation';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { MenuOverlay } from './menu-overlay';
 import { AppPathnames } from '@/i18n/routing';
+import { CATEGORIES } from '@/lib/categories';
 import { buildMapUrl } from '@/lib/map-url-builder';
 
 const fadeInKeyframes = `
@@ -33,29 +34,13 @@ const fadeInKeyframes = `
 }
 `;
 
-// Categories data - matches your existing translation keys
-const BUSINESS_CATEGORIES = [
-    'Grocery',
-    'Gastronomy',
-    'Transport',
-    'Financial',
-    'Renovation',
-    'Law',
-    'Beauty',
-    'Government',
-    'Health',
-    'Mechanics',
-    'RealEstate',
-    'HelpSupport',
-    'Education',
-    'Others'
-];
-
 const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
     const t = useTranslations('MapPage.Categories');
     const locale = useLocale() as Locale;
 
     if (!isOpen) return null;
+
+    const onlineUrl = buildMapUrl({ onlineOnly: true }, locale);
 
     return (
         <div
@@ -69,13 +54,11 @@ const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void })
                 </h3>
 
                 <div className="grid grid-cols-3 gap-2 lg:gap-3">
-                    {BUSINESS_CATEGORIES.map((categoryKey) => {
-                        // Build slug-based URL for category
-                        const categorySnake = categoryKey.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-                        const categoryUrl = buildMapUrl({ category: categorySnake }, locale);
+                    {CATEGORIES.map(({ key, text }) => {
+                        const categoryUrl = buildMapUrl({ category: key }, locale);
                         return (
                             <Link
-                                key={categoryKey}
+                                key={key}
                                 href={{
                                     pathname: categoryUrl.pathname as AppPathnames,
                                     query: categoryUrl.query
@@ -84,11 +67,28 @@ const MegaMenu = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void })
                                 role="menuitem"
                                 onClick={onClose}
                             >
-                                {t(categoryKey)}
+                                {t(text)}
                             </Link>
                         );
                     })}
                 </div>
+
+                <Link
+                    href={{
+                        pathname: onlineUrl.pathname as AppPathnames,
+                        query: onlineUrl.query,
+                    }}
+                    className="mt-4 block rounded-lg border-t border-gray-100 px-4 py-3 transition-all duration-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
+                    role="menuitem"
+                    onClick={onClose}
+                >
+                    <span className="block text-sm font-medium text-gray-700 hover:text-green-600 dark:text-gray-300 dark:hover:text-green-400">
+                        {t('Online')}
+                    </span>
+                    <span className="block text-xs text-gray-500 dark:text-gray-400">
+                        {t('OnlineHint')}
+                    </span>
+                </Link>
             </div>
         </div>
     );

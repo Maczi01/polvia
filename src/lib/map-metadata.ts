@@ -6,7 +6,7 @@
 import type { Locale } from '@/i18n/config';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import { buildMapUrl, localePathPrefix, localizeMapPath } from '@/lib/map-url-builder';
-import { CATEGORY_MESSAGE_KEYS } from '@/lib/slug-mappings';
+import { getCategoryMessageKey } from '@/lib/categories';
 
 export type MapMetadataLabels = {
     category: (messageKey: string) => string;
@@ -34,7 +34,7 @@ export function buildMapTitleSuffix(filters: MapFilters, labels: MapMetadataLabe
     const parts: string[] = [];
 
     if (category) {
-        parts.push(labels.category(CATEGORY_MESSAGE_KEYS[category]));
+        parts.push(labels.category(getCategoryMessageKey(category)));
     }
 
     if (onlineOnly) {
