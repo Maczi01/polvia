@@ -1,46 +1,14 @@
 import type Supercluster from 'supercluster';
 import { PointFeature } from 'supercluster';
+import { CATEGORY_DEFINITIONS, isCategory } from '@/lib/categories';
 import { ItemPointClusterProperties, ItemPointFeatureProperties, PartialService } from '@/types';
 
-export const categoryImage = (category: string) => {
-    switch (category) {
-        case 'grocery':
-            return '/markers/grocery.svg';
-        case 'education':
-            return '/markers/education.svg';
-        case 'law':
-            return '/markers/law.svg';
-        case 'transport':
-            return '/markers/transport.svg';
-        case 'mechanics':
-            return '/markers/mechanics.svg';
-        case 'beauty':
-            return '/markers/beauty.svg';
-        case 'financial':
-            return '/markers/financial.svg';
-        case 'health':
-            return '/markers/health.svg';
-        case 'renovation':
-            return '/markers/renovation.svg';
-        case 'gov':
-            return '/markers/gov.svg';
-        case 'real_estate':
-            return '/markers/real-estate.svg';
-        case 'help_support':
-            return '/markers/help-support.svg';
-        case 'it':
-            return '/markers/it.svg';
-        case 'others':
-            return '/markers/others.svg';
-        case 'cluster':
-            return '/markers/glass.svg';
-        case 'government':
-            return '/markers/government.svg';
-        case 'gastronomy':
-            return '/markers/gastronomy.svg';
-        default:
-            return '/markers/default.svg';
-    }
+const CLUSTER_MARKER = '/markers/glass.svg';
+const DEFAULT_MARKER = '/markers/default.svg';
+
+export const categoryImage = (category: string): string => {
+    if (category === 'cluster') return CLUSTER_MARKER;
+    return isCategory(category) ? CATEGORY_DEFINITIONS[category].marker : DEFAULT_MARKER;
 };
 
 export const initialViewState = {

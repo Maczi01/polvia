@@ -66,13 +66,6 @@ export const Beauty: Story = {
         variant: 'violet',
     },
 };
-export const Government: Story = {
-    args: {
-        text: 'Government',
-        image: '/icons/gov.svg',
-        variant: 'aqua',
-    },
-};
 export const Health: Story = {
     args: {
         text: 'Health',

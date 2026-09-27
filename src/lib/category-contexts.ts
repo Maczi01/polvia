@@ -1,6 +1,6 @@
-import { categoryEnum } from '@/db/schema';
+import { type Category, isCategory } from './categories';
 
-export type Category = (typeof categoryEnum.enumValues)[number];
+export { isCategory } from './categories';
 
 /**
  * Kontekst semantyczny kategorii — dopisywany do tekstu dokumentu przy generowaniu
@@ -57,17 +57,6 @@ export const CATEGORY_CONTEXTS: Record<Category, string> = {
         'it, computers, software, website, web development, web design, seo, online store, e-commerce, hosting, ai, automation, computer repair, laptop repair, programming; informatyka, strony internetowe, sklep internetowy, pozycjonowanie, hosting, naprawa komputerów, programista, aplikacje; сайти, розробка сайтів, інтернет-магазин, хостинг, ремонт комп’ютерів, програміст, застосунки; сайты, разработка сайтов, интернет-магазин, хостинг, ремонт компьютеров, программист',
     others: 'general services, miscellaneous, various; usługi, różne, inne; послуги, різне, інше; услуги, разное, прочее',
 };
-
-/**
- * `Set` z wartosci enuma, a nie `value in CATEGORY_CONTEXTS`: `in` widzi takze
- * prototyp, wiec `isCategory('toString')` zwracaloby `true` i wpuszczalo smiec
- * do zapytania i do filtra SQL.
- */
-const CATEGORIES: ReadonlySet<string> = new Set<string>(categoryEnum.enumValues);
-
-export function isCategory(value: string | null | undefined): value is Category {
-    return value !== null && value !== undefined && CATEGORIES.has(value);
-}
 
 /**
  * Wzbogaca zapytanie uzytkownika o kontekst wybranej kategorii. Bez kategorii

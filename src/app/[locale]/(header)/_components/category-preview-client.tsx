@@ -5,33 +5,10 @@ import { AppPathnames } from '@/i18n/routing';
 import { useEffect, useState } from 'react';
 import { buildMapUrl } from '@/lib/map-url-builder';
 import type { Locale } from '@/i18n/config';
+import type { CATEGORIES } from '@/lib/categories';
 
 type CategoryPreviewClientProps = {
-    categories: {
-        text: string;
-        key: string;
-        image: string;
-        variant:
-            | 'default'
-            | 'red'
-            | 'green'
-            | 'orange'
-            | 'blue'
-            | 'gold'
-            | 'violet'
-            | 'aqua'
-            | 'lightblue'
-            | 'darkviolet'
-            | 'starfall'
-            | 'overworld'
-            | 'oversky'
-            | 'coral'
-            | 'mojito'
-            | 'tech'
-            | 'removeFilter'
-            | null
-            | undefined;
-    }[];
+    categories: typeof CATEGORIES;
 };
 
 export function CategoryPreviewClient({ categories }: CategoryPreviewClientProps) {

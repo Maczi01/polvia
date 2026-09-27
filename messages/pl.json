@@ -13,7 +13,6 @@
     "Categories": {
       "Grocery": "Spożywcze",
       "Gastronomy": "Gastronomia",
-      "Government": "Urzędowe",
       "Transport": "Transport",
       "Financial": "Finansowe",
       "Renovation": "Remonty",
@@ -228,7 +227,6 @@
     "popularCompanies": "Popularne firmy",
     "Grocery": "Spożywcze",
     "Gastronomy": "Gastronomia",
-    "Government": "Urzędowe",
     "Transport": "Transport",
     "Financial": "Finansowe",
     "Renovation": "Remonty",
@@ -246,7 +244,6 @@
     "Categories": {
       "grocery": "Spożywcze",
       "gastronomy": "Gastronomia",
-      "government": "Urzędowe",
       "transport": "Transport",
       "financial": "Finansowe",
       "renovation": "Remonty",
@@ -266,7 +263,6 @@
     "categoriesAlt": {
       "Grocery": "Spożywcze - ikona kategorii ukraińskich sklepów spożywczych",
       "Gastronomy": "Gastronomia - ikona kategorii ukraińskiej gastronomii",
-      "Government": "Urzędowe - ikona kategorii ukraińskich usług urzędowych",
       "Transport": "Transport - ikona kategorii ukraińskich firm transportowych",
       "Financial": "Finansowe - ikona kategorii ukraińskich usług finansowych",
       "Renovation": "Remonty - ikona kategorii ukraińskich firm remontowych",
@@ -464,7 +460,6 @@
     "categories": {
       "Grocery": "Spożywcze - ikona kategorii ukraińskich sklepów spożywczych",
       "Gastronomy": "Gastronomia - ikona kategorii ukraińskiej gastronomii",
-      "Government": "Urzędowe - ikona kategorii ukraińskich usług urzędowych",
       "Transport": "Transport - ikona kategorii ukraińskich firm transportowych",
       "Financial": "Finansowe - ikona kategorii ukraińskich usług finansowych",
       "Renovation": "Remonty - ikona kategorii ukraińskich firm remontowych",

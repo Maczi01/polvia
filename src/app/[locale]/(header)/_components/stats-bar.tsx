@@ -2,7 +2,8 @@ import React from 'react';
 import { CircleEllipsis, MapPin, MapPinPlus, Rocket, ScrollText } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { categories, serviceName, serviceNameFromCapitalLetter } from '@/lib/consts';
+import { serviceName, serviceNameFromCapitalLetter } from '@/lib/consts';
+import { CATEGORIES } from '@/lib/categories';
 import { formatDisplayCount } from '@/lib/display-count';
 
 type StatDef = {
@@ -39,7 +40,7 @@ export const StatsBar = async ({ companiesCount, citiesCount }: StatsBarProps) =
         {
             id: 'categories',
             icon: CircleEllipsis,
-            value: String(categories.length),
+            value: String(CATEGORIES.length),
             label: t('Card3.title'),
             description: t('Card3.description'),
         },

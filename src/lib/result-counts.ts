@@ -1,4 +1,4 @@
-import { categories } from '@/lib/consts';
+import { CATEGORIES } from '@/lib/categories';
 import { groupServicesByCompany } from '@/lib/group-services-by-company';
 import { type CoverageFilters, splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
@@ -30,7 +30,7 @@ export function countCardsByCategory(
     filters: CoverageFilters,
 ): Record<string, number> {
     return Object.fromEntries(
-        categories.map(({ key }) => {
+        CATEGORIES.map(({ key }) => {
             const { localResults, onlineResults } = splitServicesByCoverage(services, {
                 ...filters,
                 category: key,

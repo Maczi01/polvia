@@ -2,7 +2,8 @@
 'use client';
 
 import React, { useEffect, useId, useRef } from 'react';
-import { categories, lockScroll, unlockScroll } from '@/lib/consts';
+import { lockScroll, unlockScroll } from '@/lib/consts';
+import { CATEGORIES } from '@/lib/categories';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { ButtonCategory } from './button-category/button-category';
@@ -177,7 +178,7 @@ export const MobileFilterModal = ({
                             onClick={onOnlineToggle}
                         />
 
-                        {categories.map(({ text, key, image, variant }) => {
+                        {CATEGORIES.map(({ text, key, image, variant }) => {
                             const isSelected = key === selectedCategory.toLowerCase();
                             // Pusta kategoria zostaje klikalna, ale gasnie jak niewybrana.
                             const isEmpty = categoryCounts?.[key] === 0;
