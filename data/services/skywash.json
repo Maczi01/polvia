@@ -1,0 +1,48 @@
+{
+    "name": "SkyWash",
+    "category": "others",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "skywash.png",
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Pralnia ekologiczna i chemiczna w Warszawie z kurierem odbierającym i dowożącym rzeczy pod drzwi na terenie Warszawy. W ofercie pranie ekologiczne, czyszczenie wodno-chemiczne, prasowanie oraz pranie ekspresowe. Czyści m.in. garnitury, suknie ślubne, kurtki i odzież roboczą. Strona pralni jest dostępna także po ukraińsku i rosyjsku."
+        },
+        "uk": {
+            "description": "Екологічна та хімчистка у Варшаві з кур'єром, який забирає й привозить речі до дверей у межах Варшави. Екологічне прання, аквачистка, прасування та експрес-прання. Чистить, зокрема, костюми, весільні сукні, куртки та робочий одяг. Сайт доступний також українською та російською; мову обслуговування варто уточнити телефоном."
+        },
+        "en": {
+            "description": "Eco and dry-cleaning laundry in Warsaw with a courier that collects and returns items to your door anywhere in Warsaw. Services include eco washing, wet cleaning, ironing and an express service. It cleans suits, wedding dresses, jackets and workwear, among other items. The laundry's website is also available in Ukrainian and Russian."
+        },
+        "ru": {
+            "description": "Экологическая прачечная и химчистка в Варшаве с курьером, который забирает и привозит вещи к двери в пределах Варшавы. Экологическая стирка, аквачистка, глажка и экспресс-стирка. Чистит, в частности, костюмы, свадебные платья, куртки и рабочую одежду. Сайт доступен также на украинском и русском; язык обслуживания стоит уточнить по телефону."
+        }
+    },
+
+    "tags": [
+        { "pl": "Pralnia", "uk": "Пральня", "en": "Laundry", "ru": "Прачечная" },
+        { "pl": "Pralnia chemiczna", "uk": "Хімчистка", "en": "Dry cleaning", "ru": "Химчистка" },
+        { "pl": "Dostawa", "uk": "Доставка", "en": "Delivery", "ru": "Доставка" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Edwarda Habicha 18",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-495",
+            "latitude": 52.2052316,
+            "longitude": 20.8806376,
+            "phoneNumber": "+48 600 990 370",
+            "email": "biuro@skywash.pl",
+            "webpage": "https://skywash.pl/ua",
+            "socials": {
+                "instagram": "https://www.instagram.com/skywash.pl/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

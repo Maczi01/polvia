@@ -1,0 +1,55 @@
+{
+    "name": "Kancelaria Notarialna prof. dr hab. Maciej Marszał",
+    "category": "law",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "notariusz-marszal.png",
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Kancelaria notarialna we Wrocławiu, przy ul. Purkyniego, ok. 300 metrów od Rynku. Obsługuje klientów również w języku ukraińskim — osobny numer WhatsApp służy do rozmów po ukraińsku. Sporządza akty notarialne, akty poświadczenia dziedziczenia i poświadczenia. Kancelaria jest czynna od poniedziałku do piątku w godzinach 9:00–15:00; inne terminy, także w soboty, po indywidualnym umówieniu. Można płacić kartą."
+        },
+        "uk": {
+            "description": "Нотаріальна контора у Вроцлаві, на вулиці Purkyniego, приблизно за 300 метрів від Ринку. Обслуговує клієнтів також українською — для розмов українською є окремий номер WhatsApp. Складає нотаріальні акти, акти посвідчення спадщини та засвідчення. Працює з понеділка по п'ятницю з 9:00 до 15:00; інший час, зокрема суботу, можна узгодити індивідуально. Можна оплатити карткою."
+        },
+        "en": {
+            "description": "Notary office in Wrocław on Purkyniego Street, about 300 metres from the Market Square. Clients are also served in Ukrainian, with a separate WhatsApp number for conversations in Ukrainian. The office prepares notarial deeds, certificates of inheritance and certifications. Open Monday to Friday, 9:00–15:00; other times, including Saturdays, by individual arrangement. Card payments accepted."
+        },
+        "ru": {
+            "description": "Нотариальная контора во Вроцлаве, на улице Purkyniego, примерно в 300 метрах от Рынка. Обслуживает клиентов также на украинском — для разговоров на украинском есть отдельный номер WhatsApp. Составляет нотариальные акты, акты удостоверения наследства и засвидетельствования. Работает с понедельника по пятницу с 9:00 до 15:00; другое время, в том числе субботу, можно согласовать индивидуально. Можно оплатить картой."
+        }
+    },
+
+    "tags": [
+        { "pl": "Notariusz", "uk": "Нотаріус", "en": "Notary", "ru": "Нотариус" },
+        { "pl": "Akty notarialne", "uk": "Нотаріальні акти", "en": "Notarial deeds", "ru": "Нотариальные акты" },
+        { "pl": "Spadki", "uk": "Спадщина", "en": "Inheritance", "ru": "Наследство" },
+        { "pl": "Obsługa po ukraińsku", "uk": "Обслуговування українською", "en": "Service in Ukrainian", "ru": "Обслуживание на украинском" }
+    ],
+
+    "locations": [
+        {
+            "city": "Wrocław",
+            "street": "ul. Purkyniego 1 lok. 4",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-155",
+            "latitude": 51.1103079,
+            "longitude": 17.0397134,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "15:00" },
+                "tuesday": { "open": "09:00", "close": "15:00" },
+                "wednesday": { "open": "09:00", "close": "15:00" },
+                "thursday": { "open": "09:00", "close": "15:00" },
+                "friday": { "open": "09:00", "close": "15:00" }
+            },
+            "phoneNumber": "+48 71 781 68 90",
+            "email": "kancelaria@notariusz-wr.pl",
+            "webpage": "https://www.notariusz-wr.pl/",
+            "nip": "8981051247",
+            "whatsappNumber": "+48881765675",
+            "isMainLocation": true
+        }
+    ]
+}

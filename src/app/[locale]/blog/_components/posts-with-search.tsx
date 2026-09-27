@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { PostMetadata } from '@/types';
 import { Input } from '@/components/ui/input/input';
 import FeaturedCard from './featured-card';
+import { filterPosts } from './filter-posts';
 import PostCard from './post-card';
 
 const pill = (active: boolean): React.CSSProperties => ({
@@ -67,18 +68,10 @@ export default function PostsWithSearch({
         });
     };
 
-    const filtered = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        return posts.filter(p => {
-            const matchesText = q
-                ? (`${p.title ?? ''} ${p.summary ?? ''} ${p.author ?? ''}`).toLowerCase().includes(q)
-                : true;
-            const matchesTags = activeTags.length > 0
-                ? (p.tags || []).some(t => activeTags.includes(t))
-                : true;
-            return matchesText && matchesTags;
-        });
-    }, [posts, query, activeTags]);
+    const filtered = useMemo(
+        () => filterPosts(posts, query, activeTags),
+        [posts, query, activeTags],
+    );
 
     return (
         <div>

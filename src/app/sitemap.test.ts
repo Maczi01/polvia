@@ -7,6 +7,13 @@ jest.mock('@/lib/posts', () => ({
     getPosts: jest.fn().mockResolvedValue([]),
 }));
 
+// env.ts laduje @t3-oss/env-nextjs, ktory jest wylacznie ESM i nie ma buildu CJS
+// do podpiecia przez moduleNameMapper. Zmienne srodowiskowe to zewnetrzne wejscie,
+// wiec podajemy je jawnie — asercje sprawdzaja sciezki, nie domene.
+jest.mock('../../env', () => ({
+    env: { NEXT_PUBLIC_SITE_URL: 'https://polvia.test' },
+}));
+
 const urls = async (): Promise<string[]> => (await sitemap()).map(entry => String(entry.url));
 
 describe('sitemap — trasa uslug online', () => {
