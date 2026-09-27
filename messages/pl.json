@@ -375,8 +375,8 @@
       "description": "Bez bzdur! Tylko katalog firm"
     },
     "Card5": {
-      "title": "Wyszukań",
-      "description": "każdego miesiąca"
+      "title": "Miast",
+      "description": "z firmami w katalogu"
     }
   },
   "FooterNewsletter": {
@@ -521,7 +521,6 @@
     "forUsersAndBusiness": "Dla użytkowników i dla firm",
     "verifiedTitle": "Przejrzysty katalog, uporządkowane informacje i łatwy kontakt",
     "verifiedDesc": "Zbieramy firmy i usługi w jednym miejscu i prezentujemy najważniejsze dane w czytelnej formie. Użytkownik szybko znajduje to, czego szuka, a firma zyskuje widoczność wśród społeczności ukraińskiej i polskich klientów.",
-    "stat1Value": "100+",
     "stat1Label": "wizytówek firm",
     "stat2Value": "24h",
     "stat2Label": "na publikację zgłoszenia",
@@ -530,18 +529,8 @@
     "featuredLabel": "Przykładowe wizytówki",
     "featuredTitle": "Ostatnio popularne firmy",
     "featuredBadge": "Aktualne",
-    "company1Name": "Nova Post",
-    "company1Category": "Transport i logistyka",
-    "company1City": "Poznań",
-    "company1Meta": "Dostępna na platformie",
-    "company2Name": "G.Bar",
-    "company2Category": "Uroda",
-    "company2City": "Wrocław",
-    "company2Meta": "Popularna firma",
-    "company3Name": "Lviv Croissants",
-    "company3Category": "Gastronomia",
-    "company3City": "Kraków",
-    "company3Meta": "Nowo dodana",
+    "popularMeta": "Popularna firma",
+    "newMeta": "Nowo dodana",
     "viewAll": "Zobacz wszystkie firmy"
   },
   "Pricing": {

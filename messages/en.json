@@ -374,8 +374,8 @@
       "description": "No fluff, just useful feature"
     },
     "Card5": {
-      "title": "Monthly Searches",
-      "description": "Helping people find Ukrainian services"
+      "title": "Cities",
+      "description": "with businesses in the directory"
     }
   },
   "FooterNewsletter": {
@@ -520,7 +520,6 @@
     "forUsersAndBusiness": "For users and businesses",
     "verifiedTitle": "Clear directory, organized info, and easy contact",
     "verifiedDesc": "We gather businesses and services in one place and present key details in a clear format. Users quickly find what they need, and businesses gain visibility among the Ukrainian community and Polish customers.",
-    "stat1Value": "100+",
     "stat1Label": "business listings",
     "stat2Value": "24h",
     "stat2Label": "to publish a listing",
@@ -529,18 +528,8 @@
     "featuredLabel": "Example listings",
     "featuredTitle": "Recently popular businesses",
     "featuredBadge": "Current",
-    "company1Name": "Nova Post",
-    "company1Category": "Transport & Logistics",
-    "company1City": "Poznan",
-    "company1Meta": "Available on platform",
-    "company2Name": "G.Bar",
-    "company2Category": "Beauty",
-    "company2City": "Wroclaw",
-    "company2Meta": "Popular business",
-    "company3Name": "Lviv Croissants",
-    "company3Category": "Gastronomy",
-    "company3City": "Krakow",
-    "company3Meta": "Newly added",
+    "popularMeta": "Popular business",
+    "newMeta": "Newly added",
     "viewAll": "View all businesses"
   },
   "Pricing": {

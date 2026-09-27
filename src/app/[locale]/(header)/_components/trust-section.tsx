@@ -1,22 +1,27 @@
-'use client';
-
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { categories } from '@/lib/consts';
+import { formatDisplayCount } from '@/lib/display-count';
+import type { FeaturedService } from '@/lib/featured-services';
 
-export function TrustSection() {
-    const t = useTranslations('TrustSection');
+type TrustSectionProps = {
+    companiesCount: number;
+    featured: FeaturedService[];
+};
+
+function categoryLabelKey(category: string): string {
+    return categories.find(entry => entry.key === category)?.text ?? 'Others';
+}
+
+export async function TrustSection({ companiesCount, featured }: TrustSectionProps) {
+    const t = await getTranslations('TrustSection');
+    const tCategories = await getTranslations('MapPage.Categories');
 
     const trustItems = [
         { titleKey: 'item1Title', descKey: 'item1Desc', badgeKey: 'item1Badge' },
         { titleKey: 'item2Title', descKey: 'item2Desc', badgeKey: 'item2Badge' },
         { titleKey: 'item3Title', descKey: 'item3Desc', badgeKey: 'item3Badge' },
         { titleKey: 'item4Title', descKey: 'item4Desc', badgeKey: 'item4Badge' },
-    ] as const;
-
-    const featuredCompanies = [
-        { nameKey: 'company1Name', categoryKey: 'company1Category', cityKey: 'company1City', metaKey: 'company1Meta' },
-        { nameKey: 'company2Name', categoryKey: 'company2Category', cityKey: 'company2City', metaKey: 'company2Meta' },
-        { nameKey: 'company3Name', categoryKey: 'company3Category', cityKey: 'company3City', metaKey: 'company3Meta' },
     ] as const;
 
     return (
@@ -69,7 +74,7 @@ export function TrustSection() {
 
                         <div className="mt-8 grid gap-4 sm:grid-cols-3">
                             <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
-                                <div className="text-2xl font-semibold">{t('stat1Value')}</div>
+                                <div className="text-2xl font-semibold">{formatDisplayCount(companiesCount)}</div>
                                 <div className="mt-1 text-sm text-sky-100">{t('stat1Label')}</div>
                             </div>
                             <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
@@ -99,26 +104,28 @@ export function TrustSection() {
                         </div>
 
                         <div className="mt-6 space-y-3">
-                            {featuredCompanies.map((company) => (
+                            {featured.map(company => (
                                 <div
-                                    key={company.nameKey}
+                                    key={company.serviceId}
                                     className="rounded-2xl border border-sky-100 bg-sky-50/50 p-4 dark:border-gray-600 dark:bg-gray-800/50"
                                 >
                                     <div className="flex items-start justify-between gap-4">
                                         <div>
                                             <div className="text-base font-semibold text-slate-900 dark:text-gray-100">
-                                                {t(company.nameKey)}
+                                                {company.name}
                                             </div>
                                             <div className="mt-1 text-sm text-slate-600 dark:text-gray-300">
-                                                {t(company.categoryKey)}
+                                                {tCategories(categoryLabelKey(company.category))}
                                             </div>
                                         </div>
-                                        <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100 dark:bg-gray-800 dark:text-green-400 dark:ring-gray-600">
-                                            {t(company.cityKey)}
-                                        </div>
+                                        {company.city && (
+                                            <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100 dark:bg-gray-800 dark:text-green-400 dark:ring-gray-600">
+                                                {company.city}
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="mt-3 text-xs font-medium uppercase tracking-wide text-sky-700/80 dark:text-green-400/80">
-                                        {t(company.metaKey)}
+                                        {company.reason === 'new' ? t('newMeta') : t('popularMeta')}
                                     </div>
                                 </div>
                             ))}
