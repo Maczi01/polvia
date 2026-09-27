@@ -247,6 +247,50 @@ describe('splitServicesByCoverage', () => {
             expect(ids(poSprzataniu.localResults)).toEqual([bezZnakow.id]);
         });
 
+        describe('forma z diakrytykami i bez daje identyczny zbior wynikow', () => {
+            // Dane celowo niespojne: czesc wpisow ze znakami, czesc bez, lokalne i online.
+            const katalog = [
+                service({ name: 'Księgowa Anna' }),
+                service({ name: 'Biuro ksiegowe', coverage: 'online' }),
+                service({ name: 'Biuro Tłumaczeń', coverage: 'hybrid' }),
+                service({ name: 'Tlumacz przysiegly' }),
+                service({ name: 'Salon masażu' }),
+                service({ name: 'Masaz tajski', coverage: 'online' }),
+                service({ name: 'Firma', tags: ['sprzątanie'] }),
+                service({ name: 'Ekipa', tags: ['sprzatanie biur'] }),
+                service({ name: 'Wynajem samochodów' }),
+                service({ name: 'Naprawa samochod', coverage: 'online' }),
+                service({ name: 'Юрист', description: 'Офіс: м. Київ' }),
+                service({ name: 'Перекладач', description: 'Киів та онлайн', coverage: 'online' }),
+                service({ name: 'Нотариус Семён' }),
+                service({ name: 'Бухгалтер Семен', coverage: 'online' }),
+                service({ name: 'Fryzjer' }),
+            ];
+
+            const wyniki = (query: string) => {
+                const { localResults, onlineResults } = splitServicesByCoverage(katalog, {
+                    ...NO_FILTERS,
+                    query,
+                });
+                return { local: ids(localResults), online: ids(onlineResults) };
+            };
+
+            it.each([
+                ['księgowa', 'ksiegowa'],
+                ['tłumacz', 'tlumacz'],
+                ['masaż', 'masaz'],
+                ['sprzątanie', 'sprzatanie'],
+                ['samochód', 'samochod'],
+                ['Київ', 'Киів'],
+                ['Семён', 'Семен'],
+            ])('"%s" i "%s"', (zeZnakami, bezZnakow) => {
+                const zZnakami = wyniki(zeZnakami);
+
+                expect(wyniki(bezZnakow)).toEqual(zZnakami);
+                expect([...zZnakami.local, ...zZnakami.online].length).toBeGreaterThanOrEqual(2);
+            });
+        });
+
         it('ignorowanie polskich znakow nie rozluznia dopasowania innych liter', () => {
             const masaz = service({ name: 'Salon masażu' });
 
