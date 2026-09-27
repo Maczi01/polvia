@@ -1,0 +1,31 @@
+# Codzienny test produkcji: czy wyszukiwanie semantyczne zwraca wyniki.
+#
+# Po co: we wrzesniu 2026 wygasly klucz OpenAI na Vercelu wylaczyl wyszukiwanie
+# semantyczne na nieznany czas. Klient chowa blad i pokazuje "brak wynikow", wiec
+# nikt tego nie zauwazyl. Nieudany run = mail od GitHuba do autora ostatniej zmiany crona.
+#
+# Kazdy run to jedno zapytanie: embedding + ocena trafnosci w OpenAI (ulamek grosza).
+name: Production smoke test
+
+on:
+    schedule:
+        - cron: '0 6 * * *'
+    workflow_dispatch:
+
+jobs:
+    semantic-search:
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        steps:
+            - name: Wyszukiwanie semantyczne zwraca wyniki
+              env:
+                  # www — goly polvia.pl odpowiada 308 na www.
+                  URL: https://www.polvia.pl/api/services?query=prawnik&locale=pl&semanticOnly=true
+              run: |
+                  body=$(curl -sS --max-time 30 --retry 2 --retry-delay 10 "$URL")
+                  if ! echo "$body" | jq -e '.success == true and .count >= 1' > /dev/null; then
+                      echo "::error::Wyszukiwanie semantyczne na produkcji nie zwraca wynikow"
+                      echo "$body" | head -c 500
+                      exit 1
+                  fi
+                  echo "OK: $(echo "$body" | jq -r '.count') wynikow, $(echo "$body" | jq -r '.executionTime') ms"
