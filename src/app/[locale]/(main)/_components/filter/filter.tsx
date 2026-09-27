@@ -143,7 +143,6 @@ export const Filter = memo(
                                 image={'/icons/remove.svg'}
                                 text={t('Categories.RemoveFilter')}
                                 variant={hasActiveFilters ? 'removeFilter' : 'default'}
-                                isSelected={false}
                                 onClick={handleResetFilters}
                                 className="flex-none"
                                 disabled={!hasActiveFilters}

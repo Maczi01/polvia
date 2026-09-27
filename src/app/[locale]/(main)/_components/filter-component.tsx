@@ -29,9 +29,15 @@ const MobileFilterModal = dynamic(
 type FilterComponentProps = {
     initialFilters?: MapFilters;
     onFiltersChange?: (filters: MapFilters) => void;
+    /** Liczba kart na kategorie przy pozostalych aktywnych filtrach. */
+    categoryCounts?: Record<string, number>;
 };
 
-export function FilterComponent({ initialFilters, onFiltersChange }: FilterComponentProps) {
+export function FilterComponent({
+    initialFilters,
+    onFiltersChange,
+    categoryCounts,
+}: FilterComponentProps) {
     const t = useTranslations('MapPage');
     const locale = useLocale() as Locale;
     const router = useRouter();
@@ -269,6 +275,7 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                 onOnlineToggle={handleOnlineClick}
                 resetAllFilters={resetAllFilters}
                 clearCategories={clearCategories}
+                categoryCounts={categoryCounts}
             />
 
 
@@ -399,7 +406,6 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                 image={'/icons/remove.svg'}
                                 text={t('Categories.RemoveFilter')}
                                 variant={hasActiveFilters ? 'removeFilter' : 'default'}
-                                isSelected={false}
                                 onClick={resetAllFilters}
                                 className="flex-none"
                                 disabled={!hasActiveFilters}
@@ -413,34 +419,30 @@ export function FilterComponent({ initialFilters, onFiltersChange }: FilterCompo
                                 onClick={handleOnlineClick}
                                 className="flex-none"
                                 title={t('Categories.OnlineHint')}
-                                aria-pressed={onlineOnly}
                             />
 
                             <div
                                 ref={categoryReference}
                                 className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden pr-4"
                             >
-                                {categories.map(({ text, key, image, variant }) => (
-                                    <ButtonCategory
-                                        key={text}
-                                        image={image}
-                                        text={t(`Categories.${text}`)}
-                                        variant={
-                                            selectedCategory
-                                                ? key ===
-                                                selectedCategory.toLowerCase()
-                                                    ? variant
-                                                    : 'default'
-                                                : variant
-                                        }
-                                        isSelected={
-                                            !!selectedCategory &&
-                                            key === selectedCategory.toLowerCase()
-                                        }
-                                        onClick={() => handleCategoryClick(key)}
-                                        className="flex-none"
-                                    />
-                                ))}
+                                {categories.map(({ text, key, image, variant }) => {
+                                    const isSelected = key === selectedCategory?.toLowerCase();
+                                    // Pusta kategoria zostaje klikalna, ale gasnie jak niewybrana.
+                                    const isEmpty = categoryCounts?.[key] === 0;
+                                    const isColored = isSelected || (!selectedCategory && !isEmpty);
+                                    return (
+                                        <ButtonCategory
+                                            key={text}
+                                            image={image}
+                                            text={t(`Categories.${text}`)}
+                                            count={categoryCounts?.[key]}
+                                            variant={isColored ? variant : 'default'}
+                                            isSelected={isSelected}
+                                            onClick={() => handleCategoryClick(key)}
+                                            className="flex-none"
+                                        />
+                                    );
+                                })}
                             </div>
 
                             {isScrollable && (

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocale } from 'next-intl';
+import { useQueryState } from 'nuqs';
 import { FilterComponent } from './filter-component';
 import { ServicesClientComponent } from './services-client-component';
 import type { Locale } from '@/i18n/config';
 import { mapFiltersFromPathname } from '@/lib/map-pathname';
 import type { MapFilters } from '@/lib/map-slug-parser';
+import { countCardsByCategory } from '@/lib/result-counts';
 import type { Service } from '@/types';
 
 interface MapPageClientProps {
@@ -27,6 +29,15 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
         setCurrentFilters(initialFilters || { category: null, county: null, city: null, onlineOnly: false });
     }, [initialFilters]);
 
+    const [searchInput] = useQueryState('query', { defaultValue: '' });
+
+    // Liczone tutaj, bo tylko ten komponent ma i uslugi, i komplet filtrow.
+    // Ten sam `splitServicesByCoverage`, ktory filtruje liste — liczby nie moga sie rozjechac.
+    const categoryCounts = useMemo(
+        () => countCardsByCategory(services, { ...currentFilters, query: searchInput }),
+        [services, currentFilters, searchInput],
+    );
+
     // Filtry zmieniaja adres przez history.pushState, wiec przy Wstecz/Naprzod
     // serwer nie przysyla nowych initialFilters — odtwarzamy je z samego adresu.
     useEffect(() => {
@@ -44,6 +55,7 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
                 <FilterComponent
                     initialFilters={currentFilters}
                     onFiltersChange={setCurrentFilters}
+                    categoryCounts={categoryCounts}
                 />
             </div>
 
