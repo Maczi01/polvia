@@ -41,7 +41,9 @@ export function HeroMapTooltip({ pin, style, visible, onMouseEnter, onMouseLeave
 
             {/* Info: companies in categories */}
             <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                {t('autoTooltip', { count: pin.placesCount, categories: pin.categoriesCount })}
+                {pin.placesCount > 0
+                    ? t('autoTooltip', { count: pin.placesCount, categories: pin.categoriesCount })
+                    : t('emptyTooltip')}
             </p>
 
             {/* CTA */}

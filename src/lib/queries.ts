@@ -100,11 +100,11 @@ export type VoivodeshipStats = {
 };
 
 export async function getVoivodeshipStats(): Promise<VoivodeshipStats[]> {
-    return db
+    const rows = await db
         .select({
             voivodeship: serviceLocationsTable.voivodeship,
-            companiesCount: sql<number>`COUNT(DISTINCT ${servicesTable.id})`.as('companies_count'),
-            categoriesCount: sql<number>`COUNT(DISTINCT ${servicesTable.category})`.as('categories_count'),
+            companiesCount: sql<number>`COUNT(DISTINCT ${servicesTable.id})::int`.as('companies_count'),
+            categoriesCount: sql<number>`COUNT(DISTINCT ${servicesTable.category})::int`.as('categories_count'),
         })
         .from(serviceLocationsTable)
         .innerJoin(servicesTable, and(
@@ -112,7 +112,10 @@ export async function getVoivodeshipStats(): Promise<VoivodeshipStats[]> {
             isPublicService,
         ))
         .where(isNotNull(serviceLocationsTable.voivodeship))
-        .groupBy(serviceLocationsTable.voivodeship) as unknown as VoivodeshipStats[];
+        .groupBy(serviceLocationsTable.voivodeship);
+
+    // `where` odsiewa NULL w SQL, ale typ kolumny tego nie wie — zawezamy tutaj.
+    return rows.flatMap(({ voivodeship, ...counts }) => (voivodeship ? [{ voivodeship, ...counts }] : []));
 }
 
 export type CatalogStats = {

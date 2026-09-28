@@ -493,7 +493,8 @@
     "places": "{count} місць",
     "viewOnMap": "Дивитися на карті",
     "exampleCities": "напр. {cities}",
-    "autoTooltip": "{count} компаній у {categories} категоріях"
+    "autoTooltip": "{count} компаній у {categories} категоріях",
+    "emptyTooltip": "У цьому воєводстві поки немає компаній"
   },
   "TrustSection": {
     "badge": "Чому варто обрати Polvia",

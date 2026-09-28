@@ -1,30 +1,30 @@
-export type HeroPin = {
+import type { VoivodeshipStats } from '@/lib/queries';
+
+/** Statyczna czesc pinu: pozycja na mapie, ikona i wojewodztwo. Liczby przychodza z bazy. */
+export type HeroPinDefinition = {
     svgLabel: string;
     categoryKey: string;
     icon: string;
     variant: string;
     position: { x: number; y: number };
-    placesCount: number;
-    categoriesCount: number;
     voivodeship: string;
     voivodeshipKey: string;
-    exampleCities: string[];
-    exampleCompanies: string[];
 };
 
-export const HERO_PINS: HeroPin[] = [
+export type HeroPin = HeroPinDefinition & {
+    placesCount: number;
+    categoriesCount: number;
+};
+
+export const HERO_PINS: HeroPinDefinition[] = [
     {
         svgLabel: 'Beauty',
         categoryKey: 'beauty',
         icon: '/icons/beauty.svg',
         variant: 'violet',
         position: { x: 198, y: 168 },
-        placesCount: 12,
-        categoriesCount: 5,
         voivodeship: 'Zachodniopomorskie',
         voivodeshipKey: 'zachodniopomorskie',
-        exampleCities: ['Szczecin', 'Koszalin'],
-        exampleCompanies: ['Salon Glamour', 'Beauty House'],
     },
     {
         svgLabel: 'Education',
@@ -32,12 +32,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/education.svg',
         variant: 'overworld',
         position: { x: 338, y: 108 },
-        placesCount: 18,
-        categoriesCount: 7,
         voivodeship: 'Pomorskie',
         voivodeshipKey: 'pomorskie',
-        exampleCities: ['Gdańsk', 'Gdynia'],
-        exampleCompanies: ['EduCenter', 'Lingua Plus'],
     },
     {
         svgLabel: 'RealEstate',
@@ -45,12 +41,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/real-estate.svg',
         variant: 'starfall',
         position: { x: 488, y: 145 },
-        placesCount: 8,
-        categoriesCount: 4,
         voivodeship: 'Warmińsko-Mazurskie',
         voivodeshipKey: 'warminsko-mazurskie',
-        exampleCities: ['Olsztyn', 'Ełk'],
-        exampleCompanies: ['DomExpert', 'NieruchomościPL'],
     },
     {
         svgLabel: 'Financial',
@@ -58,12 +50,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/financial.svg',
         variant: 'orange',
         position: { x: 618, y: 212 },
-        placesCount: 6,
-        categoriesCount: 3,
         voivodeship: 'Podlaskie',
         voivodeshipKey: 'podlaskie',
-        exampleCities: ['Białystok', 'Łomża'],
-        exampleCompanies: ['FinExpert', 'MoneyWise'],
     },
     {
         svgLabel: 'Gastronomy',
@@ -71,12 +59,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/gastronomy.svg',
         variant: 'oversky',
         position: { x: 185, y: 295 },
-        placesCount: 9,
-        categoriesCount: 4,
         voivodeship: 'Lubuskie',
         voivodeshipKey: 'lubuskie',
-        exampleCities: ['Zielona Góra', 'Gorzów'],
-        exampleCompanies: ['Smaczek', 'Domowa Kuchnia'],
     },
     {
         svgLabel: 'Grocery',
@@ -84,12 +68,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/grocery.svg',
         variant: 'red',
         position: { x: 290, y: 302 },
-        placesCount: 22,
-        categoriesCount: 8,
         voivodeship: 'Wielkopolskie',
         voivodeshipKey: 'wielkopolskie',
-        exampleCities: ['Poznań', 'Kalisz'],
-        exampleCompanies: ['FreshMarket', 'Smak Wschodu'],
     },
     {
         svgLabel: 'Health',
@@ -97,12 +77,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/health.svg',
         variant: 'lightblue',
         position: { x: 359, y: 225 },
-        placesCount: 14,
-        categoriesCount: 6,
         voivodeship: 'Kujawsko-Pomorskie',
         voivodeshipKey: 'kujawsko-pomorskie',
-        exampleCities: ['Bydgoszcz', 'Toruń'],
-        exampleCompanies: ['MedClinic', 'Zdrowie+'],
     },
     {
         svgLabel: 'Law',
@@ -110,12 +86,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/law.svg',
         variant: 'gold',
         position: { x: 508, y: 295 },
-        placesCount: 35,
-        categoriesCount: 12,
         voivodeship: 'Mazowieckie',
         voivodeshipKey: 'mazowieckie',
-        exampleCities: ['Warszawa', 'Radom'],
-        exampleCompanies: ['LexPol', 'Kancelaria Prawa'],
     },
     {
         svgLabel: 'Mechanics',
@@ -123,12 +95,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/mechanic.svg',
         variant: 'darkviolet',
         position: { x: 415, y: 358 },
-        placesCount: 16,
-        categoriesCount: 7,
         voivodeship: 'Łódzkie',
         voivodeshipKey: 'lodzkie',
-        exampleCities: ['Łódź', 'Piotrków'],
-        exampleCompanies: ['AutoFix', 'MechanikPro'],
     },
     {
         svgLabel: 'Others',
@@ -136,12 +104,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/others.svg',
         variant: 'mojito',
         position: { x: 238, y: 410 },
-        placesCount: 19,
-        categoriesCount: 8,
         voivodeship: 'Dolnośląskie',
         voivodeshipKey: 'dolnoslaskie',
-        exampleCities: ['Wrocław', 'Legnica'],
-        exampleCompanies: ['UsługiXL', 'MultiSerwis'],
     },
     {
         svgLabel: 'Renovation',
@@ -149,12 +113,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/renovation.svg',
         variant: 'blue',
         position: { x: 460, y: 530 },
-        placesCount: 24,
-        categoriesCount: 9,
         voivodeship: 'Małopolskie',
         voivodeshipKey: 'malopolskie',
-        exampleCities: ['Kraków', 'Tarnów'],
-        exampleCompanies: ['RemontPro', 'BudExpert'],
     },
     {
         svgLabel: 'Transport',
@@ -162,12 +122,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/transport.svg',
         variant: 'green',
         position: { x: 612, y: 392 },
-        placesCount: 11,
-        categoriesCount: 5,
         voivodeship: 'Lubelskie',
         voivodeshipKey: 'lubelskie',
-        exampleCities: ['Lublin', 'Zamość'],
-        exampleCompanies: ['TransExpress', 'PrzewózPL'],
     },
     {
         svgLabel: 'Search',
@@ -175,12 +131,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/others.svg',
         variant: 'green',
         position: { x: 575, y: 518 },
-        placesCount: 7,
-        categoriesCount: 3,
         voivodeship: 'Podkarpackie',
         voivodeshipKey: 'podkarpackie',
-        exampleCities: ['Rzeszów', 'Przemyśl'],
-        exampleCompanies: [],
     },
     {
         svgLabel: 'Technology',
@@ -188,12 +140,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/others.svg',
         variant: 'cyan',
         position: { x: 310, y: 465 },
-        placesCount: 8,
-        categoriesCount: 4,
         voivodeship: 'Opolskie',
         voivodeshipKey: 'opolskie',
-        exampleCities: ['Opole', 'Nysa'],
-        exampleCompanies: ['TechHub', 'CodeWorks'],
     },
     {
         svgLabel: 'Construction',
@@ -201,12 +149,8 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/others.svg',
         variant: 'pink',
         position: { x: 370, y: 498 },
-        placesCount: 28,
-        categoriesCount: 10,
         voivodeship: 'Śląskie',
         voivodeshipKey: 'slaskie',
-        exampleCities: ['Katowice', 'Gliwice'],
-        exampleCompanies: ['BudMaster', 'RemontyPL'],
     },
     {
         svgLabel: 'Pets',
@@ -214,15 +158,27 @@ export const HERO_PINS: HeroPin[] = [
         icon: '/icons/others.svg',
         variant: 'amber',
         position: { x: 508, y: 442 },
-        placesCount: 5,
-        categoriesCount: 3,
         voivodeship: 'Świętokrzyskie',
         voivodeshipKey: 'swietokrzyskie',
-        exampleCities: ['Kielce', 'Ostrowiec'],
-        exampleCompanies: ['PetCare', 'ZooVet'],
     },
 ];
 
-export const HERO_PIN_MAP = new Map<string, HeroPin>(
-    HERO_PINS.map((pin) => [pin.svgLabel, pin]),
-);
+/**
+ * Dokleja do pinow prawdziwe liczby z bazy. Wojewodztwo bez aktywnych firm
+ * dostaje 0 — wczesniej zostawala w nim zmyslona liczba z tego pliku.
+ */
+export function withVoivodeshipStats(
+    pins: HeroPinDefinition[],
+    stats: VoivodeshipStats[],
+): HeroPin[] {
+    const statsByVoivodeship = new Map(stats.map(entry => [entry.voivodeship, entry]));
+
+    return pins.map(pin => {
+        const entry = statsByVoivodeship.get(pin.voivodeshipKey);
+        return {
+            ...pin,
+            placesCount: entry?.companiesCount ?? 0,
+            categoriesCount: entry?.categoriesCount ?? 0,
+        };
+    });
+}

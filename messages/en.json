@@ -494,7 +494,8 @@
     "places": "{count} places",
     "viewOnMap": "View on map",
     "exampleCities": "e.g. {cities}",
-    "autoTooltip": "{count} companies in {categories} categories"
+    "autoTooltip": "{count} companies in {categories} categories",
+    "emptyTooltip": "No businesses in this voivodeship yet"
   },
   "TrustSection": {
     "badge": "Why choose Polvia",
