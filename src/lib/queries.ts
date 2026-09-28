@@ -14,6 +14,7 @@ import { and, desc, eq, gt, sql } from 'drizzle-orm';
 import { isNotNull } from 'drizzle-orm';
 import 'server-only';
 import { type FeaturedService, pickFeaturedServices } from '@/lib/featured-services';
+import { isPublicService } from '@/lib/public-service-filter';
 import { Service } from '@/types';
 
 export async function getServices(locale: string = 'en') {
@@ -83,7 +84,7 @@ export async function getServices(locale: string = 'en') {
             ),
         )
         .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
-
+        .where(isPublicService)
         .orderBy(
             desc(sql`COALESCE(${promotedServicesTable.priority}, 0)`),
             desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`),
@@ -108,7 +109,7 @@ export async function getVoivodeshipStats(): Promise<VoivodeshipStats[]> {
         .from(serviceLocationsTable)
         .innerJoin(servicesTable, and(
             eq(serviceLocationsTable.serviceId, servicesTable.id),
-            eq(servicesTable.status, 'active'),
+            isPublicService,
         ))
         .where(isNotNull(serviceLocationsTable.voivodeship))
         .groupBy(serviceLocationsTable.voivodeship) as unknown as VoivodeshipStats[];
@@ -127,7 +128,7 @@ export async function getCatalogStats(): Promise<CatalogStats> {
         })
         .from(servicesTable)
         .leftJoin(serviceLocationsTable, eq(serviceLocationsTable.serviceId, servicesTable.id))
-        .where(eq(servicesTable.status, 'active'));
+        .where(isPublicService);
 
     return row ?? { companiesCount: 0, citiesCount: 0 };
 }
@@ -159,7 +160,7 @@ function selectFeaturedCandidates(locale: string) {
             ),
         )
         .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
-        .where(eq(servicesTable.status, 'active'))
+        .where(isPublicService)
         .$dynamic();
 }
 
@@ -261,7 +262,7 @@ export async function getMostPopular(locale: string) {
             ),
         )
         .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
-
+        .where(isPublicService)
         .orderBy(
             desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`),
         )

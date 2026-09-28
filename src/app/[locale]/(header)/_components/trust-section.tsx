@@ -127,10 +127,12 @@ export async function TrustSection({ companiesCount, featured }: TrustSectionPro
                             ))}
                         </div>
 
-                        <Link href="/map" prefetch>
-                            <button className="mt-6 inline-flex rounded-2xl bg-sky-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-sky-700 dark:bg-green-600 dark:hover:bg-green-500">
-                                {t('viewAll')}
-                            </button>
+                        <Link
+                            href="/map"
+                            prefetch
+                            className="mt-6 inline-flex rounded-2xl bg-sky-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 dark:bg-green-600 dark:hover:bg-green-500 dark:focus-visible:ring-green-400"
+                        >
+                            {t('viewAll')}
                         </Link>
                     </div>
                 </div>

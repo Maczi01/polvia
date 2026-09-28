@@ -14,6 +14,7 @@ import {
     voivodeshipEnum,
 } from '@/db/schema';
 import { createContextualQuery, isCategory } from '@/lib/category-contexts';
+import { isPublicService } from '@/lib/public-service-filter';
 import { RELEVANCE_FLOOR, selectRelevant } from '@/lib/search-relevance';
 import { judgeRelevance, RelevanceJudgeError } from '@/lib/semantic-relevance-judge';
 import { PartialService } from '@/types';
@@ -96,7 +97,7 @@ function buildWhereConditions(
     embeddingVector: string,
     { category, voivodeship, excludeIds }: SemanticSearchParams,
 ): SQL[] {
-    const whereConditions: SQL[] = [];
+    const whereConditions: SQL[] = [isPublicService];
 
     if (excludeIds.length > 0) {
         whereConditions.push(
