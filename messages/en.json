@@ -34,6 +34,7 @@
       "OnlineHint": "Services delivered remotely, across Poland"
     },
     "Filters": "Filters",
+    "closeFilters": "Close filters",
     "counties": {
       "allVoivodeships": "All locations",
       "największe-miasta": "Biggest cities",

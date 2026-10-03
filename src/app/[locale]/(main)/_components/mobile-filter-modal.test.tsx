@@ -60,7 +60,7 @@ describe('<MobileFilterModal />', () => {
         });
         const dialog = screen.getByRole('dialog', { name: 'Filters' });
         expect(dialog).toHaveAttribute('aria-modal', 'true');
-        expect(screen.getByRole('button', { name: 'Go Back' })).toHaveFocus();
+        expect(screen.getByRole('button', { name: 'closeFilters' })).toHaveFocus();
         expect(await axe(container)).toHaveNoViolations();
     });
 

@@ -133,7 +133,7 @@ export const MobileFilterModal = ({
                         <button
                             ref={backButtonRef}
                             onClick={onClose}
-                            aria-label="Go Back"
+                            aria-label={t('closeFilters')}
                             className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
                         >
                             <ArrowLeft size={20} />
