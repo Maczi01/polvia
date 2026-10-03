@@ -34,6 +34,7 @@
       "OnlineHint": "Послуги, що надаються дистанційно, по всій Польщі"
     },
     "Filters": "Фільтри",
+    "closeFilters": "Закрити фільтри",
     "counties": {
       "allVoivodeships": "Усі локації",
       "największe-miasta": "Найбільші міста",

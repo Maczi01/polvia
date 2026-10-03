@@ -34,6 +34,7 @@
       "OnlineHint": "Услуги, оказываемые дистанционно, по всей Польше"
     },
     "Filters": "Фильтры",
+    "closeFilters": "Закрыть фильтры",
     "counties": {
       "allVoivodeships": "Все локации",
       "największe-miasta": "Крупнейшие города",

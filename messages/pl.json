@@ -34,6 +34,7 @@
       "OnlineHint": "Usługi świadczone zdalnie, w całej Polsce"
     },
     "Filters": "Filtry",
+    "closeFilters": "Zamknij filtry",
     "counties": {
       "allVoivodeships": "Wszystkie lokalizacje",
       "największe-miasta": "Największe miasta",
