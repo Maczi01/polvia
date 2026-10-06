@@ -35,6 +35,7 @@
     },
     "Filters": "Filters",
     "closeFilters": "Close filters",
+    "showResults": "{count, plural, =0 {No results} one {Show # result} other {Show # results}}",
     "counties": {
       "allVoivodeships": "All locations",
       "największe-miasta": "Biggest cities",
