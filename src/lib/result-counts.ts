@@ -18,6 +18,21 @@ export function countListCards(services: PartialService[]): number {
 }
 
 /**
+ * Liczba kart, jaka lista pokaze przy AKTUALNYCH filtrach — razem z kategoria.
+ *
+ * Inaczej niz `countCardsByCategory`, ktore podmienia kategorie na liczona:
+ * tu nic nie podmieniamy, bo to suma dla stanu, w ktorym uzytkownik juz jest.
+ * Uzywane przez przycisk "pokaz wyniki" w mobilnym arkuszu filtrow.
+ */
+export function countVisibleCards(
+    services: PartialService[],
+    filters: CoverageFilters,
+): number {
+    const { localResults, onlineResults } = splitServicesByCoverage(services, filters);
+    return countListCards(localResults) + countListCards(onlineResults);
+}
+
+/**
  * Liczba kart dla kazdej kategorii przy POZOSTALYCH aktywnych filtrach.
  *
  * Aktywna kategoria jest podmieniana na liczona, reszta filtrow (miasto,

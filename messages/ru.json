@@ -35,6 +35,7 @@
     },
     "Filters": "Фильтры",
     "closeFilters": "Закрыть фильтры",
+    "showResults": "{count, plural, =0 {Нет результатов} one {Показать # результат} few {Показать # результата} many {Показать # результатов} other {Показать # результата}}",
     "counties": {
       "allVoivodeships": "Все локации",
       "największe-miasta": "Крупнейшие города",

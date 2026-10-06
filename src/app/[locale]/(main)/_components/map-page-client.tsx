@@ -8,7 +8,7 @@ import { ServicesClientComponent } from './services-client-component';
 import type { Locale } from '@/i18n/config';
 import { mapFiltersFromPathname } from '@/lib/map-pathname';
 import type { MapFilters } from '@/lib/map-slug-parser';
-import { countCardsByCategory } from '@/lib/result-counts';
+import { countCardsByCategory, countVisibleCards } from '@/lib/result-counts';
 import type { Service } from '@/types';
 
 interface MapPageClientProps {
@@ -38,6 +38,13 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
         [services, currentFilters, searchInput],
     );
 
+    // Suma dla stanu, w ktorym uzytkownik juz jest — stopka arkusza mobilnego
+    // mowi nia, co zobaczy po zamknieciu.
+    const totalCount = useMemo(
+        () => countVisibleCards(services, { ...currentFilters, query: searchInput }),
+        [services, currentFilters, searchInput],
+    );
+
     // Filtry zmieniaja adres przez history.pushState, wiec przy Wstecz/Naprzod
     // serwer nie przysyla nowych initialFilters — odtwarzamy je z samego adresu.
     useEffect(() => {
@@ -56,6 +63,7 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
                     initialFilters={currentFilters}
                     onFiltersChange={setCurrentFilters}
                     categoryCounts={categoryCounts}
+                    totalCount={totalCount}
                 />
             </div>
 

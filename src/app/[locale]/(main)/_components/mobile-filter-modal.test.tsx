@@ -9,7 +9,12 @@ expect.extend(toHaveNoViolations);
 // next-intl to biblioteka zewnetrzna — mock zwraca sam klucz, wiec asercje
 // sprawdzaja zachowanie, nie tresc tlumaczen.
 jest.mock('next-intl', () => ({
-    useTranslations: () => (key: string) => key,
+    // Wartosci ICU doklejamy do klucza, zeby dalo sie sprawdzic, ze liczba w ogole
+    // dociera do etykiety. Tresc tlumaczen nie jest tu przedmiotem testu.
+    useTranslations:
+        () =>
+        (key: string, values?: Record<string, unknown>): string =>
+            values ? `${key}:${Object.values(values).join(',')}` : key,
 }));
 
 type ModalProps = React.ComponentProps<typeof MobileFilterModal>;
@@ -28,6 +33,7 @@ function renderModal(overrides: Partial<ModalProps> = {}): ReturnType<typeof ren
         onOnlineToggle: jest.fn(),
         resetAllFilters: jest.fn(),
         clearCategories: jest.fn(),
+        totalCount: 0,
         ...overrides,
     };
     return render(<MobileFilterModal {...props} />);
@@ -86,5 +92,60 @@ describe('<MobileFilterModal />', () => {
 
         await userEvent.tab({ shift: true });
         expect(last).toHaveFocus();
+    });
+
+    // Regresja: arkusz dostawal `onSearchChange` i `onCountyChange`, ale nie
+    // renderowal zadnej kontrolki, ktora by je wolala — w kodzie stal komentarz
+    // "(Optional) insert search and county selects here". Na mobile nie bylo
+    // wiec zadnego sposobu, zeby szukac tekstem albo wybrac wojewodztwo.
+    it('arkusz ma wyszukiwarke i wybor lokalizacji, nie same kategorie', () => {
+        renderModal({ isOpen: true });
+
+        expect(screen.getByRole('textbox', { name: 'search' })).toBeInTheDocument();
+        expect(screen.getByRole('combobox', { name: 'selectCounty' })).toBeInTheDocument();
+    });
+
+    it('wpisanie tekstu w wyszukiwarke oddaje go rodzicowi', async () => {
+        const onSearchChange = jest.fn();
+        renderModal({ isOpen: true, onSearchChange });
+
+        await userEvent.type(screen.getByRole('textbox', { name: 'search' }), 'ab');
+
+        expect(onSearchChange).toHaveBeenCalledTimes(2);
+        expect(onSearchChange).toHaveBeenLastCalledWith('b');
+    });
+
+    it('wybor kategorii NIE zamyka arkusza — zostaje miejsce na reszte filtrow', async () => {
+        const onClose = jest.fn();
+        const onCategoryChange = jest.fn();
+        renderModal({ isOpen: true, onClose, onCategoryChange, selectedCategory: '' });
+
+        await userEvent.click(screen.getByRole('button', { name: 'Categories.Grocery' }));
+
+        expect(onCategoryChange).toHaveBeenCalledWith('grocery');
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('stopka podaje liczbe wynikow i zamyka arkusz', async () => {
+        const onClose = jest.fn();
+        renderModal({ isOpen: true, onClose, totalCount: 27 });
+
+        const cta = screen.getByRole('button', { name: 'showResults:27' });
+        await userEvent.click(cta);
+
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('zero wynikow tez zamyka, a nazwa stopki nie dubluje strzalki z naglowka', async () => {
+        const onClose = jest.fn();
+        renderModal({ isOpen: true, onClose, totalCount: 0 });
+
+        // Jedno `closeFilters` w calym arkuszu: strzalka w naglowku. Stopka ma
+        // wlasna nazwe, bo dwa przyciski „Zamknij filtry" sa nie do rozroznienia
+        // dla czytnika ekranu.
+        expect(screen.getAllByRole('button', { name: 'closeFilters' })).toHaveLength(1);
+
+        await userEvent.click(screen.getByRole('button', { name: 'showResults:0' }));
+        expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

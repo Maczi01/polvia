@@ -1,5 +1,5 @@
 import { buildListRows } from '@/lib/map-list-rows';
-import { countCardsByCategory, countListCards } from '@/lib/result-counts';
+import { countCardsByCategory, countListCards, countVisibleCards } from '@/lib/result-counts';
 import { type CoverageFilters, splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
 
@@ -63,6 +63,37 @@ describe('countListCards', () => {
 
     it('pusta sekcja daje zero', () => {
         expect(countListCards([])).toBe(0);
+    });
+});
+
+describe('countVisibleCards', () => {
+    const catalog = [
+        ...branches('siec-salonow', 5, { category: 'beauty', city: 'Kraków', voivodeship: 'małopolskie' }),
+        service({ category: 'beauty', city: 'Warszawa', voivodeship: 'mazowieckie' }),
+        service({ category: 'law', city: 'Białystok', voivodeship: 'podlaskie' }),
+        service({ category: 'law', coverage: 'online', latitude: null, longitude: null }),
+    ];
+
+    // Licznik w stopce arkusza obiecuje, ile kart uzytkownik zobaczy po zamknieciu.
+    // Wyrocznia jest model wierszy listy, nie druga implementacja liczenia.
+    it('zgadza sie z liczba kart, ktore lista faktycznie wyrenderuje', () => {
+        const filters: CoverageFilters = { ...NO_FILTERS, category: 'law' };
+
+        expect(countVisibleCards(catalog, filters)).toBe(renderedCardCount(catalog, filters));
+    });
+
+    it('nie podmienia kategorii — liczy stan, w ktorym uzytkownik juz jest', () => {
+        const beauty = countVisibleCards(catalog, { ...NO_FILTERS, category: 'beauty' });
+        const law = countVisibleCards(catalog, { ...NO_FILTERS, category: 'law' });
+
+        // 5 oddzialow sieci to jedna karta, plus pojedynczy salon w Warszawie.
+        expect(beauty).toBe(2);
+        // Kancelaria lokalna plus wpis online, ktory trafia do sekcji zdalnej.
+        expect(law).toBe(2);
+    });
+
+    it('filtr bez dopasowan daje zero', () => {
+        expect(countVisibleCards(catalog, { ...NO_FILTERS, county: 'lubuskie', category: 'beauty' })).toBe(0);
     });
 });
 

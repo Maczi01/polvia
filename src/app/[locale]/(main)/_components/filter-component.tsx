@@ -32,12 +32,15 @@ type FilterComponentProps = {
     onFiltersChange?: (filters: MapFilters) => void;
     /** Liczba kart na kategorie przy pozostalych aktywnych filtrach. */
     categoryCounts?: Record<string, number>;
+    /** Suma kart przy aktualnych filtrach — etykieta stopki arkusza mobilnego. */
+    totalCount: number;
 };
 
 export function FilterComponent({
     initialFilters,
     onFiltersChange,
     categoryCounts,
+    totalCount,
 }: FilterComponentProps) {
     const t = useTranslations('MapPage');
     const locale = useLocale() as Locale;
@@ -277,6 +280,7 @@ export function FilterComponent({
                 resetAllFilters={resetAllFilters}
                 clearCategories={clearCategories}
                 categoryCounts={categoryCounts}
+                totalCount={totalCount}
             />
 
 

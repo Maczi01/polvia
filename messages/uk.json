@@ -35,6 +35,7 @@
     },
     "Filters": "Фільтри",
     "closeFilters": "Закрити фільтри",
+    "showResults": "{count, plural, =0 {Немає результатів} one {Показати # результат} few {Показати # результати} many {Показати # результатів} other {Показати # результату}}",
     "counties": {
       "allVoivodeships": "Усі локації",
       "największe-miasta": "Найбільші міста",

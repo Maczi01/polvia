@@ -2,10 +2,13 @@
 'use client';
 
 import React, { useEffect, useId, useRef } from 'react';
-import { lockScroll, unlockScroll } from '@/lib/consts';
+import { counties, lockScroll, unlockScroll } from '@/lib/consts';
 import { CATEGORIES } from '@/lib/categories';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button/button';
+import { Input } from '@/components/ui/input/input';
+import { SelectScrollable } from '@/components/ui/select/select-scrollable';
 import { ButtonCategory } from './button-category/button-category';
 
 const FOCUSABLE_SELECTOR =
@@ -44,6 +47,12 @@ interface MobileFilterModalProps {
     clearCategories: () => void;
     /** Liczba kart na kategorie przy pozostalych aktywnych filtrach. */
     categoryCounts?: Record<string, number>;
+    /**
+     * Suma kart przy AKTUALNYCH filtrach — etykieta przycisku w stopce.
+     * Wymagana: jedyny rodzic zawsze ja liczy, a wariant „bez liczby" dawal
+     * stopce te sama nazwe co strzalce w naglowku (dwa „Zamknij filtry").
+     */
+    totalCount: number;
 }
 
 export const MobileFilterModal = ({
@@ -60,6 +69,7 @@ export const MobileFilterModal = ({
                                       resetAllFilters,
                                       clearCategories,
                                       categoryCounts,
+                                      totalCount,
                                   }: MobileFilterModalProps) => {
     const t = useTranslations('MapPage');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -87,7 +97,9 @@ export const MobileFilterModal = ({
         if (event.key === 'Tab') trapTabKey(event);
     };
 
-    // Toggle category
+    // Toggle category. Arkusz NIE zamyka sie po wyborze: kategoria, zasieg,
+    // lokalizacja i tekst stoja tu obok siebie, wiec zamkniecie po pierwszym
+    // tapnieciu odbieraloby mozliwosc ustawienia reszty. Wyjsciem jest stopka.
     const handleCategoryClick = (category: string) => {
         const newCat =
             selectedCategory.toLowerCase() === category.toLowerCase()
@@ -149,9 +161,28 @@ export const MobileFilterModal = ({
 
                 {/* Body */}
                 <div className="grow overflow-y-auto p-4">
-                    {/* (Optional) insert search and county selects here */}
+                    <div className="flex flex-col gap-y-3">
+                        <Input
+                            value={searchQuery}
+                            onChange={event => onSearchChange(event.target.value)}
+                            icon
+                            clearable
+                            aria-label={t('search')}
+                            placeholder={t('search')}
+                            onClear={() => onSearchChange('')}
+                        />
 
-                    <div className="mt-2 flex flex-col gap-y-1.5">
+                        <SelectScrollable
+                            options={counties}
+                            value={selectedCounty}
+                            onValueChange={onCountyChange}
+                            placeholder={t('selectCounty')}
+                            ariaLabel={t('selectCounty')}
+                            className="w-full"
+                        />
+                    </div>
+
+                    <div className="mt-3 flex flex-col gap-y-1.5">
                         <ButtonCategory
                             image={'/icons/remove.svg'}
                             text={t('Categories.RemoveFilterMobile')}
@@ -196,6 +227,16 @@ export const MobileFilterModal = ({
                             );
                         })}
                     </div>
+                </div>
+
+                {/* Stopka: jedyne wyjscie z arkusza poza Escape i tapnieciem tla.
+                    Liczba mowi, co uzytkownik zobaczy po zamknieciu — filtr dziala
+                    natychmiast, wiec bez niej tapniecie kategorii nie daje zadnej
+                    informacji zwrotnej spod zakrywajacego ekran arkusza. */}
+                <div className="flex-none border-t border-slate-200 p-4 dark:border-gray-600">
+                    <Button variant="default" className="w-full" onClick={onClose}>
+                        {t('showResults', { count: totalCount })}
+                    </Button>
                 </div>
             </div>
         </div>
