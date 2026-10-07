@@ -35,20 +35,33 @@ export const EmptyListState = () => {
                     {t('description')}
                 </p>
 
-                <div className="mb-6 grid w-full grid-cols-1 gap-4 md:grid-cols-3">
-                    <div className="flex flex-col items-center rounded-lg bg-gray-50 p-1 shadow dark:bg-gray-700 dark:shadow-gray-900/20 md:p-4">
-                        <Search className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6" />
+                {/* To sa wskazowki, nie kontrolki. Mialy `shadow`, czyli chrome karty
+                    klikalnej — uzytkownik probowal w nie klikac, a nic sie nie dzialo.
+                    Lista zamiast trzech divow daje tez czytnikowi ekranu informacje,
+                    ze to zbior rad, i ile ich jest. */}
+                <ul className="mb-6 grid w-full list-none grid-cols-1 gap-4 md:grid-cols-3">
+                    <li className="flex flex-col items-center rounded-lg bg-gray-50 p-1 dark:bg-gray-700 md:p-4">
+                        <Search
+                            aria-hidden="true"
+                            className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6"
+                        />
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('adviceOne')}</p>
-                    </div>
-                    <div className="flex flex-col items-center rounded-lg bg-gray-50 p-1 shadow dark:bg-gray-700 dark:shadow-gray-900/20 md:p-4">
-                        <Filter className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6" />
+                    </li>
+                    <li className="flex flex-col items-center rounded-lg bg-gray-50 p-1 dark:bg-gray-700 md:p-4">
+                        <Filter
+                            aria-hidden="true"
+                            className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6"
+                        />
                         <p className="text-sm text-gray-600 dark:text-gray-300">{t('adviceTwo')}</p>
-                    </div>
-                    <div className="flex flex-col items-center rounded-lg bg-gray-50 p-1 shadow dark:bg-gray-700 dark:shadow-gray-900/20 md:p-4">
-                        <MapPin className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6" />
-                        <p className="text-sm text-gray-600 dark:text-gray-300"> {t('adviceThree')}</p>
-                    </div>
-                </div>
+                    </li>
+                    <li className="flex flex-col items-center rounded-lg bg-gray-50 p-1 dark:bg-gray-700 md:p-4">
+                        <MapPin
+                            aria-hidden="true"
+                            className="mb-2 size-4 text-green-500 dark:text-green-400 md:size-6"
+                        />
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{t('adviceThree')}</p>
+                    </li>
+                </ul>
                 <button
                     className="rounded-full bg-green-500 px-6 py-2 font-medium text-white transition-colors hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500"
                     onClick={resetAllFilters}

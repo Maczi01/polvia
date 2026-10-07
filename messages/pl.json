@@ -76,6 +76,8 @@
     "description": "Znajdź lokalne usługi w Polsce na interaktywnej mapie"
   },
   "NavBar": {
+    "skipToContent": "Przejdź do głównej treści",
+    "skipToNavigation": "Przejdź do nawigacji",
     "map": "Mapa",
     "Business": "Firmy",
     "list": "Lista",
@@ -195,7 +197,7 @@
   },
   "EmptyList": {
     "title": "Ups! Nic nie znaleźliśmy",
-    "description": "Nie ma firm spełniających Twoje kryteria w wybranej okolicy. Spróbuj rozszerzyć wyszukiwanie - może znajdziemy coś ciekawego!",
+    "description": "Nie ma firm spełniających wybrane kryteria. Spróbuj rozszerzyć wyszukiwanie — może znajdziemy coś ciekawego!",
     "adviceOne": "Wyszukaj konkretną usługę",
     "adviceTwo": "Przeglądaj inne kategorie",
     "adviceThree": "Wybierz inną lokalizację",

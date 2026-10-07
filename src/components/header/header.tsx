@@ -221,13 +221,13 @@ export const Header = () => {
                     href="#main-content"
                     className="fixed left-2 top-2 z-[9999] rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
-                    Przejdź do głównej treści
+                    {t('skipToContent')}
                 </a>
                 <a
                     href="#mobile-navigation"
                     className="fixed left-40 top-2 z-[9999] rounded bg-blue-600 px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-300"
                 >
-                    Przejdź do nawigacji
+                    {t('skipToNavigation')}
                 </a>
             </div>
 
