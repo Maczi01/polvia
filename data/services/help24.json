@@ -1,0 +1,47 @@
+{
+    "name": "Help24 by West Auto Import",
+    "category": "transport",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "help24.png",
+    "languages": ["pl"],
+
+    "translations": {
+        "pl": {
+            "description": "Help24 to serwis pierwszego kontaktu firmy West Auto Import z Przemyśla, organizujący transport samochodów między krajami Europy oraz do i z Ukrainy. Przewozi auta sprawne i uszkodzone, pomaga przy odprawie celnej w Ukrainie i organizuje pomoc drogową. Obsługuje trasy m.in. z Hiszpanii, Francji, Włoch, Niemiec, Holandii i Belgii. Auto można przekazać w bazach w Warszawie, Medyce, Kijowie lub Lwowie — miejsce i termin ustala się wcześniej z koordynatorem przez Telegram lub telefon."
+        },
+        "uk": {
+            "description": "Help24 — сервіс першого контакту компанії West Auto Import з Перемишля, який організовує перевезення автомобілів між країнами Європи, а також в Україну та з України. Перевозять як справні, так і пошкоджені авто, допомагають із розмитненням в Україні та організовують евакуатор. Маршрути охоплюють, зокрема, Іспанію, Францію, Італію, Німеччину, Нідерланди та Бельгію. Передати авто можна на базах у Варшаві, Медиці, Києві чи Львові — місце й дату потрібно заздалегідь узгодити з координатором у Telegram або телефоном."
+        },
+        "en": {
+            "description": "Help24 is the first-contact service of West Auto Import, based in Przemyśl, arranging car transport between European countries and to and from Ukraine. It moves both running and damaged vehicles, helps with customs clearance in Ukraine and organises roadside assistance. Routes include Spain, France, Italy, Germany, the Netherlands and Belgium. Cars can be handed over at bases in Warsaw, Medyka, Kyiv or Lviv — the place and date are agreed in advance with a coordinator via Telegram or phone."
+        },
+        "ru": {
+            "description": "Help24 — сервис первого контакта компании West Auto Import из Перемышля, который организует перевозку автомобилей между странами Европы, а также в Украину и из Украины. Перевозят как исправные, так и повреждённые машины, помогают с растаможкой в Украине и организуют эвакуатор. Маршруты охватывают, в частности, Испанию, Францию, Италию, Германию, Нидерланды и Бельгию. Передать авто можно на базах в Варшаве, Медыке, Киеве или Львове — место и дату нужно заранее согласовать с координатором в Telegram или по телефону."
+        }
+    },
+
+    "tags": [
+        { "pl": "Transport samochodów", "uk": "Перевезення автомобілів", "en": "Car transport", "ru": "Перевозка автомобилей" },
+        { "pl": "Pomoc drogowa", "uk": "Евакуатор", "en": "Roadside assistance", "ru": "Эвакуатор" },
+        { "pl": "Odprawa celna", "uk": "Розмитнення", "en": "Customs clearance", "ru": "Растаможка" },
+        { "pl": "Transport do Ukrainy", "uk": "Перевезення в Україну", "en": "Transport to Ukraine", "ru": "Перевозка в Украину" }
+    ],
+
+    "locations": [
+        {
+            "city": "Przemyśl",
+            "street": "ul. Zygmunta Zielińskiego 12/27",
+            "voivodeship": "podkarpackie",
+            "postcode": "37-700",
+            "phoneNumber": "+48 459 568 320",
+            "webpage": "https://help24.westautoimport.eu/pl",
+            "nip": "7952587051",
+            "socials": {
+                "telegram": "https://t.me/westautoimport_Valeria"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
