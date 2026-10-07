@@ -14,3 +14,18 @@ if (!('ResizeObserver' in globalThis)) {
 
     globalThis.ResizeObserver = ResizeObserverStub;
 }
+
+// jsdom nie implementuje metod przewijania na elemencie (tylko na window). Pasek
+// kategorii przewija aktywny kafel do widoku przy kazdej zmianie filtra, wiec bez
+// tych stubow kazdy test montujacy pasek wywala sie na "scrollTo is not a function".
+// Stub jest pusty celowo: testy sprawdzaja filtrowanie, a nie pozycje przewiniecia,
+// ktorej jsdom i tak nie wylicza (wszystkie prostokaty maja zerowe wymiary).
+// Straz na `Element`: czesc suit (np. route handlery) chodzi w srodowisku `node`,
+// gdzie DOM-u nie ma wcale.
+if (typeof Element !== 'undefined') {
+    for (const method of ['scrollTo', 'scrollBy', 'scrollIntoView'] as const) {
+        if (typeof Element.prototype[method] !== 'function') {
+            Element.prototype[method] = function noop(): void {};
+        }
+    }
+}

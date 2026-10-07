@@ -249,6 +249,54 @@ export function FilterComponent({
         };
     }, [handleScroll, handleResize, updateScrollState, handleWheel]);
 
+    /**
+     * Przewija pasek tak, zeby aktywna kategoria byla widoczna.
+     *
+     * Na 1440px miesci sie 5 z 15 kategorii, a pasek zawsze startowal od lewej.
+     * Wejscie z wyszukiwarki na `/mapa/urzedowe` pokazywalo wiec wyniki bez
+     * jakiegokolwiek sladu, ktory filtr je zawezil — aktywny kafel stal poza
+     * kadrem. Liczymy z prostokatow, nie z `offsetLeft`, bo `offsetParent`
+     * nie musi byc kontenerem przewijania.
+     */
+    useEffect(() => {
+        const scroller = categoryReference.current;
+        if (!scroller || !selectedCategory) return;
+
+        const centerActive = (): void => {
+            const active = scroller.querySelector<HTMLElement>(
+                `[data-category="${selectedCategory.toLowerCase()}"]`,
+            );
+            if (!active) return;
+
+            const scrollerRect = scroller.getBoundingClientRect();
+            const activeRect = active.getBoundingClientRect();
+            // Juz w kadrze — nie przewijamy, zeby nie szarpac paskiem przy kazdym
+            // przeliczeniu i nie odbierac uzytkownikowi recznego przewiniecia.
+            if (activeRect.left >= scrollerRect.left && activeRect.right <= scrollerRect.right) {
+                return;
+            }
+
+            const offsetToCenter =
+                activeRect.left - scrollerRect.left - (scrollerRect.width - activeRect.width) / 2;
+            scroller.scrollTo({
+                left: Math.max(0, scroller.scrollLeft + offsetToCenter),
+                behavior: 'smooth',
+            });
+        };
+
+        centerActive();
+
+        // Strzalki przewijania renderuja sie warunkowo (`isScrollable` startuje
+        // jako false), wiec zaraz po pierwszym pomiarze pojawiaja sie po bokach i
+        // ZWEZAJA ten kontener. Przy wejsciu prosto z adresu (np. /mapa/inne) kafel
+        // zatrzymywal sie przez to tuz przed krawedzia kadru. Obserwujemy sam
+        // kontener, bo to jego szerokosc sie zmienia — kafle maja `flex-none`.
+        // Przy okazji lapie to zmiane rozmiaru okna.
+        const observer = new ResizeObserver(centerActive);
+        observer.observe(scroller);
+        return () => observer.disconnect();
+    }, [selectedCategory]);
+
     const scrollLeft = useCallback(() => {
         categoryReference.current?.scrollBy({ left: -200, behavior: 'smooth' });
     }, []);
@@ -277,7 +325,6 @@ export function FilterComponent({
                 searchQuery={searchInput || ''}
                 onlineOnly={onlineOnly}
                 onOnlineToggle={handleOnlineClick}
-                resetAllFilters={resetAllFilters}
                 clearCategories={clearCategories}
                 categoryCounts={categoryCounts}
                 totalCount={totalCount}
@@ -445,6 +492,7 @@ export function FilterComponent({
                                             isSelected={isSelected}
                                             onClick={() => handleCategoryClick(key)}
                                             className="flex-none"
+                                            data-category={key}
                                         />
                                     );
                                 })}
