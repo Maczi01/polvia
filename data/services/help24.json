@@ -5,7 +5,7 @@
     "status": "active",
     "verified": false,
     "image": "help24.png",
-    "languages": ["pl"],
+    "languages": ["pl", "uk"],
 
     "translations": {
         "pl": {
