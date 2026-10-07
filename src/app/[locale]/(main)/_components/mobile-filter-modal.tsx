@@ -43,7 +43,6 @@ interface MobileFilterModalProps {
     onCountyChange: (query: string) => void;
     onlineOnly: boolean;
     onOnlineToggle: () => void;
-    resetAllFilters: () => void;
     clearCategories: () => void;
     /** Liczba kart na kategorie przy pozostalych aktywnych filtrach. */
     categoryCounts?: Record<string, number>;
@@ -66,7 +65,6 @@ export const MobileFilterModal = ({
                                       onCountyChange,
                                       onlineOnly,
                                       onOnlineToggle,
-                                      resetAllFilters,
                                       clearCategories,
                                       categoryCounts,
                                       totalCount,
@@ -186,19 +184,13 @@ export const MobileFilterModal = ({
                         <ButtonCategory
                             image={'/icons/remove.svg'}
                             text={t('Categories.RemoveFilterMobile')}
-                            variant={
-                                selectedCategory ||
-                                (selectedCounty && selectedCounty !== 'all-voivodeships')
-                                    ? 'removeFilter'
-                                    : 'default'
-                            }
+                            // Przycisk czysci WYLACZNIE kategorie — tyle mowi jego
+                            // etykieta i tyle robi `clearCategories`. Wczesniej zapalal
+                            // sie takze dla tekstu, zasiegu i lokalizacji, wiec dalo sie
+                            // go kliknac i nie zobaczyc zadnej zmiany.
+                            variant={selectedCategory ? 'removeFilter' : 'default'}
                             onClick={clearCategories}
-                            disabled={
-                                !selectedCategory &&
-                                !searchQuery &&
-                                !onlineOnly &&
-                                (!selectedCounty || selectedCounty === 'all-voivodeships')
-                            }
+                            disabled={!selectedCategory}
                         />
 
                         <ButtonCategory

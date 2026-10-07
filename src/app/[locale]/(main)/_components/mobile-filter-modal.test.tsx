@@ -31,7 +31,6 @@ function renderModal(overrides: Partial<ModalProps> = {}): ReturnType<typeof ren
         onCountyChange: jest.fn(),
         onlineOnly: false,
         onOnlineToggle: jest.fn(),
-        resetAllFilters: jest.fn(),
         clearCategories: jest.fn(),
         totalCount: 0,
         ...overrides,
@@ -147,5 +146,38 @@ describe('<MobileFilterModal />', () => {
 
         await userEvent.click(screen.getByRole('button', { name: 'showResults:0' }));
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    // Regresja: przycisk czysci wylacznie kategorie, ale zapalal sie takze dla
+    // tekstu, zasiegu i wojewodztwa — dalo sie go kliknac i nie zobaczyc zmiany.
+    describe('przycisk czyszczenia kategorii', () => {
+        const nazwa = 'Categories.RemoveFilterMobile';
+
+        it('jest nieaktywny, gdy zadna kategoria nie jest wybrana', () => {
+            renderModal({
+                isOpen: true,
+                selectedCategory: '',
+                searchQuery: 'fryzjer',
+                onlineOnly: true,
+                selectedCounty: 'pomorskie',
+            });
+
+            expect(screen.getByRole('button', { name: nazwa })).toBeDisabled();
+        });
+
+        it('jest aktywny, gdy kategoria jest wybrana', () => {
+            renderModal({ isOpen: true, selectedCategory: 'law' });
+
+            expect(screen.getByRole('button', { name: nazwa })).toBeEnabled();
+        });
+
+        it('czysci kategorie, nie reszte filtrow', async () => {
+            const clearCategories = jest.fn();
+            renderModal({ isOpen: true, selectedCategory: 'law', clearCategories });
+
+            await userEvent.click(screen.getByRole('button', { name: nazwa }));
+
+            expect(clearCategories).toHaveBeenCalledTimes(1);
+        });
     });
 });
