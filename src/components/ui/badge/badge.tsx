@@ -109,9 +109,13 @@ function Badge({
         variantTextColors.default;
     const content = label === undefined ? children : label.charAt(0).toUpperCase() + label.slice(1);
     return (
+        // Badge to statyczna etykieta, nie komunikat. Mial `role="status"`, czyli
+        // obszar live — czytnik ekranu oglaszal kazdy tag jak zmiane na zywo, a przy
+        // trzech tagach na karcie i kilkuset kartach lista stawala sie nie do
+        // sluchania. `tabIndex={0}` dokladal do tego trzy przystanki Tab na karte.
+        // Rola i fokus przechodza przez `...props`, wiec uzycie, ktore naprawde
+        // potrzebuje komunikatu, moze je podac samo.
         <div
-            role="status"
-            tabIndex={0}
             className={cn(
                 'whitespace-nowrap',
                 badgeVariants({ variant: variantToUse }),

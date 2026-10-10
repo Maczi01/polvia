@@ -64,23 +64,40 @@ describe('<Badge />', () => {
             expect(results).toHaveNoViolations();
         });
 
-        test(`is keyboard accessible for the ${variant} variant`, async () => {
-            render(<Badge variant={variant}>{variant} Badge</Badge>);
-            const badge = screen.getByText(`${variant} Badge`);
+        // Regresja: badge mial `tabIndex={0}`, wiec kazdy tag byl przystankiem Tab.
+        // Trzy tagi na karcie i kilkaset kart to setki przystankow po samych
+        // etykietach, ktorych i tak nie da sie uzyc.
+        test(`is not a tab stop for the ${variant} variant`, async () => {
+            render(
+                <>
+                    <Badge variant={variant}>{variant} Badge</Badge>
+                    <button type="button">po badge</button>
+                </>,
+            );
 
-            await userEvent.tab().then(() => {
-                expect(badge).toHaveFocus();
-            });
+            await userEvent.tab();
+
+            expect(screen.getByText(`${variant} Badge`)).not.toHaveFocus();
+            expect(screen.getByRole('button', { name: 'po badge' })).toHaveFocus();
         });
 
-        test(`has appropriate ARIA attributes for the ${variant} variant`, () => {
+        // Regresja: `role="status"` czyni z elementu obszar live, wiec czytnik
+        // oglaszal statyczna etykiete jak zmiane na zywo.
+        test(`is not a live region for the ${variant} variant`, () => {
+            render(<Badge variant={variant}>{variant} Badge</Badge>);
+
+            expect(screen.queryByRole('status')).not.toBeInTheDocument();
+            expect(screen.getByText(`${variant} Badge`)).not.toHaveAttribute('aria-live');
+        });
+
+        test(`forwards an explicit role for the ${variant} variant`, () => {
             render(
-                <Badge variant={variant} aria-label={`${variant} status`}>
+                <Badge variant={variant} role="status" aria-label={`${variant} status`}>
                     {variant} Badge
                 </Badge>,
             );
-            const badge = screen.getByRole('status', { name: `${variant} status` });
-            expect(badge).toBeInTheDocument();
+
+            expect(screen.getByRole('status', { name: `${variant} status` })).toBeInTheDocument();
         });
     });
 

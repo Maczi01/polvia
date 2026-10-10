@@ -76,6 +76,8 @@
     "description": "Find local services in Poland on our interactive map"
   },
   "NavBar": {
+    "skipToContent": "Skip to main content",
+    "skipToNavigation": "Skip to navigation",
     "map": "Map",
     "Business": "Business",
     "list": "List",
@@ -194,7 +196,7 @@
   },
   "EmptyList": {
     "title": "Oops! We didn't find anything",
-    "description": "There are no businesses matching your criteria in the selected area. Try expanding your search - we might find something interesting!",
+    "description": "No businesses match the selected criteria. Try broadening your search — we might find something interesting!",
     "adviceOne": "Search for a specific service",
     "adviceTwo": "Browse other categories",
     "adviceThree": "Choose a different location",
