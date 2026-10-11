@@ -756,7 +756,7 @@ po domenie (R7).
 
 ### Faza B — akcje, strona, wejście
 
-- [ ] **Unit 8: Orkiestracja i Server Actions**
+- [x] **Unit 8: Orkiestracja i Server Actions**
 
 **Cel:** Połączyć moduły w trzy akcje: `generateDraft`, `relocate` i `submitDraft`. Każda ma
 kontrakt wyniku dla UI.
@@ -827,16 +827,16 @@ LLM, geocode, store, mailer). Mockujemy tylko usługi zewnętrzne, nie testowan�
   `success: boolean`).
 
 **Scenariusze testowe:**
-- [Unit] Link Instagram → `needsManual('SOCIAL_LINK')`. Zero wywołań fetch, LLM i limitu gen.
-- [Unit] Domena istniejącego wpisu → `duplicate` z URL. Dla locale `ru` URL nie zaczyna się
+- [x] [Unit] Link Instagram → `needsManual('SOCIAL_LINK')`. Zero wywołań fetch, LLM i limitu gen.
+- [x] [Unit] Domena istniejącego wpisu → `duplicate` z URL. Dla locale `ru` URL nie zaczyna się
   od `/en` (asercja negatywna z learned-patterns).
-- [Unit] Fetch kończy się `TIMEOUT` → `needsManual('UNREADABLE')`, limit gen nie zużyty.
-- [Unit] Wyczerpany limit gen → `limited` przed jakimkolwiek fetchem.
-- [Unit] Happy path → `ready` i draft zapisany. LLM wywołany raz, limit gen zużyty raz.
-- [Unit] `submitDraft` z wygasłym draftem → `error('DRAFT_EXPIRED')`, bez maila.
-- [Unit] `submitDraft` z FormData zawierającą sfałszowaną `category` → kategoria w JSON
+- [x] [Unit] Fetch kończy się `TIMEOUT` → `needsManual('UNREADABLE')`, limit gen nie zużyty.
+- [x] [Unit] Wyczerpany limit gen → `limited` przed jakimkolwiek fetchem.
+- [x] [Unit] Happy path → `ready` i draft zapisany. LLM wywołany raz, limit gen zużyty raz.
+- [x] [Unit] `submitDraft` z wygasłym draftem → `error('DRAFT_EXPIRED')`, bez maila.
+- [x] [Unit] `submitDraft` z FormData zawierającą sfałszowaną `category` → kategoria w JSON
   pochodzi z draftu (R9 serwerowo).
-- [Unit] Mail operatora pada → `error('SEND_FAILED')` i log z JSON-em. Potwierdzenie pada →
+- [x] [Unit] Mail operatora pada → `error('SEND_FAILED')` i log z JSON-em. Potwierdzenie pada →
   `sent` mimo to.
 
 **Weryfikacja:**
@@ -847,7 +847,7 @@ LLM, geocode, store, mailer). Mockujemy tylko usługi zewnętrzne, nie testowan�
 
 ---
 
-- [ ] **Unit 9: Strona flow i komponenty UI**
+- [x] **Unit 9: Strona flow i komponenty UI**
 
 **Cel:** Strona z trzema stanami: link → podgląd + edycja → podziękowanie, plus tryb ręczny,
 duplikat i limit.
@@ -907,13 +907,13 @@ duplikat i limit.
 - `useActionState` w `dashboard/_components/add-service-form.tsx`.
 
 **Scenariusze testowe:**
-- [Unit] Każdy komponent: render + `toHaveNoViolations` (jest-axe).
-- [Unit] `business-card-preview` z polem w `unconfirmed` → widoczny znacznik „do
+- [x] [Unit] Każdy komponent: render + `toHaveNoViolations` (jest-axe).
+- [x] [Unit] `business-card-preview` z polem w `unconfirmed` → widoczny znacznik „do
   uzupełnienia” dostępny po roli/tekście.
-- [Unit] `draft-editor`: kategoria nie ma kontrolki formularza (brak `combobox`/`textbox` o tej
+- [x] [Unit] `draft-editor`: kategoria nie ma kontrolki formularza (brak `combobox`/`textbox` o tej
   nazwie). Błąd e-maila podpięty przez `aria-describedby`.
-- [Unit] `link-step`: pusty/niepoprawny URL → komunikat błędu bez wywołania akcji.
-- [Unit] `submitted-state` renderuje nazwę firmy i tekst o mailu potwierdzającym.
+- [x] [Unit] `link-step`: pusty/niepoprawny URL → komunikat błędu bez wywołania akcji.
+- [x] [Unit] `submitted-state` renderuje nazwę firmy i tekst o mailu potwierdzającym.
 - [Manual] Wizualne porównanie podglądu z prawdziwą kartą na `/mapa` (pozycja logo,
   paddingi), desktop i 390 px.
 - [Manual] Pełny flow na dev: link do strony firmy z JSON-LD → podgląd → edycja telefonu →
@@ -936,7 +936,7 @@ duplikat i limit.
 
 ---
 
-- [ ] **Unit 10: Wejście z formularza kontaktowego**
+- [x] **Unit 10: Wejście z formularza kontaktowego**
 
 **Cel:** Przycisk „Dodaj firmę z AI” pod formularzem kontaktowym (R1).
 
@@ -965,7 +965,7 @@ duplikat i limit.
 **Wzorce do naśladowania:** `buttonVariants` z `src/components/ui/button/button`.
 
 **Scenariusze testowe:**
-- [Unit] CTA renderuje link o dostępnej nazwie „Dodaj firmę z AI” wskazujący na ścieżkę
+- [x] [Unit] CTA renderuje link o dostępnej nazwie „Dodaj firmę z AI” wskazujący na ścieżkę
   `/add-business`; jest-axe bez naruszeń.
 - [Manual] `/kontakt` → klik → `/dodaj-firme`. `/uk/contact` → `/uk/add-business`.
 

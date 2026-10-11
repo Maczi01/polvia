@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (poprawki po review fazy A ukończone)
+Ostatnia aktualizacja: 2026-10-11 (Faza B ukończona)
 
 ## Źródła
 
@@ -228,3 +228,40 @@ Wykonanie: 4 subagenci `feature-builder-web-data` (3 równolegle na rozłącznyc
 
 **Gate (2026-10-11):** `tsc` 0 błędów; `jest` 64 suity, 825/825 PASS; `next lint` 0 błędów;
 `npm run build` OK (env głównego checkoutu przez `@next/env`, bez `NODE_ENV`).
+
+## Log wykonania — Faza B (2026-10-11)
+
+### U8 Orkiestracja + Server Actions — completed (commit 5228704)
+- Pliki: `types.ts`, `generate-draft.ts`, `submit-draft.ts`, `relocate-draft.ts`, `action-errors.ts` (`withActionBoundary`, `server-only`), `page-sources.ts`, `manual-input-schema.ts`, `draft-geo.ts`, `preview.ts`, `_actions.ts`; testy + `tests/fixtures/add-business/generate-draft-harness.ts`. `bodySizeLimit: '3mb'`.
+- API dla UI: `generateDraftAction` (`mode` = `link` | `manual`), `relocateDraftAction`, `submitDraftAction`, wszystkie `(prev, formData) => Promise<Result>`. Kody UI: `GENERATION_FAILED`, `DRAFT_EXPIRED`, `RELOCATION_LIMIT`, `ADDRESS_NOT_FOUND`, `GEOCODE_UNAVAILABLE`, `INVALID_ENTRY`, `SEND_FAILED`, `INTERNAL`.
+- Budżet czasu (review A P2 #9): `GENERATION_BUDGET_MS = 50 000`, `GEOCODE_RESERVE_MS = 9 500`, fetch dostaje resztę po LLM 30 s. Podstrony mają limit 4 s, fallbacki `/kontakt` 2 s, a przy budżecie < 1 s są pomijane.
+- **Odchylenia:**
+  - kolejność `generateDraft`: social → peek gen → limit fetch → duplikat → fetch. **Decyzja usera 2026-10-11:** zapytanie do bazy idzie za limitem. Duplikat zużywa 1 z 6 fetchy, a przy wyczerpanym limicie generowania właściciel widzi „limit”, nie „duplikat”;
+  - kolejność `submitDraft`: wszystko, co może zawieść (walidacja uploadu, limit, geokodowanie, kandydat logo), dzieje się przed `consumeDraft`;
+  - tryb ręczny bez godzin: trafiają do `unconfirmed`, a właściciel uzupełnia je w edytorze;
+  - log `SEND_FAILED` zawiera `entry.json`, ale nie `submitterEmail` ani `notes` (review A P3 #5);
+  - nowe eksporty w Fazie A: `DRAFT_TIMEOUT_MS`, `mergeFacts`, `CONTACT_FALLBACK_PATHS`, `optionalText/Email/Webpage`.
+
+### U9 Strona i komponenty — completed (commit e099104)
+- `page.tsx` (`maxDuration = 60`, `generateStaticParams`, metadata przez `getPathname`), flow (`FlowState` + `useOptimistic`), `link-step`, `manual-step`, `draft-editor` (+ `relocate-control`, `opening-hours-fields`, `languages-field`, `generated-summary`), `business-card-preview` (+ `static-map-pin`, stories), `submitted-state`, wspólne `form-field`, `flow-heading`, `generation-progress`, `flow-notices`. Routing `/dodaj-firme`. Sitemap pl+en. Test spójności kluczy `addBusiness.*` w 4 locale.
+- Decyzje:
+  - `next/image` z `unoptimized` dla Mapboxa, blob i kandydata logo (bez `remotePatterns`);
+  - przyciski z `aria-disabled`;
+  - fokus na `h2` każdego kroku;
+  - po `SEND_FAILED`, `INVALID_ENTRY` i `DRAFT_EXPIRED` powrót do kroku link (draft zużyty).
+- Pomiar logo: `left` 12 px mobile, 16 px od `md`, jak w `service-card`. Do sprawdzenia przez operatora.
+- **Odchylenia:** dodatkowe pliki (limit 300 linii), `preview-fixture.ts` obok komponentu (Storybook), logo/e-mail/uwagi w kroku 2 (D1, nie R2).
+- **Ryzyko do decyzji usera:** token `pk.` Mapboxa na sztywno w `overview-map.tsx` należy do obcego konta (`hijiangtao`). Teraz jest też w `static-map-url.ts` (`MAPBOX_PUBLIC_TOKEN`). Propozycja: własny token jako `NEXT_PUBLIC_*` w `env.ts`.
+- Wniosek do `docs/solutions/`: React 19 łączy trwające akcje async; niezakończona obietnica akcji w teście blokuje kolejne testy.
+
+### U10 CTA na /kontakt — completed (commit 3b1e0a3)
+- `add-business-cta.tsx` (Server Component z `useTranslations`, `buttonVariants({ variant: 'addBusiness', size: 'lg' })`), `<section aria-labelledby>` z `h2`. Klucze `addBusiness.cta.{heading,description,button}`.
+- **Odchylenie:** dodany nagłówek sekcji (dostępna nazwa regionu).
+- Poza zakresem (zgłoszone): martwy import `Header` i nieposortowane importy w `contact/page.tsx`; `map/[[...slug]]/page.tsx:121` daje dla `pl` `/map?…` zamiast `/mapa?…` po odrzuceniu starych filtrów (z raportu U8).
+
+## Gate Fazy B (2026-10-11)
+- `npx tsc --noEmit`: 0 błędów
+- `npx jest`: 85 suit, 963/963 PASS
+- `npx next lint`: 0 błędów (warningi `no-undef` jest i istniejące wcześniej)
+- grep: zero `any`, `console.log`, `process.env` w `src/lib/add-business/**` i `add-business/**`; zero `next/link` / `next/navigation`
+- `npm run build`: OK; `/[locale]/add-business` prerenderowane dla 4 locale

@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (poprawki po review fazy A ukończone)
+Ostatnia aktualizacja: 2026-10-11 (Faza B ukończona)
 
 Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-ai-plan.md`.
 
@@ -198,39 +198,39 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [ ] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s → przeniesione do Operator checklist U9 (pomiar p50/p95)
 - [ ] 🟡 [nit] 28 sugestii P3 — lista w `review-faza-A.md`. Zrobione przy okazji: #1, #17, #28. Otwarte m.in.: #13 (`queries.ts` → `domain-match`), #23 (`EMAIL_PATTERN`), rekurencja `flattenNodes`, `tel:`/`24:00` w JSON-LD, `normalizeHours({})`, nesting > 2, testy graniczne i współbieżności
 
-## Faza B — akcje, strona, wejście
+## Faza B — akcje, strona, wejście ✅
 
 ### U8: Orkiestracja + Server Actions — `feature-builder-web-data` — L
 
 > Notatka wykonawcza: orkiestratory testowane z wstrzykniętymi fałszywymi zależnościami
 > zewnętrznymi.
 
-- [ ] Stwórz `src/lib/add-business/types.ts`: unie wyników `generateDraft`, `relocate`,
+- [x] Stwórz `src/lib/add-business/types.ts`: unie wyników `generateDraft`, `relocate`,
   `submitDraft`
-- [ ] Stwórz `src/lib/add-business/generate-draft.ts`:
+- [x] Stwórz `src/lib/add-business/generate-draft.ts`:
   - kolejność social → duplikat → `peek` → limit fetch → fetch strony + ≤ 2 podstron → LLM →
     verify → geocode → save;
   - tryb ręczny.
-- [ ] Stwórz `src/lib/add-business/submit-draft.ts`:
+- [x] Stwórz `src/lib/add-business/submit-draft.ts`:
   - walidacja → limit submit → `consume`;
   - geokodowanie przy zmianie adresu;
   - JSON → logo → maile.
-- [ ] Stwórz `src/app/[locale]/(header)/add-business/_actions.ts`: cienkie akcje (IP z
+- [x] Stwórz `src/app/[locale]/(header)/add-business/_actions.ts`: cienkie akcje (IP z
   `headers()`, locale, FormData), bez `revalidatePath`
-- [ ] Modyfikuj `next.config.ts`: `experimental.serverActions.bodySizeLimit: '3mb'`
-- [ ] (review A P2 #9) Jeden deadline na generowanie: `timeoutMs` fetchy z pozostałego czasu,
+- [x] Modyfikuj `next.config.ts`: `experimental.serverActions.bodySizeLimit: '3mb'`
+- [x] (review A P2 #9) Jeden deadline na generowanie: `timeoutMs` fetchy z pozostałego czasu,
   krótszy timeout fallbacków `/kontakt`/`/contact`, pominięcie podstron przy braku budżetu
-- [ ] Zapis geokodowania do draftu przez `toDraftGeo(result, address)`, nie `{ ...result, address }`
-- [ ] Stwórz testy `generate-draft.test.ts`, `submit-draft.test.ts`
-- [ ] Test: Instagram → `needsManual('SOCIAL_LINK')`; zero wywołań fetch, LLM i limitu gen
-- [ ] Test: domena istniejącego wpisu → `duplicate` z URL; dla `ru` URL nie zaczyna się od
+- [x] Zapis geokodowania do draftu przez `toDraftGeo(result, address)`, nie `{ ...result, address }`
+- [x] Stwórz testy `generate-draft.test.ts`, `submit-draft.test.ts`
+- [x] Test: Instagram → `needsManual('SOCIAL_LINK')`; zero wywołań fetch, LLM i limitu gen
+- [x] Test: domena istniejącego wpisu → `duplicate` z URL; dla `ru` URL nie zaczyna się od
   `/en`
-- [ ] Test: fetch `TIMEOUT` → `needsManual('UNREADABLE')`, limit gen nie zużyty
-- [ ] Test: wyczerpany limit gen → `limited` przed fetchem
-- [ ] Test: happy path → `ready`, draft zapisany, LLM 1×, limit gen 1×
-- [ ] Test: `submitDraft` z wygasłym draftem → `DRAFT_EXPIRED`, bez maila
-- [ ] Test: sfałszowana `category` w FormData → kategoria z draftu
-- [ ] Test: mail operatora pada → `SEND_FAILED` + log z JSON; potwierdzenie pada → `sent`
+- [x] Test: fetch `TIMEOUT` → `needsManual('UNREADABLE')`, limit gen nie zużyty
+- [x] Test: wyczerpany limit gen → `limited` przed fetchem
+- [x] Test: happy path → `ready`, draft zapisany, LLM 1×, limit gen 1×
+- [x] Test: `submitDraft` z wygasłym draftem → `DRAFT_EXPIRED`, bez maila
+- [x] Test: sfałszowana `category` w FormData → kategoria z draftu
+- [x] Test: mail operatora pada → `SEND_FAILED` + log z JSON; potwierdzenie pada → `sent`
 - [ ] Weryfikacja: `npx jest src/lib/add-business/generate-draft.test.ts src/lib/add-business/submit-draft.test.ts`
   przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
@@ -238,34 +238,34 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 
 ### U9: Strona i komponenty UI — `feature-builder-web-ui` — XL
 
-- [ ] Modyfikuj `src/i18n/routing.ts`: `'/add-business'` → pl `/dodaj-firme`, en/ru/uk
+- [x] Modyfikuj `src/i18n/routing.ts`: `'/add-business'` → pl `/dodaj-firme`, en/ru/uk
   `/add-business`
-- [ ] Stwórz `src/app/[locale]/(header)/add-business/page.tsx`:
+- [x] Stwórz `src/app/[locale]/(header)/add-business/page.tsx`:
   - Server Component;
   - metadata z tłumaczeń, canonical i alternates helperami locale;
   - `maxDuration = 60`.
-- [ ] Stwórz `_components/add-business-flow/add-business-flow.tsx`: stan jako unia
+- [x] Stwórz `_components/add-business-flow/add-business-flow.tsx`: stan jako unia
   (`link` | `generating` | `manual` | `editing` | `submitting` | `submitted` | `duplicate` |
   `limited`)
-- [ ] Stwórz `_components/link-step/link-step.tsx` + test
-- [ ] Stwórz `_components/manual-step/manual-step.tsx` + test
-- [ ] Stwórz `_components/draft-editor/draft-editor.tsx` + test:
+- [x] Stwórz `_components/link-step/link-step.tsx` + test
+- [x] Stwórz `_components/manual-step/manual-step.tsx` + test
+- [x] Stwórz `_components/draft-editor/draft-editor.tsx` + test:
   - pola R8, logo, e-mail, uwagi;
   - „Sprawdź na mapie”;
   - kategoria, zasięg i tagi jako tekst.
-- [ ] Stwórz `_components/business-card-preview/business-card-preview.tsx` + test + stories:
+- [x] Stwórz `_components/business-card-preview/business-card-preview.tsx` + test + stories:
   - klasy 1:1 z `service-card`;
   - znaczniki „do uzupełnienia”;
   - statyczny pin + atrybucja.
-- [ ] Stwórz `_components/submitted-state/submitted-state.tsx` + test
-- [ ] Modyfikuj `messages/{pl,en,ru,uk}.json`: namespace `addBusiness`
-- [ ] Sprawdź `src/app/sitemap.ts`; jeśli listuje strony statyczne, dodaj `/add-business`
-- [ ] Test: każdy komponent → render + `toHaveNoViolations`
-- [ ] Test: `business-card-preview` z polem w `unconfirmed` → znacznik „do uzupełnienia”
+- [x] Stwórz `_components/submitted-state/submitted-state.tsx` + test
+- [x] Modyfikuj `messages/{pl,en,ru,uk}.json`: namespace `addBusiness`
+- [x] Sprawdź `src/app/sitemap.ts`; jeśli listuje strony statyczne, dodaj `/add-business`
+- [x] Test: każdy komponent → render + `toHaveNoViolations`
+- [x] Test: `business-card-preview` z polem w `unconfirmed` → znacznik „do uzupełnienia”
   dostępny po roli/tekście
-- [ ] Test: `draft-editor` → brak kontrolki kategorii; błąd e-maila przez `aria-describedby`
-- [ ] Test: `link-step` → pusty/niepoprawny URL daje komunikat bez wywołania akcji
-- [ ] Test: `submitted-state` → nazwa firmy i tekst o mailu potwierdzającym
+- [x] Test: `draft-editor` → brak kontrolki kategorii; błąd e-maila przez `aria-describedby`
+- [x] Test: `link-step` → pusty/niepoprawny URL daje komunikat bez wywołania akcji
+- [x] Test: `submitted-state` → nazwa firmy i tekst o mailu potwierdzającym
 - [ ] Weryfikacja: `npx jest "src/app/\[locale\]/(header)/add-business"` przechodzi (z
   jest-axe)
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów; `npx next lint` bez nowych błędów
@@ -286,12 +286,12 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 
 ### U10: Wejście z `/kontakt` — `feature-builder-web-ui` — S
 
-- [ ] Stwórz `src/app/[locale]/(header)/contact/_components/add-business-cta/add-business-cta.tsx`
+- [x] Stwórz `src/app/[locale]/(header)/contact/_components/add-business-cta/add-business-cta.tsx`
   (Server Component, `Link` z `@/i18n/navigation`, `buttonVariants`)
-- [ ] Stwórz `.../add-business-cta/add-business-cta.test.tsx`
-- [ ] Modyfikuj `src/app/[locale]/(header)/contact/page.tsx`: CTA pod `<ContactForm />`
-- [ ] Modyfikuj `messages/{pl,en,ru,uk}.json`: tekst CTA
-- [ ] Test: link „Dodaj firmę z AI” wskazuje `/add-business`; jest-axe bez naruszeń
+- [x] Stwórz `.../add-business-cta/add-business-cta.test.tsx`
+- [x] Modyfikuj `src/app/[locale]/(header)/contact/page.tsx`: CTA pod `<ContactForm />`
+- [x] Modyfikuj `messages/{pl,en,ru,uk}.json`: tekst CTA
+- [x] Test: link „Dodaj firmę z AI” wskazuje `/add-business`; jest-axe bez naruszeń
 - [ ] Weryfikacja: `npx jest "src/app/\[locale\]/(header)/contact"` przechodzi
 - [ ] Weryfikacja: grep — klucz CTA w 4 plikach `messages/*.json`
 
