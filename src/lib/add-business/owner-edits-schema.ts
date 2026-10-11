@@ -42,10 +42,10 @@ const emptyToNull = (value: unknown): unknown => {
 /** `File` w polu tekstowym to podrobiony request — konczy sie bledem pola, nie wyjatkiem. */
 const text = (): z.ZodString => z.string({ invalid_type_error: OWNER_EDIT_ERRORS.invalidValue });
 
-const optionalText = (max: number) =>
+export const optionalText = (max: number) =>
     z.preprocess(emptyToNull, text().max(max, OWNER_EDIT_ERRORS.tooLong).nullable());
 
-const optionalEmail = z.preprocess(
+export const optionalEmail = z.preprocess(
     emptyToNull,
     text().max(255, OWNER_EDIT_ERRORS.tooLong).email(OWNER_EDIT_ERRORS.invalidEmail).nullable(),
 );
@@ -56,7 +56,7 @@ function isHttpUrl(value: string): boolean {
     return protocol === 'http:' || protocol === 'https:';
 }
 
-const optionalWebpage = z.preprocess(
+export const optionalWebpage = z.preprocess(
     emptyToNull,
     text()
         .max(255, OWNER_EDIT_ERRORS.tooLong)

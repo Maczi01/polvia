@@ -209,7 +209,7 @@ function factsFromNode(node: JsonObject): StructuredFacts {
 }
 
 /** Pierwsza zdefiniowana wartosc wygrywa — wezly sa posortowane od najbardziej konkretnego. */
-function mergeFacts(all: StructuredFacts[]): StructuredFacts {
+export function mergeFacts(all: StructuredFacts[]): StructuredFacts {
     const merged: StructuredFacts = {};
     for (const facts of all) {
         merged.name ??= facts.name;

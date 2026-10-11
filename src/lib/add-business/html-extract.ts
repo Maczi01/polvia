@@ -18,7 +18,7 @@ export const MAX_CONTACT_LINKS = 2;
 
 const STRIPPED_ELEMENTS = 'script, style, noscript, svg, iframe, template';
 const CONTACT_PATTERN = /kontakt|contact|контакт/i;
-const CONTACT_FALLBACK_PATHS = ['/kontakt', '/contact'];
+export const CONTACT_FALLBACK_PATHS = ['/kontakt', '/contact'];
 
 const LOGO_SELECTORS = [
     'meta[property="og:image"], meta[property="og:image:url"], meta[name="og:image"]',

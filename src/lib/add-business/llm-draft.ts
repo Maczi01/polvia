@@ -36,7 +36,7 @@ const DRAFT_MODEL = 'gpt-4.1-mini-2025-04-14';
 const MAX_COMPLETION_TOKENS = 3000;
 
 /** Strona ma `maxDuration = 60` (D6); fetch i geokodowanie potrzebuja reszty. */
-const DRAFT_TIMEOUT_MS = 30_000;
+export const DRAFT_TIMEOUT_MS = 30_000;
 
 const SOURCE_START = '<<<ZRODLO_START>>>';
 const SOURCE_END = '<<<ZRODLO_KONIEC>>>';
