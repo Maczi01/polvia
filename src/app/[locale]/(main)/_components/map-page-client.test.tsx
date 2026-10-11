@@ -82,7 +82,11 @@ const ROUTER_STUB = {
     prefetch: jest.fn(),
 };
 
-async function renderMapPage(pathname: string, initialFilters: MapFilters): Promise<void> {
+async function renderMapPage(
+    pathname: string,
+    initialFilters: MapFilters,
+    services: Service[] = SERVICES,
+): Promise<void> {
     window.history.replaceState({}, '', pathname);
     // Mapa i modal filtrow ida przez next/dynamic (React.lazy) — async act czeka,
     // az leniwe moduly sie rozwiaza, zanim test zacznie asercje.
@@ -91,7 +95,7 @@ async function renderMapPage(pathname: string, initialFilters: MapFilters): Prom
             <AppRouterContext.Provider value={ROUTER_STUB}>
                 <NextIntlClientProvider locale="pl" messages={messages}>
                     <NuqsTestingAdapter>
-                        <MapPageClient services={SERVICES} initialFilters={initialFilters} />
+                        <MapPageClient services={services} initialFilters={initialFilters} />
                     </NuqsTestingAdapter>
                 </NextIntlClientProvider>
             </AppRouterContext.Provider>,
@@ -121,26 +125,27 @@ function removeFiltersButton(): HTMLElement {
     return screen.getByRole('button', { name: /Usuń filtry$/ });
 }
 
-describe('<MapPageClient /> — Wstecz/Naprzod w przegladarce', () => {
-    beforeAll(() => {
-        // Modal filtrow zdejmuje blokade scrolla przez window.scrollTo, ktorego jsdom
-        // nie implementuje. Bez restore — tak jak w mobile-filter-modal.test.tsx.
-        jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
-    });
+beforeAll(() => {
+    // Modal filtrow zdejmuje blokade scrolla przez window.scrollTo, ktorego jsdom
+    // nie implementuje. Bez restore — tak jak w mobile-filter-modal.test.tsx.
+    jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+});
 
-    beforeEach(() => {
-        // jsdom nie implementuje matchMedia (useMediaQuery listy wynikow).
-        window.matchMedia = jest.fn().mockImplementation(query => ({
-            matches: true,
-            media: query,
-            onchange: null,
-            addEventListener: jest.fn(),
-            removeEventListener: jest.fn(),
-            addListener: jest.fn(),
-            removeListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-        }));
-    });
+beforeEach(() => {
+    // jsdom nie implementuje matchMedia (useMediaQuery listy wynikow).
+    window.matchMedia = jest.fn().mockImplementation(query => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+    }));
+});
+
+describe('<MapPageClient /> — Wstecz/Naprzod w przegladarce', () => {
 
     it('powrot z /mapa/prawne na /mapa czysci filtr na liscie wynikow ORAZ w pasku filtrow', async () => {
         await renderMapPage('/mapa/prawne', LAW_FILTERS);
@@ -162,5 +167,49 @@ describe('<MapPageClient /> — Wstecz/Naprzod w przegladarce', () => {
 
         expect(renderedResultNames()).toEqual(['Kancelaria Prawna']);
         expect(removeFiltersButton()).toBeEnabled();
+    });
+});
+
+// Regresja: sekcja online celowo nie filtruje po geografii (R5), ale wpisy `hybrid`
+// maja wspolrzedne i wchodzily przez nia na mape. Efekt: /mapa/podlaskie pisalo
+// "nie znaleziono" i rownoczesnie rysowalo piny z drugiego konca Polski.
+describe('<MapPageClient /> — piny respektuja filtr geograficzny', () => {
+    const BIALYSTOK = service({
+        name: 'Fryzjer Bialystok',
+        coverage: 'local',
+        city: 'Bialystok',
+        voivodeship: 'podlaskie',
+        latitude: 53.1325,
+        longitude: 23.1688,
+    });
+
+    // `hybrid`, bo tylko taki wpis ma jednoczesnie wspolrzedne i wstep do sekcji online.
+    const WROCLAW = service({
+        name: 'Remonty Wroclaw',
+        coverage: 'hybrid',
+        city: 'Wroclaw',
+        voivodeship: 'dolnoslaskie',
+        latitude: 51.1079,
+        longitude: 17.0385,
+    });
+
+    // Pin to <Image alt="shop icon">, a zlepek pinow — <img alt="cluster icon"> z licznikiem.
+    // Marker nie przyjmuje aria-label, wiec po nazwie firmy nie da sie go znalezc.
+    const pins = (): HTMLElement[] => screen.queryAllByAltText('shop icon');
+
+    it('filtr wojewodztwa zdejmuje z mapy piny spoza niego', async () => {
+        await renderMapPage('/mapa/podlaskie', { ...NO_FILTERS, county: 'podlaskie' }, [
+            BIALYSTOK,
+            WROCLAW,
+        ]);
+
+        expect(pins()).toHaveLength(1);
+        expect(screen.queryByAltText('cluster icon')).toBeNull();
+    });
+
+    it('bez filtra geograficznego oba wpisy maja pin', async () => {
+        await renderMapPage('/mapa', NO_FILTERS, [BIALYSTOK, WROCLAW]);
+
+        expect(pins()).toHaveLength(2);
     });
 });
