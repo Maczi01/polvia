@@ -739,7 +739,8 @@
     "limited": {
       "heading": "Osiągnięto dzienny limit",
       "body": "Dziennie można przygotować tylko kilka wpisów. Spróbuj ponownie {when}.",
-      "contact": "Napisz do nas przez formularz kontaktowy"
+      "contact": "Napisz do nas przez formularz kontaktowy",
+      "submitBody": "Wykorzystano dzienny limit wysyłania zgłoszeń. Spróbuj ponownie {when} albo napisz do nas — dodamy firmę ręcznie."
     },
     "notice": {
       "contactLink": "Napisz do nas"
@@ -751,7 +752,7 @@
       "ADDRESS_NOT_FOUND": "Nie znaleźliśmy tego adresu na mapie. Sprawdź ulicę i miasto.",
       "GEOCODE_UNAVAILABLE": "Wyszukiwanie adresu jest chwilowo niedostępne. Spróbuj ponownie za chwilę.",
       "INVALID_ENTRY": "Nie udało się złożyć wpisu z tych danych.",
-      "SEND_FAILED": "Nie udało się wysłać zgłoszenia. Spróbuj ponownie później.",
+      "SEND_FAILED": "Nie udało się przekazać zgłoszenia. Dodamy firmę ręcznie — wystarczy wiadomość przez formularz kontaktowy.",
       "INTERNAL": "Coś poszło nie tak po naszej stronie. Spróbuj ponownie za chwilę."
     },
     "errors": {

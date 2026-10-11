@@ -5,12 +5,12 @@ import { type ChangeEvent, type FormEvent, type JSX, useState } from 'react';
 
 import { Button } from '@/components/ui/button/button';
 import { LOGO_ACCEPTED_TYPES, NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
-import type { ActionErrorCode, FieldErrorKey, FieldErrors } from '@/lib/add-business/types';
+import type { FieldErrorKey, FieldErrors } from '@/lib/add-business/types';
 
-import type { ReadyDraft } from '../add-business-flow/flow-state';
+import type { EditingError, ReadyDraft } from '../add-business-flow/flow-state';
 import { BusinessCardPreview } from '../business-card-preview/business-card-preview';
 import { FlowHeading } from '../flow-heading/flow-heading';
-import { ActionErrorNotice } from '../flow-notices/flow-notices';
+import { ActionErrorNotice, SubmitLimitNotice } from '../flow-notices/flow-notices';
 import { PRIMARY_BUTTON_CLASSES, TextAreaField, TextField } from '../form-field/form-field';
 import {
     addressOf,
@@ -33,7 +33,7 @@ const HEADING_ID = 'add-business-editor-heading';
 export interface DraftEditorProps {
     draft: ReadyDraft;
     fieldErrors: FieldErrors;
-    error: ActionErrorCode | null;
+    error: EditingError | null;
     isPending: boolean;
     /** Logo do podgladu (upload → kandydat); `null` = placeholder karty. */
     logoSrc: string | null;
@@ -98,7 +98,10 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                 <p className="text-gray-600 dark:text-gray-300">{t('editor.intro')}</p>
             </div>
 
-            {error && <ActionErrorNotice code={error} />}
+            {typeof error === 'string' && <ActionErrorNotice code={error} />}
+            {typeof error === 'object' && error !== null && (
+                <SubmitLimitNotice retryAfter={error.retryAfter} />
+            )}
 
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 <div className="space-y-3 lg:sticky lg:top-4 lg:self-start">

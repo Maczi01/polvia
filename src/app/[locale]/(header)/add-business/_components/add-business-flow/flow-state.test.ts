@@ -1,11 +1,14 @@
 import { PIN_FIXTURE, PREVIEW_FIXTURE } from '../business-card-preview/preview-fixture';
 import {
+    afterAction,
     afterGenerate,
     afterRejection,
     afterSubmit,
     editingLogo,
     type EditingState,
+    type FlowState,
     INITIAL_FLOW,
+    linkWithError,
     manualStep,
     type ReadyDraft,
     submittedLogo,
@@ -23,7 +26,12 @@ const DRAFT: ReadyDraft = {
 const EDITING: EditingState = { step: 'editing', draft: DRAFT, fieldErrors: {}, error: null };
 
 const failure = (
-    code: 'DRAFT_EXPIRED' | 'SEND_FAILED' | 'GEOCODE_UNAVAILABLE' | 'GENERATION_FAILED',
+    code:
+        | 'DRAFT_EXPIRED'
+        | 'SEND_FAILED'
+        | 'INVALID_ENTRY'
+        | 'GEOCODE_UNAVAILABLE'
+        | 'GENERATION_FAILED',
 ) => ({ status: 'error', error: { code, message: 'techniczny' } }) as const;
 
 describe('afterGenerate', () => {
@@ -105,6 +113,29 @@ describe('afterSubmit', () => {
         expect(afterSubmit(EDITING, failure('SEND_FAILED'))).toMatchObject({ step: 'link' });
     });
 
+    it('szkicu nie da sie zlozyc we wpis — wraca do linku z INVALID_ENTRY', () => {
+        expect(afterSubmit(EDITING, failure('INVALID_ENTRY'))).toEqual(
+            linkWithError('INVALID_ENTRY'),
+        );
+    });
+
+    it('limit wysylek zostaje w edycji z tym samym szkicem i czasem ponowienia', () => {
+        const withFieldErrors: EditingState = {
+            ...EDITING,
+            fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' },
+        };
+
+        const next = afterSubmit(withFieldErrors, { status: 'limited', retryAfter: 600 });
+
+        expect(next).toEqual({
+            step: 'editing',
+            draft: DRAFT,
+            fieldErrors: {},
+            error: { kind: 'submitLimited', retryAfter: 600 },
+        });
+        expect(next).not.toMatchObject({ step: 'limited' });
+    });
+
     it('blad, po ktorym szkic zyje, zostaje w edycji', () => {
         expect(afterSubmit(EDITING, failure('GEOCODE_UNAVAILABLE'))).toEqual({
             ...EDITING,
@@ -138,8 +169,36 @@ describe('afterRejection', () => {
 
     it('dziala tez dla kroku z linkiem', () => {
         expect(
-            afterRejection({ ...INITIAL_FLOW, fieldErrors: { link: 'addBusiness.errors.required' } }),
+            afterRejection({
+                ...INITIAL_FLOW,
+                fieldErrors: { link: 'addBusiness.errors.required' },
+            }),
         ).toEqual({ ...INITIAL_FLOW, error: 'INTERNAL' });
+    });
+});
+
+describe('afterAction', () => {
+    const SUBMITTED: FlowState = {
+        step: 'submitted',
+        card: PREVIEW_FIXTURE,
+        unconfirmed: [],
+        pin: PIN_FIXTURE,
+        hasLogo: false,
+        logoCandidate: null,
+    };
+
+    it('po udanej wysylce kolejny wynik akcji nie nadpisuje podziekowania', () => {
+        const late = afterSubmit(EDITING, failure('DRAFT_EXPIRED'));
+
+        expect(afterAction(SUBMITTED, late)).toBe(SUBMITTED);
+        expect(afterAction(SUBMITTED, afterRejection(EDITING))).toBe(SUBMITTED);
+        expect(afterAction(SUBMITTED, { step: 'limited', retryAfter: 60 })).toBe(SUBMITTED);
+    });
+
+    it('przed wysylka wynik akcji przechodzi bez zmian', () => {
+        const next = afterSubmit(EDITING, failure('DRAFT_EXPIRED'));
+
+        expect(afterAction(EDITING, next)).toBe(next);
     });
 });
 

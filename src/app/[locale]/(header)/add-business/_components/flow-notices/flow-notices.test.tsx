@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { renderWithIntl } from '../test-utils/render-with-intl';
-import { ActionErrorNotice, DuplicateNotice, LimitedNotice } from './flow-notices';
+import {
+    ActionErrorNotice,
+    DuplicateNotice,
+    LimitedNotice,
+    SubmitLimitNotice,
+} from './flow-notices';
 
 expect.extend(toHaveNoViolations);
 
@@ -74,6 +79,25 @@ describe('<LimitedNotice />', () => {
 
     it('nie ma naruszen dostepnosci', async () => {
         const { container } = renderWithIntl(<LimitedNotice retryAfter={600} />);
+        expect(await axe(container)).toHaveNoViolations();
+    });
+});
+
+describe('<SubmitLimitNotice />', () => {
+    it('oglasza limit wysylek z czasem ponowienia i linkiem do kontaktu', () => {
+        renderWithIntl(<SubmitLimitNotice retryAfter={30 * 60} />);
+
+        const alert = screen.getByRole('alert');
+        expect(alert).toHaveTextContent('Wykorzystano dzienny limit wysyłania zgłoszeń.');
+        expect(alert).toHaveTextContent('Spróbuj ponownie za 30 minut');
+        expect(screen.getByRole('link', { name: 'Napisz do nas' })).toHaveAttribute(
+            'href',
+            '/contact',
+        );
+    });
+
+    it('nie ma naruszen dostepnosci', async () => {
+        const { container } = renderWithIntl(<SubmitLimitNotice retryAfter={600} />);
         expect(await axe(container)).toHaveNoViolations();
     });
 });

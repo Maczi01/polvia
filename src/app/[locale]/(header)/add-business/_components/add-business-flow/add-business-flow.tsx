@@ -9,6 +9,7 @@ import { LinkStep } from '../link-step/link-step';
 import { ManualStep } from '../manual-step/manual-step';
 import { SubmittedState } from '../submitted-state/submitted-state';
 import {
+    afterAction,
     afterGenerate,
     afterRejection,
     afterSubmit,
@@ -39,24 +40,31 @@ function logRejection(action: string): (error: unknown) => null {
 /**
  * Odrzucona akcja (siec, przerwane polaczenie) nie ma kodu z serwera — zamiast wywracac
  * strone do error boundary wracamy do kroku z kodem `INTERNAL` (`afterRejection`).
+ * Wynik akcji po udanej wysylce nie zmienia juz ekranu (`afterAction`).
  */
-async function runFlowEvent(_previous: FlowState, event: FlowEvent): Promise<FlowState> {
+async function runFlowEvent(previous: FlowState, event: FlowEvent): Promise<FlowState> {
     switch (event.type) {
         case 'generate': {
             const result = await generateDraftAction(null, event.formData).catch(
                 logRejection('generate'),
             );
-            return result === null
-                ? afterRejection(event.origin)
-                : afterGenerate(event.origin, result);
+            return afterAction(
+                previous,
+                result === null
+                    ? afterRejection(event.origin)
+                    : afterGenerate(event.origin, result),
+            );
         }
         case 'submit': {
+            // Zakolejkowany drugi submit po udanej wysylce nie idzie na serwer (limit wysylek).
+            if (previous.step === 'submitted') return previous;
             const result = await submitDraftAction(null, event.formData).catch(
                 logRejection('submit'),
             );
-            return result === null
-                ? afterRejection(event.origin)
-                : afterSubmit(event.origin, result);
+            return afterAction(
+                previous,
+                result === null ? afterRejection(event.origin) : afterSubmit(event.origin, result),
+            );
         }
         case 'go':
             return event.state;

@@ -34,11 +34,22 @@ export interface ManualState {
     error: ActionErrorCode | null;
 }
 
+/**
+ * Limit wysylek z edytora: szkic dalej zyje, wiec zostajemy w edycji z wpisanymi danymi
+ * i podajemy, kiedy wysylka znow przejdzie (w odroznieniu od ekranu limitu generowania).
+ */
+export interface SubmitLimitError {
+    kind: 'submitLimited';
+    retryAfter: number;
+}
+
+export type EditingError = ActionErrorCode | SubmitLimitError;
+
 export interface EditingState {
     step: 'editing';
     draft: ReadyDraft;
     fieldErrors: FieldErrors;
-    error: ActionErrorCode | null;
+    error: EditingError | null;
 }
 
 export interface SubmittedState {
@@ -127,7 +138,10 @@ export function afterSubmit(origin: EditingState, result: SubmitDraftResult): Fl
                 logoCandidate: origin.draft.logoCandidate,
             };
         case 'limited':
-            return { step: 'limited', retryAfter: result.retryAfter };
+            return {
+                ...cleared(origin),
+                error: { kind: 'submitLimited', retryAfter: result.retryAfter },
+            };
         case 'invalid':
             return { ...cleared(origin), fieldErrors: result.fieldErrors };
         case 'error':
@@ -135,6 +149,14 @@ export function afterSubmit(origin: EditingState, result: SubmitDraftResult): Fl
                 ? linkWithError(result.error.code)
                 : { ...cleared(origin), error: result.error.code };
     }
+}
+
+/**
+ * Wyslane zgloszenie konczy flow: wynik kolejnej, zakolejkowanej akcji (np. drugi klik
+ * „Wyslij" → `DRAFT_EXPIRED`, bo szkic juz zuzyty) nie moze nadpisac podziekowania.
+ */
+export function afterAction(previous: FlowState, next: FlowState): FlowState {
+    return previous.step === 'submitted' ? previous : next;
 }
 
 /** Logo kolejno: wlasny upload → kandydat ze strony → placeholder karty (`null`). */

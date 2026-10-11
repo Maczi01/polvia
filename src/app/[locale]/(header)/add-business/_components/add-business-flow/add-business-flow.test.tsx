@@ -152,6 +152,57 @@ describe('<AddBusinessFlow />', () => {
         expect(screen.queryByText('techniczny')).not.toBeInTheDocument();
     });
 
+    it('nieudane przekazanie zgloszenia kieruje do kontaktu, bez namawiania do ponowienia', async () => {
+        generate.mockResolvedValue(READY);
+        submit.mockResolvedValue({
+            status: 'error',
+            error: { code: 'SEND_FAILED', message: 'techniczny' },
+        });
+        const { container } = renderWithIntl(<AddBusinessFlow />);
+
+        await submitLink();
+        await screen.findByRole('heading', { name: 'Sprawdź i popraw wpis' });
+        await userEvent.click(screen.getByRole('button', { name: 'Wyślij zgłoszenie' }));
+
+        const alert = await screen.findByRole('alert');
+        expect(alert).toHaveTextContent('Nie udało się przekazać zgłoszenia.');
+        expect(alert).toHaveTextContent('Dodamy firmę ręcznie');
+        expect(alert).not.toHaveTextContent(/ponownie|spróbuj/i);
+        expect(screen.getByRole('link', { name: 'Napisz do nas' })).toHaveAttribute(
+            'href',
+            '/contact',
+        );
+        expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('limit wysylek zostawia edytor z wpisanymi danymi i mowi o wysylkach', async () => {
+        generate.mockResolvedValue(READY);
+        submit.mockResolvedValue({ status: 'limited', retryAfter: 2 * 60 * 60 });
+        const { container } = renderWithIntl(<AddBusinessFlow />);
+
+        await submitLink();
+        const email = await screen.findByRole('textbox', { name: 'Twój e-mail (wymagane)' });
+        await userEvent.type(email, 'wlasciciel@firma.pl');
+        await userEvent.click(screen.getByRole('button', { name: 'Wyślij zgłoszenie' }));
+
+        const alert = await screen.findByRole('alert');
+        expect(alert).toHaveTextContent('dzienny limit wysyłania zgłoszeń');
+        expect(alert).toHaveTextContent('Spróbuj ponownie za 2 godziny');
+        expect(alert).not.toHaveTextContent('przygotować');
+        expect(screen.getByRole('link', { name: 'Napisz do nas' })).toHaveAttribute(
+            'href',
+            '/contact',
+        );
+        expect(screen.getByRole('heading', { name: 'Sprawdź i popraw wpis' })).toBeInTheDocument();
+        expect(
+            screen.queryByRole('heading', { name: 'Osiągnięto dzienny limit' }),
+        ).not.toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Twój e-mail (wymagane)' })).toHaveValue(
+            'wlasciciel@firma.pl',
+        );
+        expect(await axe(container)).toHaveNoViolations();
+    });
+
     it('duplikat linkuje do istniejacego wpisu', async () => {
         generate.mockResolvedValue({
             status: 'duplicate',

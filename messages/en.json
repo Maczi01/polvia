@@ -738,7 +738,8 @@
     "limited": {
       "heading": "Daily limit reached",
       "body": "Only a few listings can be prepared per day. Try again {when}.",
-      "contact": "Write to us using the contact form"
+      "contact": "Write to us using the contact form",
+      "submitBody": "The daily limit for sending listings has been reached. Try again {when} or write to us and we will add your business manually."
     },
     "notice": {
       "contactLink": "Write to us"
@@ -750,7 +751,7 @@
       "ADDRESS_NOT_FOUND": "We could not find this address on the map. Check the street and city.",
       "GEOCODE_UNAVAILABLE": "Address search is temporarily unavailable. Try again in a moment.",
       "INVALID_ENTRY": "We could not build a listing from these details.",
-      "SEND_FAILED": "We could not send the listing. Try again later.",
+      "SEND_FAILED": "We could not pass on your listing. We will add your business manually — just send us a message through the contact form.",
       "INTERNAL": "Something went wrong on our side. Try again in a moment."
     },
     "errors": {

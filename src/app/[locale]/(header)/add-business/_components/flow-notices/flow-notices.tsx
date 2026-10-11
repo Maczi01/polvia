@@ -13,6 +13,9 @@ import { FlowHeading } from '../flow-heading/flow-heading';
 const LINK_CLASSES =
     'font-medium text-green-700 underline underline-offset-4 hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 dark:text-green-400';
 
+const ALERT_CLASSES =
+    'flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200';
+
 const PANEL_CLASSES =
     'space-y-4 rounded-xl bg-white/80 p-6 shadow-xl ring-1 ring-gray-100 dark:bg-gray-800/90 dark:ring-gray-700';
 
@@ -27,10 +30,7 @@ const CONTACT_CODES: ReadonlySet<ActionErrorCode> = new Set<ActionErrorCode>([
 export function ActionErrorNotice({ code }: { code: ActionErrorCode }): JSX.Element {
     const t = useTranslations('addBusiness');
     return (
-        <div
-            role="alert"
-            className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-200"
-        >
+        <div role="alert" className={ALERT_CLASSES}>
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
             <p>
                 {t(`actionErrors.${code}`)}
@@ -42,6 +42,31 @@ export function ActionErrorNotice({ code }: { code: ActionErrorCode }): JSX.Elem
                         </Link>
                     </>
                 )}
+            </p>
+        </div>
+    );
+}
+
+/** Czas ponowienia jako „za 3 godziny" — liczony od chwili pokazania komunikatu. */
+function useRetryWhen(retryAfter: number): string {
+    const format = useFormatter();
+    // Chwila wejscia na ekran, nie kazdy render — inaczej tekst „za 5 godzin" plywalby.
+    const [now] = useState(() => new Date());
+    return format.relativeTime(new Date(now.getTime() + retryAfter * 1000), now);
+}
+
+/** Limit wysylek z edytora: dane zostaja w formularzu, wiec mowimy, kiedy wyslac. */
+export function SubmitLimitNotice({ retryAfter }: { retryAfter: number }): JSX.Element {
+    const t = useTranslations('addBusiness');
+    const when = useRetryWhen(retryAfter);
+    return (
+        <div role="alert" className={ALERT_CLASSES}>
+            <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+            <p>
+                {t('limited.submitBody', { when })}{' '}
+                <Link href="/contact" className={LINK_CLASSES}>
+                    {t('notice.contactLink')}
+                </Link>
             </p>
         </div>
     );
@@ -83,10 +108,7 @@ export function DuplicateNotice({ name, slug, onStartOver }: DuplicateNoticeProp
 /** R16: limit generowan — kiedy znow mozna i droga przez formularz kontaktowy. */
 export function LimitedNotice({ retryAfter }: { retryAfter: number }): JSX.Element {
     const t = useTranslations('addBusiness.limited');
-    const format = useFormatter();
-    // Chwila wejscia na ekran, nie kazdy render — inaczej tekst „za 5 godzin" plywalby.
-    const [now] = useState(() => new Date());
-    const when = format.relativeTime(new Date(now.getTime() + retryAfter * 1000), now);
+    const when = useRetryWhen(retryAfter);
 
     return (
         <section aria-labelledby="add-business-limited-heading" className={PANEL_CLASSES}>
