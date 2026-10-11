@@ -4,13 +4,12 @@ import { randomUUID } from 'node:crypto';
 
 import { z } from 'zod';
 
-import { coverageEnum, voivodeshipEnum } from '@/db/schema';
-import { type Locale, locales } from '@/i18n/config';
-import type { Voivodeship } from '@/lib/add-business/geocode';
-import { type BusinessDraft, FACT_FIELDS, LANGUAGE_CODES } from '@/lib/add-business/draft-schema';
-import { CATEGORY_VALUES } from '@/lib/categories';
+import { locales } from '@/i18n/config';
+import { businessDraftSchema } from '@/lib/add-business/draft-schema';
+import type { GeocodeAddress, GeocodeResult } from '@/lib/add-business/geocode';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { redis } from '@/lib/redis';
+import { VOIVODESHIP_VALUES } from '@/lib/voivodeships';
 
 /**
  * Szkic wpisu po stronie serwera (D2).
@@ -23,6 +22,9 @@ import { redis } from '@/lib/redis';
  * submit musi miec wspolrzedne, a `relocate` je podmienia. `geo.address` to adres, ktory
  * geokodowano — submit porownuje z nim adres po edycji i geokoduje ponownie tylko przy
  * roznicy.
+ *
+ * Zapis i odczyt ida przez ten sam `storedDraftSchema`: zapis rzuca (blad programisty
+ * nie moze zapisac szkicu, ktorego odczyt dalby potem ciche `DRAFT_EXPIRED`).
  */
 
 export const DRAFT_TTL_SECONDS = 2 * 60 * 60;
@@ -30,30 +32,6 @@ export const DRAFT_TTL_SECONDS = 2 * 60 * 60;
 export const MAX_RELOCATIONS = 10;
 
 const DRAFT_KEY_PREFIX = 'add-business:draft:';
-
-export type DraftSource = 'page' | 'owner';
-
-export interface DraftGeo {
-    lat: number;
-    lng: number;
-    approximate: boolean;
-    voivodeship: Voivodeship | null;
-    postcode: string | null;
-    /** Adres, dla ktorego policzono wspolrzedne. */
-    address: { street: string | null; city: string };
-}
-
-export interface StoredDraft {
-    draft: BusinessDraft;
-    locale: Locale;
-    source: DraftSource;
-    /** Link podany przez wlasciciela; w trybie recznym moze go nie byc. */
-    sourceUrl: string | null;
-    /** Absolutny URL proponowanego logo ze strony (R11). */
-    logoCandidate: string | null;
-    /** `null`: wpis `online` albo geokoder nie trafil (D3 — nie blokuje wysylki). */
-    geo: DraftGeo | null;
-}
 
 export type DraftExpired = { ok: false; code: 'DRAFT_EXPIRED' };
 
@@ -69,64 +47,60 @@ const EXPIRED: DraftExpired = { ok: false, code: 'DRAFT_EXPIRED' };
 
 const draftIdSchema = z.string().uuid();
 
-const localizedTextSchema = z
-    .object({
-        pl: z.string().min(1),
-        uk: z.string().min(1),
-        en: z.string().min(1),
-        ru: z.string().min(1),
-    })
-    .strict();
-
-const openingHoursSchema = z.record(
-    z.string(),
-    z.object({ open: z.string(), close: z.string() }).strict(),
-);
-
-const businessDraftSchema = z
-    .object({
-        category: z.enum(CATEGORY_VALUES),
-        coverage: z.enum(coverageEnum.enumValues),
-        languages: z.array(z.enum(LANGUAGE_CODES)),
-        tags: z.array(localizedTextSchema),
-        descriptions: localizedTextSchema,
-        facts: z
-            .object({
-                name: z.string().nullable(),
-                street: z.string().nullable(),
-                postcode: z.string().nullable(),
-                city: z.string().nullable(),
-                phoneNumber: z.string().nullable(),
-                email: z.string().nullable(),
-                openingHours: openingHoursSchema.nullable(),
-            })
-            .strict(),
-        unconfirmed: z.array(z.enum(FACT_FIELDS)),
-    })
-    .strict() satisfies z.ZodType<BusinessDraft>;
-
 const draftGeoSchema = z
     .object({
         lat: z.number(),
         lng: z.number(),
         approximate: z.boolean(),
-        voivodeship: z.enum(voivodeshipEnum.enumValues).nullable(),
+        voivodeship: z.enum(VOIVODESHIP_VALUES).nullable(),
         postcode: z.string().nullable(),
+        /** Adres, dla ktorego policzono wspolrzedne. */
         address: z.object({ street: z.string().nullable(), city: z.string() }).strict(),
     })
-    .strict() satisfies z.ZodType<DraftGeo>;
+    .strict();
 
-/** Dane z Redisa to granica systemu — odczyt zawsze przez ten schemat. */
+export type DraftGeo = z.infer<typeof draftGeoSchema>;
+
+/** Dane z Redisa to granica systemu — zapis i odczyt zawsze przez ten schemat. */
 const storedDraftSchema = z
     .object({
         draft: businessDraftSchema,
         locale: z.enum(locales),
         source: z.enum(['page', 'owner']),
+        /** Link podany przez wlasciciela; w trybie recznym moze go nie byc. */
         sourceUrl: z.string().nullable(),
+        /** Absolutny URL proponowanego logo ze strony (R11). */
         logoCandidate: z.string().nullable(),
+        /** `null`: wpis `online` albo geokoder nie trafil (D3 — nie blokuje wysylki). */
         geo: draftGeoSchema.nullable(),
     })
-    .strict() satisfies z.ZodType<StoredDraft>;
+    .strict();
+
+export type StoredDraft = z.infer<typeof storedDraftSchema>;
+
+export type DraftSource = StoredDraft['source'];
+
+type GeocodeSuccess = Extract<GeocodeResult, { ok: true }>;
+
+/**
+ * Sukces geokodowania → `DraftGeo`. Jawne mapowanie zamiast `{ ...result, address }`:
+ * `ok` z wyniku geokodera nie przeszedlby `.strict()` i szkic bylby nie do zapisania.
+ */
+export function toDraftGeo(result: GeocodeSuccess, address: GeocodeAddress): DraftGeo {
+    return {
+        lat: result.lat,
+        lng: result.lng,
+        approximate: result.approximate,
+        voivodeship: result.voivodeship,
+        postcode: result.postcode,
+        address: { street: address.street, city: address.city },
+    };
+}
+
+/** Rzuca `ZodError` przy niepoprawnym ksztalcie — to blad wolajacego, nie danych z Redisa. */
+function serializeStored(stored: StoredDraft): string {
+    return JSON.stringify(storedDraftSchema.parse(stored));
+}
 
 function draftKey(draftId: string): string {
     return `${DRAFT_KEY_PREFIX}${draftId}`;
@@ -166,10 +140,10 @@ function parseStored(draftId: string, raw: string | null): DraftReadResult {
     return { ok: true, stored: parsed.data };
 }
 
-/** Zapisuje nowy szkic z TTL 2 h i zwraca jego identyfikator. */
+/** Zapisuje nowy szkic z TTL 2 h i zwraca jego identyfikator. Niepoprawny szkic rzuca. */
 export async function saveDraft(stored: StoredDraft): Promise<string> {
     const draftId = randomUUID();
-    await redis.set(draftKey(draftId), JSON.stringify(stored), 'EX', DRAFT_TTL_SECONDS);
+    await redis.set(draftKey(draftId), serializeStored(stored), 'EX', DRAFT_TTL_SECONDS);
     return draftId;
 }
 
@@ -204,7 +178,7 @@ export async function updateDraftGeo(
     if (!current.ok) return current;
 
     const next: StoredDraft = { ...current.stored, geo };
-    const written = await redis.set(draftKey(draftId), JSON.stringify(next), 'KEEPTTL', 'XX');
+    const written = await redis.set(draftKey(draftId), serializeStored(next), 'KEEPTTL', 'XX');
 
     return written === 'OK' ? { ok: true } : EXPIRED;
 }

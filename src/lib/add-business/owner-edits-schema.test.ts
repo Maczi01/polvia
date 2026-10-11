@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { WEEKDAY_KEYS } from '@/lib/add-business/draft-schema';
+import { WEEKDAY_KEYS } from '@/db/service-input-schema';
 import {
     NOTES_MAX_LENGTH,
     OWNER_EDIT_ERRORS,

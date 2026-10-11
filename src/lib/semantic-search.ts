@@ -11,12 +11,12 @@ import {
     servicesTagsTable,
     servicesTranslationsTable,
     tagsTranslationsTable,
-    voivodeshipEnum,
 } from '@/db/schema';
 import { createContextualQuery, isCategory } from '@/lib/category-contexts';
 import { isPublicService } from '@/lib/public-service-filter';
 import { RELEVANCE_FLOOR, selectRelevant } from '@/lib/search-relevance';
 import { judgeRelevance, RelevanceJudgeError } from '@/lib/semantic-relevance-judge';
+import { type Voivodeship, VOIVODESHIP_VALUES } from '@/lib/voivodeships';
 import { PartialService } from '@/types';
 
 import { env } from '../../env';
@@ -49,9 +49,7 @@ export const DEFAULT_SEMANTIC_LIMIT = 3;
  */
 const JUDGE_POOL_SIZE = 10;
 
-type Voivodeship = (typeof voivodeshipEnum.enumValues)[number];
-
-const VOIVODESHIPS: ReadonlySet<string> = new Set<string>(voivodeshipEnum.enumValues);
+const VOIVODESHIPS: ReadonlySet<string> = new Set<string>(VOIVODESHIP_VALUES);
 
 function isVoivodeship(value: string | null | undefined): value is Voivodeship {
     return value !== null && value !== undefined && VOIVODESHIPS.has(value);

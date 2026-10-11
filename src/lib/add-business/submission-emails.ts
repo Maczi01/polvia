@@ -4,7 +4,8 @@ import { createTranslator } from 'next-intl';
 
 import type { Locale } from '@/i18n/config';
 import type { BuildServiceJsonResult, ServiceJson } from '@/lib/add-business/build-service-json';
-import { LANGUAGE_CODES, type LanguageCode, WEEKDAY_KEYS } from '@/lib/add-business/draft-schema';
+import { WEEKDAY_KEYS, type Weekday } from '@/db/service-input-schema';
+import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
 import type { StoredDraft } from '@/lib/add-business/draft-store';
 import { getOperatorInbox, type MailMessage, toHeaderText } from '@/lib/mailer';
 
@@ -39,7 +40,6 @@ export interface SubmissionEmailInput {
 
 type Location = ServiceJson['locations'][number];
 type Hours = NonNullable<Location['openingHours']>;
-type Weekday = (typeof WEEKDAY_KEYS)[number];
 
 const MESSAGES = { pl, en, ru, uk } satisfies Record<Locale, unknown>;
 

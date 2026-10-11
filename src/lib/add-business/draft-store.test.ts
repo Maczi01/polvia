@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { createFakeRedis } from '../../../tests/fixtures/add-business/fake-redis';
 import type { BusinessDraft } from './draft-schema';
 import {
@@ -9,6 +11,7 @@ import {
     reserveRelocation,
     saveDraft,
     type StoredDraft,
+    toDraftGeo,
     updateDraftGeo,
 } from './draft-store';
 
@@ -26,7 +29,11 @@ const DRAFT: BusinessDraft = {
     category: 'law',
     coverage: 'hybrid',
     languages: ['pl', 'uk'],
-    tags: [{ pl: 'Prawo pracy', uk: 'Трудове право', en: 'Labour law', ru: 'Трудовое право' }],
+    tags: [
+        { pl: 'Prawo pracy', uk: 'Трудове право', en: 'Labour law', ru: 'Трудовое право' },
+        { pl: 'Prawo rodzinne', uk: 'Сімейне право', en: 'Family law', ru: 'Семейное право' },
+        { pl: 'Umowy', uk: 'Договори', en: 'Contracts', ru: 'Договоры' },
+    ],
     descriptions: {
         pl: 'Kancelaria prawna.',
         uk: 'Юридична фірма.',
@@ -135,6 +142,62 @@ describe('odczyt uszkodzonych danych', () => {
             reason: 'schema',
             paths: ['draft.category'],
         });
+    });
+});
+
+describe('walidacja przy zapisie', () => {
+    it('szkic z nadmiarowym polem w geo rzuca i nic nie zapisuje', async () => {
+        const set = jest.spyOn(mockRedis, 'set');
+        // Naturalny blad wolajacego: rozlany wynik geokodera razem z `ok`.
+        const geocoded = { ok: true, ...GEO };
+
+        await expect(saveDraft({ ...STORED, geo: geocoded })).rejects.toThrow(z.ZodError);
+        expect(set).not.toHaveBeenCalled();
+        set.mockRestore();
+    });
+
+    it('szkic z mniej niz trzema tagami rzuca', async () => {
+        const draft: BusinessDraft = { ...DRAFT, tags: DRAFT.tags.slice(0, 1) };
+
+        await expect(saveDraft({ ...STORED, draft })).rejects.toThrow(z.ZodError);
+    });
+
+    it('godziny spoza formatu HH:MM rzucaja', async () => {
+        const draft: BusinessDraft = {
+            ...DRAFT,
+            facts: { ...DRAFT.facts, openingHours: { monday: { open: '9', close: '17:00' } } },
+        };
+
+        await expect(saveDraft({ ...STORED, draft })).rejects.toThrow(z.ZodError);
+    });
+
+    it('updateDraftGeo z nadmiarowym polem rzuca i zostawia poprzednie geo', async () => {
+        const draftId = await saveDraft(STORED);
+        const geocoded = { ok: true, ...GEO, lat: 50.06 };
+
+        await expect(updateDraftGeo(draftId, geocoded)).rejects.toThrow(z.ZodError);
+        expect(await getDraft(draftId)).toEqual({ ok: true, stored: STORED });
+    });
+});
+
+describe('toDraftGeo', () => {
+    it('wynik geokodera po mapowaniu przechodzi zapis i odczyt', async () => {
+        const geo = toDraftGeo(
+            {
+                ok: true,
+                lat: 52.23,
+                lng: 21.01,
+                postcode: '00-001',
+                voivodeship: 'mazowieckie',
+                approximate: false,
+            },
+            { street: 'Marszałkowska 1', city: 'Warszawa' },
+        );
+
+        const draftId = await saveDraft({ ...STORED, geo });
+
+        expect(geo).toEqual(GEO);
+        expect(await getDraft(draftId)).toEqual({ ok: true, stored: { ...STORED, geo: GEO } });
     });
 });
 

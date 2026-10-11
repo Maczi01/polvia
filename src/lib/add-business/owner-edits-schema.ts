@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-import { LANGUAGE_CODES, type LanguageCode, WEEKDAY_KEYS } from '@/lib/add-business/draft-schema';
+import { TIME_PATTERN, WEEKDAY_KEYS } from '@/db/service-input-schema';
+import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
 
 /**
@@ -32,9 +33,6 @@ export const OWNER_EDIT_ERRORS = {
 export type OwnerEditErrorKey = (typeof OWNER_EDIT_ERRORS)[keyof typeof OWNER_EDIT_ERRORS];
 
 export const NOTES_MAX_LENGTH = 2000;
-
-/** Ten sam format co `serviceInputSchema` — inaczej wpis odpadlby dopiero przy `db:add`. */
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
 const emptyToNull = (value: unknown): unknown => {
     const normalized = typeof value === 'string' ? value.trim() : value;

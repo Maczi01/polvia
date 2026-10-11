@@ -1,10 +1,11 @@
+import { WEEKDAY_KEYS } from '@/db/service-input-schema';
+
 import {
     type DraftFacts,
     FACT_FIELDS,
     type FactField,
     type LlmFacts,
     type LlmOpeningHours,
-    WEEKDAY_KEYS,
 } from './draft-schema';
 import type { OpeningHours, StructuredFacts } from './jsonld-facts';
 

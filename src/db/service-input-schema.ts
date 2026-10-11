@@ -1,20 +1,26 @@
 import slugify from 'slugify';
 import { z } from 'zod';
 
-import { categoryEnum, coverageEnum, statusEnum, voivodeshipEnum } from './schema';
+import { CATEGORY_VALUES } from '../lib/categories';
+import { COVERAGE_VALUES } from '../lib/coverage';
+import { SERVICE_STATUS_VALUES } from '../lib/service-status';
+import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 
 /**
  * Czysta warstwa walidacji opisu wpisu katalogowego (plik JSON z `data/services/`).
  *
  * Wydzielona z `add-service.ts`, bo tamten modul importuje `./index` — klient
  * postgresa tworzony przy ladowaniu modulu, czyli nie da sie go zaimportowac
- * w tescie bez otwierania polaczenia z baza. `./schema` jest bezpieczny:
- * definiuje tylko tabele i enumy.
+ * w tescie bez otwierania polaczenia z baza. Wartosci enumow bierze z lekkich modulow
+ * `src/lib/*` zamiast z `./schema`, bo plik jest wlascicielem kontraktu wpisu importowanym
+ * takze przez kod aplikacji (formularz `/dodaj`) — `./schema` wciagnalby drizzle `pg-core`.
  */
 
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+/** Format godziny w calym katalogu: `HH:MM`, 00:00–23:59. */
+export const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-const WEEKDAYS = new Set([
+/** Klucze godzin otwarcia, w kolejnosci wyswietlania. */
+export const WEEKDAY_KEYS = [
     'monday',
     'tuesday',
     'wednesday',
@@ -22,7 +28,11 @@ const WEEKDAYS = new Set([
     'friday',
     'saturday',
     'sunday',
-]);
+] as const;
+
+export type Weekday = (typeof WEEKDAY_KEYS)[number];
+
+const WEEKDAYS: ReadonlySet<string> = new Set<string>(WEEKDAY_KEYS);
 
 const dayHoursSchema = z
     .object({
@@ -38,7 +48,7 @@ const dayHoursSchema = z
  * po prostu pomijamy; `refine` pilnuje, zeby literowka ("monady") nie wjechala
  * do bazy jako nowy, niewidoczny dla UI dzien tygodnia.
  */
-const openingHoursSchema = z
+export const openingHoursSchema = z
     .record(z.string(), dayHoursSchema)
     .refine(hours => Object.keys(hours).every(day => WEEKDAYS.has(day)), {
         message: 'Klucze godzin otwarcia to monday...sunday; dzien nieczynny pomin',
@@ -69,7 +79,7 @@ const locationInputSchema = z
     .object({
         city: z.string().min(1).max(255),
         street: z.string().max(255).nullish(),
-        voivodeship: z.enum(voivodeshipEnum.enumValues).nullish(),
+        voivodeship: z.enum(VOIVODESHIP_VALUES).nullish(),
         postcode: z.string().max(20).nullish(),
         latitude: z.number().min(-90).max(90).nullish(),
         longitude: z.number().min(-180).max(180).nullish(),
@@ -94,7 +104,7 @@ const translationSchema = z
     })
     .strict();
 
-const tagInputSchema = z
+export const tagInputSchema = z
     .object({
         pl: z.string().min(1),
         uk: z.string().min(1),
@@ -114,9 +124,9 @@ export const serviceInputSchema = z
             .string()
             .regex(/^[a-z0-9-]+$/, 'Slug: male litery, cyfry i mysniki')
             .optional(),
-        category: z.enum(categoryEnum.enumValues),
-        coverage: z.enum(coverageEnum.enumValues).default('local'),
-        status: z.enum(statusEnum.enumValues).default('active'),
+        category: z.enum(CATEGORY_VALUES),
+        coverage: z.enum(COVERAGE_VALUES).default('local'),
+        status: z.enum(SERVICE_STATUS_VALUES).default('active'),
         verified: z.boolean().default(false),
         /** Sama nazwa pliku z `public/services/`, nie sciezka. */
         image: z.string().max(255).nullish(),

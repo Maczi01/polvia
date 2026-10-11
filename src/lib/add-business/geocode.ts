@@ -2,8 +2,8 @@ import 'server-only';
 
 import { z } from 'zod';
 
-import { voivodeshipEnum } from '@/db/schema';
 import { redis } from '@/lib/redis';
+import { type Voivodeship, VOIVODESHIP_VALUES } from '@/lib/voivodeships';
 
 import { env } from '../../../env';
 
@@ -24,8 +24,6 @@ const FETCH_TIMEOUT_MS = 8000;
 const HTTP_TOO_MANY_REQUESTS = 429;
 
 const POLAND_BOUNDS = { minLat: 49, maxLat: 55, minLng: 14, maxLng: 24 } as const;
-
-export type Voivodeship = (typeof voivodeshipEnum.enumValues)[number];
 
 export type GeocodeErrorCode = 'NOT_FOUND' | 'MISMATCH' | 'RATE_LIMITED' | 'UPSTREAM_FAILED';
 
@@ -111,7 +109,7 @@ export function mapVoivodeship(state?: string): Voivodeship | null {
 
     const candidate = foldText(state).replace(/^wojewodztwo /, '').replaceAll(' ', '-');
 
-    return voivodeshipEnum.enumValues.find(value => value === candidate) ?? null;
+    return VOIVODESHIP_VALUES.find(value => value === candidate) ?? null;
 }
 
 function buildQuery(address: GeocodeAddress): string {

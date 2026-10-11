@@ -1,12 +1,7 @@
 import type { z } from 'zod';
 
-import { buildServiceSlug, serviceInputSchema } from '@/db/service-input-schema';
-import {
-    type DraftFacts,
-    FACT_FIELDS,
-    type FactField,
-    WEEKDAY_KEYS,
-} from '@/lib/add-business/draft-schema';
+import { buildServiceSlug, serviceInputSchema, WEEKDAY_KEYS } from '@/db/service-input-schema';
+import { type DraftFacts, FACT_FIELDS, type FactField } from '@/lib/add-business/draft-schema';
 import type { DraftGeo, StoredDraft } from '@/lib/add-business/draft-store';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
 import type { OwnerEdits } from '@/lib/add-business/owner-edits-schema';

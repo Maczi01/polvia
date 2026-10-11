@@ -17,49 +17,18 @@ import {
 import { relations, sql } from 'drizzle-orm';
 
 import { CATEGORY_VALUES } from '../lib/categories';
+import { COVERAGE_VALUES } from '../lib/coverage';
+import { SERVICE_STATUS_VALUES } from '../lib/service-status';
+import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 
 export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
 
-export const voivodeshipEnum = pgEnum('voivodeship', [
-    'dolnoslaskie',
-    'kujawsko-pomorskie',
-    'lubelskie',
-    'lubuskie',
-    'lodzkie',
-    'malopolskie',
-    'mazowieckie',
-    'opolskie',
-    'podkarpackie',
-    'podlaskie',
-    'pomorskie',
-    'slaskie',
-    'swietokrzyskie',
-    'warminsko-mazurskie',
-    'wielkopolskie',
-    'zachodniopomorskie',
-]);
+export const voivodeshipEnum = pgEnum('voivodeship', VOIVODESHIP_VALUES);
 
-export const statusEnum = pgEnum('status', [
-    'active',
-    'inactive',
-    'pending',
-    'confirmed'
-]);
+export const statusEnum = pgEnum('status', SERVICE_STATUS_VALUES);
 
-/**
- * Zasieg obslugi — druga, ortogonalna os obok kategorii (branzy).
- *
- * - `local`  — obsluga wylacznie na miejscu; ma pin na mapie
- * - `online` — obsluga wylacznie zdalna, brak punktu obslugi; NIE ma pinu na mapie
- * - `hybrid` — punkt obslugi ORAZ obsluga zdalna; ma pin i wchodzi do wynikow online
- */
-export const coverageEnum = pgEnum('coverage', [
-    'local',
-    'online',
-    'hybrid',
-]);
-
-export type Coverage = (typeof coverageEnum.enumValues)[number];
+/** Zasieg obslugi — druga, ortogonalna os obok kategorii (branzy). Opis wartosci: `coverage.ts`. */
+export const coverageEnum = pgEnum('coverage', COVERAGE_VALUES);
 
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -253,3 +222,5 @@ export const newsletterTable = pgTable('newsletter_subscribers', {
     isActive: boolean('is_active').default(true),
     source: varchar('source', { length: 50 }).default('banner'),
 });
+
+export type { Coverage } from '../lib/coverage';

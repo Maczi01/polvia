@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { LocationInput } from '@/db/service-input-schema';
+import { type LocationInput, WEEKDAY_KEYS } from '@/db/service-input-schema';
 
 /**
  * Fakty strukturalne z blokow JSON-LD (schema.org). Kazde pole walidujemy
@@ -32,16 +32,12 @@ export interface StructuredFacts {
 
 type JsonObject = Record<string, unknown>;
 
-const WEEKDAYS = new Set([
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-]);
-const TIME_PATTERN = /^(\d{1,2}):([0-5]\d)/;
+const WEEKDAYS: ReadonlySet<string> = new Set<string>(WEEKDAY_KEYS);
+/**
+ * Wzorzec PARSOWANIA godziny schema.org (`9:00`, `09:00:00`) — luzniejszy niz kanoniczny
+ * `TIME_PATTERN` z `service-input-schema.ts`; `normalizeTime` sprowadza wynik do `HH:MM`.
+ */
+const SCHEMA_ORG_TIME_PATTERN = /^(\d{1,2}):([0-5]\d)/;
 
 /**
  * Podtypy `LocalBusiness` spotykane w katalogu. Pelna lista schema.org ma setki
@@ -171,7 +167,7 @@ function normalizeDay(value: unknown): string | undefined {
 
 function normalizeTime(value: unknown): string | undefined {
     if (typeof value !== 'string') return undefined;
-    const match = TIME_PATTERN.exec(value.trim());
+    const match = SCHEMA_ORG_TIME_PATTERN.exec(value.trim());
     if (!match) return undefined;
     const hours = Number(match[1]);
     return hours <= 23 ? `${String(hours).padStart(2, '0')}:${match[2]}` : undefined;
