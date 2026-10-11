@@ -168,8 +168,9 @@ export interface LocalizedText {
 }
 
 /**
- * Szkic wpisu. `category`, `coverage`, `languages`, `tags`, `descriptions` pochodza od
- * modelu i nie sa edytowalne przez wlasciciela (R9). `facts` przeszly weryfikacje (D4);
+ * Szkic wpisu. `category`, `coverage`, `tags`, `descriptions` pochodza od modelu i nie sa
+ * edytowalne przez wlasciciela (R9); `languages` to propozycja modelu, ktora wlasciciel moze
+ * poprawic. `facts` przeszly weryfikacje (D4);
  * pole, ktorego nie dalo sie potwierdzic, ma `null` i jest w `unconfirmed` (R4).
  */
 export interface BusinessDraft {
