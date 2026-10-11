@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (review Fazy B)
+Ostatnia aktualizacja: 2026-10-11 (poprawki po review Fazy B)
 
 ## Źródła
 
@@ -294,3 +294,50 @@ wszystkie scenariusze przeglądarkowe to `[Manual]`.
   - brak XSS i open redirect;
   - wyczerpujące unie stanów;
   - zero `any`/`as`/`!`.
+
+## Poprawki po review Fazy B (2026-10-11)
+Wykonawcy:
+- `feature-builder-web-data`: commit `66413bc`;
+- `feature-builder-web-ui`: commit `f044f76`.
+
+Grupy szły jedna po drugiej, bo UI importuje nowe moduły stałych. Wynik: 10 z 11 poprawek P2.
+Token Mapbox czeka na decyzję usera.
+
+**Warstwa danych:**
+- **Kolejność w submicie:** `peekSubmitLimit` jest przed `processLogoUpload`, wiążący `consume` został na miejscu.
+- **Geo i logo:** `resolveGeo` ∥ `resolveLogo` przez `Promise.all`, oba przed `consumeDraft`.
+- **SMTP:** `SMTP_TIMEOUT_MS = 10_000` dla `connectionTimeout`, `greetingTimeout` i `socketTimeout`. Zawieszony SMTP daje `SEND_FAILED` i wpis w logu.
+- **Lekkie stałe:**
+  - `src/lib/weekdays.ts`: `WEEKDAY_KEYS`, `Weekday`;
+  - `src/lib/add-business/form-limits.ts`: `LANGUAGE_CODES`, `NOTES_MAX_LENGTH`, `MANUAL_DESCRIPTION_MIN/MAX`, `LOGO_MAX_BYTES`, `LOGO_ACCEPTED_TYPES`.
+
+  Stare ścieżki importu reeksportują je przez `export … from`.
+- **`duplicate`:** bez `url` i `duplicateUrl()`. `HtmlExtractError` strony głównej daje teraz `INVALID_FINAL_URL` (P3 #26), w UI nadal `UNREADABLE`.
+- **Nowe testy:**
+  - `generate-draft-branches.test.ts`: gałęzie limitów, `NOT_FOUND` daje `pin:null`;
+  - `submit-draft-resilience.test.ts` + harness: peek przed sharpem, równoległość, zawieszony SMTP, ponowne geokodowanie, `RATE_LIMITED`;
+  - `manual-input-schema.test.ts`, `page-sources.test.ts`, `form-limits.test.ts`;
+  - `relocate-draft.test.ts` rozszerzony o `RATE_LIMITED`/`UPSTREAM_FAILED`.
+- **Odchylenie:** testy rozbite na osobne pliki (limit 300 linii). `submit-draft.test.ts` miał 307 linii, teraz ma 219.
+- **Budżet wysyłki:** mail operatora kończy się najpóźniej po ok. 40 s. Teoretyczny sufit razem z potwierdzeniem to ok. 70 s, ale ubicie funkcji w trakcie potwierdzenia nie gubi zgłoszenia. Rachunek jest w docstringu `submit-draft.ts`.
+- **Uwaga:** `URL.canParse` nie istnieje w jsdom, więc testy schematów mają `@jest-environment node`.
+
+**UI:**
+- **Importy:** komponenty biorą wartości tylko z lekkich modułów. 0 importów z `@/db/` w `_components`; z `draft-schema` zostały wyłącznie `import type`.
+- **Logo:** `logo-file.ts` z funkcją `logoFileError`, która zwraca:
+  - przy rozmiarze > `LOGO_MAX_BYTES`: `logoTooLarge`;
+  - przy MIME spoza listy: `invalidLogo`;
+  - przy pustym typie: nic (plik przechodzi dalej).
+
+  Oba klucze już istniały. Błąd pojawia się od razu przy wyborze pliku, przez `aria-describedby`, a wysyłka jest wtedy zablokowana. `accept` bierze wartości z `LOGO_ACCEPTED_TYPES`.
+- **Odrzucenia:** `afterRejection(origin)` w `flow-state.ts` czyści `fieldErrors` i ustawia `INTERNAL`. Flow i `use-relocation` logują błąd przez `console.error`; `use-relocation` zwraca `actionFailure('INTERNAL')`.
+- **Linki duplikatu:** `flow-notices.locales.test.tsx` używa prawdziwego `@/i18n/navigation` i mockuje tylko `next/navigation`. Sprawdzane: `pl` daje `/mapa?place=`, `ru`/`uk` dają `/{locale}/map`, z asercją negatywną na `/en`.
+- **Odchylenie:** test linków jest w osobnym pliku, bo mock nawigacji obowiązuje cały plik testów.
+- **Do rozważenia (P3):** wzorzec z prawdziwym routingiem w innych testach linków. Ostrzeżenia `no-undef` w testach wynikają z braku env jest w ESLint dla całego repo.
+
+**Gate (2026-10-11):**
+- `npx tsc --noEmit`: 0 błędów.
+- `npx jest`: 92 suity, 1017/1017.
+- `npx next lint`: 0 błędów.
+- Grepy czyste: brak `any`, `console.log`, `process.env`, `@/db/` w `_components`, `next/link`, `next/navigation`.
+- `npm run build`: OK. Dev server z głównego checkoutu działał, ale korzysta z innego `.next`.

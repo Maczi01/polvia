@@ -301,18 +301,19 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 ## Do poprawy po review fazy B
 
 Raport: `review-faza-B.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 11 × P2, 37 × P3).
+Poprawki wykonane 2026-10-11 (commity `66413bc`, `f044f76`); token Mapbox czeka na decyzję usera.
 
-- [ ] 🟠 [important] **src/lib/add-business/submit-draft.ts:139-147** — sharp na uploadzie logo przed `consumeSubmitLimit` (jeden draftId = nielimitowane dekodowanie); `peekRateLimit(submitIpKey)` przed `processLogoUpload` + test
-- [ ] 🟠 [important] **src/lib/add-business/submit-draft.ts:150-170 / src/lib/mailer.ts:67** — submit sekwencyjny, SMTP bez timeoutów; zawieszony Gmail po `consumeDraft` = zgłoszenie znika bez logu; geo ∥ logo (`Promise.all`), timeouty transportu ~10 s + test
+- [x] 🟠 [important] **src/lib/add-business/submit-draft.ts:139-147** — sharp na uploadzie logo przed `consumeSubmitLimit` (jeden draftId = nielimitowane dekodowanie); `peekRateLimit(submitIpKey)` przed `processLogoUpload` + test
+- [x] 🟠 [important] **src/lib/add-business/submit-draft.ts:150-170 / src/lib/mailer.ts:67** — submit sekwencyjny, SMTP bez timeoutów; zawieszony Gmail po `consumeDraft` = zgłoszenie znika bez logu; geo ∥ logo (`Promise.all`), timeouty transportu ~10 s + test
 - [ ] 🟠 [important] **add-business/_components/business-card-preview/static-map-url.ts:9-10** — druga kopia tokenu Mapbox z obcego konta poza `env.ts`; DECYZJA USERA: własny `NEXT_PUBLIC_MAPBOX_TOKEN` w `env.ts`, jedna stała, fallback przy błędzie obrazka
-- [ ] 🟠 [important] **manual-step.tsx:7-10, draft-editor.tsx:7, business-card-preview.tsx:10, draft-values.ts:1, opening-hours-fields.tsx:7, languages-field.tsx:6, generated-summary.tsx:6** — klient importuje stałe z modułów zod/`src/db` (schematy + `slugify` w bundlu, granica warstw); lekkie `src/lib/weekdays.ts` + `src/lib/add-business/form-limits.ts`
-- [ ] 🟠 [important] **draft-editor.tsx:278-287 / add-business-flow.tsx:181** — logo > ~3 MB daje `INTERNAL` zamiast błędu pola (`bodySizeLimit`); walidacja `file.size` w kliencie + test
-- [ ] 🟠 [important] **add-business-flow.tsx:175,181 / use-relocation.ts:52** — `.catch(() => null)` połyka błąd bez logu, stare `fieldErrors` zostają; logowanie + przejście `afterRejection` w `flow-state.ts` + `actionFailure('INTERNAL')`
-- [ ] 🟠 [important] **generate-draft.ts:91-96,169 / types.ts:155-158** — martwe `url`/`duplicateUrl` w wyniku `duplicate` (UI używa `slug`); usunąć, asercję „ru ≠ /en” przenieść do testu `DuplicateNotice`
-- [ ] 🟠 [important] **generate-draft.ts:163-164,182-183,192-193** — brak testów gałęzi limitów: consume gen po fetchu (wyścig), wyczerpany fetch, global przy wolnym IP, tryb ręczny przy limicie
-- [ ] 🟠 [important] **draft-geo.ts / submit-draft.ts:70-85 / relocate-draft.ts** — brak testów porażki geokodera (NOT_FOUND przy generowaniu, re-geokodowanie przy `geo:null`, RATE_LIMITED przy submit → `missingCoordinates`, relocate → `GEOCODE_UNAVAILABLE`)
-- [ ] 🟠 [important] **src/lib/add-business/manual-input-schema.ts** — brak własnego testu (tooLong, same spacje, zły e-mail/link, brak name/city, File w polu tekstowym)
-- [ ] 🟠 [important] **src/lib/add-business/page-sources.ts** — brak własnego testu ścieżek błędów `readPageSource` (HtmlExtractError, timeout < minimum, odrzucona podstrona, priorytet JSON-LD, `combine`)
+- [x] 🟠 [important] **manual-step.tsx:7-10, draft-editor.tsx:7, business-card-preview.tsx:10, draft-values.ts:1, opening-hours-fields.tsx:7, languages-field.tsx:6, generated-summary.tsx:6** — klient importuje stałe z modułów zod/`src/db` (schematy + `slugify` w bundlu, granica warstw); lekkie `src/lib/weekdays.ts` + `src/lib/add-business/form-limits.ts`
+- [x] 🟠 [important] **draft-editor.tsx:278-287 / add-business-flow.tsx:181** — logo > ~3 MB daje `INTERNAL` zamiast błędu pola (`bodySizeLimit`); walidacja `file.size` w kliencie + test
+- [x] 🟠 [important] **add-business-flow.tsx:175,181 / use-relocation.ts:52** — `.catch(() => null)` połyka błąd bez logu, stare `fieldErrors` zostają; logowanie + przejście `afterRejection` w `flow-state.ts` + `actionFailure('INTERNAL')`
+- [x] 🟠 [important] **generate-draft.ts:91-96,169 / types.ts:155-158** — martwe `url`/`duplicateUrl` w wyniku `duplicate` (UI używa `slug`); usunąć, asercję „ru ≠ /en” przenieść do testu `DuplicateNotice`
+- [x] 🟠 [important] **generate-draft.ts:163-164,182-183,192-193** — brak testów gałęzi limitów: consume gen po fetchu (wyścig), wyczerpany fetch, global przy wolnym IP, tryb ręczny przy limicie
+- [x] 🟠 [important] **draft-geo.ts / submit-draft.ts:70-85 / relocate-draft.ts** — brak testów porażki geokodera (NOT_FOUND przy generowaniu, re-geokodowanie przy `geo:null`, RATE_LIMITED przy submit → `missingCoordinates`, relocate → `GEOCODE_UNAVAILABLE`)
+- [x] 🟠 [important] **src/lib/add-business/manual-input-schema.ts** — brak własnego testu (tooLong, same spacje, zły e-mail/link, brak name/city, File w polu tekstowym)
+- [x] 🟠 [important] **src/lib/add-business/page-sources.ts** — brak własnego testu ścieżek błędów `readPageSource` (HtmlExtractError, timeout < minimum, odrzucona podstrona, priorytet JSON-LD, `combine`)
 - [ ] 🟡 [nit] 37 sugestii P3 — lista w `review-faza-B.md`. Zrobione w trakcie review: #37 (wzorzec jest w checklistach, kolejność w `zadania.md`). Warte uwagi: #13 (podwójny submit nadpisuje `submitted`), #16 (`limited` z submitu porzuca edytor), #17 (`SEND_FAILED` sugeruje ponowienie przy zużytym szkicu), #19 (tryb ręczny bez sprawdzenia duplikatu), #4 (wszystkie 4 opisy w mailu operatora)
 
 ## Quality gate (przed PR)
