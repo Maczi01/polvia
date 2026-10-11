@@ -46,7 +46,6 @@ describe('afterGenerate', () => {
                 status: 'duplicate',
                 name: 'K',
                 slug: 'k',
-                url: '/mapa?place=k',
             }),
         ).toEqual({ step: 'duplicate', name: 'K', slug: 'k' });
         expect(afterGenerate(INITIAL_FLOW, { status: 'limited', retryAfter: 60 })).toEqual({

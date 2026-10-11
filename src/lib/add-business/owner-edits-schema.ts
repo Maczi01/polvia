@@ -1,8 +1,15 @@
 import { z } from 'zod';
 
 import { TIME_PATTERN, WEEKDAY_KEYS } from '@/db/service-input-schema';
-import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
+import {
+    LANGUAGE_CODES,
+    type LanguageCode,
+    NOTES_MAX_LENGTH,
+} from '@/lib/add-business/form-limits';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
+
+/** Reeksport z lekkiego modulu `form-limits` — klient importuje stale stamtad. */
+export { NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
 
 /**
  * Pola, ktore wlasciciel moze poprawic przed wysylka (R9: kategoria, zasieg, tagi i opisy
@@ -31,8 +38,6 @@ export const OWNER_EDIT_ERRORS = {
 } as const;
 
 export type OwnerEditErrorKey = (typeof OWNER_EDIT_ERRORS)[keyof typeof OWNER_EDIT_ERRORS];
-
-export const NOTES_MAX_LENGTH = 2000;
 
 const emptyToNull = (value: unknown): unknown => {
     const normalized = typeof value === 'string' ? value.trim() : value;

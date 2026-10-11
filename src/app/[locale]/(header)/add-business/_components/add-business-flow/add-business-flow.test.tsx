@@ -157,7 +157,6 @@ describe('<AddBusinessFlow />', () => {
             status: 'duplicate',
             name: 'Kawiarnia Lwów',
             slug: 'kawiarnia-lwow',
-            url: '/mapa?place=kawiarnia-lwow',
         });
         renderWithIntl(<AddBusinessFlow />);
 

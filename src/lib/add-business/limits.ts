@@ -99,10 +99,22 @@ export async function consumeFetchLimit(ip: string): Promise<RateLimitResult> {
     });
 }
 
-export async function consumeSubmitLimit(ip: string): Promise<RateLimitResult> {
-    return checkRateLimit({
+function submitOptions(ip: string): RateLimitOptions {
+    return {
         key: submitIpKey(ip),
         max: SUBMISSIONS_PER_IP,
         windowSeconds: ADD_BUSINESS_WINDOW_SECONDS,
-    });
+    };
+}
+
+/**
+ * Czy wysylka zmiesci sie w limicie. Niczego nie zuzywa — orkiestrator woła go przed
+ * dekodowaniem logo (sharp), zeby klient ponad limitem nie mial darmowego dekodera obrazkow.
+ */
+export async function peekSubmitLimit(ip: string): Promise<RateLimitResult> {
+    return peekRateLimit(submitOptions(ip));
+}
+
+export async function consumeSubmitLimit(ip: string): Promise<RateLimitResult> {
+    return checkRateLimit(submitOptions(ip));
 }

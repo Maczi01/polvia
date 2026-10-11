@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { DraftFacts } from '@/lib/add-business/draft-schema';
+import { MANUAL_DESCRIPTION_MAX, MANUAL_DESCRIPTION_MIN } from '@/lib/add-business/form-limits';
 import {
     OWNER_EDIT_ERRORS,
     optionalEmail,
@@ -8,6 +9,9 @@ import {
     optionalWebpage,
 } from '@/lib/add-business/owner-edits-schema';
 import { EXTRA_FIELD_ERRORS, type FieldErrorKey, type FieldErrors } from '@/lib/add-business/types';
+
+/** Reeksport z lekkiego modulu `form-limits` — klient importuje stale stamtad. */
+export { MANUAL_DESCRIPTION_MAX, MANUAL_DESCRIPTION_MIN } from '@/lib/add-business/form-limits';
 
 /**
  * Formularz trybu recznego (R6): pola kluczowe + opis dzialalnosci, z ktorego model pisze
@@ -17,9 +21,6 @@ import { EXTRA_FIELD_ERRORS, type FieldErrorKey, type FieldErrors } from '@/lib/
  * Granica `FormData`: puste pole i pole nieobecne to `null` przed walidacja (te same
  * helpery co `parseOwnerEdits`), wymagalnosc w `.superRefine()`.
  */
-
-export const MANUAL_DESCRIPTION_MIN = 50;
-export const MANUAL_DESCRIPTION_MAX = 1000;
 
 export interface ManualInput {
     fields: DraftFacts;

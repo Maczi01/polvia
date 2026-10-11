@@ -5,6 +5,7 @@ import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
+import { WEEKDAY_KEYS } from '../lib/weekdays';
 
 /**
  * Czysta warstwa walidacji opisu wpisu katalogowego (plik JSON z `data/services/`).
@@ -19,18 +20,8 @@ import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 /** Format godziny w calym katalogu: `HH:MM`, 00:00–23:59. */
 export const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-/** Klucze godzin otwarcia, w kolejnosci wyswietlania. */
-export const WEEKDAY_KEYS = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-] as const;
-
-export type Weekday = (typeof WEEKDAY_KEYS)[number];
+/** Reeksport z lekkiego modulu — klient importuje `@/lib/weekdays` bez zoda i `slugify`. */
+export { type Weekday, WEEKDAY_KEYS } from '../lib/weekdays';
 
 const WEEKDAYS: ReadonlySet<string> = new Set<string>(WEEKDAY_KEYS);
 

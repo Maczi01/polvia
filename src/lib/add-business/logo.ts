@@ -2,7 +2,11 @@ import 'server-only';
 
 import sharp from 'sharp';
 
+import { LOGO_ACCEPTED_TYPES, LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
 import { safeFetchImage, type SafeFetchOptions } from '@/lib/add-business/safe-fetch';
+
+/** Reeksport z lekkiego modulu `form-limits` — klient importuje stale stamtad. */
+export { LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
 
 /**
  * Logo wpisu (D9): upload wlasciciela albo kandydat ze strony, oba przez ten sam pipeline.
@@ -13,7 +17,6 @@ import { safeFetchImage, type SafeFetchOptions } from '@/lib/add-business/safe-f
  * doklejony do oryginalu. Nic nie trafia na dysk — bufor idzie jako zalacznik maila.
  */
 
-export const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 export const LOGO_MAX_DIMENSION = 512;
 
 /**
@@ -22,7 +25,10 @@ export const LOGO_MAX_DIMENSION = 512;
  */
 export const LOGO_MAX_INPUT_PIXELS = 4096 * 4096;
 
-const ALLOWED_FORMATS = new Set(['png', 'jpeg', 'webp']);
+/** Nazwy formatow sharp to podtyp MIME: `image/png` → `png`. */
+const ALLOWED_FORMATS: ReadonlySet<string> = new Set(
+    LOGO_ACCEPTED_TYPES.map(type => type.slice('image/'.length)),
+);
 
 export type LogoErrorCode = 'INVALID_LOGO' | 'LOGO_TOO_LARGE';
 

@@ -14,7 +14,7 @@ import {
     getDraft,
     type StoredDraft,
 } from '@/lib/add-business/draft-store';
-import { consumeSubmitLimit } from '@/lib/add-business/limits';
+import { consumeSubmitLimit, peekSubmitLimit } from '@/lib/add-business/limits';
 import { type LogoErrorCode, processLogoUpload } from '@/lib/add-business/logo';
 import { OWNER_EDIT_ERRORS, parseOwnerEdits } from '@/lib/add-business/owner-edits-schema';
 import { buildPreview, toPin } from '@/lib/add-business/preview';
@@ -39,6 +39,15 @@ import type { MailMessage, SendMailResult } from '@/lib/mailer';
  * z winy danych albo uslug (walidacja, logo, geokodowanie, pobranie logo ze strony), dzieje
  * sie PRZED `consumeDraft`: porazka nie pali szkicu i wlasciciel moze poprawic i wyslac
  * ponownie. Po `consumeDraft` zostaje czysta budowa JSON-a i maile, ktore nie rzucaja.
+ *
+ * Budzet czasu (`maxDuration = 60` strony). Przed `consumeDraft`: geokodowanie (blokada
+ * Nominatim do 1,1 s + fetch 8 s) rownolegle z kandydatem logo (safe-fetch 8 s) ≈ 9 s,
+ * plus Redis i sharp ≈ 1 s. Po `consumeDraft` maile sa sekwencyjne, a `SMTP_TIMEOUT_MS`
+ * (10 s) dotyczy kazdej fazy osobno: zawieszenie w jednej fazie = 10 s, najgorszy przypadek
+ * (kazda faza tuz pod limitem) = 3 × 10 s = 30 s na mail. Mail operatora konczy sie zatem
+ * najpozniej po ~40 s — zawsze sukcesem albo `SEND_FAILED` z `logLostSubmission`, nigdy
+ * ubiciem funkcji. Teoretyczny sufit z potwierdzeniem (~70 s) przekracza 60 s, ale ubicie
+ * w trakcie potwierdzenia nie gubi zgloszenia: mail operatora juz wyszedl.
  */
 
 export interface SubmitDraftDeps {
@@ -82,6 +91,16 @@ async function resolveGeo(
     if (unchanged) return geo;
 
     return geocodeToDraftGeo(geocode, { street: edits.street, city: edits.city });
+}
+
+/** Upload wlasciciela ma pierwszenstwo; kandydat ze strony tylko, gdy uploadu brak. */
+async function resolveLogo(
+    uploaded: Buffer | null,
+    candidate: string | null,
+    deps: SubmitDraftDeps,
+): Promise<Buffer | null> {
+    if (uploaded !== null) return uploaded;
+    return candidate === null ? null : deps.fetchLogoCandidate(candidate);
 }
 
 function logoFile(value: unknown): File | null {
@@ -139,6 +158,11 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     const current = await getDraft(draftId.data);
     if (!current.ok) return actionFailure(current.code);
 
+    // Tani odczyt licznika przed sharpem; wiazacy `consume` dopiero po walidacji logo,
+    // zeby zly plik nie spalal proby.
+    const peek = await peekSubmitLimit(ip);
+    if (!peek.allowed) return { status: 'limited', retryAfter: peek.retryAfter };
+
     const upload = await processLogoUpload(logoFile(formData.get('logo')));
     if (!upload.ok)
         return { status: 'invalid', fieldErrors: { logo: LOGO_FIELD_ERRORS[upload.code] } };
@@ -147,10 +171,10 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     if (!limit.allowed) return { status: 'limited', retryAfter: limit.retryAfter };
 
     const { submitterEmail, notes, ...edits } = parsed.data;
-    const geo = await resolveGeo(current.stored, edits, deps.geocode);
-    const candidate = current.stored.logoCandidate;
-    const logo =
-        upload.png ?? (candidate === null ? null : await deps.fetchLogoCandidate(candidate));
+    const [geo, logo] = await Promise.all([
+        resolveGeo(current.stored, edits, deps.geocode),
+        resolveLogo(upload.png, current.stored.logoCandidate, deps),
+    ]);
 
     const consumed = await consumeDraft(draftId.data);
     if (!consumed.ok) return actionFailure(consumed.code);

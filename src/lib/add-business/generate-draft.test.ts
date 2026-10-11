@@ -60,21 +60,21 @@ describe('generateDraft — link', () => {
         expect(await generationCount()).toBeNull();
     });
 
-    it('domena istniejacego wpisu daje duplikat z linkiem w locale uzytkownika', async () => {
+    it('domena istniejacego wpisu daje duplikat z nazwa i slugiem wpisu', async () => {
         const h = harness();
         h.findDuplicate.mockResolvedValue({ name: 'Gabinet Zdrowie', slug: 'gabinet-zdrowie' });
 
-        const ru = await generateDraft({ formData: linkForm(SITE), ip: IP, locale: 'ru' }, h.deps);
-        const pl = await generateDraft({ formData: linkForm(SITE), ip: IP, locale: 'pl' }, h.deps);
+        const result = await generateDraft(
+            { formData: linkForm(SITE), ip: IP, locale: 'ru' },
+            h.deps,
+        );
 
-        expect(ru).toEqual({
+        // Link do wpisu buduje UI z `slug` (`Link` z `@/i18n/navigation`, prefiks locale).
+        expect(result).toEqual({
             status: 'duplicate',
             name: 'Gabinet Zdrowie',
             slug: 'gabinet-zdrowie',
-            url: '/ru/map?place=gabinet-zdrowie',
         });
-        expect(ru.status === 'duplicate' && ru.url.startsWith('/en')).toBe(false);
-        expect(pl.status === 'duplicate' && pl.url).toBe('/mapa?place=gabinet-zdrowie');
         expect(h.findDuplicate).toHaveBeenCalledWith('gabinet-zdrowie.pl', 'ru');
         expect(h.fetchHtml).not.toHaveBeenCalled();
         expect(await generationCount()).toBeNull();

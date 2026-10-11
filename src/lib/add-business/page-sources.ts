@@ -53,9 +53,12 @@ export interface PageSource {
     logoCandidate: string | null;
 }
 
+/** Kody safe-fetch plus blad ekstrakcji strony glownej — w logu widac, co naprawde zawiodlo. */
+export type PageSourceErrorCode = SafeFetchErrorCode | HtmlExtractError['code'];
+
 export type PageSourceResult =
     | { ok: true; source: PageSource }
-    | { ok: false; code: SafeFetchErrorCode };
+    | { ok: false; code: PageSourceErrorCode };
 
 function timeLeft(deps: PageSourceDeps): number {
     return deps.fetchDeadline - deps.now();
@@ -121,7 +124,7 @@ export async function readPageSource(url: string, deps: PageSourceDeps): Promise
     if (!fetched.ok) return fetched;
 
     const main = extractOrNull(fetched.body, fetched.finalUrl);
-    if (main === null) return { ok: false, code: 'INVALID_URL' };
+    if (main === null) return { ok: false, code: 'INVALID_FINAL_URL' };
 
     const subpages = await fetchSubpages(main.contactLinks, deps);
     return { ok: true, source: combine(fetched.finalUrl, main, subpages) };

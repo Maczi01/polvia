@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { openingHoursSchema, tagInputSchema, WEEKDAY_KEYS } from '@/db/service-input-schema';
+import { LANGUAGE_CODES } from '@/lib/add-business/form-limits';
 import { CATEGORY_VALUES } from '@/lib/categories';
 import { COVERAGE_VALUES } from '@/lib/coverage';
 
@@ -26,9 +27,8 @@ import { COVERAGE_VALUES } from '@/lib/coverage';
  * Modul nie importuje `@/db/schema` (drizzle `pg-core`) — nadaje sie do walidacji klienckiej.
  */
 
-/** Jezyki obslugi klienta — te same kody co locale katalogu (`klasyfikacja.md`). */
-export const LANGUAGE_CODES = ['pl', 'uk', 'en', 'ru'] as const;
-export type LanguageCode = (typeof LANGUAGE_CODES)[number];
+/** Reeksport z lekkiego modulu — klient importuje `form-limits` bez zoda. */
+export { type LanguageCode, LANGUAGE_CODES } from '@/lib/add-business/form-limits';
 
 export const MIN_TAGS = 3;
 export const MAX_TAGS = 5;

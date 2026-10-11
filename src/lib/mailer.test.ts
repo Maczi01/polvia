@@ -1,14 +1,20 @@
 /**
  * @jest-environment node
  */
-import { sendMail, toHeaderText } from './mailer';
+import { sendMail, SMTP_TIMEOUT_MS, toHeaderText } from './mailer';
 
 const mockTransportSendMail = jest.fn();
+const mockCreateTransport = jest.fn();
 
 // SMTP (Gmail) to zewnetrzny serwis — zaden test nie wysyla prawdziwego maila.
 jest.mock('nodemailer', () => ({
     __esModule: true,
-    default: { createTransport: () => ({ sendMail: mockTransportSendMail }) },
+    default: {
+        createTransport: (options: unknown) => {
+            mockCreateTransport(options);
+            return { sendMail: mockTransportSendMail };
+        },
+    },
 }));
 jest.mock('../../env', () => ({
     env: { MY_GMAIL: 'operator@example.com', MY_GMAIL_PASSWORD: 'app-password' },
@@ -18,6 +24,7 @@ const transportSendMail = mockTransportSendMail;
 
 beforeEach(() => {
     transportSendMail.mockReset();
+    mockCreateTransport.mockReset();
     jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -74,6 +81,32 @@ describe('sendMail', () => {
         expect(JSON.stringify(jest.mocked(console.error).mock.calls)).not.toContain(
             'owner@example.com',
         );
+    });
+
+    it('transport ma timeouty polaczenia, powitania i gniazda — zawieszony SMTP konczy sie bledem', async () => {
+        transportSendMail.mockResolvedValue({ messageId: '1' });
+
+        await sendMail({ to: 'a@example.com', subject: 's', text: 't' });
+
+        expect(mockCreateTransport).toHaveBeenCalledWith(
+            expect.objectContaining({
+                connectionTimeout: SMTP_TIMEOUT_MS,
+                greetingTimeout: SMTP_TIMEOUT_MS,
+                socketTimeout: SMTP_TIMEOUT_MS,
+            }),
+        );
+        expect(SMTP_TIMEOUT_MS).toBeLessThanOrEqual(10_000);
+    });
+
+    it('timeout transportu to SEND_FAILED, nie wyjatek', async () => {
+        transportSendMail.mockRejectedValue(
+            Object.assign(new Error('Greeting never received'), { code: 'ETIMEDOUT' }),
+        );
+
+        expect(await sendMail({ to: 'a@example.com', subject: 's', text: 't' })).toEqual({
+            ok: false,
+            code: 'SEND_FAILED',
+        });
     });
 });
 

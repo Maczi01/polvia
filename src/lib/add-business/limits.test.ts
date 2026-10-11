@@ -9,6 +9,7 @@ import {
     GENERATIONS_GLOBAL,
     generationIpKey,
     peekGenerationLimit,
+    peekSubmitLimit,
 } from './limits';
 
 const mockRedis = createFakeRedis();
@@ -112,6 +113,24 @@ describe('consumeFetchLimit i consumeSubmitLimit', () => {
 
         expect(await consumeSubmitLimit(IP)).toMatchObject({ allowed: false });
         expect(await consumeSubmitLimit(OTHER_IP)).toMatchObject({ allowed: true });
+    });
+});
+
+describe('peekSubmitLimit', () => {
+    it('nie inkrementuje licznika wysylek', async () => {
+        await peekSubmitLimit(IP);
+        await peekSubmitLimit(IP);
+
+        expect(await consumeSubmitLimit(IP)).toMatchObject({ allowed: true });
+        expect(await consumeSubmitLimit(IP)).toMatchObject({ allowed: true });
+    });
+
+    it('po wyczerpaniu limitu wysylek odrzuca', async () => {
+        await consumeSubmitLimit(IP);
+        await consumeSubmitLimit(IP);
+
+        expect(await peekSubmitLimit(IP)).toMatchObject({ allowed: false });
+        expect(await peekSubmitLimit(OTHER_IP)).toMatchObject({ allowed: true });
     });
 });
 

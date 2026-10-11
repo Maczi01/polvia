@@ -2,11 +2,19 @@
  * @jest-environment node
  */
 import { createFakeRedis } from '../../../tests/fixtures/add-business/fake-redis';
-import type { BusinessDraft } from './draft-schema';
-import { getDraft, saveDraft, type StoredDraft } from './draft-store';
-import type { GeocodeResult } from './geocode';
+import {
+    harness,
+    IP,
+    LOGO_PNG,
+    operatorEntry,
+    OWNER_EMAIL,
+    STORED,
+    submitForm,
+    TAG,
+} from '../../../tests/fixtures/add-business/submit-draft-harness';
+import { getDraft, saveDraft } from './draft-store';
 import { submitIpKey, SUBMISSIONS_PER_IP } from './limits';
-import { submitDraft, type SubmitDraftDeps } from './submit-draft';
+import { submitDraft } from './submit-draft';
 
 const mockRedis = createFakeRedis();
 
@@ -21,102 +29,6 @@ jest.mock('@/lib/redis', () => ({
 jest.mock('../../../env', () => ({
     env: { MY_GMAIL: 'operator@example.com', MY_GMAIL_PASSWORD: 'app-password' },
 }));
-
-const IP = '198.51.100.20';
-const OWNER_EMAIL = 'wlasciciel@example.com';
-const OWNER_NOTES = 'Mamy tez punkt w Gdansku, prosze o kontakt pod 600 000 000.';
-
-const TAG = { pl: 'Prawo pracy', uk: 'Трудове право', en: 'Labour law', ru: 'Трудовое право' };
-
-const DRAFT: BusinessDraft = {
-    category: 'law',
-    coverage: 'hybrid',
-    languages: ['pl', 'uk'],
-    tags: [TAG, TAG, TAG],
-    descriptions: { pl: 'Opis pl', uk: 'Опис uk', en: 'Description en', ru: 'Описание ru' },
-    facts: {
-        name: 'Kancelaria Nowak',
-        street: 'ul. Prosta 1',
-        postcode: '00-001',
-        city: 'Warszawa',
-        phoneNumber: null,
-        email: 'biuro@nowak.example.pl',
-        openingHours: null,
-    },
-    unconfirmed: ['phoneNumber', 'openingHours'],
-};
-
-const STORED: StoredDraft = {
-    draft: DRAFT,
-    locale: 'pl',
-    source: 'page',
-    sourceUrl: 'https://nowak.example.pl/',
-    logoCandidate: null,
-    geo: {
-        lat: 52.23,
-        lng: 21.01,
-        approximate: false,
-        voivodeship: 'mazowieckie',
-        postcode: '00-001',
-        address: { street: 'ul. Prosta 1', city: 'Warszawa' },
-    },
-};
-
-const GEOCODED: GeocodeResult = {
-    ok: true,
-    lat: 50.06,
-    lng: 19.94,
-    postcode: '30-001',
-    voivodeship: 'malopolskie',
-    approximate: true,
-};
-
-const LOGO_PNG = Buffer.from('png-bytes');
-
-interface Harness {
-    deps: SubmitDraftDeps;
-    sendMail: jest.Mock;
-    geocode: jest.Mock;
-    fetchLogoCandidate: jest.Mock;
-}
-
-function harness(): Harness {
-    const sendMail = jest.fn().mockResolvedValue({ ok: true });
-    const geocode = jest.fn().mockResolvedValue(GEOCODED);
-    const fetchLogoCandidate = jest.fn().mockResolvedValue(LOGO_PNG);
-    return {
-        deps: { sendMail, geocode, fetchLogoCandidate },
-        sendMail,
-        geocode,
-        fetchLogoCandidate,
-    };
-}
-
-function submitForm(draftId: string, overrides: Record<string, string> = {}): FormData {
-    const form = new FormData();
-    const fields: Record<string, string> = {
-        draftId,
-        name: 'Kancelaria Nowak',
-        street: 'ul. Prosta 1',
-        postcode: '00-001',
-        city: 'Warszawa',
-        phoneNumber: '',
-        email: 'biuro@nowak.example.pl',
-        webpage: 'https://nowak.example.pl/',
-        submitterEmail: OWNER_EMAIL,
-        notes: OWNER_NOTES,
-        ...overrides,
-    };
-    for (const [key, value] of Object.entries(fields)) form.set(key, value);
-    form.append('languages', 'pl');
-    form.append('languages', 'uk');
-    return form;
-}
-
-function operatorEntry(sendMail: jest.Mock): Record<string, unknown> {
-    const [message] = sendMail.mock.calls[0];
-    return JSON.parse(message.attachments[0].content);
-}
 
 beforeEach(() => {
     mockRedis.reset();

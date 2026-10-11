@@ -63,10 +63,21 @@ function describeTransportError(error: unknown): TransportErrorDetails {
     return { name: error.name, code, responseCode };
 }
 
+/**
+ * Limit kazdej fazy SMTP: nawiazania polaczenia, powitania serwera i bezczynnosci gniazda.
+ * Domyslne nodemailera to 2 min / 30 s / 10 min — zawieszony Gmail przezylby `maxDuration`
+ * akcji i zgloszenie zniknelo bez logu. Z limitem transport rzuca, a `sendMail` zwraca
+ * `SEND_FAILED`, ktory wolajacy loguje.
+ */
+export const SMTP_TIMEOUT_MS = 10_000;
+
 export async function sendMail(message: MailMessage): Promise<SendMailResult> {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: { user: env.MY_GMAIL, pass: env.MY_GMAIL_PASSWORD },
+        connectionTimeout: SMTP_TIMEOUT_MS,
+        greetingTimeout: SMTP_TIMEOUT_MS,
+        socketTimeout: SMTP_TIMEOUT_MS,
     });
 
     try {

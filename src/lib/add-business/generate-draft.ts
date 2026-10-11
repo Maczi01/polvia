@@ -27,14 +27,8 @@ import { buildPreview, toPin } from '@/lib/add-business/preview';
 import {
     type GenerateDraftResult,
     type ManualReason,
-    SAFE_FETCH_ERROR_TO_MANUAL,
+    PAGE_SOURCE_ERROR_TO_MANUAL,
 } from '@/lib/add-business/types';
-import {
-    buildServiceUrl,
-    localePathPrefix,
-    localizeMapPath,
-    stringifyMapUrl,
-} from '@/lib/map-url-builder';
 import type { DomainMatch } from '@/lib/queries';
 import type { RateLimitResult } from '@/lib/rate-limit';
 
@@ -85,14 +79,6 @@ function needsManual(reason: ManualReason, link: string | null): GenerateDraftRe
 
 function limited(result: Extract<RateLimitResult, { allowed: false }>): GenerateDraftResult {
     return { status: 'limited', retryAfter: result.retryAfter };
-}
-
-/** Sciezka wpisu w locale uzytkownika — prefiks z helpera, nigdy `/en` na sztywno. */
-export function duplicateUrl(slug: string, locale: Locale): string {
-    const { pathname, query } = buildServiceUrl(slug, locale);
-    // Lokalizujemy sama sciezke: `localizeMapPath` nie rozpozna `/map?place=…` jako `/map`.
-    const localized = stringifyMapUrl({ pathname: localizeMapPath(pathname, locale), query });
-    return `${localePathPrefix(locale)}${localized}`;
 }
 
 async function geoForDraft(
@@ -165,8 +151,7 @@ async function generateFromLink(request: ActionRequest, deps: GenerateDraftDeps)
 
     const duplicate = await deps.findDuplicate(link.host, locale);
     if (duplicate !== null) {
-        const { name, slug } = duplicate;
-        return { status: 'duplicate', name, slug, url: duplicateUrl(slug, locale) };
+        return { status: 'duplicate', name: duplicate.name, slug: duplicate.slug };
     }
 
     const page = await readPageSource(url, {
@@ -176,7 +161,7 @@ async function generateFromLink(request: ActionRequest, deps: GenerateDraftDeps)
     });
     if (!page.ok) {
         console.warn('add-business page unreadable', { code: page.code });
-        return needsManual(SAFE_FETCH_ERROR_TO_MANUAL[page.code], url);
+        return needsManual(PAGE_SOURCE_ERROR_TO_MANUAL[page.code], url);
     }
 
     const consumed = await consumeGenerationLimit(ip);

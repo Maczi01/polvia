@@ -100,6 +100,22 @@ describe('relocateDraft', () => {
         expect(stored.ok && stored.stored.geo).toBeNull();
     });
 
+    it.each(['RATE_LIMITED', 'UPSTREAM_FAILED'] as const)(
+        'geokoder %s daje GEOCODE_UNAVAILABLE i nie zmienia szkicu',
+        async code => {
+            const geocode = jest.fn().mockResolvedValue({ ok: false, code });
+            const draftId = await saveDraft(STORED);
+
+            const result = await relocateDraft(relocateForm(draftId, 'ul. Długa 2', 'Kraków'), {
+                geocode,
+            });
+
+            expect(result.status === 'error' && result.error.code).toBe('GEOCODE_UNAVAILABLE');
+            const stored = await getDraft(draftId);
+            expect(stored.ok && stored.stored.geo).toBeNull();
+        },
+    );
+
     it('po wyczerpaniu limitu relokacji nie geokoduje', async () => {
         const geocode = jest.fn().mockResolvedValue({ ok: false, code: 'NOT_FOUND' });
         const draftId = await saveDraft(STORED);

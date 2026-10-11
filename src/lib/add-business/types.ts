@@ -3,6 +3,7 @@ import type { GeocodeErrorCode } from '@/lib/add-business/geocode';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
 import type { DraftGenerationErrorCode } from '@/lib/add-business/llm-draft';
 import type { OwnerEditErrorKey } from '@/lib/add-business/owner-edits-schema';
+import type { PageSourceErrorCode } from '@/lib/add-business/page-sources';
 import type { SafeFetchErrorCode } from '@/lib/add-business/safe-fetch';
 import type { Category } from '@/lib/categories';
 import type { Coverage } from '@/lib/coverage';
@@ -85,6 +86,11 @@ export const SAFE_FETCH_ERROR_TO_MANUAL: Record<SafeFetchErrorCode, ManualReason
     NETWORK_ERROR: 'UNREADABLE',
 };
 
+export const PAGE_SOURCE_ERROR_TO_MANUAL: Record<PageSourceErrorCode, ManualReason> = {
+    ...SAFE_FETCH_ERROR_TO_MANUAL,
+    INVALID_FINAL_URL: 'UNREADABLE',
+};
+
 export function toActionError(code: ActionErrorCode): ActionError {
     return { code, message: ACTION_ERROR_MESSAGES[code] };
 }
@@ -154,8 +160,6 @@ export type GenerateDraftResult =
           name: string;
           /** Slug lokalizacji: `Link` z `@/i18n/navigation` → `{ pathname: '/map', query: { place } }`. */
           slug: string;
-          /** Pelna sciezka wpisu w locale uzytkownika (`/mapa?place=…`, `/uk/map?place=…`). */
-          url: string;
       }
     | {
           status: 'needsManual';
