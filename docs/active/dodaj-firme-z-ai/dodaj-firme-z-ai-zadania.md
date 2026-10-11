@@ -2,15 +2,15 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11
+Ostatnia aktualizacja: 2026-10-11 (Faza A ukończona)
 
 Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-ai-plan.md`.
 
-## Faza A — moduły serwerowe
+## Faza A — moduły serwerowe ✅
 
 ### U1: Guard SSRF — `feature-builder-web-data` — M
 
-- [ ] Stwórz `src/lib/add-business/safe-fetch.ts`:
+- [x] Stwórz `src/lib/add-business/safe-fetch.ts`:
   - walidacja URL;
   - undici `Agent` z własnym lookupem;
   - ręczne redirecty ≤ 3;
@@ -18,40 +18,40 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
   - limit 2 MB;
   - content-type HTML i wariant obrazkowy;
   - wynik jako unia z kodami.
-- [ ] Stwórz `src/lib/add-business/safe-fetch.test.ts`
-- [ ] Test: klasyfikator IP odrzuca `127.0.0.1`, `10.0.0.5`, `172.16.0.1`, `192.168.1.1`,
+- [x] Stwórz `src/lib/add-business/safe-fetch.test.ts`
+- [x] Test: klasyfikator IP odrzuca `127.0.0.1`, `10.0.0.5`, `172.16.0.1`, `192.168.1.1`,
   `169.254.169.254`, `100.64.0.1`, `0.0.0.0`, `::1`, `fc00::1`, `fe80::1`, `::ffff:127.0.0.1`
   i przepuszcza publiczne IPv4/IPv6
-- [ ] Test: `file:`, `ftp:`, `javascript:`, userinfo, port 22 → `INVALID_URL`
-- [ ] Test: redirect na adres prywatny → `BLOCKED_ADDRESS`; 4 redirecty → `TOO_MANY_REDIRECTS`
+- [x] Test: `file:`, `ftp:`, `javascript:`, userinfo, port 22 → `INVALID_URL`
+- [x] Test: redirect na adres prywatny → `BLOCKED_ADDRESS`; 4 redirecty → `TOO_MANY_REDIRECTS`
   (transport mockowany)
-- [ ] Test: za duża odpowiedź → `TOO_LARGE`; `application/pdf` → `BAD_CONTENT_TYPE`; brak
+- [x] Test: za duża odpowiedź → `TOO_LARGE`; `application/pdf` → `BAD_CONTENT_TYPE`; brak
   odpowiedzi → `TIMEOUT`
-- [ ] Test: 200 `text/html` → `ok: true` z `finalUrl` po redirectcie
+- [x] Test: 200 `text/html` → `ok: true` z `finalUrl` po redirectcie
 - [ ] Weryfikacja: `npx jest src/lib/add-business/safe-fetch.test.ts` przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U2: Ekstrakcja HTML + `link-kind` — `feature-builder-web-data` — M
 
-- [ ] Dodaj `cheerio` (dokładna wersja) do `package.json` / `package-lock.json`
-- [ ] Stwórz `src/lib/add-business/html-extract.ts`:
+- [x] Dodaj `cheerio` (dokładna wersja) do `package.json` / `package-lock.json`
+- [x] Stwórz `src/lib/add-business/html-extract.ts`:
   - tekst ≤ 12 tys. znaków;
   - JSON-LD `LocalBusiness`/`@graph` z walidacją zod;
   - godziny z dniami lowercase;
   - kandydaci logo;
   - link kontaktu (≤ 2 podstrony).
-- [ ] Stwórz `src/lib/add-business/link-kind.ts`: normalizacja hosta, wykrycie social
-- [ ] Stwórz fixtures `tests/fixtures/add-business/`:
+- [x] Stwórz `src/lib/add-business/link-kind.ts`: normalizacja hosta, wykrycie social
+- [x] Stwórz fixtures `tests/fixtures/add-business/`:
   - `local-business-jsonld.html`
   - `no-jsonld.html`
   - `graph-jsonld.html`
-- [ ] Stwórz testy `html-extract.test.ts`, `link-kind.test.ts`
-- [ ] Test: fixture z `LocalBusiness` → adres, telefon, godziny (lowercase), geo
-- [ ] Test: `@graph` + zepsuty blok JSON-LD → poprawny węzeł wyciągnięty, błąd zalogowany,
+- [x] Stwórz testy `html-extract.test.ts`, `link-kind.test.ts`
+- [x] Test: fixture z `LocalBusiness` → adres, telefon, godziny (lowercase), geo
+- [x] Test: `@graph` + zepsuty blok JSON-LD → poprawny węzeł wyciągnięty, błąd zalogowany,
   brak wyjątku
-- [ ] Test: brak JSON-LD → puste fakty strukturalne, niepusty tekst bez skryptów
-- [ ] Test: względny `apple-touch-icon` → absolutny URL; brak og:image → następny kandydat
-- [ ] Test: `instagram.com/x` i `maps.app.goo.gl/…` → social; `https://WWW.Firma.pl/o-nas` →
+- [x] Test: brak JSON-LD → puste fakty strukturalne, niepusty tekst bez skryptów
+- [x] Test: względny `apple-touch-icon` → absolutny URL; brak og:image → następny kandydat
+- [x] Test: `instagram.com/x` i `maps.app.goo.gl/…` → social; `https://WWW.Firma.pl/o-nas` →
   `firma.pl`
 - [ ] Weryfikacja: `npx jest src/lib/add-business/html-extract.test.ts src/lib/add-business/link-kind.test.ts`
   przechodzi
@@ -61,64 +61,64 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 
 > Notatka wykonawcza: `verify-facts` test-first.
 
-- [ ] Stwórz `src/lib/add-business/draft-schema.ts`:
+- [x] Stwórz `src/lib/add-business/draft-schema.ts`:
   - płaski schemat strict, pola nullable;
   - `category` z `CATEGORY_VALUES`;
   - typ `BusinessDraft`.
-- [ ] Stwórz `src/lib/add-business/llm-draft.ts`:
+- [x] Stwórz `src/lib/add-business/llm-draft.ts`:
   - `fromPage` / `fromOwner`;
   - wstrzykiwany klient;
   - prompt z danymi w ogranicznikach + `CATEGORY_CONTEXTS`;
   - `DraftGenerationError`.
-- [ ] Stwórz `src/lib/add-business/verify-facts.ts`
-- [ ] Stwórz testy `llm-draft.test.ts`, `verify-facts.test.ts`
-- [ ] Test: telefon z LLM nieobecny w źródle → `null` + `phone` w `unconfirmed`
-- [ ] Test: JSON-LD telefon A, LLM B → A
-- [ ] Test: źródło `+48 22 123-45-67`, LLM `221234567` → przyjęty po normalizacji
-- [ ] Test: `APIError` → `UPSTREAM_FAILED`; odpowiedź niezgodna ze schematem →
+- [x] Stwórz `src/lib/add-business/verify-facts.ts`
+- [x] Stwórz testy `llm-draft.test.ts`, `verify-facts.test.ts`
+- [x] Test: telefon z LLM nieobecny w źródle → `null` + `phone` w `unconfirmed`
+- [x] Test: JSON-LD telefon A, LLM B → A
+- [x] Test: źródło `+48 22 123-45-67`, LLM `221234567` → przyjęty po normalizacji
+- [x] Test: `APIError` → `UPSTREAM_FAILED`; odpowiedź niezgodna ze schematem →
   `INVALID_RESPONSE`
-- [ ] Test: `fromOwner` → fakty właściciela bez zmian i bez `unconfirmed`; opis właściciela w
+- [x] Test: `fromOwner` → fakty właściciela bez zmian i bez `unconfirmed`; opis właściciela w
   prompcie
-- [ ] Test: kategoria spoza enumu → `INVALID_RESPONSE` (nie ciche `others`)
+- [x] Test: kategoria spoza enumu → `INVALID_RESPONSE` (nie ciche `others`)
 - [ ] Weryfikacja: `npx jest src/lib/add-business/llm-draft.test.ts src/lib/add-business/verify-facts.test.ts`
   przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U4: Geokodowanie — `feature-builder-web-data` — M
 
-- [ ] Stwórz `src/lib/add-business/geocode.ts`:
+- [x] Stwórz `src/lib/add-business/geocode.ts`:
   - Nominatim, User-Agent z `env.NEXT_PUBLIC_SITE_URL`;
   - cache Redis 30 dni (również „nie znaleziono”);
   - blokada `SET NX PX 1000`;
   - kontrole miasta i zakresu PL;
   - `approximate`;
   - mapowanie województwa.
-- [ ] Stwórz `src/lib/add-business/geocode.test.ts`
-- [ ] Test: trafienie w cache → brak `fetch`
-- [ ] Test: wynik spoza PL / inne miasto → `MISMATCH`
-- [ ] Test: brak `house_number` → `approximate: true`
-- [ ] Test: zajęta blokada przy obu próbach → `RATE_LIMITED` bez sieci
-- [ ] Test: `województwo mazowieckie` → `mazowieckie`
+- [x] Stwórz `src/lib/add-business/geocode.test.ts`
+- [x] Test: trafienie w cache → brak `fetch`
+- [x] Test: wynik spoza PL / inne miasto → `MISMATCH`
+- [x] Test: brak `house_number` → `approximate: true`
+- [x] Test: zajęta blokada przy obu próbach → `RATE_LIMITED` bez sieci
+- [x] Test: `województwo mazowieckie` → `mazowieckie`
 - [ ] Weryfikacja: `npx jest src/lib/add-business/geocode.test.ts` przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U5: Draft store, limity, duplikaty — `feature-builder-web-data` — M
 
-- [ ] Stwórz `src/lib/add-business/draft-store.ts`:
+- [x] Stwórz `src/lib/add-business/draft-store.ts`:
   - save / get / consume (GETDEL);
   - TTL 2 h;
   - walidacja zod przy odczycie;
   - licznik relokacji.
-- [ ] Stwórz `src/lib/add-business/limits.ts`: stałe D7, `peek` / `consume`, klucz IP +
+- [x] Stwórz `src/lib/add-business/limits.ts`: stałe D7, `peek` / `consume`, klucz IP +
   globalny
-- [ ] Modyfikuj `src/lib/queries.ts`: `findServiceByDomain(host, locale)`. Zawężenie w SQL,
+- [x] Modyfikuj `src/lib/queries.ts`: `findServiceByDomain(host, locale)`. Zawężenie w SQL,
   dokładne porównanie hosta, tylko aktywne wpisy.
-- [ ] Stwórz testy `draft-store.test.ts`, `limits.test.ts`
-- [ ] Test: `save` → `consume` zwraca draft; drugi `consume` → `DRAFT_EXPIRED`
-- [ ] Test: uszkodzony JSON w Redis → `DRAFT_EXPIRED` + log, bez wyjątku
-- [ ] Test: trzecie `consume` `gen:<ip>` → `allowed: false` z `retryAfter`; `peek` nie
+- [x] Stwórz testy `draft-store.test.ts`, `limits.test.ts`
+- [x] Test: `save` → `consume` zwraca draft; drugi `consume` → `DRAFT_EXPIRED`
+- [x] Test: uszkodzony JSON w Redis → `DRAFT_EXPIRED` + log, bez wyjątku
+- [x] Test: trzecie `consume` `gen:<ip>` → `allowed: false` z `retryAfter`; `peek` nie
   inkrementuje
-- [ ] Test: wyczerpany limit globalny blokuje mimo wolnego limitu IP
+- [x] Test: wyczerpany limit globalny blokuje mimo wolnego limitu IP
 - [ ] Weryfikacja: `npx jest src/lib/add-business/draft-store.test.ts src/lib/add-business/limits.test.ts`
   przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
@@ -127,32 +127,32 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 
 > Notatka wykonawcza: zacznij od testu kontraktu z `serviceInputSchema`.
 
-- [ ] Stwórz `src/lib/add-business/build-service-json.ts`:
+- [x] Stwórz `src/lib/add-business/build-service-json.ts`:
   - scalenie draft + edycje;
   - `changedByOwner`;
   - `image: <slug>.png` tylko gdy jest logo;
   - `missingCoordinates`.
-- [ ] Stwórz `src/lib/add-business/owner-edits-schema.ts`:
+- [x] Stwórz `src/lib/add-business/owner-edits-schema.ts`:
   - `emptyToNull` + `z.preprocess`;
   - godziny jako 7 par;
   - języki z dozwolonego zbioru;
   - URL http(s);
   - e-mail zgłaszającego;
   - uwagi ≤ 2000.
-- [ ] Stwórz `src/lib/add-business/logo.ts`:
+- [x] Stwórz `src/lib/add-business/logo.ts`:
   - ≤ 2 MB;
   - format przez sharp `metadata()`;
   - PNG ≤ 512 px;
   - kandydat przez safe-fetch (wariant obrazkowy).
-- [ ] Stwórz fixtures `tests/fixtures/add-business/logo.png`, `fake-png.svg`
-- [ ] Stwórz testy `build-service-json.test.ts`, `owner-edits-schema.test.ts`, `logo.test.ts`
-- [ ] Test: pełny draft `hybrid` + edycje → `serviceInputSchema.safeParse` sukces; `image` =
+- [x] Stwórz fixtures `tests/fixtures/add-business/logo.png`, `fake-png.svg`
+- [x] Stwórz testy `build-service-json.test.ts`, `owner-edits-schema.test.ts`, `logo.test.ts`
+- [x] Test: pełny draft `hybrid` + edycje → `serviceInputSchema.safeParse` sukces; `image` =
   `<slug>.png`
-- [ ] Test: draft `local` bez współrzędnych → wynik + `missingCoordinates: true`, brak wyjątku
-- [ ] Test: edycja telefonu → `changedByOwner` zawiera `phoneNumber`; niezmienione pole nie
-- [ ] Test: FormData z każdym polem `''` → `null`, nie `0`; puste godziny → dzień pominięty
-- [ ] Test: zły e-mail zgłaszającego → błąd pola z kluczem tłumaczenia
-- [ ] Test: poprawny PNG → PNG ≤ 512 px; SVG jako `.png` → `INVALID_LOGO`; 3 MB →
+- [x] Test: draft `local` bez współrzędnych → wynik + `missingCoordinates: true`, brak wyjątku
+- [x] Test: edycja telefonu → `changedByOwner` zawiera `phoneNumber`; niezmienione pole nie
+- [x] Test: FormData z każdym polem `''` → `null`, nie `0`; puste godziny → dzień pominięty
+- [x] Test: zły e-mail zgłaszającego → błąd pola z kluczem tłumaczenia
+- [x] Test: poprawny PNG → PNG ≤ 512 px; SVG jako `.png` → `INVALID_LOGO`; 3 MB →
   `LOGO_TOO_LARGE`
 - [ ] Weryfikacja: `npx jest src/lib/add-business/build-service-json.test.ts src/lib/add-business/owner-edits-schema.test.ts src/lib/add-business/logo.test.ts`
   przechodzi
@@ -160,19 +160,19 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 
 ### U7: Maile — `feature-builder-web-data` — M
 
-- [ ] Stwórz `src/lib/mailer.ts`: transport Gmail z `env`, `sendMail` z typowanym błędem
-- [ ] Modyfikuj `src/app/api/submit-contact-query/route.ts`: użycie `mailer.ts`, bez
+- [x] Stwórz `src/lib/mailer.ts`: transport Gmail z `env`, `sendMail` z typowanym błędem
+- [x] Modyfikuj `src/app/api/submit-contact-query/route.ts`: użycie `mailer.ts`, bez
   `String(error)` w odpowiedzi
-- [ ] Stwórz `src/lib/add-business/submission-emails.ts`:
+- [x] Stwórz `src/lib/add-business/submission-emails.ts`:
   - operator: plain text, sekcje, komenda dry-run, załączniki, `replyTo`;
   - właściciel: plain text w locale zgłoszenia.
-- [ ] Stwórz testy `src/lib/mailer.test.ts`, `src/lib/add-business/submission-emails.test.ts`
-- [ ] Test: mail operatora ma „Niepotwierdzone”, uwagi i 2 załączniki `<slug>.json` /
+- [x] Stwórz testy `src/lib/mailer.test.ts`, `src/lib/add-business/submission-emails.test.ts`
+- [x] Test: mail operatora ma „Niepotwierdzone”, uwagi i 2 załączniki `<slug>.json` /
   `<slug>.png`; JSON się parsuje
-- [ ] Test: nazwa z `\r\n` → temat bez nowych linii
-- [ ] Test: potwierdzenie `uk` z tekstem z `messages/uk.json`
-- [ ] Test: błąd transportu → typowany błąd bez surowego komunikatu
-- [ ] Test: trasa kontaktu działa po przejściu na `mailer.ts`
+- [x] Test: nazwa z `\r\n` → temat bez nowych linii
+- [x] Test: potwierdzenie `uk` z tekstem z `messages/uk.json`
+- [x] Test: błąd transportu → typowany błąd bez surowego komunikatu
+- [x] Test: trasa kontaktu działa po przejściu na `mailer.ts`
 - [ ] Weryfikacja: `npx jest src/lib/add-business/submission-emails.test.ts src/lib/mailer.test.ts`
   przechodzi
 - [ ] Weryfikacja: `npx tsc --noEmit` bez błędów

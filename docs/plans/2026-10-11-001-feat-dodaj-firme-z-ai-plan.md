@@ -327,7 +327,7 @@ sequenceDiagram
 
 ### Faza A — moduły serwerowe (`src/lib/add-business/`)
 
-- [ ] **Unit 1: Bezpieczne pobieranie strony (guard SSRF)**
+- [x] **Unit 1: Bezpieczne pobieranie strony (guard SSRF)**
 
 **Cel:** Pobrać HTML z linku podanego przez użytkownika tak, żeby nie dało się dotrzeć do
 zasobów wewnętrznych ani zawiesić funkcji.
@@ -383,7 +383,7 @@ zasobów wewnętrznych ani zawiesić funkcji.
 
 ---
 
-- [ ] **Unit 2: Ekstrakcja z HTML (tekst, JSON-LD, logo, link kontaktu, hosty social)**
+- [x] **Unit 2: Ekstrakcja z HTML (tekst, JSON-LD, logo, link kontaktu, hosty social)**
 
 **Cel:** Zamienić HTML na materiał dla LLM i na fakty strukturalne.
 
@@ -453,7 +453,7 @@ zasobów wewnętrznych ani zawiesić funkcji.
 
 ---
 
-- [ ] **Unit 3: Szkic z LLM + weryfikacja faktów**
+- [x] **Unit 3: Szkic z LLM + weryfikacja faktów**
 
 **Cel:** Z materiału strony (albo z tekstu właściciela) zbudować szkic wpisu: klasyfikacja,
 tagi, opisy w 4 językach oraz fakty, które przeszły weryfikację, z listą pól
@@ -528,7 +528,7 @@ klient, `OpenAI.APIError`).
 
 ---
 
-- [ ] **Unit 4: Geokodowanie (Nominatim z cache i throttlingiem)**
+- [x] **Unit 4: Geokodowanie (Nominatim z cache i throttlingiem)**
 
 **Cel:** Wyliczyć współrzędne dla `local`/`hybrid` zgodnie z polityką Nominatim i kontrolami z
 `/dodaj` faza 2.
@@ -573,7 +573,7 @@ klient, `OpenAI.APIError`).
 
 ---
 
-- [ ] **Unit 5: Draft w Redis, limity i wykrywanie duplikatów**
+- [x] **Unit 5: Draft w Redis, limity i wykrywanie duplikatów**
 
 **Cel:** Przechować szkic serwerowo (D2), wyegzekwować limity (D7) i znaleźć istniejący wpis
 po domenie (R7).
@@ -631,7 +631,7 @@ po domenie (R7).
 
 ---
 
-- [ ] **Unit 6: Złożenie wpisu JSON i obróbka logo**
+- [x] **Unit 6: Złożenie wpisu JSON i obróbka logo**
 
 **Cel:** Z draftu i edycji właściciela zbudować dokładnie to, co operator zapisze jako
 `data/services/<slug>.json`, oraz przygotować PNG logo.
@@ -701,7 +701,7 @@ po domenie (R7).
 
 ---
 
-- [ ] **Unit 7: Maile — wspólny transport, mail operatora, potwierdzenie właściciela**
+- [x] **Unit 7: Maile — wspólny transport, mail operatora, potwierdzenie właściciela**
 
 **Cel:** Wysłać oba maile z R13 i R15 przez istniejący kanał Gmail.
 
