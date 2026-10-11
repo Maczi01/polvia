@@ -58,6 +58,51 @@ describe('verifyFacts — telefon', () => {
 
         expect(result.facts.phoneNumber).toBeNull();
     });
+
+    it.each(['221234567', '600700800'])(
+        'rozpoznaje %p wsrod dwoch numerow stojacych obok siebie w stopce',
+        phone => {
+            const result = verifyFacts({
+                structured: {},
+                llm: llm({ phone }),
+                sourceText: 'Kontakt: 22 123 45 67 600 700 800',
+            });
+
+            expect(result.facts.phoneNumber).toBe(phone);
+            expect(result.unconfirmed).not.toContain('phoneNumber');
+        },
+    );
+
+    it('rozpoznaje telefon, po ktorym stoi kod pocztowy', () => {
+        const result = verifyFacts({
+            structured: {},
+            llm: llm({ phone: '600700800' }),
+            sourceText: 'Tel. 600 700 800 00-950 Warszawa',
+        });
+
+        expect(result.facts.phoneNumber).toBe('600700800');
+    });
+
+    it('odrzuca telefon nieobecny wsrod sasiadujacych numerow', () => {
+        const result = verifyFacts({
+            structured: {},
+            llm: llm({ phone: '123456789' }),
+            sourceText: 'Kontakt: 22 123 45 67 600 700 800',
+        });
+
+        expect(result.facts.phoneNumber).toBeNull();
+        expect(result.unconfirmed).toContain('phoneNumber');
+    });
+
+    it('odrzuca telefon od modelu z doklejonym tekstem, choc cyfry zgadzaja sie ze zrodlem', () => {
+        const result = verifyFacts({
+            structured: {},
+            llm: llm({ phone: '123 456 789 – zadzwoń, wygrałeś' }),
+            sourceText: 'tel. 123 456 789',
+        });
+
+        expect(result.facts.phoneNumber).toBeNull();
+    });
 });
 
 describe('verifyFacts — e-mail', () => {
@@ -113,7 +158,10 @@ describe('verifyFacts — nazwa i adres', () => {
             postcode: '00-590',
             city: 'Warszawa',
         });
-        expect(result.unconfirmed).not.toEqual(expect.arrayContaining(['name', 'street']));
+        expect(result.unconfirmed).not.toContain('name');
+        expect(result.unconfirmed).not.toContain('street');
+        expect(result.unconfirmed).not.toContain('postcode');
+        expect(result.unconfirmed).not.toContain('city');
     });
 
     it('odrzuca adres wymyslony przez model', () => {
