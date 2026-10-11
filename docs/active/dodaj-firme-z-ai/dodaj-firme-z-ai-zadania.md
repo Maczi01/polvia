@@ -301,11 +301,11 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 ## Do poprawy po review fazy B
 
 Raport: `review-faza-B.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 11 × P2, 37 × P3).
-Poprawki wykonane 2026-10-11 (commity `66413bc`, `f044f76`); token Mapbox czeka na decyzję usera.
+Poprawki wykonane 2026-10-11 (commity `66413bc`, `f044f76`); token Mapbox: decyzja usera — zostaje istniejący, przeniesiony do `src/lib/mapbox.ts`.
 
 - [x] 🟠 [important] **src/lib/add-business/submit-draft.ts:139-147** — sharp na uploadzie logo przed `consumeSubmitLimit` (jeden draftId = nielimitowane dekodowanie); `peekRateLimit(submitIpKey)` przed `processLogoUpload` + test
 - [x] 🟠 [important] **src/lib/add-business/submit-draft.ts:150-170 / src/lib/mailer.ts:67** — submit sekwencyjny, SMTP bez timeoutów; zawieszony Gmail po `consumeDraft` = zgłoszenie znika bez logu; geo ∥ logo (`Promise.all`), timeouty transportu ~10 s + test
-- [ ] 🟠 [important] **add-business/_components/business-card-preview/static-map-url.ts:9-10** — druga kopia tokenu Mapbox z obcego konta poza `env.ts`; DECYZJA USERA: własny `NEXT_PUBLIC_MAPBOX_TOKEN` w `env.ts`, jedna stała, fallback przy błędzie obrazka
+- [x] 🟠 [important] **add-business/_components/business-card-preview/static-map-url.ts:9-10** — druga kopia tokenu Mapbox z obcego konta poza `env.ts`; DECYZJA USERA: własny `NEXT_PUBLIC_MAPBOX_TOKEN` w `env.ts`, jedna stała, fallback przy błędzie obrazka — DECYZJA (2026-10-11): zostaje istniejący token; jedna stała w `src/lib/mapbox.ts` dla obu miejsc
 - [x] 🟠 [important] **manual-step.tsx:7-10, draft-editor.tsx:7, business-card-preview.tsx:10, draft-values.ts:1, opening-hours-fields.tsx:7, languages-field.tsx:6, generated-summary.tsx:6** — klient importuje stałe z modułów zod/`src/db` (schematy + `slugify` w bundlu, granica warstw); lekkie `src/lib/weekdays.ts` + `src/lib/add-business/form-limits.ts`
 - [x] 🟠 [important] **draft-editor.tsx:278-287 / add-business-flow.tsx:181** — logo > ~3 MB daje `INTERNAL` zamiast błędu pola (`bodySizeLimit`); walidacja `file.size` w kliencie + test
 - [x] 🟠 [important] **add-business-flow.tsx:175,181 / use-relocation.ts:52** — `.catch(() => null)` połyka błąd bez logu, stare `fieldErrors` zostają; logowanie + przejście `afterRejection` w `flow-state.ts` + `actionFailure('INTERNAL')`

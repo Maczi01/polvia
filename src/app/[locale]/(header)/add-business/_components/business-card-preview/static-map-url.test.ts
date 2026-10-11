@@ -1,4 +1,6 @@
-import { MAPBOX_PUBLIC_TOKEN, staticMapUrl } from './static-map-url';
+import { MAPBOX_PUBLIC_TOKEN } from '@/lib/mapbox';
+
+import { staticMapUrl } from './static-map-url';
 
 describe('staticMapUrl', () => {
     it('stawia pin i centruje kadr na wspolrzednych (kolejnosc lng,lat)', () => {

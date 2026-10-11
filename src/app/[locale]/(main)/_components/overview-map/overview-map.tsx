@@ -5,6 +5,7 @@ import { Coordinates, MarkerData, MarkerDataCluster, PartialService } from '@/ty
 import useSupercluster from 'use-supercluster';
 import { MarkerPopup } from '../marker-popup';
 import { useIsMobile } from '@/hooks/use-is-mobile';
+import { MAPBOX_PUBLIC_TOKEN } from '@/lib/mapbox';
 import { useTranslations } from 'next-intl';
 import { Globe } from 'lucide-react';
 import { ClusterPopup } from '../cluster-popup/cluster-popup';
@@ -469,8 +470,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     reuseMaps
                     initialViewState={initialViewState}
                     ref={mapRef}
-                    mapboxAccessToken="pk.eyJ1IjoiaGlqaWFuZ3RhbyIsImEiOiJjampxcjFnb3E2NTB5M3BvM253ZHV5YjhjIn0.WneUon5qFigfJRJ3oaZ3Ow
-"
+                    mapboxAccessToken={MAPBOX_PUBLIC_TOKEN}
                     style={{ width: '100%', height: '100%', overflow: 'visible'  }}
                     // mapStyle={mapTheme}
                     mapStyle="mapbox://styles/mapbox/streets-v12"

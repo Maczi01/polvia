@@ -1,13 +1,9 @@
 import type { DraftPin } from '@/lib/add-business/types';
+import { MAPBOX_PUBLIC_TOKEN } from '@/lib/mapbox';
 
 /**
  * Statyczny obraz Mapbox dla pinu podgladu (D10) — bez mapbox-gl w tym flow.
- *
- * Token: ten sam publiczny `pk.`, ktory `overview-map.tsx` ma wpisany na sztywno (nie ma
- * go w `env.ts`). Token publiczny z natury trafia do przegladarki.
  */
-export const MAPBOX_PUBLIC_TOKEN =
-    'pk.eyJ1IjoiaGlqaWFuZ3RhbyIsImEiOiJjampxcjFnb3E2NTB5M3BvM253ZHV5YjhjIn0.WneUon5qFigfJRJ3oaZ3Ow';
 
 const STYLE = 'mapbox/streets-v12';
 /** Kolor obramowania rozwinietej karty (`border-[#C52289]`), zeby pin pasowal do karty. */

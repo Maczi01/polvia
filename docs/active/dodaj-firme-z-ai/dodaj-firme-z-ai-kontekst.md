@@ -341,3 +341,9 @@ Token Mapbox czeka na decyzję usera.
 - `npx next lint`: 0 błędów.
 - Grepy czyste: brak `any`, `console.log`, `process.env`, `@/db/` w `_components`, `next/link`, `next/navigation`.
 - `npm run build`: OK. Dev server z głównego checkoutu działał, ale korzysta z innego `.next`.
+
+## Token Mapbox: decyzja usera (2026-10-11)
+User zdecydował: **zostaje istniejący publiczny token `pk.`**, bez zakładania własnego konta.
+- Token jest w jednym miejscu: `src/lib/mapbox.ts` (`MAPBOX_PUBLIC_TOKEN`). Korzystają z niego `overview-map.tsx` (`mapboxAccessToken`) i `static-map-url.ts`. Zamyka to P2 #3 z review B jako „decyzja: akceptowane”.
+- Oryginalny atrybut w `overview-map.tsx` miał w wartości znak nowej linii przed zamykającym cudzysłowem. Teraz idzie czysty token, ten sam, którego używa statyczna mapa.
+- Ryzyko zostaje świadomie: właściciel tokenu może go unieważnić, a wtedy przestaną działać mapa na `/mapa` i pin w podglądzie. Podmiana to teraz zmiana jednej stałej.
