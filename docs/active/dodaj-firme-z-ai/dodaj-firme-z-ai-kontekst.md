@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (Faza A ukończona)
+Ostatnia aktualizacja: 2026-10-11 (poprawki po review fazy A ukończone)
 
 ## Źródła
 
@@ -190,3 +190,41 @@ Ostatnia aktualizacja: 2026-10-11 (Faza A ukończona)
   - Kontrakty dla U8 do domknięcia przed fazą B: walidacja przy zapisie draftu, jeden schemat `BusinessDraft`, wspólny `TIME_PATTERN`/`WEEKDAY_KEYS`.
   - Budżet czasu 60 s jest ciaśniejszy niż w planie (podstrony sekwencyjnie, LLM 30 s). U8 potrzebuje jednego deadline'u.
   - `next.config.ts` `removeConsole` wycina na produkcji wszystkie logi, więc mitygacja `SEND_FAILED` z planu nie działa. Decyzja usera.
+
+## Poprawki po review Fazy A (2026-10-11)
+
+Decyzje usera: najpierw poprawki, potem Faza B; `removeConsole: { exclude: ['error','warn'] }`.
+Wykonanie: 4 subagenci `feature-builder-web-data` (3 równolegle na rozłącznych plikach, potem
+`verify-facts`), #14 inline.
+
+| Commit | Zakres | Najważniejsze |
+|---|---|---|
+| `5b0c286` | P2 #6, #7, #8, #13, P3 #17 | Jeden `businessDraftSchema` (typy przez `z.infer`). `saveDraft`/`updateDraftGeo` robią `parse` przy zapisie i rzucają `ZodError` (błąd programisty). Nowy `toDraftGeo(result, address)`. `TIME_PATTERN`, `WEEKDAY_KEYS`, `Weekday`, `openingHoursSchema`, `tagInputSchema` eksportowane z `service-input-schema.ts`. Nowe lekkie moduły `src/lib/coverage.ts`, `voivodeships.ts`, `service-status.ts`; `service-input-schema.ts` nie importuje już `./schema`. Wartości enumów bez zmian (bez `drizzle-kit push`). |
+| `6e4bd31` | P2 #1, #2 | `LOGO_MAX_INPUT_PIXELS = 4096²`, `failOn: 'error'`, jedna instancja sharp. `stripDelimiters` (eksport) usuwa ciągi `<{3,}`/`>{3,}`. |
+| `288658b` | P2 #3, #11, #12 | `checkRateLimit`: `MULTI SET NX EX + INCR + TTL`, samonaprawa przy `TTL -1`, `RateLimitStoreError`. `rateLimitSubject(ip)` (IPv6 → /64, IPv4-mapped → IPv4) tylko w kluczach `limits.ts`. `domainLikePatterns(host)` + `LIMIT 100`. Nowy `src/lib/queries.test.ts` (mock `@/db`, SQL renderowany przez `PgDialect`). |
+| `770b665` | P2 #4, #5, P3 #1, #28 | Granice słów Unicode, `MIN_TEXT_FACT_LENGTH = 3`, `verifyPostcode`. Telefon szukany w oknach grup cyfr (≤ 6 grup, ≤ 13 cyfr). Telefon z LLM ze znakami spoza `[\d\s()+.-]` odrzucony. |
+| `1640e9d` | P2 #14 | `removeConsole` z `exclude: ['error', 'warn']`. |
+
+**Odchylenia (zalogowane przez subagentów, zaakceptowane):**
+- Fixture `DRAFT` w `draft-store.test.ts` ma 3 tagi zamiast 1, bo jednolity schemat wymaga 3–5. Asercje bez zmian.
+- `rate-limit.test.ts` przepisany na `createFakeRedis`. Asercje na wywołania mocków (`expire` wywołany / niewywołany) zastąpione asercjami na stan klucza (TTL 60/40, licznik nietknięty po `peek`). Wartości oczekiwane bez zmian; orkiestrator sprawdził diff, osłabień brak.
+- `services/route.test.ts`: mock Redisa → fake z `multi`. `fake-redis.ts` ma `multi()` i synchroniczne komendy wewnętrzne.
+- `verify-facts-text.test.ts` wydzielony (limit 300 linii).
+- Telefon od LLM musi mieć dokładnie 9 cyfr krajowych; numery zagraniczne od LLM odrzucane (z JSON-LD przechodzą).
+- Wzorce parsowania godzin w `jsonld-facts.ts` (`SCHEMA_ORG_TIME_PATTERN`) i `verify-facts.ts` celowo zostały lokalne: parsują luźne wejście przed normalizacją.
+- `src/lib/service-status.ts`: moduł spoza zakresu, potrzebny, żeby `service-input-schema` nie importował `pg-core`.
+
+**Kontrakty dla U8 (zmienione):**
+- Geo do draftu wyłącznie przez `toDraftGeo(result, address)`.
+- Typ `Voivodeship` z `@/lib/voivodeships`; `geocode.ts` go już nie eksportuje.
+- `WEEKDAY_KEYS` z `@/db/service-input-schema`, nie z `draft-schema`.
+- `checkRateLimit` może rzucić `RateLimitStoreError` (jak wcześniej `redis.incr`).
+
+**Otwarte:**
+- P2 #9 (deadline 60 s) → U8; P2 #10 (pomiar LLM) → Operator checklist U9.
+- Globalny limit fetch (decyzja). `x-vercel-forwarded-for` jako twardsza alternatywa dla `x-forwarded-for` (decyzja).
+- P3 #13 (`queries.ts` importuje z folderu feature'a, teraz też `domainLikePatterns`), P3 #23 (`EMAIL_PATTERN`) i pozostałe P3.
+- Poza zakresem: `dashboard/_service-schema.ts` używa `*Enum.enumValues` z `@/db/schema`, więc wciąga `pg-core`.
+
+**Gate (2026-10-11):** `tsc` 0 błędów; `jest` 64 suity, 825/825 PASS; `next lint` 0 błędów;
+`npm run build` OK (env głównego checkoutu przez `@next/env`, bez `NODE_ENV`).

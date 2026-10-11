@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (Faza A ukończona)
+Ostatnia aktualizacja: 2026-10-11 (poprawki po review fazy A ukończone)
 
 Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-ai-plan.md`.
 
@@ -180,22 +180,23 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 ## Do poprawy po review fazy A
 
 Raport: `review-faza-A.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 14 × P2, 28 × P3).
+Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesione do U8/U9.
 
-- [ ] 🟠 [important] **src/lib/add-business/logo.ts:34-47** — sharp bez `limitInputPixels` (bomba dekompresyjna); limit 4096², jedna instancja, test z dużym wymiarem
-- [ ] 🟠 [important] **src/lib/add-business/llm-draft.ts:122-124** — `stripDelimiters` nieidempotentny (zagnieżdżony znacznik przeżywa); usuwać `<{3,}`/`>{3,}` lub nonce + test
-- [ ] 🟠 [important] **src/lib/rate-limit.ts:39-47 / limits.ts:35-46** — klucze od pełnego IPv6; normalizacja do /64, rozważyć globalny limit fetch, potwierdzić `x-forwarded-for` na Vercelu
-- [ ] 🟠 [important] **src/lib/add-business/verify-facts.ts:63-69** — `verifyText` po podciągu („Gdańsk” w „ul. Gdańska”); granice Unicode, postcode `^\d{2}-\d{3}$`, min. długość + testy
-- [ ] 🟠 [important] **src/lib/add-business/verify-facts.ts:28** — sklejanie sąsiednich liczb gubi prawdziwy telefon; okna grup cyfr 9–11 + 3 testy
-- [ ] 🟠 [important] **src/lib/add-business/draft-store.ts:154-191** — zapis bez walidacji vs strict odczyt (ciche `DRAFT_EXPIRED`); `parse` przy zapisie + `toDraftGeo()` z testem
-- [ ] 🟠 [important] **draft-store.ts:72-129 vs draft-schema.ts:40-80** — zduplikowany, luźniejszy schemat `BusinessDraft`; jeden schemat w `draft-schema.ts`, typ przez `z.infer`
-- [ ] 🟠 [important] **owner-edits-schema.ts:37, jsonld-facts.ts:35-44, draft-schema.ts:27-35** — `TIME_PATTERN`/dni w 4 miejscach; eksport z `src/db/service-input-schema.ts`
-- [ ] 🟠 [important] **src/lib/queries.ts:314-318** — `ILIKE %host%` + `LIMIT 20` gubi duplikat przy krótkim hoście; zakotwiczone wzorce, `normalizeHost` w funkcji, test > 20 kandydatów
-- [ ] 🟠 [important] **src/lib/rate-limit.ts:61-65** — `INCR`/`EXPIRE` nieatomowe (klucz globalny bez TTL = trwała blokada); `multi` + `EXPIRE NX` lub samonaprawa
-- [ ] 🟠 [important] **src/lib/add-business/draft-schema.ts:5** — import `coverageEnum` z `@/db/schema` ciągnie drizzle do potencjalnego bundla klienta; `COVERAGE_VALUES` w lekkim module
-- [ ] 🟠 [important] **next.config.ts:13** — `removeConsole` wycina `warn`/`error` na produkcji, mitygacja `SEND_FAILED` nie działa; `exclude: ['error','warn']` — DECYZJA USERA (config sprzed zadania)
-- [ ] 🟠 [important] **U8 (orkiestrator) / plan tabela ryzyk** — budżet 60 s: podstrony sekwencyjnie po stronie głównej (8+8 s, najgorzej ~55 s); jeden deadline, `timeoutMs` z pozostałego czasu, krótszy timeout fallbacków
-- [ ] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s blisko realnego czasu; zmierzyć p50/p95 w ręcznym przebiegu U9, ewentualnie przesunąć budżet / zwrot limitu IP przy timeoutcie
-- [ ] 🟡 [nit] 28 sugestii P3 — lista w `review-faza-A.md` (m.in. `verifyPhone` zwraca string LLM, rekurencja `flattenNodes`, `tel:`/`24:00` w JSON-LD, `normalizeHours({})`, ReDoS `EMAIL_PATTERN`, nesting > 2, testy graniczne i współbieżności)
+- [x] 🟠 [important] **src/lib/add-business/logo.ts:34-47** — sharp bez `limitInputPixels` (bomba dekompresyjna); limit 4096², jedna instancja, test z dużym wymiarem
+- [x] 🟠 [important] **src/lib/add-business/llm-draft.ts:122-124** — `stripDelimiters` nieidempotentny (zagnieżdżony znacznik przeżywa); usuwać `<{3,}`/`>{3,}` lub nonce + test
+- [x] 🟠 [important] **src/lib/rate-limit.ts:39-47 / limits.ts:35-46** — klucze od pełnego IPv6; normalizacja do /64 ✅; `x-forwarded-for` udokumentowane w `getClientIp`; globalny limit fetch NIE dodany (otwarte, decyzja)
+- [x] 🟠 [important] **src/lib/add-business/verify-facts.ts:63-69** — `verifyText` po podciągu („Gdańsk” w „ul. Gdańska”); granice Unicode, postcode `^\d{2}-\d{3}$`, min. długość + testy
+- [x] 🟠 [important] **src/lib/add-business/verify-facts.ts:28** — sklejanie sąsiednich liczb gubi prawdziwy telefon; okna grup cyfr 9–11 + 3 testy
+- [x] 🟠 [important] **src/lib/add-business/draft-store.ts:154-191** — zapis bez walidacji vs strict odczyt (ciche `DRAFT_EXPIRED`); `parse` przy zapisie + `toDraftGeo()` z testem
+- [x] 🟠 [important] **draft-store.ts:72-129 vs draft-schema.ts:40-80** — zduplikowany, luźniejszy schemat `BusinessDraft`; jeden schemat w `draft-schema.ts`, typ przez `z.infer`
+- [x] 🟠 [important] **owner-edits-schema.ts:37, jsonld-facts.ts:35-44, draft-schema.ts:27-35** — `TIME_PATTERN`/dni w 4 miejscach; eksport z `src/db/service-input-schema.ts`
+- [x] 🟠 [important] **src/lib/queries.ts:314-318** — `ILIKE %host%` + `LIMIT 20` gubi duplikat przy krótkim hoście; zakotwiczone wzorce, `normalizeHost` w funkcji, test > 20 kandydatów
+- [x] 🟠 [important] **src/lib/rate-limit.ts:61-65** — `INCR`/`EXPIRE` nieatomowe (klucz globalny bez TTL = trwała blokada); `MULTI SET NX EX + INCR + TTL` + samonaprawa
+- [x] 🟠 [important] **src/lib/add-business/draft-schema.ts:5** — import `coverageEnum` z `@/db/schema` ciągnie drizzle do potencjalnego bundla klienta; `COVERAGE_VALUES` w lekkim module
+- [x] 🟠 [important] **next.config.ts:13** — `removeConsole` wycina `warn`/`error` na produkcji; `exclude: ['error','warn']` (decyzja usera 2026-10-11)
+- [ ] 🟠 [important] **U8 (orkiestrator) / plan tabela ryzyk** — budżet 60 s → przeniesione do U8 (zadanie „jeden deadline” niżej)
+- [ ] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s → przeniesione do Operator checklist U9 (pomiar p50/p95)
+- [ ] 🟡 [nit] 28 sugestii P3 — lista w `review-faza-A.md`. Zrobione przy okazji: #1, #17, #28. Otwarte m.in.: #13 (`queries.ts` → `domain-match`), #23 (`EMAIL_PATTERN`), rekurencja `flattenNodes`, `tel:`/`24:00` w JSON-LD, `normalizeHours({})`, nesting > 2, testy graniczne i współbieżności
 
 ## Faza B — akcje, strona, wejście
 
@@ -217,6 +218,9 @@ Raport: `review-faza-A.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1
 - [ ] Stwórz `src/app/[locale]/(header)/add-business/_actions.ts`: cienkie akcje (IP z
   `headers()`, locale, FormData), bez `revalidatePath`
 - [ ] Modyfikuj `next.config.ts`: `experimental.serverActions.bodySizeLimit: '3mb'`
+- [ ] (review A P2 #9) Jeden deadline na generowanie: `timeoutMs` fetchy z pozostałego czasu,
+  krótszy timeout fallbacków `/kontakt`/`/contact`, pominięcie podstron przy braku budżetu
+- [ ] Zapis geokodowania do draftu przez `toDraftGeo(result, address)`, nie `{ ...result, address }`
 - [ ] Stwórz testy `generate-draft.test.ts`, `submit-draft.test.ts`
 - [ ] Test: Instagram → `needsManual('SOCIAL_LINK')`; zero wywołań fetch, LLM i limitu gen
 - [ ] Test: domena istniejącego wpisu → `duplicate` z URL; dla `ru` URL nie zaczyna się od
@@ -273,6 +277,8 @@ Raport: `review-faza-A.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1
   desktop i 390 px
 - [ ] [Manual] Pełny flow: strona z JSON-LD → podgląd → edycja telefonu → submit → oba maile
   dotarły. Plik z załącznika przechodzi `npm run db:add -- <plik> --dry-run`.
+- [ ] [Manual] (review A P2 #10) Czas LLM p50/p95 na 5–10 stronach; przy p95 > 25 s przesunąć
+  budżet / zwrot limitu IP przy timeoutcie
 - [ ] [Manual] Link Instagram → tryb ręczny → submit
 - [ ] [Manual] Domena istniejącego wpisu → komunikat duplikatu z działającym linkiem
 - [ ] [Manual] `pl` i `uk`: brak brakujących kluczy, brak błędów konsoli; ścieżki
