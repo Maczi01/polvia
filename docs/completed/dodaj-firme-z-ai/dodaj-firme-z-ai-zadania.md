@@ -194,8 +194,8 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [x] 🟠 [important] **src/lib/rate-limit.ts:61-65** — `INCR`/`EXPIRE` nieatomowe (klucz globalny bez TTL = trwała blokada); `MULTI SET NX EX + INCR + TTL` + samonaprawa
 - [x] 🟠 [important] **src/lib/add-business/draft-schema.ts:5** — import `coverageEnum` z `@/db/schema` ciągnie drizzle do potencjalnego bundla klienta; `COVERAGE_VALUES` w lekkim module
 - [x] 🟠 [important] **next.config.ts:13** — `removeConsole` wycina `warn`/`error` na produkcji; `exclude: ['error','warn']` (decyzja usera 2026-10-11)
-- [ ] 🟠 [important] **U8 (orkiestrator) / plan tabela ryzyk** — budżet 60 s → przeniesione do U8 (zadanie „jeden deadline” niżej)
-- [ ] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s → przeniesione do Operator checklist U9 (pomiar p50/p95)
+- [x] 🟠 [important] **U8 (orkiestrator) / plan tabela ryzyk** — budżet 60 s → przeniesione do U8 (zadanie „jeden deadline” niżej)
+- [x] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s → przeniesione do Operator checklist U9 (pomiar p50/p95)
 - [ ] 🟡 [nit] 28 sugestii P3 — lista w `review-faza-A.md`. Zrobione przy okazji: #1, #17, #28. Otwarte m.in.: #13 (`queries.ts` → `domain-match`), #23 (`EMAIL_PATTERN`), rekurencja `flattenNodes`, `tel:`/`24:00` w JSON-LD, `normalizeHours({})`, nesting > 2, testy graniczne i współbieżności
 
 ## Faza B — akcje, strona, wejście ✅
@@ -318,8 +318,8 @@ Poprawki wykonane 2026-10-11 (commity `66413bc`, `f044f76`); token Mapbox: decyz
 
 ## Quality gate (przed PR)
 
-- [ ] Weryfikacja: `npx tsc --noEmit` — zero błędów
-- [ ] Weryfikacja: `npx jest` — wszystkie testy przechodzą
-- [ ] Weryfikacja: `npx next lint` — zero błędów
-- [ ] Weryfikacja: grep — brak nowych `any`, `console.log`, `process.env` w
+- [x] Weryfikacja: `npx tsc --noEmit` — zero błędów
+- [x] Weryfikacja: `npx jest` — wszystkie testy przechodzą
+- [x] Weryfikacja: `npx next lint` — zero błędów
+- [x] Weryfikacja: grep — brak nowych `any`, `console.log`, `process.env` w
   `src/lib/add-business/**` i `src/app/[locale]/(header)/add-business/**`
