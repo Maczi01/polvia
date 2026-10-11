@@ -1,4 +1,4 @@
-import { splitServicesByCoverage } from '@/lib/service-coverage';
+import { matchesServiceLocation, splitServicesByCoverage } from '@/lib/service-coverage';
 import type { Coverage, PartialService } from '@/types';
 
 let counter = 0;
@@ -368,5 +368,45 @@ describe('splitServicesByCoverage', () => {
 
         expect(localResults).toHaveLength(0);
         expect(onlineResults).toHaveLength(0);
+    });
+});
+
+// Predykat jest eksportowany, bo poza lista uzywa go mapa — piny musza mowic o tym
+// samym miejscu co wyniki. Dlatego ma wlasne badania, nie tylko przez kubelkowanie.
+describe('matchesServiceLocation', () => {
+    it('bez filtra geograficznego przepuszcza kazdy wpis', () => {
+        const wroclaw = service({ city: 'Wroclaw', voivodeship: 'dolnoslaskie' });
+
+        expect(matchesServiceLocation(wroclaw, { county: null, city: null })).toBe(true);
+    });
+
+    it('filtr wojewodztwa odrzuca wpis z innego wojewodztwa', () => {
+        const wroclaw = service({ city: 'Wroclaw', voivodeship: 'dolnoslaskie' });
+
+        expect(matchesServiceLocation(wroclaw, { county: 'podlaskie', city: null })).toBe(false);
+        expect(matchesServiceLocation(wroclaw, { county: 'dolnoslaskie', city: null })).toBe(true);
+    });
+
+    it('miasto ma priorytet nad wojewodztwem', () => {
+        const gdynia = service({ city: 'Gdynia', voivodeship: 'pomorskie' });
+
+        // Wojewodztwo sie zgadza, miasto nie — wpis odpada.
+        expect(matchesServiceLocation(gdynia, { county: 'pomorskie', city: 'Gdansk' })).toBe(false);
+    });
+
+    it('nie patrzy na wielkosc liter', () => {
+        const bialystok = service({ city: 'Bialystok', voivodeship: 'podlaskie' });
+
+        expect(matchesServiceLocation(bialystok, { county: 'PODLASKIE', city: null })).toBe(true);
+        expect(matchesServiceLocation(bialystok, { county: null, city: 'bialystok' })).toBe(true);
+    });
+
+    // Wpis w pelni zdalny moze nie miec adresu wcale. Przy aktywnym filtrze miejsca
+    // nie ma czym dowiesc, ze tam jest — wiec odpada, zamiast przechodzic po cichu.
+    it('wpis bez adresu odpada przy aktywnym filtrze miejsca', () => {
+        const bezAdresu = service({ coverage: 'online', city: null, voivodeship: null });
+
+        expect(matchesServiceLocation(bezAdresu, { county: 'podlaskie', city: null })).toBe(false);
+        expect(matchesServiceLocation(bezAdresu, { county: null, city: null })).toBe(true);
     });
 });
