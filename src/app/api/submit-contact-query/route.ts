@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
 import { env } from '../../../../env';
 import { redis } from '@/lib/redis';
 import { getClientIp } from '@/lib/rate-limit';
 import { getTranslations } from 'next-intl/server';
 import { serviceName } from '@/lib/consts';
+import { sendMail } from '@/lib/mailer';
 
 const ContactFormSchema = z.object({
     email: z.string().email('Please enter a valid email address').max(100),
@@ -68,29 +68,24 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { email, topic, message } = ContactFormSchema.parse(body);
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: env.MY_GMAIL,
-            pass: env.MY_GMAIL_PASSWORD
-        },
+    const sent = await sendMail({
+        to: env.MY_GMAIL,
+        replyTo: email,
+        subject: `Nowa wiadomość z serwisu ${serviceName}: ${topic}`,
+        text: message,
     });
 
-    try {
-        await transporter.sendMail({
-            from: env.MY_GMAIL,
-            to: env.MY_GMAIL,
-            replyTo: email,
-            subject: `Nowa wiadomość z serwisu ${serviceName}: ${topic}`,
-            text: message,
-        });
-        await incrementContactRateLimit(ip);
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        console.error('Mail error:', error);
+    // Szczegoly bledu transportu loguje `mailer.ts`; klient dostaje tylko kod i komunikat.
+    // `success`/`message` zostaja dla `contact-form.tsx`, ktory czyta wlasnie te pola.
+    if (!sent.ok) {
+        const failure = t('sendFailed');
         return NextResponse.json(
-            { success: false, message: String(error) },
-            { status: 500 }
-        );    }
+            { success: false, message: failure, error: { code: sent.code, message: failure } },
+            { status: 500 },
+        );
+    }
+
+    await incrementContactRateLimit(ip);
+
+    return NextResponse.json({ success: true, data: null });
 }

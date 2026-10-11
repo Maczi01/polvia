@@ -457,7 +457,8 @@
     "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem"
   },
   "contact": {
-    "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej."
+    "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej.",
+    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później."
   },
   "images": {
     "logo": "Logo Polvia - katalog ukraińskich firm w Polsce",
@@ -604,5 +605,40 @@
     "mapDescription": "Adres, który otworzyłeś, nie odpowiada żadnej kategorii ani lokalizacji na mapie.",
     "backToMap": "Przejdź do mapy",
     "backHome": "Strona główna"
+  },
+  "addBusiness": {
+    "confirmationEmail": {
+      "subject": "Otrzymaliśmy zgłoszenie firmy {name}",
+      "greeting": "Dzień dobry,",
+      "intro": "dziękujemy za zgłoszenie firmy {name} do katalogu Polvia.",
+      "factsHeading": "Dane, które otrzymaliśmy:",
+      "fields": {
+        "name": "Nazwa",
+        "address": "Adres",
+        "phone": "Telefon",
+        "email": "E-mail",
+        "webpage": "Strona internetowa",
+        "openingHours": "Godziny otwarcia",
+        "languages": "Języki obsługi"
+      },
+      "days": {
+        "monday": "poniedziałek",
+        "tuesday": "wtorek",
+        "wednesday": "środa",
+        "thursday": "czwartek",
+        "friday": "piątek",
+        "saturday": "sobota",
+        "sunday": "niedziela"
+      },
+      "languages": {
+        "pl": "polski",
+        "uk": "ukraiński",
+        "en": "angielski",
+        "ru": "rosyjski"
+      },
+      "review": "Wpis pojawi się w katalogu po weryfikacji przez nasz zespół. Jeśli będziemy mieć pytania, napiszemy na ten adres.",
+      "correction": "Jeśli coś się nie zgadza, po prostu odpowiedz na tę wiadomość.",
+      "signature": "Zespół Polvia"
+    }
   }
 }

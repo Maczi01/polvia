@@ -456,7 +456,8 @@
     "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address"
   },
   "contact": {
-    "rateLimitExceeded": "Message limit exceeded. Please try again later."
+    "rateLimitExceeded": "Message limit exceeded. Please try again later.",
+    "sendFailed": "We could not send your message. Please try again later."
   },
   "images": {
     "logo": "Polvia - Ukrainian Business Directory Poland",
@@ -603,5 +604,40 @@
     "mapDescription": "The address you opened does not match any category or location on the map.",
     "backToMap": "Go to the map",
     "backHome": "Home page"
+  },
+  "addBusiness": {
+    "confirmationEmail": {
+      "subject": "We have received your submission: {name}",
+      "greeting": "Hello,",
+      "intro": "thank you for submitting {name} to the Polvia directory.",
+      "factsHeading": "Details we received:",
+      "fields": {
+        "name": "Name",
+        "address": "Address",
+        "phone": "Phone",
+        "email": "Email",
+        "webpage": "Website",
+        "openingHours": "Opening hours",
+        "languages": "Service languages"
+      },
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      },
+      "languages": {
+        "pl": "Polish",
+        "uk": "Ukrainian",
+        "en": "English",
+        "ru": "Russian"
+      },
+      "review": "The listing will appear in the directory after our team has reviewed it. If we have any questions, we will write to this address.",
+      "correction": "If anything is incorrect, simply reply to this message.",
+      "signature": "The Polvia team"
+    }
   }
 }
