@@ -3,6 +3,7 @@ import 'server-only';
 import {
     checkRateLimit,
     peekRateLimit,
+    rateLimitSubject,
     type RateLimitOptions,
     type RateLimitResult,
 } from '@/lib/rate-limit';
@@ -30,18 +31,23 @@ export const SUBMISSIONS_PER_IP = 2;
 
 const KEY_PREFIX = 'add-business';
 
+/**
+ * Klucze per klient licza po `rateLimitSubject`: caly IPv6 /64 to jeden klient.
+ * Inaczej abonent z jedna siecia /64 omijalby limity fetch/submit, a kilkanascie
+ * jego adresow wyczerpaloby `gen:global` dla wszystkich.
+ */
 export const GENERATION_GLOBAL_KEY = `${KEY_PREFIX}:gen:global`;
 
 export function generationIpKey(ip: string): string {
-    return `${KEY_PREFIX}:gen:${ip}`;
+    return `${KEY_PREFIX}:gen:${rateLimitSubject(ip)}`;
 }
 
 export function fetchIpKey(ip: string): string {
-    return `${KEY_PREFIX}:fetch:${ip}`;
+    return `${KEY_PREFIX}:fetch:${rateLimitSubject(ip)}`;
 }
 
 export function submitIpKey(ip: string): string {
-    return `${KEY_PREFIX}:submit:${ip}`;
+    return `${KEY_PREFIX}:submit:${rateLimitSubject(ip)}`;
 }
 
 function ipGenerationOptions(ip: string): RateLimitOptions {

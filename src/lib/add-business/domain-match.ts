@@ -3,8 +3,8 @@ import { normalizeHost } from '@/lib/add-business/link-kind';
 /**
  * Dopasowanie wpisu katalogu po domenie strony (R7) — czesc bez bazy.
  *
- * `findServiceByDomain` zaweza kandydatow w SQL przez `ILIKE '%host%'`, ale to tylko
- * filtr wstepny: `abc.pl` pasuje tez do `xabc.pl` i do `abc.pl.example.com`.
+ * `findServiceByDomain` zaweza kandydatow w SQL wzorcami z `domainLikePatterns`, ale to
+ * tylko filtr wstepny: `abc.pl` pasuje tez do `abc.pl.example.com` i `abc.plus.pl`.
  * Rozstrzyga dokladne porownanie znormalizowanych hostow tutaj.
  */
 
@@ -13,6 +13,22 @@ const SCHEME = /^[a-z][a-z\d+.-]*:\/\//i;
 /** Escapuje znaki specjalne `LIKE` (domyslny znak ucieczki Postgresa to `\`). */
 export function escapeLikePattern(value: string): string {
     return value.replaceAll(/[\\%_]/g, character => `\\${character}`);
+}
+
+/**
+ * Wzorce `ILIKE` zakotwiczone na poczatku hosta w kolumnie `webpage`: po `://` albo
+ * na poczatku wartosci (starsze wiersze bez schematu), z `www.` i bez. Niezakotwiczone
+ * `%host%` lapalo kazdy adres zawierajacy krotki host (`art.pl` w `smart.pl`), a nadmiar
+ * kandydatow mogl wypchnac prawdziwy duplikat za `LIMIT`. Host jest normalizowany
+ * tutaj, bo wolajacy moze podac go z `www.` albo wielkimi literami.
+ * Pusty host → brak wzorcow.
+ */
+export function domainLikePatterns(host: string): string[] {
+    const normalized = normalizeHost(host.trim());
+    if (normalized === '') return [];
+
+    const escaped = escapeLikePattern(normalized);
+    return [`%://${escaped}%`, `%://www.${escaped}%`, `${escaped}%`, `www.${escaped}%`];
 }
 
 /**

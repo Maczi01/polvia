@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 // jsdom nie ma `URL.canParse`.
-import { escapeLikePattern, hostOfWebpage, pickByHost } from './domain-match';
+import { domainLikePatterns, escapeLikePattern, hostOfWebpage, pickByHost } from './domain-match';
 
 describe('escapeLikePattern', () => {
     it('escapuje %, _ i backslash', () => {
@@ -11,6 +11,29 @@ describe('escapeLikePattern', () => {
 
     it('zwykly host zostawia bez zmian', () => {
         expect(escapeLikePattern('kancelaria-test.pl')).toBe('kancelaria-test.pl');
+    });
+});
+
+describe('domainLikePatterns', () => {
+    it('zakotwicza host po schemacie i na poczatku wartosci, z www i bez', () => {
+        expect(domainLikePatterns('art.pl')).toEqual([
+            '%://art.pl%',
+            '%://www.art.pl%',
+            'art.pl%',
+            'www.art.pl%',
+        ]);
+    });
+
+    it('normalizuje host: wielkie litery, www. i biale znaki', () => {
+        expect(domainLikePatterns('  WWW.Art.PL ')).toEqual(domainLikePatterns('art.pl'));
+    });
+
+    it('escapuje znaki specjalne LIKE w hoscie', () => {
+        expect(domainLikePatterns('a_b.pl')[0]).toBe(String.raw`%://a\_b.pl%`);
+    });
+
+    it('dla pustego hosta nie daje wzorcow', () => {
+        expect(domainLikePatterns('www.')).toEqual([]);
     });
 });
 

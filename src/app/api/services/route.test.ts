@@ -4,14 +4,19 @@
 // NextRequest wymaga fetch API, ktorego jsdom nie ma.
 import { NextRequest } from 'next/server';
 
-import { redis } from '@/lib/redis';
 import { searchServicesSemantic } from '@/lib/semantic-search';
 
+import { createFakeRedis } from '../../../../tests/fixtures/add-business/fake-redis';
 import { GET } from './route';
 
+const mockRedis = createFakeRedis();
+
 // Redis i OpenAI (za `searchServicesSemantic`) to zewnetrzne serwisy.
+// Getter, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje `mockRedis`.
 jest.mock('@/lib/redis', () => ({
-    redis: { incr: jest.fn(), expire: jest.fn(), ttl: jest.fn() },
+    get redis() {
+        return mockRedis;
+    },
 }));
 jest.mock('@/lib/semantic-search', () => ({
     DEFAULT_SEMANTIC_LIMIT: 3,
@@ -25,8 +30,7 @@ function request(query: string): NextRequest {
 }
 
 beforeEach(() => {
-    jest.mocked(redis.incr).mockResolvedValue(1);
-    jest.mocked(redis.expire).mockResolvedValue(1);
+    mockRedis.reset();
 });
 
 describe('GET /api/services', () => {

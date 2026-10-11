@@ -4,6 +4,7 @@ import {
     consumeFetchLimit,
     consumeGenerationLimit,
     consumeSubmitLimit,
+    fetchIpKey,
     GENERATION_GLOBAL_KEY,
     GENERATIONS_GLOBAL,
     generationIpKey,
@@ -111,5 +112,39 @@ describe('consumeFetchLimit i consumeSubmitLimit', () => {
 
         expect(await consumeSubmitLimit(IP)).toMatchObject({ allowed: false });
         expect(await consumeSubmitLimit(OTHER_IP)).toMatchObject({ allowed: true });
+    });
+});
+
+describe('klucze po sieci IPv6 /64', () => {
+    const SAME_SUBNET_A = '2001:db8:1:2::a';
+    const SAME_SUBNET_B = '2001:db8:1:2:ffff:ffff:ffff:ffff';
+
+    it('adresy z jednej sieci /64 maja wspolny klucz', () => {
+        expect(fetchIpKey(SAME_SUBNET_A)).toBe(fetchIpKey(SAME_SUBNET_B));
+        expect(generationIpKey(SAME_SUBNET_A)).toBe('add-business:gen:2001:db8:1:2::/64');
+    });
+
+    it('rotacja adresu w obrebie /64 nie omija limitu fetch', async () => {
+        for (let attempt = 0; attempt < 6; attempt += 1) {
+            await consumeFetchLimit(`2001:db8:1:2::${attempt + 1}`);
+        }
+
+        expect(await consumeFetchLimit(SAME_SUBNET_B)).toMatchObject({ allowed: false });
+        expect(await consumeFetchLimit('2001:db8:1:3::1')).toMatchObject({ allowed: true });
+    });
+
+    it('rotacja adresu w obrebie /64 nie wypala puli globalnej', async () => {
+        for (let suffix = 1; suffix <= 10; suffix += 1) {
+            await consumeGenerationLimit(`2001:db8:1:2::${suffix}`);
+        }
+
+        expect(await mockRedis.get(GENERATION_GLOBAL_KEY)).toBe('2');
+    });
+
+    it('IPv4 zmapowany w IPv6 dzieli licznik z czystym IPv4', async () => {
+        await consumeSubmitLimit(IP);
+        await consumeSubmitLimit(`::ffff:${IP}`);
+
+        expect(await consumeSubmitLimit(IP)).toMatchObject({ allowed: false });
     });
 });
