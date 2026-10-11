@@ -208,7 +208,7 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [x] Stwórz `src/lib/add-business/types.ts`: unie wyników `generateDraft`, `relocate`,
   `submitDraft`
 - [x] Stwórz `src/lib/add-business/generate-draft.ts`:
-  - kolejność social → duplikat → `peek` → limit fetch → fetch strony + ≤ 2 podstron → LLM →
+  - kolejność social → `peek` → limit fetch → duplikat → fetch strony + ≤ 2 podstron → LLM →
     verify → geocode → save;
   - tryb ręczny.
 - [x] Stwórz `src/lib/add-business/submit-draft.ts`:
@@ -231,10 +231,10 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [x] Test: `submitDraft` z wygasłym draftem → `DRAFT_EXPIRED`, bez maila
 - [x] Test: sfałszowana `category` w FormData → kategoria z draftu
 - [x] Test: mail operatora pada → `SEND_FAILED` + log z JSON; potwierdzenie pada → `sent`
-- [ ] Weryfikacja: `npx jest src/lib/add-business/generate-draft.test.ts src/lib/add-business/submit-draft.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/generate-draft.test.ts src/lib/add-business/submit-draft.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
-- [ ] Weryfikacja: grep — `add-business/_actions.ts` bez `process.env` i `console.log`
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: grep — `add-business/_actions.ts` bez `process.env` i `console.log`
 
 ### U9: Strona i komponenty UI — `feature-builder-web-ui` — XL
 
@@ -266,11 +266,11 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [x] Test: `draft-editor` → brak kontrolki kategorii; błąd e-maila przez `aria-describedby`
 - [x] Test: `link-step` → pusty/niepoprawny URL daje komunikat bez wywołania akcji
 - [x] Test: `submitted-state` → nazwa firmy i tekst o mailu potwierdzającym
-- [ ] Weryfikacja: `npx jest "src/app/\[locale\]/(header)/add-business"` przechodzi (z
+- [x] Weryfikacja: `npx jest "src/app/\[locale\]/\(header\)/add-business"` przechodzi (z
   jest-axe)
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów; `npx next lint` bez nowych błędów
-- [ ] Weryfikacja: grep — każdy klucz `addBusiness.*` w 4 plikach `messages/*.json`
-- [ ] Weryfikacja: grep — brak `next/link` / `next/navigation` w `add-business/**`
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów; `npx next lint` bez nowych błędów
+- [x] Weryfikacja: grep — każdy klucz `addBusiness.*` w 4 plikach `messages/*.json`
+- [x] Weryfikacja: grep — brak `next/link` / `next/navigation` w `add-business/**`
 
 **Operator checklist (brak `.env.e2e`; flow woła płatne OpenAI i wysyła prawdziwe maile):**
 - [ ] [Manual] Porównanie podglądu z prawdziwą kartą na `/mapa` (pozycja logo, paddingi),
@@ -292,11 +292,28 @@ Poprawki wykonane 2026-10-11 (commity `5b0c286`..`1640e9d`); #9 i #10 przeniesio
 - [x] Modyfikuj `src/app/[locale]/(header)/contact/page.tsx`: CTA pod `<ContactForm />`
 - [x] Modyfikuj `messages/{pl,en,ru,uk}.json`: tekst CTA
 - [x] Test: link „Dodaj firmę z AI” wskazuje `/add-business`; jest-axe bez naruszeń
-- [ ] Weryfikacja: `npx jest "src/app/\[locale\]/(header)/contact"` przechodzi
-- [ ] Weryfikacja: grep — klucz CTA w 4 plikach `messages/*.json`
+- [x] Weryfikacja: `npx jest "src/app/\[locale\]/\(header\)/contact"` przechodzi
+- [x] Weryfikacja: grep — klucz CTA w 4 plikach `messages/*.json`
 
 **Operator checklist:**
 - [ ] [Manual] `/kontakt` → klik → `/dodaj-firme`; `/uk/contact` → `/uk/add-business`
+
+## Do poprawy po review fazy B
+
+Raport: `review-faza-B.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 11 × P2, 37 × P3).
+
+- [ ] 🟠 [important] **src/lib/add-business/submit-draft.ts:139-147** — sharp na uploadzie logo przed `consumeSubmitLimit` (jeden draftId = nielimitowane dekodowanie); `peekRateLimit(submitIpKey)` przed `processLogoUpload` + test
+- [ ] 🟠 [important] **src/lib/add-business/submit-draft.ts:150-170 / src/lib/mailer.ts:67** — submit sekwencyjny, SMTP bez timeoutów; zawieszony Gmail po `consumeDraft` = zgłoszenie znika bez logu; geo ∥ logo (`Promise.all`), timeouty transportu ~10 s + test
+- [ ] 🟠 [important] **add-business/_components/business-card-preview/static-map-url.ts:9-10** — druga kopia tokenu Mapbox z obcego konta poza `env.ts`; DECYZJA USERA: własny `NEXT_PUBLIC_MAPBOX_TOKEN` w `env.ts`, jedna stała, fallback przy błędzie obrazka
+- [ ] 🟠 [important] **manual-step.tsx:7-10, draft-editor.tsx:7, business-card-preview.tsx:10, draft-values.ts:1, opening-hours-fields.tsx:7, languages-field.tsx:6, generated-summary.tsx:6** — klient importuje stałe z modułów zod/`src/db` (schematy + `slugify` w bundlu, granica warstw); lekkie `src/lib/weekdays.ts` + `src/lib/add-business/form-limits.ts`
+- [ ] 🟠 [important] **draft-editor.tsx:278-287 / add-business-flow.tsx:181** — logo > ~3 MB daje `INTERNAL` zamiast błędu pola (`bodySizeLimit`); walidacja `file.size` w kliencie + test
+- [ ] 🟠 [important] **add-business-flow.tsx:175,181 / use-relocation.ts:52** — `.catch(() => null)` połyka błąd bez logu, stare `fieldErrors` zostają; logowanie + przejście `afterRejection` w `flow-state.ts` + `actionFailure('INTERNAL')`
+- [ ] 🟠 [important] **generate-draft.ts:91-96,169 / types.ts:155-158** — martwe `url`/`duplicateUrl` w wyniku `duplicate` (UI używa `slug`); usunąć, asercję „ru ≠ /en” przenieść do testu `DuplicateNotice`
+- [ ] 🟠 [important] **generate-draft.ts:163-164,182-183,192-193** — brak testów gałęzi limitów: consume gen po fetchu (wyścig), wyczerpany fetch, global przy wolnym IP, tryb ręczny przy limicie
+- [ ] 🟠 [important] **draft-geo.ts / submit-draft.ts:70-85 / relocate-draft.ts** — brak testów porażki geokodera (NOT_FOUND przy generowaniu, re-geokodowanie przy `geo:null`, RATE_LIMITED przy submit → `missingCoordinates`, relocate → `GEOCODE_UNAVAILABLE`)
+- [ ] 🟠 [important] **src/lib/add-business/manual-input-schema.ts** — brak własnego testu (tooLong, same spacje, zły e-mail/link, brak name/city, File w polu tekstowym)
+- [ ] 🟠 [important] **src/lib/add-business/page-sources.ts** — brak własnego testu ścieżek błędów `readPageSource` (HtmlExtractError, timeout < minimum, odrzucona podstrona, priorytet JSON-LD, `combine`)
+- [ ] 🟡 [nit] 37 sugestii P3 — lista w `review-faza-B.md`. Zrobione w trakcie review: #37 (wzorzec jest w checklistach, kolejność w `zadania.md`). Warte uwagi: #13 (podwójny submit nadpisuje `submitted`), #16 (`limited` z submitu porzuca edytor), #17 (`SEND_FAILED` sugeruje ponowienie przy zużytym szkicu), #19 (tryb ręczny bez sprawdzenia duplikatu), #4 (wszystkie 4 opisy w mailu operatora)
 
 ## Quality gate (przed PR)
 

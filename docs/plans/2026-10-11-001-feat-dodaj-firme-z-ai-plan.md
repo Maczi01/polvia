@@ -924,7 +924,7 @@ duplikat i limit.
   `/dodaj-firme`, uk `/uk/add-business`.
 
 **Weryfikacja:**
-- `npx jest "src/app/\[locale\]/(header)/add-business"` przechodzi, włącznie z asercjami
+- `npx jest "src/app/\[locale\]/\(header\)/add-business"` przechodzi, włącznie z asercjami
   jest-axe.
 - `npx tsc --noEmit` bez błędów; `npx next lint` bez nowych błędów.
 - grep: każdy klucz `addBusiness.*` istnieje we wszystkich 4 plikach `messages/*.json`.
@@ -970,7 +970,7 @@ duplikat i limit.
 - [Manual] `/kontakt` → klik → `/dodaj-firme`. `/uk/contact` → `/uk/add-business`.
 
 **Weryfikacja:**
-- `npx jest "src/app/\[locale\]/(header)/contact"` przechodzi.
+- `npx jest "src/app/\[locale\]/\(header\)/contact"` przechodzi.
 - grep: klucz CTA obecny w 4 plikach `messages/*.json`.
 
 ## Wpływ systemowy

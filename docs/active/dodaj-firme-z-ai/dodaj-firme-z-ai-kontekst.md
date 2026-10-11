@@ -2,7 +2,7 @@
 
 Branch: `feature/dodaj-firme-z-ai`
 Worktree: `C:\Users\mateu\WebstormProjects\polvia-dodaj-firme-ai`
-Ostatnia aktualizacja: 2026-10-11 (Faza B ukończona)
+Ostatnia aktualizacja: 2026-10-11 (review Fazy B)
 
 ## Źródła
 
@@ -265,3 +265,32 @@ Wykonanie: 4 subagenci `feature-builder-web-data` (3 równolegle na rozłącznyc
 - `npx next lint`: 0 błędów (warningi `no-undef` jest i istniejące wcześniej)
 - grep: zero `any`, `console.log`, `process.env` w `src/lib/add-business/**` i `add-business/**`; zero `next/link` / `next/navigation`
 - `npm run build`: OK; `/[locale]/add-business` prerenderowane dla 4 locale
+
+## Review Fazy B (2026-10-11)
+Raport: `review-faza-B.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami. Wynik: 0 × P1, 11 × P2, 37 × P3.
+Reviewerzy: security, performance, architektura/TS, scenariusze. E2E pominięte, bo
+wszystkie scenariusze przeglądarkowe to `[Manual]`.
+
+**Kluczowe wnioski:**
+- **Wysyłka (`submitDraft`) jest najsłabszym miejscem:**
+  - sharp działa przed limitem wysyłek, więc jeden szkic pozwala na nielimitowane dekodowanie obrazów;
+  - SMTP nie ma timeoutów, więc zawieszony Gmail po `consumeDraft` gubi zgłoszenie bez logu.
+
+  Poprawka: peek limitu przed sharpem, geo ∥ logo, timeouty transportu.
+- **Bundle klienta:** stałe importowane z modułów zod/`src/db` ciągną schematy i `slugify`.
+  Potrzebne są lekkie moduły stałych. Ta sama klasa problemu co P2 #13 z fazy A.
+- **Testy:** brakuje testów ścieżek błędów orkiestratorów (gałęzie limitów, porażka
+  geokodera) oraz własnych testów `manual-input-schema` i `page-sources`. Scenariusze z planu
+  są pokryte w całości.
+- **Token Mapbox:** nadal czeka na decyzję usera. Dwóch reviewerów potwierdziło, że to P2.
+- **Bookkeeping:** 9/9 checkboxów `Weryfikacja:` fazy B jest odznaczonych (CLI/grep PASS).
+  Wzorzec `(header)` w komendach jest w checklistach i w planie dopasowywał 0 plików (nawiasy
+  w regexie); poprawiony na `\(header\)`. Kolejność kroków `generateDraft` w `zadania.md`
+  została uzgodniona z kodem.
+- **Potwierdzone jako poprawne:**
+  - R9 (z FormData czytane są tylko pola R8);
+  - atomowość `consumeDraft`;
+  - budżet generowania ≈ 50–51 s;
+  - brak XSS i open redirect;
+  - wyczerpujące unie stanów;
+  - zero `any`/`as`/`!`.
