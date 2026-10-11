@@ -2,7 +2,7 @@
 
 Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane przez `/dev-compound` i `/dev-compound-refresh`.
 
-<!-- rule-count: 7 -->
+<!-- rule-count: 8 -->
 
 - **Zmiany schematu aplikuj przez `npx drizzle-kit push`, nie `generate`**: katalog `drizzle/` w tym repo jest martwy (snapshoty znaja 2 z 4 enumow i nie znaja tabeli `service_locations`), wiec `generate` produkuje migracje tworzaca od zera obiekty juz istniejace w bazie. Jesli `generate` zapyta o `rename`, ZATRZYMAJ SIE — wybor `~ county > coverage rename enum` jest destrukcyjny. Skrypt `npm run drizzle:generate` wola przedawniony `generate:pg` i nic nie robi.
   Source: docs/solutions/database-issues/2026-08-22-drizzle-generate-nieuzywalny-snapshoty.md
@@ -24,3 +24,6 @@ Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane prze
 
 - **Paczka bez buildu CJS i `next/dynamic` w tescie**: gdy paczka nie ma CJS (next-intl, use-intl, nuqs, use-supercluster), dopisz ja do `ESM_ONLY_PACKAGES` w `jest.config.js` — wyjatek trafia do `transformIgnorePatterns` juz wyliczonych przez `next/jest`, nie do `customJestConfig`. `next/dynamic` w Jescie musi byc zmapowany na `app-dynamic` (tak robi build App Routera); loader Pages Routera wiaze `ref` z `{ retry }`, wiec test uruchamia inna implementacje niz produkcja. Komponent z `dynamic()` renderuj w `await act(async () => ...)`.
   Source: docs/solutions/testing-issues/2026-09-27-montowanie-map-page-client-esm-only-i-next-dynamic.md
+
+- **Wzorzec `npx jest` ze sciezka route group escapuj w calosci**: argumenty `npx jest` to regex, wiec `(header)` jest grupa dopasowujaca `header` bez nawiasow i nie trafia w zaden plik. Pisz `"src/app/\[locale\]/\(header\)/..."`. Przy kilku wzorcach w jednej komendzie pusty wzorzec znika bez bledu (kod 0), wiec porownuj liczbe `Test Suites:` z oczekiwana albo sprawdz `npx jest --listTests "<wzorzec>"`.
+  Source: docs/solutions/testing-issues/2026-10-11-jest-wzorzec-sciezki-z-route-group.md
