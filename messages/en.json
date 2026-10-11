@@ -606,6 +606,162 @@
     "backHome": "Home page"
   },
   "addBusiness": {
+    "page": {
+      "metaTitle": "Add your business to the directory with AI | Polvia",
+      "metaDescription": "Paste a link to your business website and we will prepare a Polvia directory listing: descriptions in four languages, a category and a pin on the map. You review it before sending.",
+      "title": "Add your business to the directory",
+      "intro": "Paste a link to your business website. We will prepare a draft listing that you can correct and send to us. We publish listings after a manual review."
+    },
+    "link": {
+      "heading": "Link to your business",
+      "label": "Business website address",
+      "hint": "A website or a social media profile.",
+      "placeholder": "https://yourbusiness.com",
+      "submit": "Prepare listing",
+      "generating": "Preparing…",
+      "manualPrompt": "No website?",
+      "manualButton": "Enter details manually"
+    },
+    "progress": {
+      "reading": "Reading the page…",
+      "classifying": "Classifying the business…",
+      "writing": "Writing descriptions in four languages…",
+      "patience": "This can take up to a minute."
+    },
+    "manual": {
+      "heading": "Business details",
+      "intro": "Enter the key details and describe what you do. We will use it to prepare the category, tags and descriptions in four languages.",
+      "reasons": {
+        "SOCIAL_LINK": "We cannot read social media profiles automatically. Enter your business details manually, we have kept the link.",
+        "UNREADABLE": "We could not read this page. Enter your business details manually."
+      },
+      "descriptionLabel": "Business description",
+      "descriptionHint": "What you do, for whom, and which languages you serve customers in. {min} to {max} characters.",
+      "counter": "{count} / {max} characters",
+      "submit": "Prepare listing",
+      "backToLink": "Back to link"
+    },
+    "fields": {
+      "name": "Business name",
+      "address": "Address",
+      "street": "Street and number",
+      "postcode": "Postal code",
+      "city": "City",
+      "phoneNumber": "Phone",
+      "email": "Business e-mail",
+      "webpage": "Website",
+      "link": "Website or profile",
+      "openingHours": "Opening hours",
+      "languages": "Languages spoken with customers",
+      "logo": "Logo (optional)",
+      "logoHint": "PNG, JPEG or WebP, up to 2 MB. Replaces the logo found on the website.",
+      "submitterEmail": "Your e-mail",
+      "submitterEmailHint": "We will send the confirmation there. We do not publish it.",
+      "notes": "Notes (optional)",
+      "notesHint": "E.g. a different category or another branch in another city.",
+      "requiredMark": "(required)"
+    },
+    "hours": {
+      "open": "{day}: opening",
+      "close": "{day}: closing",
+      "hint": "Leave a day empty if the business is closed then.",
+      "days": {
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday",
+        "sunday": "Sunday"
+      }
+    },
+    "languages": {
+      "pl": "Polish",
+      "uk": "Ukrainian",
+      "en": "English",
+      "ru": "Russian"
+    },
+    "coverage": {
+      "local": "On site",
+      "online": "Online",
+      "hybrid": "On site and online"
+    },
+    "editor": {
+      "heading": "Review and correct your listing",
+      "intro": "This is how your card will look in the directory. Correct anything that is wrong and send the listing.",
+      "previewHeading": "Card preview",
+      "formHeading": "Business details",
+      "generatedHeading": "Prepared by us",
+      "generatedNote": "Chosen by us; you can leave comments below.",
+      "category": "Category",
+      "coverage": "Service area",
+      "tags": "Tags",
+      "checkOnMap": "Check on the map",
+      "checkingOnMap": "Looking up the address…",
+      "addressChanged": "The address has changed. Click “Check on the map” to move the pin.",
+      "relocated": "Pin moved. Checks left: {count}.",
+      "contactHeading": "Submission",
+      "fixErrors": "Correct the highlighted fields and send again.",
+      "submit": "Send listing",
+      "submitting": "Sending the listing…",
+      "startOver": "Start over"
+    },
+    "preview": {
+      "unconfirmed": "to be completed",
+      "namePlaceholder": "Business name",
+      "logoAlt": "{name} logo",
+      "mapAlt": "Map with the business pin at: {address}",
+      "mapAltNoAddress": "Map with the business pin",
+      "approximatePin": "The pin is approximate: we could not find the exact address. Correct the street and click “Check on the map”.",
+      "noPin": "We could not find this address on the map. Check the street and city.",
+      "geocodingAttribution": "Address search: Nominatim"
+    },
+    "submitted": {
+      "heading": "Thank you for your submission!",
+      "body": "We have received the listing for {name}. We will review it manually and publish it in the directory.",
+      "emailNote": "We have sent a confirmation with a copy of the submitted details to your e-mail.",
+      "cardHeading": "Your card",
+      "backHome": "Back to the home page"
+    },
+    "duplicate": {
+      "heading": "This business is already in the directory",
+      "body": "{name} already has a listing in the Polvia directory.",
+      "link": "See the {name} listing",
+      "hint": "If the listing is out of date, write to us.",
+      "startOver": "Add another business"
+    },
+    "limited": {
+      "heading": "Daily limit reached",
+      "body": "Only a few listings can be prepared per day. Try again {when}.",
+      "contact": "Write to us using the contact form"
+    },
+    "notice": {
+      "contactLink": "Write to us"
+    },
+    "actionErrors": {
+      "GENERATION_FAILED": "We could not prepare the listing. Try again in a moment or enter the details manually.",
+      "DRAFT_EXPIRED": "The draft has expired or has already been sent. Start over.",
+      "RELOCATION_LIMIT": "Address check limit reached. Describe the correct address in the notes.",
+      "ADDRESS_NOT_FOUND": "We could not find this address on the map. Check the street and city.",
+      "GEOCODE_UNAVAILABLE": "Address search is temporarily unavailable. Try again in a moment.",
+      "INVALID_ENTRY": "We could not build a listing from these details.",
+      "SEND_FAILED": "We could not send the listing. Try again later.",
+      "INTERNAL": "Something went wrong on our side. Try again in a moment."
+    },
+    "errors": {
+      "required": "This field is required.",
+      "invalidEmail": "Enter a valid e-mail address.",
+      "invalidUrl": "Enter a valid website address, e.g. https://yourbusiness.com.",
+      "invalidTime": "Enter the time as HH:MM.",
+      "incompleteHours": "Enter both opening and closing time, or leave both empty.",
+      "invalidLanguage": "Choose a language from the list.",
+      "languagesRequired": "Choose at least one language.",
+      "tooLong": "The text is too long.",
+      "invalidValue": "Invalid value.",
+      "invalidLogo": "The logo must be a PNG, JPEG or WebP image.",
+      "logoTooLarge": "The logo can be at most 2 MB.",
+      "tooShort": "The description is too short. Write at least 50 characters."
+    },
     "confirmationEmail": {
       "subject": "We have received your submission: {name}",
       "greeting": "Hello,",

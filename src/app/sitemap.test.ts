@@ -84,3 +84,12 @@ describe('sitemap — trasa uslug online', () => {
         });
     });
 });
+
+describe('sitemap — strona „Dodaj firme"', () => {
+    it('zawiera /dodaj-firme i /en/add-business', async () => {
+        const list = await urls();
+
+        expect(list).toContain('https://polvia.test/dodaj-firme');
+        expect(list).toContain('https://polvia.test/en/add-business');
+    });
+});

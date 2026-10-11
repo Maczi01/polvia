@@ -42,6 +42,12 @@ export const routing = defineRouting({
             ru: '/pricing',
             uk: '/pricing',
         },
+        '/add-business': {
+            en: '/add-business',
+            pl: '/dodaj-firme',
+            ru: '/add-business',
+            uk: '/add-business',
+        },
         '/dashboard': '/dashboard',
         '/dashboard/services': '/dashboard/services',
         '/dashboard/services/new': '/dashboard/services/new',
