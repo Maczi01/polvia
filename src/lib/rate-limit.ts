@@ -65,12 +65,40 @@ export async function checkRateLimit({
     }
 
     if (count > max) {
-        const ttl = await redis.ttl(key);
-
-        // -1 (klucz bez TTL) i -2 (klucz zniknal miedzy INCR a TTL) sa realne przy
-        // wyscigu z wygasnieciem. `Retry-After: -1` to naglowek nie do uzycia.
-        return { allowed: false, retryAfter: ttl > 0 ? ttl : windowSeconds };
+        return { allowed: false, retryAfter: await secondsUntilReset(key, windowSeconds) };
     }
 
     return { allowed: true, remaining: max - count };
+}
+
+/**
+ * Mowi, czy KOLEJNE zapytanie zmiesciloby sie w limicie, nie liczac go.
+ *
+ * Czyta ten sam klucz co `checkRateLimit`, wiec oba widza jeden licznik. Sluzy do
+ * sprawdzenia limitu przed kosztowna praca, ktora moze sie nie udac i wtedy nie
+ * powinna go zuzywac (np. pobranie strony przed generowaniem). Nie jest rezerwacja:
+ * miedzy `peek` a `checkRateLimit` inny klient moze zajac ostatnie miejsce — wiazaca
+ * decyzje podejmuje zawsze `checkRateLimit`.
+ */
+export async function peekRateLimit({
+    key,
+    max,
+    windowSeconds,
+}: RateLimitOptions): Promise<RateLimitResult> {
+    const raw = await redis.get(key);
+    const count = raw === null ? 0 : Number.parseInt(raw, 10);
+
+    if (count >= max) {
+        return { allowed: false, retryAfter: await secondsUntilReset(key, windowSeconds) };
+    }
+
+    return { allowed: true, remaining: max - count };
+}
+
+async function secondsUntilReset(key: string, windowSeconds: number): Promise<number> {
+    const ttl = await redis.ttl(key);
+
+    // -1 (klucz bez TTL) i -2 (klucz zniknal miedzy INCR a TTL) sa realne przy
+    // wyscigu z wygasnieciem. `Retry-After: -1` to naglowek nie do uzycia.
+    return ttl > 0 ? ttl : windowSeconds;
 }

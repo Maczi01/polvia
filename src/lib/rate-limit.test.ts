@@ -1,9 +1,15 @@
-import { checkRateLimit, getClientIp, type RequestWithHeaders } from '@/lib/rate-limit';
+import {
+    checkRateLimit,
+    getClientIp,
+    peekRateLimit,
+    type RequestWithHeaders,
+} from '@/lib/rate-limit';
 import { redis } from '@/lib/redis';
 
 // Redis to zewnetrzny serwis — jedyna rzecz, ktora wolno tu zamockowac.
 jest.mock('@/lib/redis', () => ({
     redis: {
+        get: jest.fn(),
         incr: jest.fn(),
         expire: jest.fn(),
         ttl: jest.fn(),
@@ -11,6 +17,7 @@ jest.mock('@/lib/redis', () => ({
 }));
 
 const mockRedis = redis as unknown as {
+    get: jest.Mock;
     incr: jest.Mock;
     expire: jest.Mock;
     ttl: jest.Mock;
@@ -93,5 +100,39 @@ describe('checkRateLimit', () => {
         const result = await checkRateLimit({ key: 'search:1.2.3.4', max: 30, windowSeconds: 60 });
 
         expect(result).toEqual({ allowed: false, retryAfter: 60 });
+    });
+});
+
+describe('peekRateLimit', () => {
+    const options = { key: 'add-business:gen:1.2.3.4', max: 2, windowSeconds: 86_400 };
+
+    it('przy braku licznika przepuszcza z pelna pula', async () => {
+        mockRedis.get.mockResolvedValue(null);
+
+        expect(await peekRateLimit(options)).toEqual({ allowed: true, remaining: 2 });
+    });
+
+    it('nie inkrementuje licznika', async () => {
+        mockRedis.get.mockResolvedValue('1');
+
+        const result = await peekRateLimit(options);
+
+        expect(result).toEqual({ allowed: true, remaining: 1 });
+        expect(mockRedis.incr).not.toHaveBeenCalled();
+        expect(mockRedis.expire).not.toHaveBeenCalled();
+    });
+
+    it('odmawia, gdy kolejne zapytanie przekroczyloby limit', async () => {
+        mockRedis.get.mockResolvedValue('2');
+        mockRedis.ttl.mockResolvedValue(3600);
+
+        expect(await peekRateLimit(options)).toEqual({ allowed: false, retryAfter: 3600 });
+    });
+
+    it('przy braku TTL oddaje pelne okno', async () => {
+        mockRedis.get.mockResolvedValue('5');
+        mockRedis.ttl.mockResolvedValue(-1);
+
+        expect(await peekRateLimit(options)).toEqual({ allowed: false, retryAfter: 86_400 });
     });
 });

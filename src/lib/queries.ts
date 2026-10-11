@@ -10,9 +10,10 @@ import {
     tagsTranslationsTable,
 } from '@/db/schema';
 import { servicesTranslationsAlias } from '@/db/aliases';
-import { and, desc, eq, gt, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, ilike, sql } from 'drizzle-orm';
 import { isNotNull } from 'drizzle-orm';
 import 'server-only';
+import { escapeLikePattern, pickByHost } from '@/lib/add-business/domain-match';
 import { type FeaturedService, pickFeaturedServices } from '@/lib/featured-services';
 import { isPublicService } from '@/lib/public-service-filter';
 import { Service } from '@/types';
@@ -272,4 +273,50 @@ export async function getMostPopular(locale: string) {
         .limit(5);
 
     return results as Service[];
+}
+
+/** Ile wierszy z filtra `ILIKE` sprawdzamy dokladnym porownaniem hosta. */
+const DOMAIN_CANDIDATES_LIMIT = 20;
+
+export type DomainMatch = {
+    /** Nazwa w danym locale (fallback: nazwa bazowa). */
+    name: string;
+    /** Slug lokalizacji — argument `place` dla `buildServiceUrl`. */
+    slug: string;
+};
+
+/**
+ * Publiczny wpis, ktorego strona ma podany host (R7: duplikat po domenie).
+ *
+ * `ILIKE` tylko zaweza kandydatow (wartosc idzie jako parametr, znaki `%`/`_` hosta sa
+ * escapowane); o trafieniu decyduje dokladne porownanie hosta w `pickByHost`. Hosty
+ * social nie powinny tu trafiac — odsiewa je wolajacy przez `classifyLink` (D8).
+ */
+export async function findServiceByDomain(host: string, locale: string): Promise<DomainMatch | null> {
+    const candidates = await db
+        .select({
+            name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`,
+            slug: serviceLocationsTable.slug,
+            webpage: serviceLocationsTable.webpage,
+        })
+        .from(serviceLocationsTable)
+        .innerJoin(servicesTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
+        .leftJoin(
+            servicesTranslationsAlias,
+            and(
+                eq(servicesTranslationsAlias.serviceId, servicesTable.id),
+                eq(servicesTranslationsAlias.languageCode, locale),
+            ),
+        )
+        .where(
+            and(
+                isPublicService,
+                ilike(serviceLocationsTable.webpage, `%${escapeLikePattern(host)}%`),
+            ),
+        )
+        .orderBy(desc(serviceLocationsTable.isMainLocation))
+        .limit(DOMAIN_CANDIDATES_LIMIT);
+
+    const match = pickByHost(candidates, host);
+    return match ? { name: match.name, slug: match.slug } : null;
 }
