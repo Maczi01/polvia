@@ -180,3 +180,13 @@ Ostatnia aktualizacja: 2026-10-11 (Faza A ukończona)
 - U8: `bodySizeLimit: '3mb'` w `next.config.ts`.
 - U9: klucze `addBusiness.errors.*` (`OWNER_EDIT_ERRORS`) w 4 locale; nazwy pól jak w `parseOwnerEdits`; `name` i `city` wymagane; ostrzeżenie przy `approximate: true`.
 - Testy U8 mogą użyć `tests/fixtures/add-business/fake-redis.ts`.
+
+## Review Fazy A (2026-10-11)
+- Raport: `review-faza-A.md`. 4 reviewerów (security, performance, architektura/TS, scenariusze). E2E pominięte, bo faza nie ma UI.
+- Gate: ⚠️ kontynuuj z zastrzeżeniami. 0 × P1, 14 × P2, 28 × P3. 14 checkboxów `Weryfikacja:` (CLI) odznaczonych.
+- Wnioski:
+  - Rdzeń SSRF solidny; wszystkie scenariusze z planu mają testy. Przepływ end-to-end przez moduły daje JSON zgodny z `serviceInputSchema`.
+  - Najsłabsze miejsce: `verify-facts`. Podciąg bez granic słów potwierdza zmyślone miasto/numer, a sklejanie liczb gubi prawdziwe telefony. To jedyna bariera przed wymyślonymi danymi.
+  - Kontrakty dla U8 do domknięcia przed fazą B: walidacja przy zapisie draftu, jeden schemat `BusinessDraft`, wspólny `TIME_PATTERN`/`WEEKDAY_KEYS`.
+  - Budżet czasu 60 s jest ciaśniejszy niż w planie (podstrony sekwencyjnie, LLM 30 s). U8 potrzebuje jednego deadline'u.
+  - `next.config.ts` `removeConsole` wycina na produkcji wszystkie logi, więc mitygacja `SEND_FAILED` z planu nie działa. Decyzja usera.

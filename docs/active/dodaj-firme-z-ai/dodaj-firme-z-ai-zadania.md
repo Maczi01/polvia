@@ -28,8 +28,8 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: za duża odpowiedź → `TOO_LARGE`; `application/pdf` → `BAD_CONTENT_TYPE`; brak
   odpowiedzi → `TIMEOUT`
 - [x] Test: 200 `text/html` → `ok: true` z `finalUrl` po redirectcie
-- [ ] Weryfikacja: `npx jest src/lib/add-business/safe-fetch.test.ts` przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx jest src/lib/add-business/safe-fetch.test.ts` przechodzi
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U2: Ekstrakcja HTML + `link-kind` — `feature-builder-web-data` — M
 
@@ -53,9 +53,9 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: względny `apple-touch-icon` → absolutny URL; brak og:image → następny kandydat
 - [x] Test: `instagram.com/x` i `maps.app.goo.gl/…` → social; `https://WWW.Firma.pl/o-nas` →
   `firma.pl`
-- [ ] Weryfikacja: `npx jest src/lib/add-business/html-extract.test.ts src/lib/add-business/link-kind.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/html-extract.test.ts src/lib/add-business/link-kind.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U3: Szkic LLM + weryfikacja faktów — `feature-builder-web-data` — L
 
@@ -80,9 +80,9 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: `fromOwner` → fakty właściciela bez zmian i bez `unconfirmed`; opis właściciela w
   prompcie
 - [x] Test: kategoria spoza enumu → `INVALID_RESPONSE` (nie ciche `others`)
-- [ ] Weryfikacja: `npx jest src/lib/add-business/llm-draft.test.ts src/lib/add-business/verify-facts.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/llm-draft.test.ts src/lib/add-business/verify-facts.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U4: Geokodowanie — `feature-builder-web-data` — M
 
@@ -99,8 +99,8 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: brak `house_number` → `approximate: true`
 - [x] Test: zajęta blokada przy obu próbach → `RATE_LIMITED` bez sieci
 - [x] Test: `województwo mazowieckie` → `mazowieckie`
-- [ ] Weryfikacja: `npx jest src/lib/add-business/geocode.test.ts` przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx jest src/lib/add-business/geocode.test.ts` przechodzi
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U5: Draft store, limity, duplikaty — `feature-builder-web-data` — M
 
@@ -119,9 +119,9 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: trzecie `consume` `gen:<ip>` → `allowed: false` z `retryAfter`; `peek` nie
   inkrementuje
 - [x] Test: wyczerpany limit globalny blokuje mimo wolnego limitu IP
-- [ ] Weryfikacja: `npx jest src/lib/add-business/draft-store.test.ts src/lib/add-business/limits.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/draft-store.test.ts src/lib/add-business/limits.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U6: JSON wpisu + logo — `feature-builder-web-data` — L
 
@@ -154,9 +154,9 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: zły e-mail zgłaszającego → błąd pola z kluczem tłumaczenia
 - [x] Test: poprawny PNG → PNG ≤ 512 px; SVG jako `.png` → `INVALID_LOGO`; 3 MB →
   `LOGO_TOO_LARGE`
-- [ ] Weryfikacja: `npx jest src/lib/add-business/build-service-json.test.ts src/lib/add-business/owner-edits-schema.test.ts src/lib/add-business/logo.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/build-service-json.test.ts src/lib/add-business/owner-edits-schema.test.ts src/lib/add-business/logo.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
 
 ### U7: Maile — `feature-builder-web-data` — M
 
@@ -173,9 +173,29 @@ Szczegóły podejścia per unit: `docs/plans/2026-10-11-001-feat-dodaj-firme-z-a
 - [x] Test: potwierdzenie `uk` z tekstem z `messages/uk.json`
 - [x] Test: błąd transportu → typowany błąd bez surowego komunikatu
 - [x] Test: trasa kontaktu działa po przejściu na `mailer.ts`
-- [ ] Weryfikacja: `npx jest src/lib/add-business/submission-emails.test.ts src/lib/mailer.test.ts`
+- [x] Weryfikacja: `npx jest src/lib/add-business/submission-emails.test.ts src/lib/mailer.test.ts`
   przechodzi
-- [ ] Weryfikacja: `npx tsc --noEmit` bez błędów
+- [x] Weryfikacja: `npx tsc --noEmit` bez błędów
+
+## Do poprawy po review fazy A
+
+Raport: `review-faza-A.md`. Gate: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 14 × P2, 28 × P3).
+
+- [ ] 🟠 [important] **src/lib/add-business/logo.ts:34-47** — sharp bez `limitInputPixels` (bomba dekompresyjna); limit 4096², jedna instancja, test z dużym wymiarem
+- [ ] 🟠 [important] **src/lib/add-business/llm-draft.ts:122-124** — `stripDelimiters` nieidempotentny (zagnieżdżony znacznik przeżywa); usuwać `<{3,}`/`>{3,}` lub nonce + test
+- [ ] 🟠 [important] **src/lib/rate-limit.ts:39-47 / limits.ts:35-46** — klucze od pełnego IPv6; normalizacja do /64, rozważyć globalny limit fetch, potwierdzić `x-forwarded-for` na Vercelu
+- [ ] 🟠 [important] **src/lib/add-business/verify-facts.ts:63-69** — `verifyText` po podciągu („Gdańsk” w „ul. Gdańska”); granice Unicode, postcode `^\d{2}-\d{3}$`, min. długość + testy
+- [ ] 🟠 [important] **src/lib/add-business/verify-facts.ts:28** — sklejanie sąsiednich liczb gubi prawdziwy telefon; okna grup cyfr 9–11 + 3 testy
+- [ ] 🟠 [important] **src/lib/add-business/draft-store.ts:154-191** — zapis bez walidacji vs strict odczyt (ciche `DRAFT_EXPIRED`); `parse` przy zapisie + `toDraftGeo()` z testem
+- [ ] 🟠 [important] **draft-store.ts:72-129 vs draft-schema.ts:40-80** — zduplikowany, luźniejszy schemat `BusinessDraft`; jeden schemat w `draft-schema.ts`, typ przez `z.infer`
+- [ ] 🟠 [important] **owner-edits-schema.ts:37, jsonld-facts.ts:35-44, draft-schema.ts:27-35** — `TIME_PATTERN`/dni w 4 miejscach; eksport z `src/db/service-input-schema.ts`
+- [ ] 🟠 [important] **src/lib/queries.ts:314-318** — `ILIKE %host%` + `LIMIT 20` gubi duplikat przy krótkim hoście; zakotwiczone wzorce, `normalizeHost` w funkcji, test > 20 kandydatów
+- [ ] 🟠 [important] **src/lib/rate-limit.ts:61-65** — `INCR`/`EXPIRE` nieatomowe (klucz globalny bez TTL = trwała blokada); `multi` + `EXPIRE NX` lub samonaprawa
+- [ ] 🟠 [important] **src/lib/add-business/draft-schema.ts:5** — import `coverageEnum` z `@/db/schema` ciągnie drizzle do potencjalnego bundla klienta; `COVERAGE_VALUES` w lekkim module
+- [ ] 🟠 [important] **next.config.ts:13** — `removeConsole` wycina `warn`/`error` na produkcji, mitygacja `SEND_FAILED` nie działa; `exclude: ['error','warn']` — DECYZJA USERA (config sprzed zadania)
+- [ ] 🟠 [important] **U8 (orkiestrator) / plan tabela ryzyk** — budżet 60 s: podstrony sekwencyjnie po stronie głównej (8+8 s, najgorzej ~55 s); jeden deadline, `timeoutMs` z pozostałego czasu, krótszy timeout fallbacków
+- [ ] 🟠 [important] **llm-draft.ts:36-39** — timeout LLM 30 s blisko realnego czasu; zmierzyć p50/p95 w ręcznym przebiegu U9, ewentualnie przesunąć budżet / zwrot limitu IP przy timeoutcie
+- [ ] 🟡 [nit] 28 sugestii P3 — lista w `review-faza-A.md` (m.in. `verifyPhone` zwraca string LLM, rekurencja `flattenNodes`, `tel:`/`24:00` w JSON-LD, `normalizeHours({})`, ReDoS `EMAIL_PATTERN`, nesting > 2, testy graniczne i współbieżności)
 
 ## Faza B — akcje, strona, wejście
 
