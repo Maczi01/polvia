@@ -16,6 +16,12 @@ import { safeFetchImage, type SafeFetchOptions } from '@/lib/add-business/safe-f
 export const LOGO_MAX_BYTES = 2 * 1024 * 1024;
 export const LOGO_MAX_DIMENSION = 512;
 
+/**
+ * Limit pikseli wejscia. 1 MB PNG potrafi miec 16000x16000 px i zdekodowac sie do ~1 GB
+ * (bomba dekompresyjna) — a atakujacy kontroluje i upload, i kandydata logo ze swojej strony.
+ */
+export const LOGO_MAX_INPUT_PIXELS = 4096 * 4096;
+
 const ALLOWED_FORMATS = new Set(['png', 'jpeg', 'webp']);
 
 export type LogoErrorCode = 'INVALID_LOGO' | 'LOGO_TOO_LARGE';
@@ -31,12 +37,19 @@ async function toLogoPng(bytes: Uint8Array): Promise<LogoResult> {
     if (bytes.byteLength > LOGO_MAX_BYTES) return { ok: false, code: 'LOGO_TOO_LARGE' };
 
     try {
-        const { format } = await sharp(bytes).metadata();
+        // Jedna instancja: `metadata()` czyta tylko naglowek, pelne dekodowanie robi `toBuffer()`
+        // i to ono pilnuje `limitInputPixels`. `failOn: 'error'` odrzuca uszkodzone dane.
+        const image = sharp(bytes, { limitInputPixels: LOGO_MAX_INPUT_PIXELS, failOn: 'error' });
+        const { format, width, height } = await image.metadata();
         if (format === undefined || !ALLOWED_FORMATS.has(format)) {
             return { ok: false, code: 'INVALID_LOGO' };
         }
+        // Wymiary z naglowka sprawdzamy jawnie, zanim cokolwiek zdekodujemy.
+        if (width * height > LOGO_MAX_INPUT_PIXELS) {
+            return { ok: false, code: 'INVALID_LOGO' };
+        }
 
-        const png = await sharp(bytes)
+        const png = await image
             .resize({
                 width: LOGO_MAX_DIMENSION,
                 height: LOGO_MAX_DIMENSION,

@@ -118,9 +118,17 @@ export interface OwnerDraftInput {
     link: string | null;
 }
 
-/** Znacznik w danych mogl by zamknac sekcje zrodla przed czasem. */
-function stripDelimiters(value: string): string {
-    return value.replaceAll(SOURCE_START, '').replaceAll(SOURCE_END, '');
+/** Kazdy ciag 3+ nawiasow katowych — budulec znacznikow sekcji zrodla. */
+const DELIMITER_RUN = /<{3,}|>{3,}/g;
+
+/**
+ * Znacznik w danych moglby zamknac sekcje zrodla przed czasem. Usuwamy cale ciagi `<<<`/`>>>`,
+ * nie konkretne znaczniki: wycinanie znacznika nie jest idempotentne
+ * (`<<<ZRODLO_<<<ZRODLO_KONIEC>>>KONIEC>>>` sklada sie po nim w dzialajacy znacznik), a dane
+ * bez `<<<` i `>>>` nie moga zawierac zadnego znacznika.
+ */
+export function stripDelimiters(value: string): string {
+    return value.replaceAll(DELIMITER_RUN, '');
 }
 
 function wrapSource(source: Record<string, unknown>): string {

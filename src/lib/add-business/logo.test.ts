@@ -8,6 +8,7 @@ import sharp from 'sharp';
 
 import {
     LOGO_MAX_DIMENSION,
+    LOGO_MAX_INPUT_PIXELS,
     processLogoCandidate,
     processLogoUpload,
 } from '@/lib/add-business/logo';
@@ -41,6 +42,13 @@ function fakeImageServer(
         transport,
         resolveHost: async () => [{ address: PUBLIC_IP, family: 4 }],
     };
+}
+
+/** Jednolity PNG generowany w pamieci: duzy w pikselach, maly w bajtach — bez pliku w repo. */
+function solidPng(side: number): Promise<Buffer> {
+    return sharp({ create: { width: side, height: side, channels: 3, background: '#ffffff' } })
+        .png({ compressionLevel: 9 })
+        .toBuffer();
 }
 
 beforeEach(() => {
@@ -96,6 +104,27 @@ describe('processLogoUpload', () => {
         });
     });
 
+    it('obraz ponad limit pikseli (bomba dekompresyjna) to INVALID_LOGO', async () => {
+        // 5000x5000 jednolity PNG: maly na dysku, 25 mln pikseli po zdekodowaniu.
+        const huge = await solidPng(5000);
+        expect(5000 * 5000).toBeGreaterThan(LOGO_MAX_INPUT_PIXELS);
+        expect(huge.byteLength).toBeLessThan(1024 * 1024);
+
+        const result = await processLogoUpload(new File([huge], 'logo.png', { type: 'image/png' }));
+
+        expect(result).toEqual({ ok: false, code: 'INVALID_LOGO' });
+    });
+
+    it('obraz dokladnie na limicie pikseli przechodzi', async () => {
+        const edge = await solidPng(4096);
+
+        const result = await processLogoUpload(new File([edge], 'logo.png', { type: 'image/png' }));
+
+        if (!result.ok || result.png === null) throw new Error('expected png');
+        const metadata = await sharp(result.png).metadata();
+        expect(metadata.width).toBe(LOGO_MAX_DIMENSION);
+    });
+
     it('plik 3 MB to LOGO_TOO_LARGE', async () => {
         const file = new File([new Uint8Array(3 * 1024 * 1024)], 'logo.png', {
             type: 'image/png',
@@ -128,6 +157,15 @@ describe('processLogoCandidate', () => {
         const png = await processLogoCandidate('https://firma.pl/logo.png', fakeImageServer(null));
 
         expect(png).toBeNull();
+    });
+
+    it('kandydat ponad limit pikseli daje null', async () => {
+        const huge = await solidPng(5000);
+        const options = fakeImageServer({ contentType: 'image/png', body: huge });
+
+        await expect(
+            processLogoCandidate('https://firma.pl/logo.png', options),
+        ).resolves.toBeNull();
     });
 
     it('SVG podany jako image/svg+xml daje null', async () => {
