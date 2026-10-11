@@ -213,3 +213,48 @@ describe('<MapPageClient /> — piny respektuja filtr geograficzny', () => {
         expect(pins()).toHaveLength(2);
     });
 });
+
+// Na mobile widok mapy zakrywa liste, wiec pusta mapa musi sama powiedziec, czemu
+// jest pusta. Dwie przyczyny, dwa zdania — wczesniej padalo zawsze to samo
+// ("uslugi sa zdalne"), takze gdy nie bylo zadnych wynikow.
+describe('<MapPageClient /> — pusta mapa na mobile tlumaczy swoja pustke', () => {
+    const originalWidth = window.innerWidth;
+
+    const WROCLAW_ONLINE = service({
+        name: 'Zdalna Ksiegowa',
+        coverage: 'hybrid',
+        city: 'Wroclaw',
+        voivodeship: 'dolnoslaskie',
+    });
+
+    const WROCLAW_LOCAL = service({
+        name: 'Fryzjer Wroclaw',
+        coverage: 'local',
+        city: 'Wroclaw',
+        voivodeship: 'dolnoslaskie',
+    });
+
+    const PODLASKIE: MapFilters = { ...NO_FILTERS, county: 'podlaskie' };
+
+    beforeEach(() => {
+        // useIsMobile czyta innerWidth, a jsdom startuje na 1024 — czyli na desktopie,
+        // gdzie nakladki celowo nie ma (lista stoi obok mapy).
+        Object.defineProperty(window, 'innerWidth', { value: 500, configurable: true });
+    });
+
+    afterEach(() => {
+        Object.defineProperty(window, 'innerWidth', { value: originalWidth, configurable: true });
+    });
+
+    it('wyniki sa, tylko bez pinow — kieruje na liste', async () => {
+        await renderMapPage('/mapa/podlaskie', PODLASKIE, [WROCLAW_ONLINE]);
+
+        expect(screen.getByRole('status')).toHaveTextContent(messages.MapList.map_no_pins);
+    });
+
+    it('nie ma zadnych wynikow — mowi to samo, co pusta lista', async () => {
+        await renderMapPage('/mapa/podlaskie', PODLASKIE, [WROCLAW_LOCAL]);
+
+        expect(screen.getByRole('status')).toHaveTextContent(messages.EmptyList.description);
+    });
+});

@@ -665,6 +665,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                         selectedService={selectedService}
                         highlightedServiceIds={highlightedGroupIds}
                         services={mapServices}
+                        listResultCount={filteredServices.length}
                         handleClickedPlace={handleClickedPlace}
                         resetMap={resetMap}
                         scrollToTop={scrollToTop}
