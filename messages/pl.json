@@ -607,6 +607,11 @@
     "backHome": "Strona główna"
   },
   "addBusiness": {
+    "cta": {
+      "heading": "Masz firmę?",
+      "description": "Wklej link do strony swojej firmy, a AI przygotuje wpis do katalogu, który sprawdzisz przed wysłaniem.",
+      "button": "Dodaj firmę z AI"
+    },
     "page": {
       "metaTitle": "Dodaj firmę do katalogu z pomocą AI | Polvia",
       "metaDescription": "Wklej link do strony swojej firmy, a przygotujemy wpis do katalogu Polvia: opisy w czterech językach, kategorię i pinezkę na mapie. Sprawdzisz go przed wysłaniem.",

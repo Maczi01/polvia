@@ -606,6 +606,11 @@
     "backHome": "Home page"
   },
   "addBusiness": {
+    "cta": {
+      "heading": "Run a business?",
+      "description": "Paste a link to your business website and AI will draft your directory listing for you to review before sending.",
+      "button": "Add your business with AI"
+    },
     "page": {
       "metaTitle": "Add your business to the directory with AI | Polvia",
       "metaDescription": "Paste a link to your business website and we will prepare a Polvia directory listing: descriptions in four languages, a category and a pin on the map. You review it before sending.",
