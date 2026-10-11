@@ -3,7 +3,8 @@
 import { hasLocale, useLocale, useTranslations } from 'next-intl';
 import type { JSX } from 'react';
 
-import { LANGUAGE_CODES, type LocalizedText } from '@/lib/add-business/draft-schema';
+import type { LocalizedText } from '@/lib/add-business/draft-schema';
+import { LANGUAGE_CODES } from '@/lib/add-business/form-limits';
 import { type Category, CATEGORY_DEFINITIONS } from '@/lib/categories';
 import type { Coverage } from '@/lib/coverage';
 

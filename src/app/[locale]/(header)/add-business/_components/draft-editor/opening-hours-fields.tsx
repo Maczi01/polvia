@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 import { type JSX, useId } from 'react';
 
 import { Input } from '@/components/ui/input/input';
-import { WEEKDAY_KEYS, type Weekday } from '@/db/service-input-schema';
 import type { FieldErrors } from '@/lib/add-business/types';
+import { WEEKDAY_KEYS, type Weekday } from '@/lib/weekdays';
 
 import { controlClasses, describedBy, FieldError } from '../form-field/form-field';
 import type { DayHoursValue, HoursValues } from './draft-values';

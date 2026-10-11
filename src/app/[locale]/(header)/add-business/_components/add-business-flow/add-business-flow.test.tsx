@@ -180,7 +180,9 @@ describe('<AddBusinessFlow />', () => {
     });
 
     it('awaria polaczenia z akcja daje komunikat zamiast wywrotki strony', async () => {
-        generate.mockRejectedValue(new Error('Failed to fetch'));
+        const logError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        const failure = new Error('Failed to fetch');
+        generate.mockRejectedValue(failure);
         renderWithIntl(<AddBusinessFlow />);
 
         await submitLink();
@@ -188,5 +190,34 @@ describe('<AddBusinessFlow />', () => {
         expect(await screen.findByRole('alert')).toHaveTextContent(
             'Coś poszło nie tak po naszej stronie.',
         );
+        expect(logError).toHaveBeenCalledWith(expect.any(String), failure);
+        logError.mockRestore();
+    });
+
+    it('odrzucona wysylka pokazuje INTERNAL i zdejmuje bledy pol z poprzedniej proby', async () => {
+        const logError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        generate.mockResolvedValue(READY);
+        submit
+            .mockResolvedValueOnce({
+                status: 'invalid',
+                fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' },
+            })
+            .mockRejectedValueOnce(new Error('Failed to fetch'));
+        renderWithIntl(<AddBusinessFlow />);
+
+        await submitLink();
+        await screen.findByRole('heading', { name: 'Sprawdź i popraw wpis' });
+        await userEvent.click(screen.getByRole('button', { name: 'Wyślij zgłoszenie' }));
+        expect(await screen.findByText('Wpisz poprawny adres e-mail.')).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', { name: 'Wyślij zgłoszenie' }));
+
+        expect(
+            await screen.findByText(/Coś poszło nie tak po naszej stronie\./),
+        ).toBeInTheDocument();
+        expect(screen.queryByText('Wpisz poprawny adres e-mail.')).not.toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: 'Twój e-mail (wymagane)' })).toBeValid();
+        expect(logError).toHaveBeenCalled();
+        logError.mockRestore();
     });
 });

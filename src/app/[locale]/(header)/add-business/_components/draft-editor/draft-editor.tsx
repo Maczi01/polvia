@@ -4,8 +4,8 @@ import { useTranslations } from 'next-intl';
 import { type ChangeEvent, type FormEvent, type JSX, useState } from 'react';
 
 import { Button } from '@/components/ui/button/button';
-import { NOTES_MAX_LENGTH } from '@/lib/add-business/owner-edits-schema';
-import type { ActionErrorCode, FieldErrors } from '@/lib/add-business/types';
+import { LOGO_ACCEPTED_TYPES, NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
+import type { ActionErrorCode, FieldErrorKey, FieldErrors } from '@/lib/add-business/types';
 
 import type { ReadyDraft } from '../add-business-flow/flow-state';
 import { BusinessCardPreview } from '../business-card-preview/business-card-preview';
@@ -23,6 +23,7 @@ import {
 } from './draft-values';
 import { GeneratedSummary } from './generated-summary';
 import { LanguagesField } from './languages-field';
+import { logoFileError } from './logo-file';
 import { OpeningHoursFields } from './opening-hours-fields';
 import { RelocateControl } from './relocate-control';
 import { type RelocateAction, useRelocation } from './use-relocation';
@@ -51,6 +52,7 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
     const { draft, fieldErrors, error, isPending, logoSrc, onLogoChange, onSubmit } = props;
     const t = useTranslations('addBusiness');
     const [values, setValues] = useState<DraftValues>(() => initialValues(draft.preview));
+    const [logoError, setLogoError] = useState<FieldErrorKey | null>(null);
     const relocation = useRelocation(draft, props.relocateAction);
 
     const preview = previewFromValues(draft.preview, values);
@@ -58,8 +60,12 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
     const isAddressChanged = !sameAddress(addressOf(values), relocation.geocodedAddress);
     const relocationErrors =
         relocation.result?.status === 'invalid' ? relocation.result.fieldErrors : {};
-    const errors: FieldErrors = { ...relocationErrors, ...fieldErrors };
-    const hasFieldErrors = Object.keys(fieldErrors).length > 0;
+    const errors: FieldErrors = {
+        ...relocationErrors,
+        ...fieldErrors,
+        ...(logoError === null ? {} : { logo: logoError }),
+    };
+    const hasFieldErrors = Object.keys(fieldErrors).length > 0 || logoError !== null;
 
     const textProps = (name: TextFieldName) => ({
         name,
@@ -69,9 +75,17 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
         error: errors[name],
     });
 
+    /** Zly plik nie trafia do podgladu, a jego blad blokuje wysylke (patrz `logoFileError`). */
+    function handleLogoChange(event: ChangeEvent<HTMLInputElement>): void {
+        const file = event.target.files?.item(0) ?? null;
+        const error = file === null ? null : logoFileError(file);
+        setLogoError(error);
+        onLogoChange(error === null ? file : null);
+    }
+
     function handleSubmit(event: FormEvent<HTMLFormElement>): void {
         event.preventDefault();
-        if (isPending) return;
+        if (isPending || logoError !== null) return;
         onSubmit(new FormData(event.currentTarget));
     }
 
@@ -160,12 +174,12 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                     <TextField
                         name="logo"
                         type="file"
-                        accept="image/png,image/jpeg,image/webp"
+                        accept={LOGO_ACCEPTED_TYPES.join(',')}
                         label={t('fields.logo')}
                         hint={t('fields.logoHint')}
                         error={errors.logo}
                         className="h-auto"
-                        onChange={event => onLogoChange(event.target.files?.item(0) ?? null)}
+                        onChange={handleLogoChange}
                     />
                     <TextField
                         name="submitterEmail"

@@ -1,6 +1,7 @@
 import { PIN_FIXTURE, PREVIEW_FIXTURE } from '../business-card-preview/preview-fixture';
 import {
     afterGenerate,
+    afterRejection,
     afterSubmit,
     editingLogo,
     type EditingState,
@@ -121,6 +122,24 @@ describe('afterSubmit', () => {
             ...EDITING,
             fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' },
         });
+    });
+});
+
+describe('afterRejection', () => {
+    it('odrzucona akcja zostawia krok z INTERNAL i bez starych bledow pol', () => {
+        const withErrors: EditingState = {
+            ...EDITING,
+            fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' },
+            error: 'GEOCODE_UNAVAILABLE',
+        };
+
+        expect(afterRejection(withErrors)).toEqual({ ...EDITING, error: 'INTERNAL' });
+    });
+
+    it('dziala tez dla kroku z linkiem', () => {
+        expect(
+            afterRejection({ ...INITIAL_FLOW, fieldErrors: { link: 'addBusiness.errors.required' } }),
+        ).toEqual({ ...INITIAL_FLOW, error: 'INTERNAL' });
     });
 });
 

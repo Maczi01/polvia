@@ -75,6 +75,16 @@ function cleared<State extends LinkState | ManualState | EditingState>(origin: S
     return { ...origin, fieldErrors: {}, error: null };
 }
 
+/**
+ * Odrzucona akcja (siec, przerwane polaczenie) nie ma wyniku z serwera: wracamy do kroku
+ * z `INTERNAL`, bez bledow pol z poprzedniej proby — te dotyczyly innej wysylki.
+ */
+export function afterRejection<State extends LinkState | ManualState | EditingState>(
+    origin: State,
+): State {
+    return { ...cleared(origin), error: 'INTERNAL' };
+}
+
 export function afterGenerate(
     origin: LinkState | ManualState,
     result: GenerateDraftResult,

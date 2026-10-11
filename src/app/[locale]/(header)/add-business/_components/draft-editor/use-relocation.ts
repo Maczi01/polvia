@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState } from 'react';
 
-import type { DraftPin, RelocateResult } from '@/lib/add-business/types';
+import { actionFailure, type DraftPin, type RelocateResult } from '@/lib/add-business/types';
 
 import type { ReadyDraft } from '../add-business-flow/flow-state';
 import type { Address } from './draft-values';
@@ -25,10 +25,11 @@ export interface Relocation extends RelocationState {
     relocate: (address: Address) => void;
 }
 
-const NETWORK_FAILURE: RelocateResult = {
-    status: 'error',
-    error: { code: 'INTERNAL', message: 'Relocation request failed' },
-};
+/** Odrzucenie (siec) nie ma wyniku z serwera: slad w konsoli i ten sam kod co w flow. */
+function rejectedRelocation(error: unknown): RelocateResult {
+    console.error('add-business relocate action rejected', error);
+    return actionFailure('INTERNAL');
+}
 
 /**
  * „Sprawdz na mapie" (R8, D10): geokodowanie nowego adresu przez `relocateDraftAction`.
@@ -49,7 +50,7 @@ export function useRelocation(draft: ReadyDraft, relocateAction: RelocateAction)
             formData.set('street', address.street);
             formData.set('city', address.city);
 
-            const result = await relocateAction(null, formData).catch(() => NETWORK_FAILURE);
+            const result = await relocateAction(null, formData).catch(rejectedRelocation);
             if (result.status !== 'relocated') return { ...previous, result };
             return { result, pin: result.pin, geocodedAddress: address };
         },

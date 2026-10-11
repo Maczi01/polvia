@@ -10,6 +10,7 @@ import { ManualStep } from '../manual-step/manual-step';
 import { SubmittedState } from '../submitted-state/submitted-state';
 import {
     afterGenerate,
+    afterRejection,
     afterSubmit,
     editingLogo,
     type EditingState,
@@ -27,22 +28,34 @@ type FlowEvent =
     | { type: 'submit'; origin: EditingState; formData: FormData }
     | { type: 'go'; state: FlowState };
 
+/** Odrzucenie akcji nie ma wyniku z serwera — zostawiamy slad w konsoli przegladarki. */
+function logRejection(action: string): (error: unknown) => null {
+    return error => {
+        console.error(`add-business ${action} action rejected`, error);
+        return null;
+    };
+}
+
 /**
  * Odrzucona akcja (siec, przerwane polaczenie) nie ma kodu z serwera — zamiast wywracac
- * strone do error boundary wracamy do kroku z kodem `INTERNAL`.
+ * strone do error boundary wracamy do kroku z kodem `INTERNAL` (`afterRejection`).
  */
 async function runFlowEvent(_previous: FlowState, event: FlowEvent): Promise<FlowState> {
     switch (event.type) {
         case 'generate': {
-            const result = await generateDraftAction(null, event.formData).catch(() => null);
+            const result = await generateDraftAction(null, event.formData).catch(
+                logRejection('generate'),
+            );
             return result === null
-                ? { ...event.origin, error: 'INTERNAL' }
+                ? afterRejection(event.origin)
                 : afterGenerate(event.origin, result);
         }
         case 'submit': {
-            const result = await submitDraftAction(null, event.formData).catch(() => null);
+            const result = await submitDraftAction(null, event.formData).catch(
+                logRejection('submit'),
+            );
             return result === null
-                ? { ...event.origin, error: 'INTERNAL' }
+                ? afterRejection(event.origin)
                 : afterSubmit(event.origin, result);
         }
         case 'go':

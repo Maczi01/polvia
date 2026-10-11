@@ -1,6 +1,7 @@
-import { WEEKDAY_KEYS, type Weekday } from '@/db/service-input-schema';
-import type { FactField, LanguageCode } from '@/lib/add-business/draft-schema';
+import type { FactField } from '@/lib/add-business/draft-schema';
+import type { LanguageCode } from '@/lib/add-business/form-limits';
 import type { BusinessPreview } from '@/lib/add-business/types';
+import { WEEKDAY_KEYS, type Weekday } from '@/lib/weekdays';
 
 /**
  * Stan pol edytora (R8) i jego rzut na podglad karty. Pola tekstowe trzymaja napis

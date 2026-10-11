@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { type JSX, useId } from 'react';
 
-import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
+import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/form-limits';
 import type { FieldErrorKey } from '@/lib/add-business/types';
 
 import { describedBy, FieldError } from '../form-field/form-field';

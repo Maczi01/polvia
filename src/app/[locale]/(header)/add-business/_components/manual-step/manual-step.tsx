@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button/button';
 import {
     MANUAL_DESCRIPTION_MAX,
     MANUAL_DESCRIPTION_MIN,
-} from '@/lib/add-business/manual-input-schema';
+} from '@/lib/add-business/form-limits';
 import type { ActionErrorCode, FieldErrors, ManualReason } from '@/lib/add-business/types';
 
 import { FlowHeading } from '../flow-heading/flow-heading';

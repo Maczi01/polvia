@@ -7,11 +7,12 @@ import type { JSX, ReactNode } from 'react';
 
 import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
-import { WEEKDAY_KEYS } from '@/db/service-input-schema';
-import { type FactField, LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
+import type { FactField } from '@/lib/add-business/draft-schema';
+import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/form-limits';
 import type { BusinessPreview, DraftPin } from '@/lib/add-business/types';
 import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 import { cn } from '@/lib/utilities';
+import { WEEKDAY_KEYS } from '@/lib/weekdays';
 
 import { StaticMapPin } from './static-map-pin';
 
