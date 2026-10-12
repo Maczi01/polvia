@@ -95,7 +95,8 @@ export interface BusinessCardPreviewProps {
     /** Pola do uzupelnienia — znacznik dostaja tylko te, ktore wciaz sa puste. */
     unconfirmed: readonly FactField[];
     logoSrc: string | null;
-    pin: DraftPin | null;
+    /** Pominiety = karta bez mapy: edytor ma wlasna mape z pinezka i nie dubluje jej. */
+    pin?: DraftPin | null;
 }
 
 export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Element {
@@ -238,7 +239,9 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
 
                 <PreviewSocials socials={preview.socials} whatsappNumber={preview.whatsappNumber} />
 
-                <StaticMapPin pin={pin} coverage={preview.coverage} address={address} />
+                {pin !== undefined && (
+                    <StaticMapPin pin={pin} coverage={preview.coverage} address={address} />
+                )}
             </div>
         </Card>
     );

@@ -8,6 +8,7 @@ import { type JSX, useId, useRef } from 'react';
 import { Button } from '@/components/ui/button/button';
 import type { FieldErrorKey } from '@/lib/add-business/types';
 
+import { MapWarning } from '../business-card-preview/static-map-pin';
 import { describedBy, FieldError } from '../form-field/form-field';
 import { RelocateControl } from './relocate-control';
 import type { PinPicker as PinPickerState } from './use-pin-picker';
@@ -93,6 +94,11 @@ export function PinPicker({
             >
                 <PinMap pin={picker.pin} focus={relocation.pin} onPick={picker.pick} />
             </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('preview.geocodingAttribution')}
+            </p>
+            {picker.pin === null && <MapWarning>{t('preview.noPin')}</MapWarning>}
+            {picker.pin?.approximate && <MapWarning>{t('preview.approximatePin')}</MapWarning>}
             <input
                 type="hidden"
                 name="pinLat"

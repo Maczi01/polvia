@@ -142,14 +142,6 @@ export interface BusinessPreview {
     whatsappNumber: string | null;
 }
 
-/**
- * Czy szkic ma choc jeden dzien godzin — domyslny stan checkboxa `hoursEnabled` (B).
- * `{}` liczy sie jak brak godzin.
- */
-export function hasOpeningHours(hours: OpeningHours | null): boolean {
-    return hours !== null && Object.keys(hours).length > 0;
-}
-
 // --- Wyniki akcji ------------------------------------------------------------------
 
 export type ActionFailure = { status: 'error'; error: ActionError };

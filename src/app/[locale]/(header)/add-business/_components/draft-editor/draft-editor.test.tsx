@@ -4,7 +4,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
 
-import { renderEditor } from './render-editor';
+import { EDITOR_DRAFT, renderEditor } from './render-editor';
 
 expect.extend(toHaveNoViolations);
 
@@ -23,8 +23,21 @@ describe('<DraftEditor />', () => {
         expect(within(summary).getByText('Gastronomia')).toBeInTheDocument();
         expect(within(summary).getByText('Na miejscu i online')).toBeInTheDocument();
         expect(
-            within(summary).getByText('Wybierane przez nas; uwagi możesz zgłosić niżej.'),
+            within(summary).getByText(
+                'Kategorię, zasięg i tagi dobieramy sami. Jeśli coś się nie zgadza, napisz o tym w uwagach na dole formularza.',
+            ),
         ).toBeInTheDocument();
+    });
+
+    it('podglad karty nie ma drugiej mapy, sekcja zgloszenia bez naglowka „Zgłoszenie"', async () => {
+        await renderEditor();
+
+        expect(screen.queryByRole('img', { name: /Mapa z pinezką/ })).not.toBeInTheDocument();
+        expect(
+            screen.getByRole('group', { name: 'Mapa do ustawienia pinezki firmy' }),
+        ).toBeInTheDocument();
+        expect(screen.queryByRole('heading', { name: 'Zgłoszenie' })).not.toBeInTheDocument();
+        expect(screen.getByText('Wyszukiwanie adresu: Nominatim')).toBeInTheDocument();
     });
 
     it('blad e-maila jest podpiety przez aria-describedby', async () => {
@@ -46,19 +59,36 @@ describe('<DraftEditor />', () => {
         expect(screen.getAllByText('+48 500 600 700').length).toBeGreaterThan(0);
     });
 
-    it('zmiana adresu wlacza „Szukaj na mapie", ktore przesuwa pin', async () => {
+    it('„Szukaj na mapie" jest aktywne od poczatku i szuka adresu ze szkicu', async () => {
+        const relocateAction = jest.fn().mockResolvedValue({
+            status: 'relocated',
+            pin: { lat: 54.35, lng: 18.65, approximate: false },
+            remainingRelocations: 9,
+        });
+        await renderEditor({ relocateAction });
+        expect(searchButton()).toHaveAttribute('aria-disabled', 'false');
+
+        await userEvent.click(searchButton());
+
+        await waitFor(() => expect(relocateAction).toHaveBeenCalledTimes(1));
+        const formData: FormData = relocateAction.mock.calls[0][1];
+        expect(formData.get('street')).toBe('ul. Długa 1');
+        expect(formData.get('city')).toBe('Gdańsk');
+    });
+
+    it('zmiana adresu podpowiada „Szukaj na mapie", ktore przesuwa pin', async () => {
         const relocateAction = jest.fn().mockResolvedValue({
             status: 'relocated',
             pin: { lat: 54.4, lng: 18.6, approximate: true },
             remainingRelocations: 9,
         });
         await renderEditor({ relocateAction });
-        expect(searchButton()).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.queryByText(/Adres się zmienił/)).not.toBeInTheDocument();
 
         const street = screen.getByRole('textbox', { name: 'Ulica i numer' });
         await userEvent.clear(street);
         await userEvent.type(street, 'ul. Długa 5');
-        expect(searchButton()).toHaveAttribute('aria-disabled', 'false');
+        expect(screen.getByText(/Adres się zmienił/)).toBeInTheDocument();
         await userEvent.click(searchButton());
 
         await waitFor(() =>
@@ -71,7 +101,7 @@ describe('<DraftEditor />', () => {
         expect(formData.get('street')).toBe('ul. Długa 5');
         expect(formData.get('city')).toBe('Gdańsk');
         expect(screen.getByText(/Pinezka jest przybliżona/)).toBeInTheDocument();
-        expect(searchButton()).toHaveAttribute('aria-disabled', 'true');
+        expect(screen.queryByText(/Adres się zmienił/)).not.toBeInTheDocument();
     });
 
     it('blad relokacji jest ogloszony, a pin zostaje', async () => {
@@ -89,7 +119,10 @@ describe('<DraftEditor />', () => {
                 screen.getByText('Nie znaleźliśmy tego adresu na mapie. Sprawdź ulicę i miasto.'),
             ).toBeInTheDocument(),
         );
-        expect(screen.getByRole('img', { name: /Mapa z pinezką/ })).toBeInTheDocument();
+        expect(screen.getByTestId('map-marker')).toHaveAttribute(
+            'data-lat',
+            String(EDITOR_DRAFT.pin?.lat),
+        );
     });
 
     it('odrzucona relokacja oglasza INTERNAL i zostawia slad w konsoli', async () => {
@@ -168,6 +201,7 @@ describe('<DraftEditor />', () => {
             'wlasciciel@firma.pl',
         );
         await userEvent.click(screen.getByRole('checkbox', { name: 'angielski' }));
+        await userEvent.click(screen.getByRole('checkbox', { name: 'Podaj godziny otwarcia' }));
         await userEvent.click(screen.getByRole('button', { name: 'Wyślij zgłoszenie' }));
 
         const formData: FormData = onSubmit.mock.calls[0][0];

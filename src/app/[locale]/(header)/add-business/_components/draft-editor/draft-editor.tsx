@@ -114,7 +114,6 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                         preview={preview}
                         unconfirmed={unconfirmed}
                         logoSrc={logoSrc}
-                        pin={picker.pin}
                     />
                 </div>
 

@@ -26,7 +26,7 @@ export interface PinPicker {
     /** Pinezka postawiona przez wlasciciela — tylko ona wypelnia `pinLat`/`pinLng`. */
     manualPin: MapPoint | null;
     isOutsidePoland: boolean;
-    /** Pin na mapie i w podgladzie: reczny ma pierwszenstwo przed wynikiem wyszukiwania. */
+    /** Pin na mapie: reczny ma pierwszenstwo przed wynikiem wyszukiwania. */
     pin: DraftPin | null;
     pick: (point: MapPoint) => void;
     reset: () => void;

@@ -42,12 +42,18 @@ describe('draft-values', () => {
         });
     });
 
-    it('checkbox godzin domyslnie odzwierciedla szkic, odznaczony zdejmuje godziny z karty', () => {
-        expect(initialValues(PREVIEW_FIXTURE).hoursEnabled).toBe(true);
-        expect(initialValues({ ...PREVIEW_FIXTURE, openingHours: {} }).hoursEnabled).toBe(false);
+    it('checkbox godzin domyslnie odznaczony, godziny ze szkicu czekaja w polach', () => {
+        const values = initialValues(PREVIEW_FIXTURE);
 
-        const values = { ...initialValues(PREVIEW_FIXTURE), hoursEnabled: false };
+        expect(values.hoursEnabled).toBe(false);
+        expect(values.hours.monday).toEqual({ open: '09:00', close: '17:00' });
         expect(previewFromValues(PREVIEW_FIXTURE, values).openingHours).toBeNull();
+
+        const enabled = { ...values, hoursEnabled: true };
+        expect(previewFromValues(PREVIEW_FIXTURE, enabled).openingHours?.monday).toEqual({
+            open: '09:00',
+            close: '17:00',
+        });
     });
 
     it('social media: prefill ze szkicu, puste i biale znaki nie trafiaja na karte', () => {

@@ -107,13 +107,24 @@ function foldText(text: string): string {
 export function mapVoivodeship(state?: string): Voivodeship | null {
     if (!state) return null;
 
-    const candidate = foldText(state).replace(/^wojewodztwo /, '').replaceAll(' ', '-');
+    const candidate = foldText(state)
+        .replace(/^wojewodztwo /, '')
+        .replaceAll(' ', '-');
 
     return VOIVODESHIP_VALUES.find(value => value === candidate) ?? null;
 }
 
+/** „ul. ” / „ulica ” na poczatku — z nim Nominatim zwraca pusta liste. */
+const STREET_PREFIX = /^ul(?:\.|ica)\s*/i;
+/** Numer lokalu po numerze budynku („24/4B” → „24”) — OSM zna tylko budynki. */
+const APARTMENT_SUFFIX = /(\d+[a-z]?)\s*\/\s*\w+$/i;
+
+function normalizeStreet(street: string): string {
+    return street.trim().replace(STREET_PREFIX, '').replace(APARTMENT_SUFFIX, '$1');
+}
+
 function buildQuery(address: GeocodeAddress): string {
-    const street = address.street?.trim();
+    const street = address.street === null ? '' : normalizeStreet(address.street);
 
     return street ? `${street}, ${address.city.trim()}` : address.city.trim();
 }

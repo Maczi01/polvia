@@ -18,37 +18,38 @@ function draftWith(preview: Partial<typeof EDITOR_DRAFT.preview>) {
 }
 
 describe('<DraftEditor /> — godziny otwarcia', () => {
-    it('szkic z godzinami: checkbox zaznaczony i pola widoczne', async () => {
+    it('checkbox domyslnie odznaczony, pola ukryte, karta bez godzin', async () => {
         await renderEditor();
-
-        expect(hoursCheckbox()).toBeChecked();
-        expect(mondayOpen()).toHaveValue('09:00');
-    });
-
-    it('szkic bez godzin: checkbox odznaczony, pola ukryte', async () => {
-        await renderEditor({ draft: draftWith({ openingHours: null }) });
 
         expect(hoursCheckbox()).not.toBeChecked();
         expect(mondayOpen()).not.toBeInTheDocument();
+        expect(screen.queryByText(/Dziś:/)).not.toBeInTheDocument();
     });
 
-    it('klik zwija i rozwija pola, fokus zostaje na checkboxie, wpisane godziny wracaja', async () => {
+    it('zaznaczenie rozwija pola z godzinami ze szkicu, fokus zostaje na checkboxie', async () => {
         await renderEditor();
 
         await userEvent.click(hoursCheckbox());
-        expect(mondayOpen()).not.toBeInTheDocument();
+        expect(mondayOpen()).toHaveValue('09:00');
         expect(hoursCheckbox()).toHaveFocus();
-        expect(screen.queryByText(/Dziś:/)).not.toBeInTheDocument();
+        expect(screen.getByText(/Dziś:/)).toBeInTheDocument();
 
         await userEvent.click(hoursCheckbox());
-        expect(mondayOpen()).toHaveValue('09:00');
+        expect(mondayOpen()).not.toBeInTheDocument();
+    });
+
+    it('szkic bez godzin: po zaznaczeniu puste pola do wpisania', async () => {
+        await renderEditor({ draft: draftWith({ openingHours: null }) });
+
+        await userEvent.click(hoursCheckbox());
+
+        expect(mondayOpen()).toHaveValue('');
     });
 
     it('odznaczone godziny: wysylka bez hoursEnabled i bez pol hours.*', async () => {
         const onSubmit = jest.fn();
         await renderEditor({ onSubmit });
 
-        await userEvent.click(hoursCheckbox());
         await submitEditor();
 
         const formData: FormData = onSubmit.mock.calls[0][0];

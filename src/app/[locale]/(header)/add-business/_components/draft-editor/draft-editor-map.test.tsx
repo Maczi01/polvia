@@ -40,7 +40,7 @@ describe('<DraftEditor /> — mapa z pinezka', () => {
         await renderEditor();
 
         const map = screen.getByRole('group', { name: 'Mapa do ustawienia pinezki firmy' });
-        expect(map).toHaveAccessibleDescription(/Bez myszy: popraw adres/);
+        expect(map).toHaveAccessibleDescription(/Bez myszy: wpisz adres/);
         expect(marker()).toHaveAttribute('data-lat', String(EDITOR_DRAFT.pin?.lat));
     });
 
@@ -66,7 +66,7 @@ describe('<DraftEditor /> — mapa z pinezka', () => {
         expect(submitted.get('pinLng')).toBe('');
     });
 
-    it('klik w mape ustawia ukryte pola, pin w podgladzie i komunikat „recznie"', async () => {
+    it('klik w mape ustawia ukryte pola, pin i komunikat „recznie"', async () => {
         await renderEditor();
 
         clickMap(52.2297, 21.0122);
@@ -75,8 +75,6 @@ describe('<DraftEditor /> — mapa z pinezka', () => {
         expect(hiddenValue('pinLng')).toBe('21.012200');
         expect(marker()).toHaveAttribute('data-lng', '21.0122');
         expect(screen.getByText('Pinezka ustawiona ręcznie.')).toBeInTheDocument();
-        const staticMap = screen.getByRole('img', { name: /Mapa z pinezką firmy/ });
-        expect(staticMap.getAttribute('src')).toContain('21.01220,52.22970');
     });
 
     it('przeciagniecie pinezki tez ustawia pin reczny', async () => {

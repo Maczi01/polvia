@@ -1,6 +1,6 @@
 import type { FactField } from '@/lib/add-business/draft-schema';
 import { type LanguageCode, SOCIAL_KEYS, type SocialKey } from '@/lib/add-business/form-limits';
-import { type BusinessPreview, hasOpeningHours } from '@/lib/add-business/types';
+import type { BusinessPreview } from '@/lib/add-business/types';
 import { WEEKDAY_KEYS, type Weekday } from '@/lib/weekdays';
 
 /**
@@ -59,7 +59,8 @@ export function initialValues(preview: BusinessPreview): DraftValues {
         phoneNumber: preview.phoneNumber ?? '',
         email: preview.email ?? '',
         webpage: preview.webpage ?? '',
-        hoursEnabled: hasOpeningHours(preview.openingHours),
+        // Domyslnie odznaczony: godziny ze szkicu czekaja w polach do swiadomego zaznaczenia.
+        hoursEnabled: false,
         hours: { ...emptyHours(), ...hours },
         languages: [...preview.languages],
         socials: { ...preview.socials },

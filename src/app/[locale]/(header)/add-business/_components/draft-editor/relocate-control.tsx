@@ -15,22 +15,22 @@ interface RelocateControlProps {
 }
 
 /**
- * „Szukaj na mapie" (R8): bierze ulice i miasto z pol adresu edytora i jest aktywny dopiero,
- * gdy wpisany adres rozni sie od tego na mapie. Wynik trafia do regionu `aria-live` obecnego
+ * „Szukaj na mapie" (R8): bierze ulice i miasto z pol adresu edytora. Aktywny zawsze poza
+ * trwajacym wyszukiwaniem — takze dla adresu ze szkicu, ktorego geokoder mogl nie znalezc.
+ * Zmiana adresu tylko podpowiada wyszukanie. Wynik trafia do regionu `aria-live` obecnego
  * w DOM-ie od poczatku (R18).
  */
 export function RelocateControl(props: RelocateControlProps): JSX.Element {
     const { isAddressChanged, isRelocating, result, onRelocate } = props;
     const t = useTranslations('addBusiness');
-    const isBlocked = !isAddressChanged || isRelocating;
 
     return (
         <div className="space-y-2">
             <Button
                 type="button"
                 variant="outline"
-                onClick={isBlocked ? undefined : onRelocate}
-                aria-disabled={isBlocked}
+                onClick={isRelocating ? undefined : onRelocate}
+                aria-disabled={isRelocating}
                 className="border px-4 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
             >
                 <MapPinned aria-hidden />

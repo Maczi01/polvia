@@ -90,6 +90,18 @@ describe('geocodeAddress', () => {
         expect(mockSet).toHaveBeenCalledWith(expect.any(String), '1', 'PX', 1000, 'NX');
     });
 
+    it.each([
+        ['ul. Mickiewicza 24/4B', 'Mickiewicza 24, Poznań'],
+        ['Ulica Mickiewicza 24 / 4', 'Mickiewicza 24, Poznań'],
+        ['al. Jerozolimskie 65/79', 'al. Jerozolimskie 65, Poznań'],
+    ])('zdejmuje „ul.” i numer lokalu przed zapytaniem: %s', async (street, query) => {
+        const fetchImpl = fetchReturning(jsonResponse([]));
+
+        await geocodeAddress({ street, city: 'Poznań' }, { fetchImpl, sleep: noSleep });
+
+        expect(new URL(fetchImpl.mock.calls[0][0]).searchParams.get('q')).toBe(query);
+    });
+
     it('przy trafieniu w cache nie wola fetch', async () => {
         mockGet.mockResolvedValue(JSON.stringify({ hit: WARSAW_HIT }));
         const fetchImpl = jest.fn();

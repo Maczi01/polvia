@@ -13,15 +13,12 @@ interface SubmissionFieldsProps {
     onLogoChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-/** Sekcja „Zgloszenie": logo, e-mail zglaszajacego i uwagi dla operatora. */
+/** Koniec formularza: logo, e-mail zglaszajacego i uwagi dla operatora. */
 export function SubmissionFields({ errors, onLogoChange }: SubmissionFieldsProps): JSX.Element {
     const t = useTranslations('addBusiness');
 
     return (
         <>
-            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                {t('editor.contactHeading')}
-            </h3>
             <TextField
                 name="logo"
                 type="file"

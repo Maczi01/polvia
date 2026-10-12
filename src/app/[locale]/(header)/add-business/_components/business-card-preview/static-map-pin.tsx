@@ -3,7 +3,7 @@
 import { TriangleAlert } from 'lucide-react';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import type { JSX } from 'react';
+import type { JSX, ReactNode } from 'react';
 
 import type { DraftPin } from '@/lib/add-business/types';
 import type { Coverage } from '@/lib/coverage';
@@ -15,6 +15,16 @@ const ATTRIBUTION_LINK_CLASSES =
 
 const WARNING_CLASSES =
     'flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100';
+
+/** Ostrzezenie o pinezce (brak, przyblizona) — w karcie i pod mapa edytora. */
+export function MapWarning({ children }: { children: ReactNode }): JSX.Element {
+    return (
+        <p className={WARNING_CLASSES}>
+            <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+            {children}
+        </p>
+    );
+}
 
 interface StaticMapPinProps {
     pin: DraftPin | null;
@@ -36,12 +46,7 @@ export function StaticMapPin({ pin, coverage, address }: StaticMapPinProps): JSX
     if (coverage === 'online') return null;
 
     if (pin === null) {
-        return (
-            <p className={WARNING_CLASSES}>
-                <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-                {t('noPin')}
-            </p>
-        );
+        return <MapWarning>{t('noPin')}</MapWarning>;
     }
 
     return (
@@ -54,12 +59,7 @@ export function StaticMapPin({ pin, coverage, address }: StaticMapPinProps): JSX
                 unoptimized
                 className="h-auto w-full rounded-lg border border-gray-200 dark:border-gray-700"
             />
-            {pin.approximate && (
-                <p className={WARNING_CLASSES}>
-                    <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-                    {t('approximatePin')}
-                </p>
-            )}
+            {pin.approximate && <MapWarning>{t('approximatePin')}</MapWarning>}
             <figcaption className="text-xs text-gray-500 dark:text-gray-400">
                 <a
                     href="https://www.mapbox.com/about/maps/"
