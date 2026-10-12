@@ -2,7 +2,7 @@
 
 Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane przez `/dev-compound` i `/dev-compound-refresh`.
 
-<!-- rule-count: 7 -->
+<!-- rule-count: 11 -->
 
 - **Zmiany schematu aplikuj przez `npx drizzle-kit push`, nie `generate`**: katalog `drizzle/` w tym repo jest martwy (snapshoty znaja 2 z 4 enumow i nie znaja tabeli `service_locations`), wiec `generate` produkuje migracje tworzaca od zera obiekty juz istniejace w bazie. Jesli `generate` zapyta o `rename`, ZATRZYMAJ SIE — wybor `~ county > coverage rename enum` jest destrukcyjny. Skrypt `npm run drizzle:generate` wola przedawniony `generate:pg` i nic nie robi.
   Source: docs/solutions/database-issues/2026-08-22-drizzle-generate-nieuzywalny-snapshoty.md
@@ -24,3 +24,15 @@ Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane prze
 
 - **Paczka bez buildu CJS i `next/dynamic` w tescie**: gdy paczka nie ma CJS (next-intl, use-intl, nuqs, use-supercluster), dopisz ja do `ESM_ONLY_PACKAGES` w `jest.config.js` — wyjatek trafia do `transformIgnorePatterns` juz wyliczonych przez `next/jest`, nie do `customJestConfig`. `next/dynamic` w Jescie musi byc zmapowany na `app-dynamic` (tak robi build App Routera); loader Pages Routera wiaze `ref` z `{ retry }`, wiec test uruchamia inna implementacje niz produkcja. Komponent z `dynamic()` renderuj w `await act(async () => ...)`.
   Source: docs/solutions/testing-issues/2026-09-27-montowanie-map-page-client-esm-only-i-next-dynamic.md
+
+- **Wzorzec `npx jest` ze sciezka route group escapuj w calosci**: argumenty `npx jest` to regex, wiec `(header)` jest grupa dopasowujaca `header` bez nawiasow i nie trafia w zaden plik. Pisz `"src/app/\[locale\]/\(header\)/..."`. Przy kilku wzorcach w jednej komendzie pusty wzorzec znika bez bledu (kod 0), wiec porownuj liczbe `Test Suites:` z oczekiwana albo sprawdz `npx jest --listTests "<wzorzec>"`.
+  Source: docs/solutions/testing-issues/2026-10-11-jest-wzorzec-sciezki-z-route-group.md
+
+- **Po nieodwracalnym kroku kazde I/O ma jawny timeout**: kod po GETDEL/zapisie/platnosci musi skonczyc sie w `maxDuration`, inaczej Vercel ubija funkcje przed logiem porazki i dane znikaja bez sladu. Domyslne limity bibliotek zakladaja dlugo zyjacy serwer (nodemailer: 2 min / 30 s / 10 min) — ustaw `connectionTimeout`/`greetingTimeout`/`socketTimeout`. Wszystko, co moze zawiesc, przed nieodwracalnym krokiem; niezalezne kroki przez `Promise.all`.
+  Source: docs/solutions/runtime-errors/2026-10-11-nieograniczony-czas-po-nieodwracalnym-kroku.md
+
+- **`URL.canParse`: tylko na serwerze, testy z `@jest-environment node`**: jsdom 20 (domyslne srodowisko testow) i Safari < 17 nie maja `URL.canParse` — test pada `TypeError: URL.canParse is not a function`, a TypeScript milczy. W kodzie klienckim uzyj `new URL()` w `try` bez `instanceof` (jsdom rzuca z innego realmu).
+  Source: docs/solutions/testing-issues/2026-10-11-url-canparse-brak-w-jsdom.md
+
+- **Akcje „w locie” w tescie zawsze rozwiazuj przed koncem testu**: React 19 splata trwajace akcje async, wiec niezakonczona obietnica z mocka akcji blokuje commit przejsc we WSZYSTKICH kolejnych testach pliku („Unable to find …” w testach, ktore przechodza osobno). Trzymaj `resolve` i wolaj go na koncu testu z `await findBy…` na stan koncowy.
+  Source: docs/solutions/testing-issues/2026-10-11-react-19-niezakonczona-akcja-blokuje-kolejne-testy.md

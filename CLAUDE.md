@@ -116,6 +116,9 @@ Server Action jest publicznym endpointem POST — **nie ma RLS, kod jest jedyną
 ### Zmienne środowiskowe
 Wyłącznie przez `env.ts`. Zero `process.env` w kodzie aplikacji. Nowa zmienna = wpis w `server`/`client` **oraz** w `runtimeEnv`. Sekret nigdy w `client` ani za prefiksem `NEXT_PUBLIC_`.
 
+### Stałe dla komponentów klienckich
+Komponent `'use client'` **nie importuje wartości** z modułów walidacji (zod) ani z `src/db/**`. Inaczej do bundla trafiają schematy, `slugify`, a nawet drizzle `pg-core`. Stałe trzymaj w lekkich modułach bez zależności: `src/lib/categories.ts`, `coverage.ts`, `weekdays.ts`, `add-business/form-limits.ts`, `mapbox.ts`. Schemat je importuje i reeksportuje (`export … from`). Z modułów schematów klient może brać tylko `import type`.
+
 ### Styling
 Klasy warunkowe przez `cn()` z **`@/lib/utilities`**. Warianty przez `cva`. Tokeny (`bg-primary`) nad hexami.
 

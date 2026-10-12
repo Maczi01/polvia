@@ -1,6 +1,7 @@
 // app/[locale]/contact/page.tsx
 
 import { ContactForm } from '@/app/[locale]/(main)/_components/contact-form';
+import { AddBusinessCta } from './_components/add-business-cta/add-business-cta';
 import { Header } from '@/components/header/header';
 import { getTranslations, setRequestLocale } from 'next-intl/server'; // Add setRequestLocale
 import { Metadata } from 'next';
@@ -60,6 +61,7 @@ export default async function ContactPage({ // Add async and params
     return (
         <div className="overflow-y-auto px-4 py-10 sm:px-6">
             <ContactForm />
+            <AddBusinessCta />
         </div>
     );
 }

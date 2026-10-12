@@ -1,5 +1,6 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
+import { addBusinessUrl } from '@/app/[locale]/(header)/add-business/add-business-urls';
 import { getPosts } from '@/lib/posts';
 import { CATEGORY_SLUGS, COUNTY_SLUGS, COVERAGE_ONLINE_SLUG } from '@/lib/slug-mappings';
 import { env } from '../../env';
@@ -53,6 +54,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         {
             url: `${baseUrl}/en/contact`, // Angielski z prefiksem
+            lastModified: currentDate,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+
+        // Dodaj firme — sciezki z routingu next-intl (pl `/dodaj-firme`, en `/en/add-business`)
+        {
+            url: addBusinessUrl(baseUrl, 'pl'),
+            lastModified: currentDate,
+            changeFrequency: 'monthly',
+            priority: 0.8,
+        },
+        {
+            url: addBusinessUrl(baseUrl, 'en'),
             lastModified: currentDate,
             changeFrequency: 'monthly',
             priority: 0.8,

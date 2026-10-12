@@ -8,9 +8,18 @@ const nextConfig: NextConfig = {
 
     // CSS optimization for better performance - using stable features only
 
+    // Upload logo w "Dodaj firme" ma limit 2 MB (D9); domyslne 1 MB odrzuciloby go
+    // przed walidacja. Zapas na pozostale pola formularza.
+    experimental: {
+        serverActions: {
+            bodySizeLimit: '3mb',
+        },
+    },
+
     // Production optimizations
     compiler: {
-        removeConsole: process.env.NODE_ENV === 'production',
+        removeConsole:
+            process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
     },
 
     async redirects() {

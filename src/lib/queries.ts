@@ -10,9 +10,10 @@ import {
     tagsTranslationsTable,
 } from '@/db/schema';
 import { servicesTranslationsAlias } from '@/db/aliases';
-import { and, desc, eq, gt, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, ilike, or, sql } from 'drizzle-orm';
 import { isNotNull } from 'drizzle-orm';
 import 'server-only';
+import { domainLikePatterns, pickByHost } from '@/lib/add-business/domain-match';
 import { type FeaturedService, pickFeaturedServices } from '@/lib/featured-services';
 import { isPublicService } from '@/lib/public-service-filter';
 import { Service } from '@/types';
@@ -272,4 +273,58 @@ export async function getMostPopular(locale: string) {
         .limit(5);
 
     return results as Service[];
+}
+
+/**
+ * Gorna granica kandydatow z filtra `ILIKE`. Po zakotwiczeniu wzorcow trafiaja tu
+ * prawie wylacznie lokalizacje z tym samym hostem (kazda jest trafieniem) i rzadkie
+ * kolizje prefiksu (`abc.pl.example.com`) — limit chroni tylko przed patologia.
+ */
+const DOMAIN_CANDIDATES_LIMIT = 100;
+
+export type DomainMatch = {
+    /** Nazwa w danym locale (fallback: nazwa bazowa). */
+    name: string;
+    /** Slug lokalizacji — argument `place` dla `buildServiceUrl`. */
+    slug: string;
+};
+
+/**
+ * Publiczny wpis, ktorego strona ma podany host (R7: duplikat po domenie).
+ *
+ * `ILIKE` z zakotwiczonymi wzorcami tylko zaweza kandydatow (wartosci ida jako parametry,
+ * znaki `%`/`_` hosta sa escapowane); o trafieniu decyduje dokladne porownanie hosta
+ * w `pickByHost`. Host moze przyjsc nienormalizowany (`WWW.Firma.pl`). Hosty
+ * social nie powinny tu trafiac — odsiewa je wolajacy przez `classifyLink` (D8).
+ */
+export async function findServiceByDomain(host: string, locale: string): Promise<DomainMatch | null> {
+    const patterns = domainLikePatterns(host);
+    if (patterns.length === 0) return null;
+
+    const candidates = await db
+        .select({
+            name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`,
+            slug: serviceLocationsTable.slug,
+            webpage: serviceLocationsTable.webpage,
+        })
+        .from(serviceLocationsTable)
+        .innerJoin(servicesTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
+        .leftJoin(
+            servicesTranslationsAlias,
+            and(
+                eq(servicesTranslationsAlias.serviceId, servicesTable.id),
+                eq(servicesTranslationsAlias.languageCode, locale),
+            ),
+        )
+        .where(
+            and(
+                isPublicService,
+                or(...patterns.map(pattern => ilike(serviceLocationsTable.webpage, pattern))),
+            ),
+        )
+        .orderBy(desc(serviceLocationsTable.isMainLocation))
+        .limit(DOMAIN_CANDIDATES_LIMIT);
+
+    const match = pickByHost(candidates, host);
+    return match ? { name: match.name, slug: match.slug } : null;
 }

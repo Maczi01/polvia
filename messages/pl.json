@@ -457,7 +457,8 @@
     "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem"
   },
   "contact": {
-    "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej."
+    "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej.",
+    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później."
   },
   "images": {
     "logo": "Logo Polvia - katalog ukraińskich firm w Polsce",
@@ -604,5 +605,223 @@
     "mapDescription": "Adres, który otworzyłeś, nie odpowiada żadnej kategorii ani lokalizacji na mapie.",
     "backToMap": "Przejdź do mapy",
     "backHome": "Strona główna"
+  },
+  "addBusiness": {
+    "cta": {
+      "heading": "Masz firmę?",
+      "description": "Wklej link do strony swojej firmy, a AI przygotuje wpis do katalogu, który sprawdzisz przed wysłaniem.",
+      "button": "Dodaj firmę z AI"
+    },
+    "page": {
+      "metaTitle": "Dodaj firmę do katalogu z pomocą AI | Polvia",
+      "metaDescription": "Wklej link do strony swojej firmy, a przygotujemy wpis do katalogu Polvia: opisy w czterech językach, kategorię i pinezkę na mapie. Sprawdzisz go przed wysłaniem.",
+      "title": "Dodaj firmę do katalogu",
+      "intro": "Wklej link do strony firmy. Przygotujemy propozycję wpisu, którą poprawisz i wyślesz do nas. Wpis publikujemy po ręcznym sprawdzeniu."
+    },
+    "link": {
+      "heading": "Link do firmy",
+      "label": "Adres strony firmy",
+      "hint": "Strona www albo profil w mediach społecznościowych.",
+      "placeholder": "https://twojafirma.pl",
+      "submit": "Przygotuj wpis",
+      "generating": "Przygotowuję…",
+      "manualPrompt": "Nie masz strony internetowej?",
+      "manualButton": "Wpisz dane ręcznie"
+    },
+    "progress": {
+      "reading": "Czytam stronę…",
+      "classifying": "Klasyfikuję firmę…",
+      "writing": "Piszę opisy w czterech językach…",
+      "patience": "To może potrwać do minuty."
+    },
+    "manual": {
+      "heading": "Dane firmy",
+      "intro": "Wpisz najważniejsze dane i opisz działalność. Na tej podstawie przygotujemy kategorię, tagi i opisy w czterech językach.",
+      "reasons": {
+        "SOCIAL_LINK": "Profili w mediach społecznościowych nie możemy odczytać automatycznie. Wpisz dane firmy ręcznie, link już zachowaliśmy.",
+        "UNREADABLE": "Nie udało się odczytać tej strony. Wpisz dane firmy ręcznie."
+      },
+      "descriptionLabel": "Opis działalności",
+      "descriptionHint": "Co robicie, dla kogo i w jakich językach obsługujecie klientów. Od {min} do {max} znaków.",
+      "counter": "{count} / {max} znaków",
+      "submit": "Przygotuj wpis",
+      "backToLink": "Wróć do linku"
+    },
+    "fields": {
+      "name": "Nazwa firmy",
+      "address": "Adres",
+      "street": "Ulica i numer",
+      "postcode": "Kod pocztowy",
+      "city": "Miasto",
+      "phoneNumber": "Telefon",
+      "email": "E-mail firmy",
+      "webpage": "Strona www",
+      "link": "Strona www lub profil",
+      "openingHours": "Godziny otwarcia",
+      "languages": "Języki obsługi klienta",
+      "logo": "Logo (opcjonalnie)",
+      "logoHint": "PNG, JPEG lub WebP, do 2 MB. Zastąpi logo znalezione na stronie.",
+      "submitterEmail": "Twój e-mail",
+      "submitterEmailHint": "Wyślemy na niego potwierdzenie zgłoszenia. Nie publikujemy go.",
+      "notes": "Uwagi (opcjonalnie)",
+      "notesHint": "Np. inna kategoria albo kolejny punkt w innym mieście.",
+      "requiredMark": "(wymagane)"
+    },
+    "hours": {
+      "open": "{day}: otwarcie",
+      "close": "{day}: zamknięcie",
+      "hint": "Zostaw dzień pusty, jeśli firma jest wtedy zamknięta.",
+      "days": {
+        "monday": "Poniedziałek",
+        "tuesday": "Wtorek",
+        "wednesday": "Środa",
+        "thursday": "Czwartek",
+        "friday": "Piątek",
+        "saturday": "Sobota",
+        "sunday": "Niedziela"
+      }
+    },
+    "languages": {
+      "pl": "polski",
+      "uk": "ukraiński",
+      "en": "angielski",
+      "ru": "rosyjski"
+    },
+    "coverage": {
+      "local": "Na miejscu",
+      "online": "Online",
+      "hybrid": "Na miejscu i online"
+    },
+    "editor": {
+      "heading": "Sprawdź i popraw wpis",
+      "intro": "Tak będzie wyglądać Twoja karta w katalogu. Popraw dane, jeśli coś się nie zgadza, i wyślij zgłoszenie.",
+      "previewHeading": "Podgląd karty",
+      "formHeading": "Dane firmy",
+      "generatedHeading": "Przygotowane przez nas",
+      "generatedNote": "Wybierane przez nas; uwagi możesz zgłosić niżej.",
+      "category": "Kategoria",
+      "coverage": "Zasięg",
+      "tags": "Tagi",
+      "searchOnMap": "Szukaj na mapie",
+      "searchingOnMap": "Szukam adresu…",
+      "addressChanged": "Adres się zmienił. Kliknij „Szukaj na mapie”, żeby przesunąć pinezkę.",
+      "relocated": "Pinezka przesunięta. Pozostało sprawdzeń: {count}.",
+      "hoursEnabled": "Podaj godziny otwarcia",
+      "contactHeading": "Zgłoszenie",
+      "fixErrors": "Popraw zaznaczone pola i wyślij ponownie.",
+      "submit": "Wyślij zgłoszenie",
+      "submitting": "Wysyłam zgłoszenie…",
+      "startOver": "Zacznij od nowa"
+    },
+    "preview": {
+      "unconfirmed": "do uzupełnienia",
+      "namePlaceholder": "Nazwa firmy",
+      "logoAlt": "Logo firmy {name}",
+      "mapAlt": "Mapa z pinezką firmy przy adresie: {address}",
+      "mapAltNoAddress": "Mapa z pinezką firmy",
+      "approximatePin": "Pinezka jest przybliżona: nie znaleźliśmy dokładnego adresu. Popraw ulicę i kliknij „Szukaj na mapie” albo wskaż miejsce na mapie.",
+      "noPin": "Nie znaleźliśmy tego adresu na mapie. Sprawdź ulicę i miasto.",
+      "geocodingAttribution": "Wyszukiwanie adresu: Nominatim"
+    },
+    "socials": {
+      "heading": "Komunikatory i social media",
+      "hint": "Wszystkie pola są opcjonalne.",
+      "whatsappNumber": "WhatsApp (numer telefonu)",
+      "whatsappLink": "WhatsApp (link)",
+      "handlePlaceholder": "@nazwa lub link do profilu",
+      "linkPlaceholder": "Link do profilu, np. https://…",
+      "showOthers": "Dodaj inne"
+    },
+    "pinMap": {
+      "label": "Mapa do ustawienia pinezki firmy",
+      "hint": "Kliknij mapę albo przeciągnij pinezkę, żeby wskazać dokładne miejsce. Bez myszy: popraw adres i użyj „Szukaj na mapie”.",
+      "marker": "Pinezka firmy",
+      "manual": "Pinezka ustawiona ręcznie.",
+      "reset": "Cofnij do adresu",
+      "loading": "Ładuję mapę…"
+    },
+    "submitted": {
+      "heading": "Dziękujemy za zgłoszenie!",
+      "body": "Zgłoszenie firmy {name} trafiło do nas. Sprawdzimy je ręcznie i opublikujemy wpis w katalogu.",
+      "emailNote": "Na Twój adres e-mail wysłaliśmy potwierdzenie z kopią zgłoszonych danych.",
+      "cardHeading": "Twoja karta",
+      "backHome": "Wróć na stronę główną"
+    },
+    "duplicate": {
+      "heading": "Ta firma jest już w katalogu",
+      "body": "Firma {name} ma już wpis w katalogu Polvia.",
+      "link": "Zobacz wpis firmy {name}",
+      "hint": "Jeśli dane we wpisie są nieaktualne, napisz do nas.",
+      "startOver": "Dodaj inną firmę"
+    },
+    "limited": {
+      "heading": "Osiągnięto dzienny limit",
+      "body": "Dziennie można przygotować tylko kilka wpisów. Spróbuj ponownie {when}.",
+      "contact": "Napisz do nas przez formularz kontaktowy",
+      "submitBody": "Wykorzystano dzienny limit wysyłania zgłoszeń. Spróbuj ponownie {when} albo napisz do nas — dodamy firmę ręcznie."
+    },
+    "notice": {
+      "contactLink": "Napisz do nas"
+    },
+    "actionErrors": {
+      "GENERATION_FAILED": "Nie udało się przygotować wpisu. Spróbuj ponownie za chwilę albo wpisz dane ręcznie.",
+      "DRAFT_EXPIRED": "Propozycja wpisu wygasła albo została już wysłana. Zacznij od nowa.",
+      "RELOCATION_LIMIT": "Wykorzystano limit sprawdzeń adresu. Opisz poprawny adres w uwagach.",
+      "ADDRESS_NOT_FOUND": "Nie znaleźliśmy tego adresu na mapie. Sprawdź ulicę i miasto.",
+      "GEOCODE_UNAVAILABLE": "Wyszukiwanie adresu jest chwilowo niedostępne. Spróbuj ponownie za chwilę.",
+      "INVALID_ENTRY": "Nie udało się złożyć wpisu z tych danych.",
+      "SEND_FAILED": "Nie udało się przekazać zgłoszenia. Dodamy firmę ręcznie — wystarczy wiadomość przez formularz kontaktowy.",
+      "INTERNAL": "Coś poszło nie tak po naszej stronie. Spróbuj ponownie za chwilę."
+    },
+    "errors": {
+      "required": "To pole jest wymagane.",
+      "invalidEmail": "Wpisz poprawny adres e-mail.",
+      "invalidUrl": "Wpisz poprawny adres strony, np. https://twojafirma.pl.",
+      "invalidTime": "Wpisz godzinę w formacie GG:MM.",
+      "incompleteHours": "Podaj godzinę otwarcia i zamknięcia albo zostaw obie puste.",
+      "invalidLanguage": "Wybierz język z listy.",
+      "languagesRequired": "Wybierz co najmniej jeden język.",
+      "tooLong": "Tekst jest za długi.",
+      "invalidValue": "Nieprawidłowa wartość.",
+      "invalidLogo": "Logo musi być obrazem PNG, JPEG lub WebP.",
+      "logoTooLarge": "Logo może mieć najwyżej 2 MB.",
+      "tooShort": "Opis jest za krótki. Napisz co najmniej 50 znaków.",
+      "wrongSocialService": "Ten link prowadzi do innego serwisu niż to pole.",
+      "invalidPhone": "To nie wygląda na numer telefonu. Wpisz cyfry, np. +48 500 600 700.",
+      "pinOutsidePoland": "Pinezka musi być w Polsce."
+    },
+    "confirmationEmail": {
+      "subject": "Otrzymaliśmy zgłoszenie firmy {name}",
+      "greeting": "Dzień dobry,",
+      "intro": "dziękujemy za zgłoszenie firmy {name} do katalogu Polvia.",
+      "factsHeading": "Dane, które otrzymaliśmy:",
+      "fields": {
+        "name": "Nazwa",
+        "address": "Adres",
+        "phone": "Telefon",
+        "email": "E-mail",
+        "webpage": "Strona internetowa",
+        "openingHours": "Godziny otwarcia",
+        "languages": "Języki obsługi"
+      },
+      "days": {
+        "monday": "poniedziałek",
+        "tuesday": "wtorek",
+        "wednesday": "środa",
+        "thursday": "czwartek",
+        "friday": "piątek",
+        "saturday": "sobota",
+        "sunday": "niedziela"
+      },
+      "languages": {
+        "pl": "polski",
+        "uk": "ukraiński",
+        "en": "angielski",
+        "ru": "rosyjski"
+      },
+      "review": "Wpis pojawi się w katalogu po weryfikacji przez nasz zespół. Jeśli będziemy mieć pytania, napiszemy na ten adres.",
+      "correction": "Jeśli coś się nie zgadza, po prostu odpowiedz na tę wiadomość.",
+      "signature": "Zespół Polvia"
+    }
   }
 }
