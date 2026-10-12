@@ -29,7 +29,9 @@ describe('draft-values', () => {
     });
 
     it('dzien z niepelna para godzin nie trafia na karte', () => {
+        // Szkic bez godzin: wlasciciel zaznacza „Podaj godziny otwarcia" i wpisuje je sam.
         const values = initialValues({ ...PREVIEW_FIXTURE, openingHours: null });
+        values.hoursEnabled = true;
         values.hours.monday = { open: '09:00', close: '' };
 
         expect(previewFromValues(PREVIEW_FIXTURE, values).openingHours).toBeNull();
@@ -38,6 +40,36 @@ describe('draft-values', () => {
         expect(previewFromValues(PREVIEW_FIXTURE, values).openingHours).toEqual({
             monday: { open: '09:00', close: '15:00' },
         });
+    });
+
+    it('checkbox godzin domyslnie odzwierciedla szkic, odznaczony zdejmuje godziny z karty', () => {
+        expect(initialValues(PREVIEW_FIXTURE).hoursEnabled).toBe(true);
+        expect(initialValues({ ...PREVIEW_FIXTURE, openingHours: {} }).hoursEnabled).toBe(false);
+
+        const values = { ...initialValues(PREVIEW_FIXTURE), hoursEnabled: false };
+        expect(previewFromValues(PREVIEW_FIXTURE, values).openingHours).toBeNull();
+    });
+
+    it('social media: prefill ze szkicu, puste i biale znaki nie trafiaja na karte', () => {
+        const draft = {
+            ...PREVIEW_FIXTURE,
+            socials: { facebook: 'https://facebook.com/kawiarnia' },
+            whatsappNumber: '+48500600700',
+        };
+        const values = initialValues(draft);
+        expect(values.socials.facebook).toBe('https://facebook.com/kawiarnia');
+        expect(values.whatsappNumber).toBe('+48500600700');
+
+        const preview = previewFromValues(draft, {
+            ...values,
+            socials: { ...values.socials, instagram: ' @kawiarnia ', tiktok: '   ' },
+            whatsappNumber: ' ',
+        });
+        expect(preview.socials).toEqual({
+            facebook: 'https://facebook.com/kawiarnia',
+            instagram: '@kawiarnia',
+        });
+        expect(preview.whatsappNumber).toBeNull();
     });
 
     it('znacznik zostaje tylko przy polach wciaz pustych', () => {

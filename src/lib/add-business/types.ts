@@ -2,6 +2,7 @@ import type { FactField, LanguageCode, LocalizedText } from '@/lib/add-business/
 import type { GeocodeErrorCode } from '@/lib/add-business/geocode';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
 import type { DraftGenerationErrorCode } from '@/lib/add-business/llm-draft';
+import type { Socials } from '@/lib/add-business/social-links';
 import type { OwnerEditErrorKey } from '@/lib/add-business/owner-edits-schema';
 import type { PageSourceErrorCode } from '@/lib/add-business/page-sources';
 import type { SafeFetchErrorCode } from '@/lib/add-business/safe-fetch';
@@ -135,6 +136,18 @@ export interface BusinessPreview {
     email: string | null;
     webpage: string | null;
     openingHours: OpeningHours | null;
+    /** Tylko niepuste linki (klucze `SOCIAL_KEYS`); prefill pol `socials.<klucz>`. */
+    socials: Socials;
+    /** `+<cyfry>`; prefill pola `whatsappNumber`. */
+    whatsappNumber: string | null;
+}
+
+/**
+ * Czy szkic ma choc jeden dzien godzin — domyslny stan checkboxa `hoursEnabled` (B).
+ * `{}` liczy sie jak brak godzin.
+ */
+export function hasOpeningHours(hours: OpeningHours | null): boolean {
+    return hours !== null && Object.keys(hours).length > 0;
 }
 
 // --- Wyniki akcji ------------------------------------------------------------------

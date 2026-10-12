@@ -32,11 +32,16 @@ function rejectedRelocation(error: unknown): RelocateResult {
 }
 
 /**
- * „Sprawdz na mapie" (R8, D10): geokodowanie nowego adresu przez `relocateDraftAction`.
+ * „Szukaj na mapie" (R8, D10): geokodowanie nowego adresu przez `relocateDraftAction`.
  * Pin w podgladzie zmienia sie dopiero po udanej relokacji, a `geocodedAddress` mowi
- * edytorowi, czy wpisany adres rozni sie od tego, ktory jest na mapie.
+ * edytorowi, czy wpisany adres rozni sie od tego, ktory jest na mapie. `onRelocated`
+ * pozwala zdjac reczna pinezke, gdy wlasciciel wyszukal adres od nowa.
  */
-export function useRelocation(draft: ReadyDraft, relocateAction: RelocateAction): Relocation {
+export function useRelocation(
+    draft: ReadyDraft,
+    relocateAction: RelocateAction,
+    onRelocated: () => void,
+): Relocation {
     const initial: RelocationState = {
         result: null,
         pin: draft.pin,
@@ -52,6 +57,7 @@ export function useRelocation(draft: ReadyDraft, relocateAction: RelocateAction)
 
             const result = await relocateAction(null, formData).catch(rejectedRelocation);
             if (result.status !== 'relocated') return { ...previous, result };
+            onRelocated();
             return { result, pin: result.pin, geocodedAddress: address };
         },
         initial,

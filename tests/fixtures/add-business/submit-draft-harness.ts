@@ -34,6 +34,8 @@ export const DRAFT: BusinessDraft = {
         email: 'biuro@nowak.example.pl',
         openingHours: null,
     },
+    socials: {},
+    whatsappNumber: null,
     unconfirmed: ['phoneNumber', 'openingHours'],
 };
 

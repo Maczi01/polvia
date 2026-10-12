@@ -15,8 +15,9 @@ interface RelocateControlProps {
 }
 
 /**
- * „Sprawdz na mapie" (R8): aktywny dopiero, gdy wpisany adres rozni sie od tego na mapie.
- * Wynik trafia do regionu `aria-live` obecnego w DOM-ie od poczatku (R18).
+ * „Szukaj na mapie" (R8): bierze ulice i miasto z pol adresu edytora i jest aktywny dopiero,
+ * gdy wpisany adres rozni sie od tego na mapie. Wynik trafia do regionu `aria-live` obecnego
+ * w DOM-ie od poczatku (R18).
  */
 export function RelocateControl(props: RelocateControlProps): JSX.Element {
     const { isAddressChanged, isRelocating, result, onRelocate } = props;
@@ -24,7 +25,7 @@ export function RelocateControl(props: RelocateControlProps): JSX.Element {
     const isBlocked = !isAddressChanged || isRelocating;
 
     return (
-        <div className="space-y-2 md:col-span-2">
+        <div className="space-y-2">
             <Button
                 type="button"
                 variant="outline"
@@ -33,7 +34,7 @@ export function RelocateControl(props: RelocateControlProps): JSX.Element {
                 className="border px-4 aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
             >
                 <MapPinned aria-hidden />
-                {isRelocating ? t('editor.checkingOnMap') : t('editor.checkOnMap')}
+                {isRelocating ? t('editor.searchingOnMap') : t('editor.searchOnMap')}
             </Button>
             {isAddressChanged && !isRelocating && (
                 <p className="text-xs text-gray-600 dark:text-gray-400">

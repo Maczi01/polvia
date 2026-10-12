@@ -701,10 +701,11 @@
       "category": "Category",
       "coverage": "Service area",
       "tags": "Tags",
-      "checkOnMap": "Check on the map",
-      "checkingOnMap": "Looking up the address…",
-      "addressChanged": "The address has changed. Click “Check on the map” to move the pin.",
+      "searchOnMap": "Search on the map",
+      "searchingOnMap": "Looking up the address…",
+      "addressChanged": "The address has changed. Click “Search on the map” to move the pin.",
       "relocated": "Pin moved. Checks left: {count}.",
+      "hoursEnabled": "Add opening hours",
       "contactHeading": "Submission",
       "fixErrors": "Correct the highlighted fields and send again.",
       "submit": "Send listing",
@@ -717,9 +718,26 @@
       "logoAlt": "{name} logo",
       "mapAlt": "Map with the business pin at: {address}",
       "mapAltNoAddress": "Map with the business pin",
-      "approximatePin": "The pin is approximate: we could not find the exact address. Correct the street and click “Check on the map”.",
+      "approximatePin": "The pin is approximate: we could not find the exact address. Correct the street and click “Search on the map”, or point to the place on the map.",
       "noPin": "We could not find this address on the map. Check the street and city.",
       "geocodingAttribution": "Address search: Nominatim"
+    },
+    "socials": {
+      "heading": "Messengers and social media",
+      "hint": "All fields are optional.",
+      "whatsappNumber": "WhatsApp (phone number)",
+      "whatsappLink": "WhatsApp (link)",
+      "handlePlaceholder": "@name or profile link",
+      "linkPlaceholder": "Profile link, e.g. https://…",
+      "showOthers": "Add more"
+    },
+    "pinMap": {
+      "label": "Map for placing the business pin",
+      "hint": "Click the map or drag the pin to mark the exact spot. Without a mouse: correct the address and use “Search on the map”.",
+      "marker": "Business pin",
+      "manual": "Pin placed manually.",
+      "reset": "Back to the address",
+      "loading": "Loading the map…"
     },
     "submitted": {
       "heading": "Thank you for your submission!",
@@ -766,7 +784,10 @@
       "invalidValue": "Invalid value.",
       "invalidLogo": "The logo must be a PNG, JPEG or WebP image.",
       "logoTooLarge": "The logo can be at most 2 MB.",
-      "tooShort": "The description is too short. Write at least 50 characters."
+      "tooShort": "The description is too short. Write at least 50 characters.",
+      "wrongSocialService": "This link leads to a different service than this field.",
+      "invalidPhone": "This does not look like a phone number. Use digits, e.g. +48 500 600 700.",
+      "pinOutsidePoland": "The pin must be in Poland."
     },
     "confirmationEmail": {
       "subject": "We have received your submission: {name}",

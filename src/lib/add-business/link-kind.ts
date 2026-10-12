@@ -61,7 +61,8 @@ export function normalizeHost(host: string): string {
     return host.toLowerCase().replace(/^www\./, '');
 }
 
-function matchesHost(host: string, candidate: string): boolean {
+/** Host rowny kandydatowi albo jego subdomena (`m.facebook.com` pasuje do `facebook.com`). */
+export function matchesHost(host: string, candidate: string): boolean {
     return host === candidate || host.endsWith(`.${candidate}`);
 }
 

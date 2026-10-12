@@ -32,6 +32,8 @@ const DRAFT: BusinessDraft = {
         email: null,
         openingHours: null,
     },
+    socials: {},
+    whatsappNumber: null,
     unconfirmed: ['postcode', 'phoneNumber', 'email', 'openingHours'],
 };
 

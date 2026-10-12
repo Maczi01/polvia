@@ -31,6 +31,8 @@ const DRAFT: BusinessDraft = {
         email: null,
         openingHours: { monday: { open: '09:00', close: '17:00' } },
     },
+    socials: {},
+    whatsappNumber: null,
     unconfirmed: ['email'],
 };
 
@@ -66,6 +68,9 @@ function untouchedEdits(draft: BusinessDraft = DRAFT): OwnerEdits {
         webpage: 'https://nowak.pl/',
         openingHours: draft.facts.openingHours,
         languages: draft.languages,
+        socials: draft.socials,
+        whatsappNumber: draft.whatsappNumber,
+        pin: null,
         submitterEmail: 'wlasciciel@nowak.pl',
         notes: null,
     };

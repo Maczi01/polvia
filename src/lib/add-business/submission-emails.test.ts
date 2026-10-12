@@ -61,6 +61,7 @@ function input(overrides: Partial<SubmissionEmailInput> = {}): SubmissionEmailIn
         submitterEmail: 'wlasciciel@nowak.pl',
         notes: 'Prosze o dodanie godzin w sobote.',
         logo: LOGO,
+        manualPin: false,
         ...overrides,
     };
 }

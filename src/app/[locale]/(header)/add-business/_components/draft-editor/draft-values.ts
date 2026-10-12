@@ -1,6 +1,6 @@
 import type { FactField } from '@/lib/add-business/draft-schema';
-import type { LanguageCode } from '@/lib/add-business/form-limits';
-import type { BusinessPreview } from '@/lib/add-business/types';
+import { type LanguageCode, SOCIAL_KEYS, type SocialKey } from '@/lib/add-business/form-limits';
+import { type BusinessPreview, hasOpeningHours } from '@/lib/add-business/types';
 import { WEEKDAY_KEYS, type Weekday } from '@/lib/weekdays';
 
 /**
@@ -27,9 +27,16 @@ export const TEXT_FIELDS = [
 
 export type TextFieldName = (typeof TEXT_FIELDS)[number];
 
+/** Wpisane napisy pol `socials.<klucz>`; brak klucza = puste pole. */
+export type SocialValues = Partial<Record<SocialKey, string>>;
+
 export type DraftValues = Record<TextFieldName, string> & {
+    /** Checkbox `hoursEnabled`: odznaczony = wpis bez godzin, pola `hours.*` nie ida. */
+    hoursEnabled: boolean;
     hours: HoursValues;
     languages: LanguageCode[];
+    socials: SocialValues;
+    whatsappNumber: string;
 };
 
 export interface Address {
@@ -52,8 +59,11 @@ export function initialValues(preview: BusinessPreview): DraftValues {
         phoneNumber: preview.phoneNumber ?? '',
         email: preview.email ?? '',
         webpage: preview.webpage ?? '',
+        hoursEnabled: hasOpeningHours(preview.openingHours),
         hours: { ...emptyHours(), ...hours },
         languages: [...preview.languages],
+        socials: { ...preview.socials },
+        whatsappNumber: preview.whatsappNumber ?? '',
     };
 }
 
@@ -84,6 +94,15 @@ function openingHoursOf(hours: HoursValues): BusinessPreview['openingHours'] {
     return Object.keys(result).length > 0 ? result : null;
 }
 
+function socialsOf(values: SocialValues): BusinessPreview['socials'] {
+    const result: BusinessPreview['socials'] = {};
+    for (const key of SOCIAL_KEYS) {
+        const value = orNull(values[key] ?? '');
+        if (value !== null) result[key] = value;
+    }
+    return result;
+}
+
 /** Podglad po edycji: kategoria, zasieg, tagi i opisy zostaja ze szkicu (R9). */
 export function previewFromValues(preview: BusinessPreview, values: DraftValues): BusinessPreview {
     return {
@@ -95,8 +114,10 @@ export function previewFromValues(preview: BusinessPreview, values: DraftValues)
         phoneNumber: orNull(values.phoneNumber),
         email: orNull(values.email),
         webpage: orNull(values.webpage),
-        openingHours: openingHoursOf(values.hours),
+        openingHours: values.hoursEnabled ? openingHoursOf(values.hours) : null,
         languages: values.languages,
+        socials: socialsOf(values.socials),
+        whatsappNumber: orNull(values.whatsappNumber),
     };
 }
 

@@ -1,15 +1,38 @@
 import { z } from 'zod';
 
-import { TIME_PATTERN, WEEKDAY_KEYS } from '@/db/service-input-schema';
 import {
     LANGUAGE_CODES,
     type LanguageCode,
     NOTES_MAX_LENGTH,
 } from '@/lib/add-business/form-limits';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
+import {
+    OWNER_EDIT_ERRORS,
+    type OwnerEditErrorKey,
+    optionalEmail,
+    optionalText,
+    optionalWebpage,
+} from '@/lib/add-business/owner-edit-fields';
+import { ownerHoursSchema, readHoursFields } from '@/lib/add-business/owner-hours-schema';
+import { type ManualPin, pinSchema } from '@/lib/add-business/owner-pin-schema';
+import {
+    readSocialFields,
+    resolveWhatsapp,
+    socialsSchema,
+    whatsappNumberSchema,
+} from '@/lib/add-business/owner-socials-schema';
+import type { Socials } from '@/lib/add-business/social-links';
 
 /** Reeksport z lekkiego modulu `form-limits` — klient importuje stale stamtad. */
 export { NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
+/** Reeksport — dotychczasowi importerzy biora klocki pol stad. */
+export {
+    OWNER_EDIT_ERRORS,
+    type OwnerEditErrorKey,
+    optionalEmail,
+    optionalText,
+    optionalWebpage,
+} from '@/lib/add-business/owner-edit-fields';
 
 /**
  * Pola, ktore wlasciciel moze poprawic przed wysylka (R9: kategoria, zasieg, tagi i opisy
@@ -17,74 +40,7 @@ export { NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
  *
  * Formularz jest wstepnie wypelniony wartosciami szkicu, wiec wynik to KOMPLETNY stan pol
  * po edycji, a nie lista roznic: pole wyczyszczone przez wlasciciela przychodzi jako `null`.
- *
- * Granica `FormData` (docs/solutions/runtime-errors/2026-08-22-zod-coerce-number-puste-formdata.md):
- * `get()` zwraca `null` dla pola nieobecnego i `''` dla pustego — oba normalizujemy do `null`
- * PRZED walidacja, a wymagalnosc wyrazamy w `.superRefine()`.
- *
- * Komunikaty bledow to klucze tlumaczen z namespace `addBusiness` (dodawany w U9).
  */
-
-export const OWNER_EDIT_ERRORS = {
-    required: 'addBusiness.errors.required',
-    invalidEmail: 'addBusiness.errors.invalidEmail',
-    invalidUrl: 'addBusiness.errors.invalidUrl',
-    invalidTime: 'addBusiness.errors.invalidTime',
-    incompleteHours: 'addBusiness.errors.incompleteHours',
-    invalidLanguage: 'addBusiness.errors.invalidLanguage',
-    languagesRequired: 'addBusiness.errors.languagesRequired',
-    tooLong: 'addBusiness.errors.tooLong',
-    invalidValue: 'addBusiness.errors.invalidValue',
-} as const;
-
-export type OwnerEditErrorKey = (typeof OWNER_EDIT_ERRORS)[keyof typeof OWNER_EDIT_ERRORS];
-
-const emptyToNull = (value: unknown): unknown => {
-    const normalized = typeof value === 'string' ? value.trim() : value;
-    return normalized === '' || normalized === null || normalized === undefined ? null : normalized;
-};
-
-/** `File` w polu tekstowym to podrobiony request — konczy sie bledem pola, nie wyjatkiem. */
-const text = (): z.ZodString => z.string({ invalid_type_error: OWNER_EDIT_ERRORS.invalidValue });
-
-export const optionalText = (max: number) =>
-    z.preprocess(emptyToNull, text().max(max, OWNER_EDIT_ERRORS.tooLong).nullable());
-
-export const optionalEmail = z.preprocess(
-    emptyToNull,
-    text().max(255, OWNER_EDIT_ERRORS.tooLong).email(OWNER_EDIT_ERRORS.invalidEmail).nullable(),
-);
-
-function isHttpUrl(value: string): boolean {
-    if (!URL.canParse(value)) return false;
-    const { protocol } = new URL(value);
-    return protocol === 'http:' || protocol === 'https:';
-}
-
-export const optionalWebpage = z.preprocess(
-    emptyToNull,
-    text()
-        .max(255, OWNER_EDIT_ERRORS.tooLong)
-        .refine(isHttpUrl, OWNER_EDIT_ERRORS.invalidUrl)
-        .nullable(),
-);
-
-const optionalTime = z.preprocess(
-    emptyToNull,
-    text().regex(TIME_PATTERN, OWNER_EDIT_ERRORS.invalidTime).nullable(),
-);
-
-const dayPairSchema = z.object({ open: optionalTime, close: optionalTime });
-
-const hoursSchema = z.object({
-    monday: dayPairSchema,
-    tuesday: dayPairSchema,
-    wednesday: dayPairSchema,
-    thursday: dayPairSchema,
-    friday: dayPairSchema,
-    saturday: dayPairSchema,
-    sunday: dayPairSchema,
-});
 
 export interface OwnerEdits {
     name: string;
@@ -94,22 +50,17 @@ export interface OwnerEdits {
     phoneNumber: string | null;
     email: string | null;
     webpage: string | null;
-    /** Ksztalt `serviceInputSchema`; `null` gdy wlasciciel nie podal zadnego dnia. */
+    /** Ksztalt `serviceInputSchema`; `null` gdy checkbox godzin odznaczony albo zaden dzien. */
     openingHours: OpeningHours | null;
     languages: LanguageCode[];
+    /** Tylko niepuste linki, juz jako pelne URL-e serwisow. */
+    socials: Socials;
+    /** `+<cyfry>` — z pola `whatsappNumber` albo z linku `wa.me/<cyfry>`. */
+    whatsappNumber: string | null;
+    /** Pinezka ustawiona recznie na mapie; `null` = wspolrzedne ze szkicu / geokodowania. */
+    pin: ManualPin | null;
     submitterEmail: string;
     notes: string | null;
-}
-
-type HoursInput = z.infer<typeof hoursSchema>;
-
-function toOpeningHours(hours: HoursInput): OpeningHours | null {
-    const result: OpeningHours = {};
-    for (const day of WEEKDAY_KEYS) {
-        const { open, close } = hours[day];
-        if (open !== null && close !== null) result[day] = { open, close };
-    }
-    return Object.keys(result).length > 0 ? result : null;
 }
 
 const REQUIRED_FIELDS = ['name', 'city', 'submitterEmail'] as const;
@@ -136,12 +87,15 @@ const ownerEditsSchema = z
         phoneNumber: optionalText(50),
         email: optionalEmail,
         webpage: optionalWebpage,
-        hours: hoursSchema,
+        hours: ownerHoursSchema,
         languages: z.array(
             z.enum(LANGUAGE_CODES, {
                 errorMap: () => ({ message: OWNER_EDIT_ERRORS.invalidLanguage }),
             }),
         ),
+        socials: socialsSchema,
+        whatsappNumber: whatsappNumberSchema,
+        pin: pinSchema,
         submitterEmail: optionalEmail,
         notes: optionalText(NOTES_MAX_LENGTH),
     })
@@ -155,22 +109,12 @@ const ownerEditsSchema = z
                 message: OWNER_EDIT_ERRORS.languagesRequired,
             });
         }
-
-        // Pusta para = dzien nieczynny. Polowa pary to niedokonczona edycja, nie "zamkniete".
-        for (const day of WEEKDAY_KEYS) {
-            const { open, close } = input.hours[day];
-            if ((open === null) === (close === null)) continue;
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ['hours', day, open === null ? 'open' : 'close'],
-                message: OWNER_EDIT_ERRORS.incompleteHours,
-            });
-        }
     })
     // Zod pomija transform, gdy `superRefine` zglosil blad, wiec ponizszy warunek nie
     // odpali w praktyce — sluzy zawezeniu `string | null` do `string` bez `!` i `as`.
     .transform((input, ctx): OwnerEdits => {
-        const { name, city, submitterEmail, hours, languages, ...rest } = input;
+        const { name, city, submitterEmail, hours, languages, socials, whatsappNumber, ...rest } =
+            input;
         if (name === null || city === null || submitterEmail === null) {
             addRequiredIssues(input, ctx);
             return z.NEVER;
@@ -178,11 +122,12 @@ const ownerEditsSchema = z
 
         return {
             ...rest,
+            ...resolveWhatsapp(socials, whatsappNumber),
             name,
             city,
             submitterEmail,
             languages: [...new Set(languages)],
-            openingHours: toOpeningHours(hours),
+            openingHours: hours,
         };
     });
 
@@ -210,13 +155,11 @@ function readRawFields(formData: FormData): Record<string, unknown> {
         phoneNumber: field('phoneNumber'),
         email: field('email'),
         webpage: field('webpage'),
-        hours: Object.fromEntries(
-            WEEKDAY_KEYS.map(day => [
-                day,
-                { open: field(`hours.${day}.open`), close: field(`hours.${day}.close`) },
-            ]),
-        ),
+        hours: readHoursFields(formData),
         languages: formData.getAll('languages'),
+        socials: readSocialFields(formData),
+        whatsappNumber: field('whatsappNumber'),
+        pin: { lat: field('pinLat'), lng: field('pinLng') },
         submitterEmail: field('submitterEmail'),
         notes: field('notes'),
     };

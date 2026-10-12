@@ -104,6 +104,36 @@ describe('<BusinessCardPreview />', () => {
         expect(screen.getByText(/Nie znaleźliśmy tego adresu na mapie/)).toBeInTheDocument();
     });
 
+    it('social media jak na karcie katalogu: ikony w kolejnosci karty, WhatsApp z numeru', () => {
+        renderPreview({
+            preview: {
+                ...PREVIEW_FIXTURE,
+                socials: {
+                    x: 'https://x.com/kawiarnia',
+                    facebook: 'https://facebook.com/kawiarnia',
+                    youtube: 'https://youtube.com/@kawiarnia',
+                },
+                whatsappNumber: '+48500600700',
+            },
+        });
+
+        const icons = screen
+            .getAllByRole('img')
+            .map(node => node.getAttribute('aria-label'))
+            .filter(label => label === 'Facebook' || label === 'X' || label === 'YouTube');
+        expect(icons).toEqual(['Facebook', 'X']);
+        expect(screen.getByText('WhatsApp')).toBeInTheDocument();
+        expect(screen.queryByText('Telegram')).not.toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Facebook' })).not.toBeInTheDocument();
+    });
+
+    it('bez social media nie ma pustego rzedu', () => {
+        renderPreview();
+
+        expect(screen.queryByRole('img', { name: 'Facebook' })).not.toBeInTheDocument();
+        expect(screen.queryByText('WhatsApp')).not.toBeInTheDocument();
+    });
+
     it('wpis online nie ma mapy', () => {
         renderPreview({ preview: { ...PREVIEW_FIXTURE, coverage: 'online' }, pin: null });
 
@@ -113,7 +143,12 @@ describe('<BusinessCardPreview />', () => {
 
     it('nie ma naruszen dostepnosci', async () => {
         const { container } = renderPreview({
-            preview: { ...PREVIEW_FIXTURE, phoneNumber: null, openingHours: null },
+            preview: {
+                ...PREVIEW_FIXTURE,
+                phoneNumber: null,
+                openingHours: null,
+                socials: { instagram: '@kawiarnia', telegram: '@kawiarnia' },
+            },
             unconfirmed: ['phoneNumber', 'openingHours'],
         });
 

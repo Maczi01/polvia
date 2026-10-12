@@ -4,45 +4,18 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
 
-import type { ReadyDraft } from '../add-business-flow/flow-state';
-import { PIN_FIXTURE, PREVIEW_FIXTURE } from '../business-card-preview/preview-fixture';
-import { renderWithIntl } from '../test-utils/render-with-intl';
-import { DraftEditor, type DraftEditorProps } from './draft-editor';
+import { renderEditor } from './render-editor';
 
 expect.extend(toHaveNoViolations);
 
 jest.mock('@/i18n/navigation', () => jest.requireActual('../test-utils/navigation-mock'));
+jest.mock('react-map-gl/mapbox', () => jest.requireActual('../test-utils/map-gl-mock'));
 
-const DRAFT: ReadyDraft = {
-    status: 'ready',
-    draftId: 'draft-1',
-    preview: { ...PREVIEW_FIXTURE, phoneNumber: null },
-    unconfirmed: ['phoneNumber'],
-    logoCandidate: null,
-    pin: PIN_FIXTURE,
-};
-
-function renderEditor(overrides: Partial<DraftEditorProps> = {}) {
-    const props: DraftEditorProps = {
-        draft: DRAFT,
-        fieldErrors: {},
-        error: null,
-        isPending: false,
-        logoSrc: null,
-        onLogoChange: jest.fn(),
-        onSubmit: jest.fn(),
-        onStartOver: jest.fn(),
-        relocateAction: jest.fn(),
-        ...overrides,
-    };
-    return { ...renderWithIntl(<DraftEditor {...props} />), props };
-}
-
-const relocateButton = () => screen.getByRole('button', { name: 'Sprawdź na mapie' });
+const searchButton = () => screen.getByRole('button', { name: 'Szukaj na mapie' });
 
 describe('<DraftEditor />', () => {
-    it('kategoria, zasieg i tagi sa tekstem bez kontrolki formularza', () => {
-        renderEditor();
+    it('kategoria, zasieg i tagi sa tekstem bez kontrolki formularza', async () => {
+        await renderEditor();
 
         expect(screen.queryByRole('combobox', { name: /Kategoria/ })).not.toBeInTheDocument();
         expect(screen.queryByRole('textbox', { name: /Kategoria/ })).not.toBeInTheDocument();
@@ -54,8 +27,8 @@ describe('<DraftEditor />', () => {
         ).toBeInTheDocument();
     });
 
-    it('blad e-maila jest podpiety przez aria-describedby', () => {
-        renderEditor({ fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' } });
+    it('blad e-maila jest podpiety przez aria-describedby', async () => {
+        await renderEditor({ fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' } });
 
         const input = screen.getByRole('textbox', { name: 'Twój e-mail (wymagane)' });
         expect(input).toBeInvalid();
@@ -64,7 +37,7 @@ describe('<DraftEditor />', () => {
     });
 
     it('uzupelnienie pola zdejmuje znacznik w podgladzie', async () => {
-        renderEditor();
+        await renderEditor();
         expect(screen.getByText('do uzupełnienia')).toBeInTheDocument();
 
         await userEvent.type(screen.getByRole('textbox', { name: 'Telefon' }), '+48 500 600 700');
@@ -73,20 +46,20 @@ describe('<DraftEditor />', () => {
         expect(screen.getAllByText('+48 500 600 700').length).toBeGreaterThan(0);
     });
 
-    it('zmiana adresu wlacza „Sprawdz na mapie", ktore przesuwa pin', async () => {
+    it('zmiana adresu wlacza „Szukaj na mapie", ktore przesuwa pin', async () => {
         const relocateAction = jest.fn().mockResolvedValue({
             status: 'relocated',
             pin: { lat: 54.4, lng: 18.6, approximate: true },
             remainingRelocations: 9,
         });
-        renderEditor({ relocateAction });
-        expect(relocateButton()).toHaveAttribute('aria-disabled', 'true');
+        await renderEditor({ relocateAction });
+        expect(searchButton()).toHaveAttribute('aria-disabled', 'true');
 
         const street = screen.getByRole('textbox', { name: 'Ulica i numer' });
         await userEvent.clear(street);
         await userEvent.type(street, 'ul. Długa 5');
-        expect(relocateButton()).toHaveAttribute('aria-disabled', 'false');
-        await userEvent.click(relocateButton());
+        expect(searchButton()).toHaveAttribute('aria-disabled', 'false');
+        await userEvent.click(searchButton());
 
         await waitFor(() =>
             expect(
@@ -98,7 +71,7 @@ describe('<DraftEditor />', () => {
         expect(formData.get('street')).toBe('ul. Długa 5');
         expect(formData.get('city')).toBe('Gdańsk');
         expect(screen.getByText(/Pinezka jest przybliżona/)).toBeInTheDocument();
-        expect(relocateButton()).toHaveAttribute('aria-disabled', 'true');
+        expect(searchButton()).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('blad relokacji jest ogloszony, a pin zostaje', async () => {
@@ -106,10 +79,10 @@ describe('<DraftEditor />', () => {
             status: 'error',
             error: { code: 'ADDRESS_NOT_FOUND', message: 'x' },
         });
-        renderEditor({ relocateAction });
+        await renderEditor({ relocateAction });
 
         await userEvent.type(screen.getByRole('textbox', { name: 'Ulica i numer' }), 'x');
-        await userEvent.click(relocateButton());
+        await userEvent.click(searchButton());
 
         await waitFor(() =>
             expect(
@@ -123,14 +96,16 @@ describe('<DraftEditor />', () => {
         const logError = jest.spyOn(console, 'error').mockImplementation(() => {});
         const failure = new Error('Failed to fetch');
         const relocateAction = jest.fn().mockRejectedValue(failure);
-        renderEditor({ relocateAction });
+        await renderEditor({ relocateAction });
 
         await userEvent.type(screen.getByRole('textbox', { name: 'Ulica i numer' }), 'x');
-        await userEvent.click(relocateButton());
+        await userEvent.click(searchButton());
 
         await waitFor(() =>
             expect(
-                screen.getByText('Coś poszło nie tak po naszej stronie. Spróbuj ponownie za chwilę.'),
+                screen.getByText(
+                    'Coś poszło nie tak po naszej stronie. Spróbuj ponownie za chwilę.',
+                ),
             ).toBeInTheDocument(),
         );
         expect(logError).toHaveBeenCalledWith(expect.any(String), failure);
@@ -140,7 +115,7 @@ describe('<DraftEditor />', () => {
     it('logo ponad limit: blad pola od razu, bez podgladu i bez wysylki', async () => {
         const onSubmit = jest.fn();
         const onLogoChange = jest.fn();
-        const { container } = renderEditor({ onSubmit, onLogoChange });
+        const { container } = await renderEditor({ onSubmit, onLogoChange });
         const tooLarge = new File([new Uint8Array(LOGO_MAX_BYTES + 1)], 'logo.png', {
             type: 'image/png',
         });
@@ -166,7 +141,7 @@ describe('<DraftEditor />', () => {
     it('poprawne logo zdejmuje blad i trafia do wysylki', async () => {
         const onSubmit = jest.fn();
         const onLogoChange = jest.fn();
-        renderEditor({ onSubmit, onLogoChange });
+        await renderEditor({ onSubmit, onLogoChange });
         const logo = screen.getByLabelText('Logo (opcjonalnie)');
 
         await userEvent.upload(
@@ -186,7 +161,7 @@ describe('<DraftEditor />', () => {
 
     it('wysyla pola pod nazwami z parseOwnerEdits', async () => {
         const onSubmit = jest.fn();
-        renderEditor({ onSubmit });
+        await renderEditor({ onSubmit });
 
         await userEvent.type(
             screen.getByRole('textbox', { name: 'Twój e-mail (wymagane)' }),
@@ -198,15 +173,21 @@ describe('<DraftEditor />', () => {
         const formData: FormData = onSubmit.mock.calls[0][0];
         expect(formData.get('draftId')).toBe('draft-1');
         expect(formData.get('name')).toBe('Kawiarnia Lwów');
+        expect(formData.get('hoursEnabled')).toBe('on');
         expect(formData.get('hours.monday.open')).toBe('09:00');
         expect(formData.getAll('languages')).toEqual(['pl', 'uk', 'en']);
         expect(formData.get('submitterEmail')).toBe('wlasciciel@firma.pl');
+        expect(formData.get('whatsappNumber')).toBe('');
+        expect(formData.get('socials.telegram')).toBe('');
+        expect(formData.get('socials.tiktok')).toBe('');
+        expect(formData.get('pinLat')).toBe('');
+        expect(formData.get('pinLng')).toBe('');
         expect(formData.get('category')).toBeNull();
     });
 
     it('w trakcie wysylki nie wysyla ponownie i oglasza stan', async () => {
         const onSubmit = jest.fn();
-        renderEditor({ onSubmit, isPending: true });
+        await renderEditor({ onSubmit, isPending: true });
 
         await userEvent.click(screen.getByRole('button', { name: 'Wysyłam zgłoszenie…' }));
 
@@ -217,11 +198,14 @@ describe('<DraftEditor />', () => {
     });
 
     it('nie ma naruszen dostepnosci', async () => {
-        const { container } = renderEditor({
+        const { container } = await renderEditor({
             fieldErrors: {
                 submitterEmail: 'addBusiness.errors.required',
                 'hours.monday.close': 'addBusiness.errors.incompleteHours',
                 languages: 'addBusiness.errors.languagesRequired',
+                pin: 'addBusiness.errors.pinOutsidePoland',
+                'socials.facebook': 'addBusiness.errors.wrongSocialService',
+                whatsappNumber: 'addBusiness.errors.invalidPhone',
             },
             error: 'GEOCODE_UNAVAILABLE',
         });

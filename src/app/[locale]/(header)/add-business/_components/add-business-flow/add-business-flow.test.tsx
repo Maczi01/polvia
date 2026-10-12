@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { configure, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
@@ -11,6 +11,10 @@ import { AddBusinessFlow } from './add-business-flow';
 
 expect.extend(toHaveNoViolations);
 
+// Pelny flow renderuje caly edytor (mapa przez next/dynamic, axe) i pod obciazeniem
+// rownoleglego `npx jest` przekraczal domyslne 1000 ms `findBy*`. Asercje bez zmian.
+configure({ asyncUtilTimeout: 3000 });
+
 // Akcje to granica sieci (OpenAI, Redis, maile) — w tescie UI zastepujemy je w calosci.
 jest.mock('../../_actions', () => ({
     generateDraftAction: jest.fn(),
@@ -18,6 +22,7 @@ jest.mock('../../_actions', () => ({
     submitDraftAction: jest.fn(),
 }));
 jest.mock('@/i18n/navigation', () => jest.requireActual('../test-utils/navigation-mock'));
+jest.mock('react-map-gl/mapbox', () => jest.requireActual('../test-utils/map-gl-mock'));
 
 const generate = jest.mocked(generateDraftAction);
 const submit = jest.mocked(submitDraftAction);

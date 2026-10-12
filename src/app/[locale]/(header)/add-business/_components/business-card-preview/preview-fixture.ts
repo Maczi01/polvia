@@ -35,6 +35,8 @@ export const PREVIEW_FIXTURE: BusinessPreview = {
         saturday: DAY,
         sunday: DAY,
     },
+    socials: {},
+    whatsappNumber: null,
 };
 
 export const PIN_FIXTURE: DraftPin = { lat: 54.349, lng: 18.653, approximate: false };

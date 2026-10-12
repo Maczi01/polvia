@@ -19,6 +19,7 @@ import {
     llmDraftSchema,
 } from './draft-schema';
 import type { StructuredFacts } from './jsonld-facts';
+import { type SocialLinks, socialLinksFromUrls } from './social-links';
 import { verifyFacts } from './verify-facts';
 
 /**
@@ -212,6 +213,7 @@ function toDraft(
     llm: LlmDraft,
     facts: BusinessDraft['facts'],
     unconfirmed: BusinessDraft['unconfirmed'],
+    links: SocialLinks,
 ): BusinessDraft {
     return {
         category: llm.category,
@@ -220,6 +222,8 @@ function toDraft(
         tags: llm.tags,
         descriptions: llm.descriptions,
         facts,
+        socials: links.socials,
+        whatsappNumber: links.whatsappNumber,
         unconfirmed,
     };
 }
@@ -243,7 +247,7 @@ export async function fromPage(client: DraftClient, input: PageDraftInput): Prom
         llm,
         sourceText: input.text,
     });
-    return toDraft(llm, facts, unconfirmed);
+    return toDraft(llm, facts, unconfirmed, socialLinksFromUrls(input.structured.sameAs ?? []));
 }
 
 /**
@@ -266,5 +270,7 @@ export async function fromOwner(
     );
 
     const unconfirmed = FACT_FIELDS.filter(field => input.fields[field] === null);
-    return toDraft(llm, input.fields, unconfirmed);
+    // Link z kroku 1 bywa profilem social (tryb reczny po SOCIAL_LINK) — trafia do `socials`.
+    const links = socialLinksFromUrls(input.link === null ? [] : [input.link]);
+    return toDraft(llm, input.fields, unconfirmed, links);
 }

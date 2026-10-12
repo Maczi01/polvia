@@ -49,6 +49,8 @@ const DRAFT: BusinessDraft = {
         email: 'biuro@example.pl',
         openingHours: { monday: { open: '09:00', close: '17:00' } },
     },
+    socials: {},
+    whatsappNumber: null,
     unconfirmed: ['phoneNumber'],
 };
 

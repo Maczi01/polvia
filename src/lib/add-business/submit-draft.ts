@@ -17,6 +17,7 @@ import {
 import { consumeSubmitLimit, peekSubmitLimit } from '@/lib/add-business/limits';
 import { type LogoErrorCode, processLogoUpload } from '@/lib/add-business/logo';
 import { OWNER_EDIT_ERRORS, parseOwnerEdits } from '@/lib/add-business/owner-edits-schema';
+import type { ManualPin } from '@/lib/add-business/owner-pin-schema';
 import { buildPreview, toPin } from '@/lib/add-business/preview';
 import {
     buildOperatorEmail,
@@ -75,10 +76,31 @@ function sameText(a: string | null, b: string | null): boolean {
     return (a ?? '').trim().toLowerCase() === (b ?? '').trim().toLowerCase();
 }
 
-/** Ponowne geokodowanie tylko przy zmianie adresu wzgledem tego, ktory geokodowano. */
+/**
+ * Pinezka wlasciciela bez geokodowania (C). Wojewodztwo i kod pocztowy bierzemy z `known`
+ * (geokodowanie tego samego adresu) — przy zmienionym adresie zostaja puste; operator
+ * dostaje w mailu adnotacje o recznej pinezce.
+ */
+function manualPinGeo(pin: ManualPin, known: DraftGeo | null, edits: Edits): DraftGeo {
+    return {
+        lat: pin.lat,
+        lng: pin.lng,
+        approximate: false,
+        voivodeship: known?.voivodeship ?? null,
+        postcode: known?.postcode ?? null,
+        address: { street: edits.street, city: edits.city },
+    };
+}
+
+/**
+ * Wspolrzedne wpisu. `online` nie ma pinu (reczna pinezka ignorowana). Pinezka wlasciciela
+ * wygrywa i nie wola geokodera; bez niej ponowne geokodowanie tylko przy zmianie adresu
+ * wzgledem tego, ktory geokodowano.
+ */
 async function resolveGeo(
     stored: StoredDraft,
     edits: Edits,
+    pin: ManualPin | null,
     geocode: Geocode,
 ): Promise<DraftGeo | null> {
     if (stored.draft.coverage === 'online') return null;
@@ -88,6 +110,7 @@ async function resolveGeo(
         geo !== null &&
         sameText(geo.address.street, edits.street) &&
         sameText(geo.address.city, edits.city);
+    if (pin !== null) return manualPinGeo(pin, unchanged ? geo : null, edits);
     if (unchanged) return geo;
 
     return geocodeToDraftGeo(geocode, { street: edits.street, city: edits.city });
@@ -112,14 +135,17 @@ function logoFile(value: unknown): File | null {
  * Plik wpisu to dane firmy (publiczne z natury, trafiaja do katalogu). Bez `submitterEmail`
  * i `notes`: to dane osobowe zglaszajacego, a nie firmy.
  */
-function logLostSubmission(entry: BuiltServiceEntry, hasLogo: boolean): void {
+function logLostSubmission(
+    entry: BuiltServiceEntry,
+    flags: { hasLogo: boolean; manualPin: boolean },
+): void {
     console.error('add-business operator mail failed, submission kept only in this log', {
         slug: entry.slug,
         entry: entry.json,
         unconfirmed: entry.unconfirmed,
         changedByOwner: entry.changedByOwner,
         missingCoordinates: entry.missingCoordinates,
-        hasLogo,
+        ...flags,
     });
 }
 
@@ -130,7 +156,7 @@ function sentResult(
     entry: BuiltServiceEntry,
     hasLogo: boolean,
 ): SubmitDraftResult {
-    const { openingHours, languages, webpage, ...facts } = edits;
+    const { openingHours, languages, webpage, socials, whatsappNumber, ...facts } = edits;
     const postcode = facts.postcode ?? geo?.postcode ?? null;
     return {
         status: 'sent',
@@ -139,6 +165,7 @@ function sentResult(
             facts: { ...facts, postcode, openingHours },
             webpage,
             languages,
+            links: { socials, whatsappNumber },
         }),
         unconfirmed: entry.unconfirmed,
         pin: toPin(geo),
@@ -170,9 +197,10 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     const limit = await consumeSubmitLimit(ip);
     if (!limit.allowed) return { status: 'limited', retryAfter: limit.retryAfter };
 
-    const { submitterEmail, notes, ...edits } = parsed.data;
+    const { submitterEmail, notes, pin, ...edits } = parsed.data;
+    const manualPin = pin !== null && current.stored.draft.coverage !== 'online';
     const [geo, logo] = await Promise.all([
-        resolveGeo(current.stored, edits, deps.geocode),
+        resolveGeo(current.stored, edits, pin, deps.geocode),
         resolveLogo(upload.png, current.stored.logoCandidate, deps),
     ]);
 
@@ -183,10 +211,10 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     const entry = buildServiceJson({ stored, edits, geo, hasLogo: logo !== null });
     if (!entry.ok) return actionFailure(entry.code);
 
-    const mail = { entry, stored, submitterEmail, notes, logo };
+    const mail = { entry, stored, submitterEmail, notes, logo, manualPin };
     const operator = await deps.sendMail(buildOperatorEmail(mail));
     if (!operator.ok) {
-        logLostSubmission(entry, logo !== null);
+        logLostSubmission(entry, { hasLogo: logo !== null, manualPin });
         return actionFailure(operator.code);
     }
 

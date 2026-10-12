@@ -702,10 +702,11 @@
       "category": "Kategoria",
       "coverage": "Zasięg",
       "tags": "Tagi",
-      "checkOnMap": "Sprawdź na mapie",
-      "checkingOnMap": "Szukam adresu…",
-      "addressChanged": "Adres się zmienił. Kliknij „Sprawdź na mapie”, żeby przesunąć pinezkę.",
+      "searchOnMap": "Szukaj na mapie",
+      "searchingOnMap": "Szukam adresu…",
+      "addressChanged": "Adres się zmienił. Kliknij „Szukaj na mapie”, żeby przesunąć pinezkę.",
       "relocated": "Pinezka przesunięta. Pozostało sprawdzeń: {count}.",
+      "hoursEnabled": "Podaj godziny otwarcia",
       "contactHeading": "Zgłoszenie",
       "fixErrors": "Popraw zaznaczone pola i wyślij ponownie.",
       "submit": "Wyślij zgłoszenie",
@@ -718,9 +719,26 @@
       "logoAlt": "Logo firmy {name}",
       "mapAlt": "Mapa z pinezką firmy przy adresie: {address}",
       "mapAltNoAddress": "Mapa z pinezką firmy",
-      "approximatePin": "Pinezka jest przybliżona: nie znaleźliśmy dokładnego adresu. Popraw ulicę i kliknij „Sprawdź na mapie”.",
+      "approximatePin": "Pinezka jest przybliżona: nie znaleźliśmy dokładnego adresu. Popraw ulicę i kliknij „Szukaj na mapie” albo wskaż miejsce na mapie.",
       "noPin": "Nie znaleźliśmy tego adresu na mapie. Sprawdź ulicę i miasto.",
       "geocodingAttribution": "Wyszukiwanie adresu: Nominatim"
+    },
+    "socials": {
+      "heading": "Komunikatory i social media",
+      "hint": "Wszystkie pola są opcjonalne.",
+      "whatsappNumber": "WhatsApp (numer telefonu)",
+      "whatsappLink": "WhatsApp (link)",
+      "handlePlaceholder": "@nazwa lub link do profilu",
+      "linkPlaceholder": "Link do profilu, np. https://…",
+      "showOthers": "Dodaj inne"
+    },
+    "pinMap": {
+      "label": "Mapa do ustawienia pinezki firmy",
+      "hint": "Kliknij mapę albo przeciągnij pinezkę, żeby wskazać dokładne miejsce. Bez myszy: popraw adres i użyj „Szukaj na mapie”.",
+      "marker": "Pinezka firmy",
+      "manual": "Pinezka ustawiona ręcznie.",
+      "reset": "Cofnij do adresu",
+      "loading": "Ładuję mapę…"
     },
     "submitted": {
       "heading": "Dziękujemy za zgłoszenie!",
@@ -767,7 +785,10 @@
       "invalidValue": "Nieprawidłowa wartość.",
       "invalidLogo": "Logo musi być obrazem PNG, JPEG lub WebP.",
       "logoTooLarge": "Logo może mieć najwyżej 2 MB.",
-      "tooShort": "Opis jest za krótki. Napisz co najmniej 50 znaków."
+      "tooShort": "Opis jest za krótki. Napisz co najmniej 50 znaków.",
+      "wrongSocialService": "Ten link prowadzi do innego serwisu niż to pole.",
+      "invalidPhone": "To nie wygląda na numer telefonu. Wpisz cyfry, np. +48 500 600 700.",
+      "pinOutsidePoland": "Pinezka musi być w Polsce."
     },
     "confirmationEmail": {
       "subject": "Otrzymaliśmy zgłoszenie firmy {name}",

@@ -14,6 +14,7 @@ import { CATEGORY_DEFINITIONS } from '@/lib/categories';
 import { cn } from '@/lib/utilities';
 import { WEEKDAY_KEYS } from '@/lib/weekdays';
 
+import { PreviewSocials } from './preview-socials';
 import { StaticMapPin } from './static-map-pin';
 
 /**
@@ -23,9 +24,10 @@ import { StaticMapPin } from './static-map-pin';
  * 12 px na telefonie i 16 px od `md`, jak w katalogu.
  *
  * Swiadome roznice wzgledem karty: brak strzalki rozwijania i przyciskow akcji (podglad
- * nie dzwoni ani nie nawiguje), brak `z-[99]`, logo ma `size-14` (preflight daje `img`
- * `height: auto`, a logo ze strony bywa prostokatne), dni tygodnia z malej litery (karta
- * szuka `Monday` i nie pokazuje godzin — znany dlug, plan U9).
+ * nie dzwoni ani nie nawiguje; WhatsApp i Telegram sa nieklikalne, `preview-socials.tsx`),
+ * brak `z-[99]`, logo ma `size-14` (preflight daje `img` `height: auto`, a logo ze strony
+ * bywa prostokatne), dni tygodnia z malej litery (karta szuka `Monday` i nie pokazuje
+ * godzin — znany dlug, plan U9).
  */
 
 const LANGUAGE_FLAGS: Record<LanguageCode, string> = {
@@ -233,6 +235,8 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
                         ))}
                     </div>
                 )}
+
+                <PreviewSocials socials={preview.socials} whatsappNumber={preview.whatsappNumber} />
 
                 <StaticMapPin pin={pin} coverage={preview.coverage} address={address} />
             </div>

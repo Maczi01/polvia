@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { openingHoursSchema, tagInputSchema, WEEKDAY_KEYS } from '@/db/service-input-schema';
-import { LANGUAGE_CODES } from '@/lib/add-business/form-limits';
+import { LANGUAGE_CODES, SOCIAL_URL_MAX_LENGTH } from '@/lib/add-business/form-limits';
 import { CATEGORY_VALUES } from '@/lib/categories';
 import { COVERAGE_VALUES } from '@/lib/coverage';
 
@@ -156,11 +156,40 @@ const draftFactsSchema = z
 
 export type DraftFacts = z.infer<typeof draftFactsSchema>;
 
+const socialUrlSchema = z
+    .string()
+    .max(SOCIAL_URL_MAX_LENGTH)
+    .url()
+    .regex(/^https?:\/\//i)
+    .optional();
+
+/** Klucze = `SOCIAL_KEYS` (`form-limits.ts`) = kolumna `service_locations.socials`. */
+const draftSocialsSchema = z
+    .object({
+        whatsapp: socialUrlSchema,
+        telegram: socialUrlSchema,
+        facebook: socialUrlSchema,
+        instagram: socialUrlSchema,
+        tiktok: socialUrlSchema,
+        youtube: socialUrlSchema,
+        linkedin: socialUrlSchema,
+        viber: socialUrlSchema,
+        tripadvisor: socialUrlSchema,
+        x: socialUrlSchema,
+    })
+    .strict();
+
+/** Format `normalizeWhatsappNumber`: `+` i 8–15 cyfr. */
+export const WHATSAPP_NUMBER_PATTERN = /^\+\d{8,15}$/;
+
 /**
  * Szkic wpisu. `category`, `coverage`, `tags`, `descriptions` pochodza od modelu i nie sa
  * edytowalne przez wlasciciela (R9); `languages` to propozycja modelu, ktora wlasciciel moze
  * poprawic. `facts` przeszly weryfikacje (D4);
  * pole, ktorego nie dalo sie potwierdzic, ma `null` i jest w `unconfirmed` (R4).
+ *
+ * `socials` i `whatsappNumber` to prefill z linkow zrodla (JSON-LD `sameAs`, link z kroku 1),
+ * nie z modelu — sa wiec potwierdzone ze zrodla i nie trafiaja do `unconfirmed`.
  */
 export const businessDraftSchema = z
     .object({
@@ -170,6 +199,8 @@ export const businessDraftSchema = z
         tags: z.array(tagInputSchema).min(MIN_TAGS).max(MAX_TAGS),
         descriptions: localizedTextSchema,
         facts: draftFactsSchema,
+        socials: draftSocialsSchema,
+        whatsappNumber: z.string().regex(WHATSAPP_NUMBER_PATTERN).nullable(),
         unconfirmed: z.array(z.enum(FACT_FIELDS)),
     })
     .strict();

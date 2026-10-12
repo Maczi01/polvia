@@ -101,6 +101,7 @@ async function saveAndPreview(stored: StoredDraft): Outcome {
             facts: stored.draft.facts,
             webpage: stored.sourceUrl,
             languages: stored.draft.languages,
+            links: { socials: stored.draft.socials, whatsappNumber: stored.draft.whatsappNumber },
         }),
         unconfirmed: stored.draft.unconfirmed,
         logoCandidate: stored.logoCandidate,

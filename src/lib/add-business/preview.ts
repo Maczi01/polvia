@@ -1,5 +1,6 @@
 import type { BusinessDraft, DraftFacts, LanguageCode } from '@/lib/add-business/draft-schema';
 import type { DraftGeo } from '@/lib/add-business/draft-store';
+import type { SocialLinks } from '@/lib/add-business/social-links';
 import type { BusinessPreview, DraftPin } from '@/lib/add-business/types';
 
 /**
@@ -17,9 +18,16 @@ interface PreviewInput {
     facts: DraftFacts;
     webpage: string | null;
     languages: LanguageCode[];
+    links: SocialLinks;
 }
 
-export function buildPreview({ draft, facts, webpage, languages }: PreviewInput): BusinessPreview {
+export function buildPreview({
+    draft,
+    facts,
+    webpage,
+    languages,
+    links,
+}: PreviewInput): BusinessPreview {
     return {
         name: facts.name,
         category: draft.category,
@@ -34,5 +42,7 @@ export function buildPreview({ draft, facts, webpage, languages }: PreviewInput)
         email: facts.email,
         webpage,
         openingHours: facts.openingHours,
+        socials: links.socials,
+        whatsappNumber: links.whatsappNumber,
     };
 }

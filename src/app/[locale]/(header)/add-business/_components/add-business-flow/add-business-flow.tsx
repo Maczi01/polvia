@@ -4,6 +4,7 @@ import { type JSX, startTransition, useActionState, useOptimistic, useState } fr
 
 import { generateDraftAction, relocateDraftAction, submitDraftAction } from '../../_actions';
 import { DraftEditor } from '../draft-editor/draft-editor';
+import { preloadPinMap } from '../draft-editor/pin-picker';
 import { DuplicateNotice, LimitedNotice } from '../flow-notices/flow-notices';
 import { LinkStep } from '../link-step/link-step';
 import { ManualStep } from '../manual-step/manual-step';
@@ -87,6 +88,7 @@ export function AddBusinessFlow(): JSX.Element {
     const logoUrl = useObjectUrl(logoFile);
 
     function send(event: FlowEvent, pending: FlowState | null): void {
+        if (event.type === 'generate') preloadPinMap();
         startTransition(() => {
             if (pending !== null) showPending(pending);
             dispatch(event);

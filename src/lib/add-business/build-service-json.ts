@@ -5,6 +5,8 @@ import { type DraftFacts, FACT_FIELDS, type FactField } from '@/lib/add-business
 import type { DraftGeo, StoredDraft } from '@/lib/add-business/draft-store';
 import type { OpeningHours } from '@/lib/add-business/jsonld-facts';
 import type { OwnerEdits } from '@/lib/add-business/owner-edits-schema';
+import { SOCIAL_KEYS } from '@/lib/add-business/form-limits';
+import type { Socials } from '@/lib/add-business/social-links';
 
 /**
  * Sklada plik `data/services/<slug>.json` ze szkicu (Redis) i edycji wlasciciela (D3).
@@ -24,7 +26,13 @@ import type { OwnerEdits } from '@/lib/add-business/owner-edits-schema';
  */
 
 /** Pola, ktorych zmiane przez wlasciciela raportujemy operatorowi (R13). */
-export const OWNER_EDITABLE_FIELDS = [...FACT_FIELDS, 'webpage', 'languages'] as const;
+export const OWNER_EDITABLE_FIELDS = [
+    ...FACT_FIELDS,
+    'webpage',
+    'languages',
+    'socials',
+    'whatsappNumber',
+] as const;
 export type OwnerEditableField = (typeof OWNER_EDITABLE_FIELDS)[number];
 
 /** Wejscie `serviceInputSchema` — dokladnie to, co operator zapisze jako plik. */
@@ -33,8 +41,11 @@ type LocationJson = ServiceJson['locations'][number];
 
 export interface BuildServiceJsonInput {
     stored: StoredDraft;
-    edits: Omit<OwnerEdits, 'submitterEmail' | 'notes'>;
-    /** Aktualne geokodowanie: `stored.geo` albo wynik relokacji / ponownego geokodowania. */
+    edits: Omit<OwnerEdits, 'submitterEmail' | 'notes' | 'pin'>;
+    /**
+     * Aktualne wspolrzedne: `stored.geo`, wynik relokacji / ponownego geokodowania albo
+     * pinezka ustawiona recznie przez wlasciciela.
+     */
     geo: DraftGeo | null;
     hasLogo: boolean;
 }
@@ -60,24 +71,40 @@ function normalizeHours(hours: OpeningHours | null): string {
     }).join('|');
 }
 
+function normalizeSocials(socials: Socials): string {
+    return SOCIAL_KEYS.map(key => socials[key] ?? '').join('|');
+}
+
+interface ComparableExtra {
+    webpage: string | null;
+    languages: readonly string[];
+    socials: Socials;
+    whatsappNumber: string | null;
+}
+
 /** Wartosc pola sprowadzona do napisu, zeby porownanie ignorowalo kolejnosc i `null`/`{}`. */
 function comparable(
     field: OwnerEditableField,
     source: DraftFacts | Edits,
-    extra: {
-        webpage: string | null;
-        languages: readonly string[];
-    },
+    extra: ComparableExtra,
 ): string {
     if (field === 'webpage') return extra.webpage ?? '';
     if (field === 'languages') return [...extra.languages].sort().join(',');
+    if (field === 'socials') return normalizeSocials(extra.socials);
+    if (field === 'whatsappNumber') return extra.whatsappNumber ?? '';
     if (field === 'openingHours') return normalizeHours(source.openingHours);
     return source[field]?.trim() ?? '';
 }
 
 function findChangedFields(stored: StoredDraft, edits: Edits): OwnerEditableField[] {
-    const before = { webpage: stored.sourceUrl, languages: stored.draft.languages };
-    const after = { webpage: edits.webpage, languages: edits.languages };
+    const { draft } = stored;
+    const before: ComparableExtra = {
+        webpage: stored.sourceUrl,
+        languages: draft.languages,
+        socials: draft.socials,
+        whatsappNumber: draft.whatsappNumber,
+    };
+    const after: ComparableExtra = edits;
 
     return OWNER_EDITABLE_FIELDS.filter(
         field => comparable(field, stored.draft.facts, before) !== comparable(field, edits, after),
@@ -108,6 +135,8 @@ function buildLocation(edits: Edits, geo: DraftGeo | null): LocationJson {
         ...(edits.phoneNumber === null ? {} : { phoneNumber: edits.phoneNumber }),
         ...(edits.email === null ? {} : { email: edits.email }),
         ...(edits.webpage === null ? {} : { webpage: edits.webpage }),
+        ...(Object.keys(edits.socials).length === 0 ? {} : { socials: edits.socials }),
+        ...(edits.whatsappNumber === null ? {} : { whatsappNumber: edits.whatsappNumber }),
         isMainLocation: true,
     };
 }

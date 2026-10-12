@@ -4,14 +4,14 @@ import { useTranslations } from 'next-intl';
 import { type ChangeEvent, type FormEvent, type JSX, useState } from 'react';
 
 import { Button } from '@/components/ui/button/button';
-import { LOGO_ACCEPTED_TYPES, NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
 import type { FieldErrorKey, FieldErrors } from '@/lib/add-business/types';
 
 import type { EditingError, ReadyDraft } from '../add-business-flow/flow-state';
 import { BusinessCardPreview } from '../business-card-preview/business-card-preview';
 import { FlowHeading } from '../flow-heading/flow-heading';
 import { ActionErrorNotice, SubmitLimitNotice } from '../flow-notices/flow-notices';
-import { PRIMARY_BUTTON_CLASSES, TextAreaField, TextField } from '../form-field/form-field';
+import { PRIMARY_BUTTON_CLASSES } from '../form-field/form-field';
+import { BusinessFields } from './business-fields';
 import {
     addressOf,
     type DraftValues,
@@ -19,14 +19,16 @@ import {
     previewFromValues,
     sameAddress,
     stillUnconfirmed,
-    type TextFieldName,
 } from './draft-values';
 import { GeneratedSummary } from './generated-summary';
+import { HoursSection } from './hours-section';
 import { LanguagesField } from './languages-field';
 import { logoFileError } from './logo-file';
-import { OpeningHoursFields } from './opening-hours-fields';
-import { RelocateControl } from './relocate-control';
-import { type RelocateAction, useRelocation } from './use-relocation';
+import { PinPicker } from './pin-picker';
+import { SocialFields } from './social-fields';
+import { SubmissionFields } from './submission-fields';
+import { usePinPicker } from './use-pin-picker';
+import type { RelocateAction } from './use-relocation';
 
 const HEADING_ID = 'add-business-editor-heading';
 
@@ -53,9 +55,14 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
     const t = useTranslations('addBusiness');
     const [values, setValues] = useState<DraftValues>(() => initialValues(draft.preview));
     const [logoError, setLogoError] = useState<FieldErrorKey | null>(null);
-    const relocation = useRelocation(draft, props.relocateAction);
+    const picker = usePinPicker(draft, props.relocateAction);
+    const { relocation } = picker;
 
     const preview = previewFromValues(draft.preview, values);
+    // Odznaczone godziny to swiadome „bez godzin", nie pole do uzupelnienia.
+    const unconfirmed = stillUnconfirmed(draft.unconfirmed, preview).filter(
+        field => values.hoursEnabled || field !== 'openingHours',
+    );
     const isOnline = draft.preview.coverage === 'online';
     const isAddressChanged = !sameAddress(addressOf(values), relocation.geocodedAddress);
     const relocationErrors =
@@ -67,13 +74,8 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
     };
     const hasFieldErrors = Object.keys(fieldErrors).length > 0 || logoError !== null;
 
-    const textProps = (name: TextFieldName) => ({
-        name,
-        value: values[name],
-        onChange: (event: ChangeEvent<HTMLInputElement>) =>
-            setValues(current => ({ ...current, [name]: event.target.value })),
-        error: errors[name],
-    });
+    const update = (patch: Partial<DraftValues>): void =>
+        setValues(current => ({ ...current, ...patch }));
 
     /** Zly plik nie trafia do podgladu, a jego blad blokuje wysylke (patrz `logoFileError`). */
     function handleLogoChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -110,9 +112,9 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                     </h3>
                     <BusinessCardPreview
                         preview={preview}
-                        unconfirmed={stillUnconfirmed(draft.unconfirmed, preview)}
+                        unconfirmed={unconfirmed}
                         logoSrc={logoSrc}
-                        pin={relocation.pin}
+                        pin={picker.pin}
                     />
                 </div>
 
@@ -127,37 +129,27 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                     <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
                         {t('editor.formHeading')}
                     </h3>
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <TextField {...textProps('name')} label={t('fields.name')} isRequired />
-                        <TextField {...textProps('street')} label={t('fields.street')} />
-                        <TextField {...textProps('postcode')} label={t('fields.postcode')} />
-                        <TextField {...textProps('city')} label={t('fields.city')} isRequired />
-                        {!isOnline && (
-                            <RelocateControl
-                                isAddressChanged={isAddressChanged}
-                                isRelocating={relocation.isRelocating}
-                                result={relocation.result}
-                                onRelocate={() => relocation.relocate(addressOf(values))}
-                            />
-                        )}
-                        <TextField
-                            {...textProps('phoneNumber')}
-                            type="tel"
-                            label={t('fields.phoneNumber')}
-                        />
-                        <TextField {...textProps('email')} type="email" label={t('fields.email')} />
-                        <div className="md:col-span-2">
-                            <TextField
-                                {...textProps('webpage')}
-                                type="url"
-                                label={t('fields.webpage')}
-                            />
-                        </div>
-                    </div>
+                    <BusinessFields
+                        values={values}
+                        errors={errors}
+                        onChange={(name, value) => update({ [name]: value })}
+                        map={
+                            !isOnline && (
+                                <PinPicker
+                                    picker={picker}
+                                    isAddressChanged={isAddressChanged}
+                                    error={errors.pin}
+                                    onSearch={() => relocation.relocate(addressOf(values))}
+                                />
+                            )
+                        }
+                    />
 
-                    <OpeningHoursFields
+                    <HoursSection
+                        isEnabled={values.hoursEnabled}
                         hours={values.hours}
                         fieldErrors={errors}
+                        onToggle={hoursEnabled => update({ hoursEnabled })}
                         onChange={(day, hours) =>
                             setValues(current => ({
                                 ...current,
@@ -168,38 +160,23 @@ export function DraftEditor(props: DraftEditorProps): JSX.Element {
                     <LanguagesField
                         selected={values.languages}
                         error={errors.languages}
-                        onChange={languages => setValues(current => ({ ...current, languages }))}
+                        onChange={languages => update({ languages })}
+                    />
+                    <SocialFields
+                        socials={values.socials}
+                        whatsappNumber={values.whatsappNumber}
+                        hasWhatsappLink={draft.preview.socials.whatsapp !== undefined}
+                        fieldErrors={errors}
+                        onSocialChange={(key, value) =>
+                            setValues(current => ({
+                                ...current,
+                                socials: { ...current.socials, [key]: value },
+                            }))
+                        }
+                        onWhatsappNumberChange={whatsappNumber => update({ whatsappNumber })}
                     />
 
-                    <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-                        {t('editor.contactHeading')}
-                    </h3>
-                    <TextField
-                        name="logo"
-                        type="file"
-                        accept={LOGO_ACCEPTED_TYPES.join(',')}
-                        label={t('fields.logo')}
-                        hint={t('fields.logoHint')}
-                        error={errors.logo}
-                        className="h-auto"
-                        onChange={handleLogoChange}
-                    />
-                    <TextField
-                        name="submitterEmail"
-                        type="email"
-                        autoComplete="email"
-                        label={t('fields.submitterEmail')}
-                        hint={t('fields.submitterEmailHint')}
-                        error={errors.submitterEmail}
-                        isRequired
-                    />
-                    <TextAreaField
-                        name="notes"
-                        label={t('fields.notes')}
-                        hint={t('fields.notesHint')}
-                        maxLength={NOTES_MAX_LENGTH}
-                        error={errors.notes}
-                    />
+                    <SubmissionFields errors={errors} onLogoChange={handleLogoChange} />
 
                     {hasFieldErrors && (
                         <p
