@@ -1,0 +1,105 @@
+{
+    "name": "SPRAWNO",
+    "category": "mechanics",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "sprawno.png",
+    "languages": [
+        "pl",
+        "uk",
+        "en"
+    ],
+    "translations": {
+        "pl": {
+            "description": "SPRAWNO to warsztat samochodowy i detailing zlokalizowany na Starołęce w Poznaniu. Firma oferuje kompleksową obsługę aut, w tym mechanikę, diagnostykę komputerową, serwis klimatyzacji, wymianę oleju i filtrów oraz detailing. Obsługuje klientów lokalnie, zapewniając wycenę przed naprawą i gwarancję na robociznę. Godziny otwarcia: poniedziałek-piątek 8:00-18:00, sobota 8:00-14:00. Obsługa w językach polskim, ukraińskim i angielskim."
+        },
+        "uk": {
+            "description": "SPRAWNO — це автосервіс і детейлінг, розташовані на Староєлці в Познані. Компанія пропонує комплексне обслуговування автомобілів: механіку, комп'ютерну діагностику, обслуговування кондиціонерів, заміну олії та фільтрів, а також детейлінг. Обслуговує клієнтів локально, надає оцінку перед ремонтом і гарантію на роботу. Години роботи: пн-пт 8:00-18:00, сб 8:00-14:00. Обслуговування польською, українською та англійською мовами."
+        },
+        "en": {
+            "description": "SPRAWNO is a car service and detailing workshop located in Starołęka, Poznań. The company offers comprehensive car care including mechanics, computer diagnostics, air conditioning service, oil and filter changes, and detailing. It serves local customers, providing cost estimates before repairs and labor warranty. Opening hours: Monday-Friday 8:00-18:00, Saturday 8:00-14:00. Service available in Polish, Ukrainian, and English."
+        },
+        "ru": {
+            "description": "SPRAWNO — это автосервис и детейлинг, расположенные в Старолеке, Познань. Компания предлагает комплексное обслуживание автомобилей: механика, компьютерная диагностика, обслуживание кондиционеров, замена масла и фильтров, детейлинг. Обслуживает клиентов локально, предоставляет оценку перед ремонтом и гарантию на работу. Часы работы: пн-пт 8:00-18:00, сб 8:00-14:00. Обслуживание на польском, украинском и английском языках."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Diagnostyka komputerowa",
+            "uk": "Комп'ютерна діагностика",
+            "en": "Computer diagnostics",
+            "ru": "Компьютерная диагностика"
+        },
+        {
+            "pl": "Wymiana oleju i filtrów",
+            "uk": "Заміна олії та фільтрів",
+            "en": "Oil and filter change",
+            "ru": "Замена масла и фильтров"
+        },
+        {
+            "pl": "Serwis klimatyzacji",
+            "uk": "Обслуговування кондиціонера",
+            "en": "Air conditioning service",
+            "ru": "Обслуживание кондиционера"
+        },
+        {
+            "pl": "Mycie detailingowe",
+            "uk": "Детейлінг миття",
+            "en": "Detailing wash",
+            "ru": "Детейлинг мойка"
+        },
+        {
+            "pl": "Wulkanizacja i opony",
+            "uk": "Вулканізація та шини",
+            "en": "Tire service and vulcanization",
+            "ru": "Вулканизация и шины"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Poznań",
+            "street": "ul. Starołęcka 18",
+            "voivodeship": "wielkopolskie",
+            "postcode": "61-361",
+            "latitude": 52.375595,
+            "longitude": 16.934493,
+            "openingHours": {
+                "monday": {
+                    "open": "08:00",
+                    "close": "18:00"
+                },
+                "tuesday": {
+                    "open": "08:00",
+                    "close": "18:00"
+                },
+                "wednesday": {
+                    "open": "08:00",
+                    "close": "18:00"
+                },
+                "thursday": {
+                    "open": "08:00",
+                    "close": "18:00"
+                },
+                "friday": {
+                    "open": "08:00",
+                    "close": "18:00"
+                },
+                "saturday": {
+                    "open": "08:00",
+                    "close": "14:00"
+                }
+            },
+            "phoneNumber": "+48500272005",
+            "email": "biuro@sprawno.pl",
+            "webpage": "https://sprawno.pl/",
+            "socials": {
+                "facebook": "https://www.facebook.com/sprawno",
+                "instagram": "https://www.instagram.com/sprawno.pl/",
+                "linkedin": "https://www.linkedin.com/company/sprawno/"
+            },
+            "whatsappNumber": "+48500272005",
+            "isMainLocation": true
+        }
+    ]
+}
