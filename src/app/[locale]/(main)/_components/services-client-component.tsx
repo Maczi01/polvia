@@ -15,7 +15,7 @@ import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import { buildSemanticSearchParams } from '@/lib/semantic-search-request';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
-import { splitServicesByCoverage } from '@/lib/service-coverage';
+import { matchesServiceLocation, splitServicesByCoverage } from '@/lib/service-coverage';
 
 type Props = {
     services: PartialService[];
@@ -235,11 +235,21 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         [initialServices, coverageFilters, filteredEmbeddingResults],
     );
 
-    // Wspolna lista do wyszukiwania karty po id/slug, refow i lookupow. Mapa dostaje
-    // ja tez, ale sama pomija wpisy bez wspolrzednych (createPoints).
+    // Wspolna lista do wyszukiwania karty po id/slug, refow i lookupow.
     const filteredServices = useMemo(() => {
         return [...localResults, ...onlineResults, ...filteredEmbeddingResults];
     }, [localResults, onlineResults, filteredEmbeddingResults]);
+
+    // Mapa dostaje te same wpisy, ale ZAWSZE zawezone do wybranego miejsca.
+    // Sekcja online nie filtruje po geografii (R5) i slusznie — tyle ze wpisy
+    // `hybrid` maja wspolrzedne, wiec przez nia wchodzily na mape z calej Polski.
+    // Bez tego zawezenia /mapa/podlaskie pisalo "nie znaleziono" i rysowalo piny
+    // z Wroclawia i Warszawy. Wpisow bez wspolrzednych mapa i tak nie pokaze
+    // (createPoints), ale licza sie do kadru i do komunikatu pustej mapy.
+    const mapServices = useMemo(
+        () => filteredServices.filter(service => matchesServiceLocation(service, coverageFilters)),
+        [filteredServices, coverageFilters],
+    );
 
     const handleHoverPlace = useCallback(
         (serviceId: string | null) => {
@@ -467,21 +477,11 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     useEffect(() => {
         if ((!selectedCounty && !selectedCity) || !mapRef.current) return;
 
-        // Filter services for the selected city or county
-        let locationServices;
-        if (selectedCity) {
-            locationServices = filteredServices.filter(
-                service => service.city?.toLowerCase() === selectedCity.toLowerCase(),
-            );
-        } else {
-            locationServices = filteredServices.filter(
-                service => service.voivodeship?.toLowerCase() === selectedCounty.toLowerCase(),
-            );
-        }
+        // `mapServices` jest juz zawezone do wybranego miejsca tym samym predykatem,
+        // ktorego uzywa lista — wczesniej ta sama regula stala tu przepisana trzeci raz.
+        const servicesBounds = calculateServicesBounds(mapServices) as LngLatBoundsLike;
 
-        const servicesBounds = calculateServicesBounds(locationServices) as LngLatBoundsLike;
-
-        if (servicesBounds && locationServices.length > 0) {
+        if (servicesBounds && mapServices.length > 0) {
             mapRef.current.fitBounds(servicesBounds, {
                 duration: 1000,
                 padding: { top: 50, bottom: 50, left: 50, right: 50 },
@@ -504,7 +504,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         setPopup(null);
         setSelectedService(null);
         setCardToExpand(null);
-    }, [filteredServices, selectedCounty, selectedCity]);
+    }, [mapServices, selectedCounty, selectedCity]);
 
     useEffect(() => {
         if (
@@ -664,7 +664,8 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
                         ref={mapRef}
                         selectedService={selectedService}
                         highlightedServiceIds={highlightedGroupIds}
-                        services={filteredServices}
+                        services={mapServices}
+                        listResultCount={filteredServices.length}
                         handleClickedPlace={handleClickedPlace}
                         resetMap={resetMap}
                         scrollToTop={scrollToTop}

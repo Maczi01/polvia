@@ -93,10 +93,24 @@ function matchesCategory(item: PartialService, category: string): boolean {
     return item.category?.toLowerCase() === category.toLowerCase();
 }
 
-/** Miasto ma priorytet nad wojewodztwem — tak samo jak przed refaktorem. */
-function matchesLocation(item: PartialService, county: string, city: string): boolean {
+/**
+ * Czy wpis lezy w miejscu wybranym w filtrach. Miasto ma priorytet nad wojewodztwem.
+ *
+ * Eksportowana, bo tej samej reguly potrzebuje mapa. Sekcja online celowo ignoruje
+ * geografie (R5), ale wpisy `hybrid` maja wspolrzedne, wiec wchodzily na mape z
+ * calej Polski: /mapa/podlaskie pisalo "nie znaleziono" i jednoczesnie rysowalo
+ * 13 pinow spoza Podlasia. Piny i lista musza mowic o tym samym miejscu.
+ */
+export function matchesServiceLocation(
+    item: PartialService,
+    filters: Pick<CoverageFilters, 'county' | 'city'>,
+): boolean {
+    const city = filters.city ?? '';
     if (city) return item.city?.toLowerCase() === city.toLowerCase();
+
+    const county = filters.county ?? '';
     if (county) return item.voivodeship?.toLowerCase() === county.toLowerCase();
+
     return true;
 }
 
@@ -120,8 +134,6 @@ export function splitServicesByCoverage(
 ): CoverageBuckets {
     const terms = toSearchTerms(filters.query ?? '');
     const category = filters.category ?? '';
-    const county = filters.county ?? '';
-    const city = filters.city ?? '';
 
     // Kategoria i tekst dzialaja na OBA kubelki — zasieg jest ortogonalny (R2, R7).
     const matching = services.filter(
@@ -132,7 +144,7 @@ export function splitServicesByCoverage(
     const localResults = filters.onlineOnly
         ? []
         : matching.filter(
-              item => item.coverage !== 'online' && matchesLocation(item, county, city),
+              item => item.coverage !== 'online' && matchesServiceLocation(item, filters),
           );
 
     const shownIds = new Set([...localResults, ...alreadyShown].map(item => item.id));

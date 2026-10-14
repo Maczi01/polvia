@@ -26,7 +26,15 @@ import { useTheme } from 'next-themes';
 import { MapControls } from '@/app/[locale]/(main)/_components/overview-map/map-controls';
 
 type OverviewMapProps = {
+    /** Wpisy, z ktorych powstaja piny — zawezone do wybranego miejsca. */
     services: PartialService[];
+    /**
+     * Ile wynikow widac na calym ekranie, razem z sekcja online, ktora celowo
+     * ignoruje geografie (R5). Mapa sama tego nie wie, bo dostaje mniej wpisow,
+     * a bez tej liczby nakladka na mobile nie odrozni "wszystko zdalnie" od
+     * "nie ma nic" i w jednym z tych przypadkow sklamie.
+     */
+    listResultCount: number;
     selectedService: PartialService | null;
     /**
      * Punkty podswietlone jako komplet — uzywane przy najechaniu na zwinieta
@@ -58,6 +66,7 @@ const throttle = <T extends (...args: any[]) => void>(func: T, limit: number): T
 export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
     ({
          services,
+         listResultCount,
          selectedService,
          highlightedServiceIds,
          resetMap,
@@ -68,6 +77,7 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
          setPopup
      }, externalRef) => {
         const tMapList = useTranslations('MapList');
+        const tEmptyList = useTranslations('EmptyList');
         const [bounds, setBounds] = useState<BBox>([-180, -85, 180, 85]);
         const [zoom, setZoom] = useState<number>(initialViewState.zoom);
         const [mounted, setMounted] = useState(false);
@@ -451,9 +461,12 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                 aria-label="Overview Map"
             >
                 {/* R11: na mobile widok mapy jest jedyna widoczna powierzchnia, wiec brak
-                    pinow oznaczalby pusta mape Polski bez wyjasnienia. Uslugi zdalne nie
-                    maja punktu na mapie — kierujemy uzytkownika do listy.
-                    Na desktopie lista jest obok, wiec nakladka nie jest potrzebna. */}
+                    pinow oznaczalby pusta mape Polski bez wyjasnienia.
+                    Na desktopie lista jest obok, wiec nakladka nie jest potrzebna.
+
+                    Dwie rozne przyczyny pustej mapy wymagaja dwoch roznych zdan:
+                    wyniki sa, tylko zdalne (kierujemy do listy) — albo nie ma zadnych
+                    (to samo zdanie co pusta lista, bo rada jest ta sama). */}
                 {isMobile && points.length === 0 && (
                     <div
                         role="status"
@@ -462,7 +475,9 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                     >
                         <Globe className="size-8 text-gray-400 dark:text-gray-500" />
                         <p className="text-sm text-gray-600 dark:text-gray-300">
-                            {tMapList('map_no_pins')}
+                            {listResultCount > 0
+                                ? tMapList('map_no_pins')
+                                : tEmptyList('description')}
                         </p>
                     </div>
                 )}
@@ -553,21 +568,11 @@ export const OverviewMap = forwardRef<MapRef, OverviewMapProps>(
                         />
                     )}
 
-                    {services.length === 0 && (
-                        <div className="absolute left-0 top-0 block h-fit w-full bg-red-600/75 md:hidden">
-                            <span className="flex justify-center text-center text-white">
-                                Nothing found
-                            </span>
-                        </div>
-                    )}
-
-                    {isZoomingToMarker && (
-                        <div className="absolute left-0 top-0 block h-fit w-full bg-green-600/75 md:hidden">
-                            <span className="flex justify-center text-center text-white">
-                                Zooming
-                            </span>
-                        </div>
-                    )}
+                    {/* Stad zniknely dwa paski debugowe widoczne tylko na mobile: czerwony
+                        "Nothing found" i zielony "Zooming" — oba po angielsku w aplikacji
+                        o czterech jezykach. Pierwszy zastapila nakladka R11 wyzej, ktora
+                        jest przetlumaczona, ma role="status" i rozroznia przyczyny pustej
+                        mapy; drugi komunikowal uzytkownikowi stan animacji kamery. */}
 
                     <MapControls
                         handleZoomIn={handleZoomIn}
