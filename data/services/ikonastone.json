@@ -1,0 +1,59 @@
+{
+    "name": "IKONASTONE",
+    "category": "others",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "ikonastone.png",
+    "languages": ["uk", "pl"],
+
+    "translations": {
+        "pl": {
+            "description": "IKONASTONE to pracownia architektury sakralnej w kamieniu z Łucka na Ukrainie. Projektuje, wykonuje i montuje ołtarze, ikonostasy, kioty, ikony na kamieniu, krzyże, tablice pamiątkowe, chrzcielnice, kapliczki oraz schody i posadzki z kamienia naturalnego dla kościołów i cerkwi. Praca zaczyna się od rysunków i uzgodnienia proporcji, potem cięcie i ręczne wykończenie w pracowni, na końcu dostawa i montaż w świątyni. Realizacje poza Ukrainą, także w Polsce, ustalane są indywidualnie. Zapytania przyjmuje mailowo i telefonicznie."
+        },
+        "uk": {
+            "description": "IKONASTONE — майстерня сакральної архітектури в камені з Луцька. Проєктує, виготовляє та монтує престоли, іконостаси, кіоти, ікони на камені, хрести, пам'ятні дошки, купелі, каплиці, а також сходи й підлоги з натурального каменю для храмів і костелів. Спершу — креслення й узгодження пропорцій, далі різання та ручне оздоблення в майстерні, наприкінці — доставка й монтаж у храмі. Роботи за межами України, зокрема в Польщі, обговорюються індивідуально. Запити приймає електронною поштою та телефоном."
+        },
+        "en": {
+            "description": "IKONASTONE is a sacred stone architecture workshop based in Lutsk, Ukraine. It designs, makes and installs altars, iconostases, icon cases (kiots), icons carved in stone, crosses, memorial plaques, fonts, chapels, and stone stairs and floors for churches of both Catholic and Orthodox tradition. Work starts with drawings and agreed proportions, continues with cutting and hand finishing in the workshop, and ends with delivery and installation on site. Projects outside Ukraine, including Poland, are arranged case by case. Enquiries by email or phone."
+        },
+        "ru": {
+            "description": "IKONASTONE — мастерская сакральной архитектуры в камне из Луцка (Украина). Проектирует, изготавливает и монтирует престолы, иконостасы, киоты, иконы на камне, кресты, памятные доски, купели, часовни, а также лестницы и полы из натурального камня для храмов и костёлов. Сначала — чертежи и согласование пропорций, затем резка и ручная доводка в мастерской, в конце — доставка и монтаж в храме. Работы за пределами Украины, в том числе в Польше, обсуждаются индивидуально. Запросы принимает по электронной почте и телефону."
+        }
+    },
+
+    "tags": [
+        { "pl": "Ikonostasy", "uk": "Іконостаси", "en": "Iconostases", "ru": "Иконостасы" },
+        { "pl": "Ołtarze", "uk": "Престоли", "en": "Altars", "ru": "Престолы" },
+        { "pl": "Ikony na kamieniu", "uk": "Ікони на камені", "en": "Stone icons", "ru": "Иконы на камне" },
+        { "pl": "Krzyże kamienne", "uk": "Кам'яні хрести", "en": "Stone crosses", "ru": "Каменные кресты" },
+        { "pl": "Tablice pamiątkowe", "uk": "Пам'ятні дошки", "en": "Memorial plaques", "ru": "Памятные доски" }
+    ],
+
+    "locations": [
+        {
+            "city": "Łuck",
+            "street": "ul. Lwiwska 89b",
+            "openingHours": {
+                "monday": { "open": "08:00", "close": "19:00" },
+                "tuesday": { "open": "08:00", "close": "19:00" },
+                "wednesday": { "open": "08:00", "close": "19:00" },
+                "thursday": { "open": "08:00", "close": "19:00" },
+                "friday": { "open": "08:00", "close": "19:00" },
+                "saturday": { "open": "08:00", "close": "19:00" },
+                "sunday": { "open": "08:00", "close": "19:00" }
+            },
+            "phoneNumber": "+380 66 892 98 18",
+            "email": "ikonastone@gmail.com",
+            "webpage": "https://ikonastone.com/pl/",
+            "socials": {
+                "facebook": "https://www.facebook.com/ikonastone",
+                "instagram": "https://www.instagram.com/ikonastone/",
+                "youtube": "https://www.youtube.com/@ikonastone",
+                "telegram": "https://t.me/ikonastone",
+                "viber": "https://invite.viber.com/?g2=AQBj%2Be4zYFKULFHfObT4kMjC3Ri7LXRSvA1xZTCaRzn7gRO0n3%2BZgKR%2BAbuW5Jef"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
