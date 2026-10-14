@@ -1,0 +1,54 @@
+{
+    "name": "SMAR POLAND",
+    "category": "financial",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "smar-poland.png",
+    "languages": ["pl", "ru", "en"],
+
+    "translations": {
+        "pl": {
+            "description": "SMAR POLAND to biuro księgowe i firma doradcza w Warszawie, część międzynarodowej grupy SMAR GLOBAL z biurami w Polsce, USA i na Cyprze. Działa w Polsce od 2021 roku. Prowadzi księgowość i rozliczenia podatkowe, obsługę kadrowo-płacową, rejestrację JDG i spółek z o.o., doradztwo finansowe oraz księgowość operacji kryptowalutowych. Wspiera też firmy w sprawach administracyjnych i w biznesie międzynarodowym. Biuro przy ul. Prostej na Woli, konsultacje także online. Obsługa po polsku, rosyjsku i angielsku."
+        },
+        "uk": {
+            "description": "SMAR POLAND — бухгалтерська та консалтингова компанія у Варшаві, що входить до міжнародної групи SMAR GLOBAL з офісами в Польщі, США та на Кіпрі. Працює в Польщі з 2021 року. Веде бухгалтерський облік і податкову звітність, кадри та зарплату, реєструє ФОП (JDG) і компанії Sp. z o.o., консультує з фінансових питань, а також веде облік операцій з криптовалютою. Допомагає з адміністративними питаннями та міжнародним бізнесом. Офіс на вулиці Prosta (район Воля), консультації також онлайн. Обслуговування польською, російською та англійською."
+        },
+        "en": {
+            "description": "SMAR POLAND is an accounting and consulting firm in Warsaw, part of the international SMAR GLOBAL group with offices in Poland, the USA and Cyprus. Operating in Poland since 2021. Services include bookkeeping and tax filings, HR and payroll, registration of sole traders (JDG) and Sp. z o.o. companies, financial advisory, and accounting for cryptocurrency transactions. It also helps businesses with administrative matters and cross-border operations. Office on ul. Prosta in Wola, with consultations also available online. Service in Polish, Russian and English."
+        },
+        "ru": {
+            "description": "SMAR POLAND — бухгалтерская и консалтинговая компания в Варшаве, часть международной группы SMAR GLOBAL с офисами в Польше, США и на Кипре. Работает в Польше с 2021 года. Ведёт бухгалтерию и налоговую отчётность, кадры и зарплату, регистрирует ИП (JDG) и компании Sp. z o.o., консультирует по финансовым вопросам, ведёт учёт операций с криптовалютой. Помогает с административными вопросами и международным бизнесом. Офис на улице Prosta в районе Воля, консультации также онлайн. Обслуживание на русском, польском и английском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Księgowość", "uk": "Бухгалтерія", "en": "Accounting", "ru": "Бухгалтерия" },
+        { "pl": "Podatki", "uk": "Податки", "en": "Tax", "ru": "Налоги" },
+        { "pl": "Kadry i płace", "uk": "Кадри та зарплата", "en": "HR & Payroll", "ru": "Кадры и зарплата" },
+        { "pl": "Rejestracja firmy", "uk": "Реєстрація фірми", "en": "Business Registration", "ru": "Регистрация фирмы" },
+        { "pl": "Kryptowaluty", "uk": "Криптовалюти", "en": "Cryptocurrency", "ru": "Криптовалюты" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Prosta 51",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-838",
+            "latitude": 52.2304918,
+            "longitude": 20.9874391,
+            "phoneNumber": "+48 509 541 407",
+            "email": "ap@smaroutsourcing.pl",
+            "webpage": "https://smaroutsourcing.pl",
+            "socials": {
+                "telegram": "https://t.me/partner_desk_smar",
+                "facebook": "https://www.facebook.com/smarglobal/",
+                "instagram": "https://www.instagram.com/smarglobal/",
+                "linkedin": "https://www.linkedin.com/company/smarglobal/",
+                "youtube": "https://www.youtube.com/@smarglobal"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
