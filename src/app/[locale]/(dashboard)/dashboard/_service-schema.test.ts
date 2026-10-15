@@ -43,6 +43,7 @@ function buildFormData(overrides: Record<string, string | null> = {}): FormData 
         'socials.tiktok': '',
         'socials.facebook': '',
         'socials.youtube': '',
+        'socials.threads': '',
         'socials.viber': '',
         'socials.whatsapp': '',
         'socials.x': '',
@@ -203,5 +204,14 @@ describe('serviceSchema — social media', () => {
         const result = parse({ 'socials.x': '' });
 
         expect(result.success).toBe(true);
+    });
+
+    it('przepuszcza link do Threads do sparsowanych danych', () => {
+        const result = parse({ 'socials.threads': 'https://www.threads.com/@ikonastone' });
+
+        expect(result.success).toBe(true);
+        if (result.success) {
+            expect(result.data.socials?.threads).toBe('https://www.threads.com/@ikonastone');
+        }
     });
 });

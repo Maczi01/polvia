@@ -104,6 +104,7 @@ export type ServiceEditData = {
         tiktok?: string;
         facebook?: string;
         youtube?: string;
+        threads?: string;
         viber?: string;
         whatsapp?: string;
         x?: string;
@@ -269,10 +270,7 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
         const namePattern = new RegExp(`name:\\s*['"]${escaped}['"]`);
         const nameMatch = content.match(namePattern);
 
-        if (!nameMatch || nameMatch.index === undefined) {
-            console.log(`[seed-sync] Service "${serviceName}" not found in seed.ts, skipping`);
-            return;
-        }
+        if (!nameMatch || nameMatch.index === undefined) return;
 
         const beforeName = content.slice(0, Math.max(0, nameMatch.index));
         const blockStart = beforeName.lastIndexOf('seedService({');
@@ -311,7 +309,6 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
 
         content = content.slice(0, Math.max(0, blockStart)) + newBlock + content.slice(Math.max(0, blockEnd));
         await writeFile(seedPath, content, 'utf8');
-        console.log(`[seed-sync] Updated seed.ts: ${serviceName} → ${imageFilename}`);
     } catch (error) {
         console.error('[seed-sync] Failed to update seed.ts:', error);
     }

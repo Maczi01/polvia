@@ -14,6 +14,7 @@ import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
 import { CopyEmailButton } from '@/app/[locale]/(main)/_components/copy-email-button/copy-email-button';
+import { ServiceSocials } from '@/app/[locale]/(main)/_components/service-socials/service-socials';
 
 /**
  * Siatka przyciskow akcji wedlug ich liczby. Cztery przyciski wracaja do dwoch
@@ -48,38 +49,6 @@ const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
     uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
     be: { src: '/icons/by.svg', alt: 'Belarusian' },
 };
-
-const FacebookIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
-        <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
-    </svg>
-);
-
-const LinkedInIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
-        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
-    </svg>
-)
-
-const InstagramIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
-        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-    </svg>
-);
-
-const TikTokIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
-        <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.53a6.27 6.27 0 00-.79-.05A6.34 6.34 0 003.15 15.65a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.22a8.16 8.16 0 004.76 1.52V7.3a4.82 4.82 0 01-1-.61z" />
-    </svg>
-);
-
-const XIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-);
 
 type CardProps = {
     className?: string;
@@ -117,33 +86,6 @@ const getTodayHours = (
     const today = days[new Date().getDay()];
     return openingHours[today] || null;
 };
-
-const SocialLink = ({
-    href,
-    label,
-    children,
-    className,
-}: {
-    href: string;
-    /** Wymagany: w srodku jest samo SVG, wiec bez tego link nie ma nazwy dostepnej. */
-    label: string;
-    children: React.ReactNode;
-    className?: string;
-}) => (
-    <Link
-        href={href}
-        aria-label={label}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn(
-            'flex size-9 items-center justify-center rounded-full text-white transition-opacity hover:opacity-80',
-            className,
-        )}
-        onClick={e => e.stopPropagation()}
-    >
-        {children}
-    </Link>
-);
 
 export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
     (
@@ -394,16 +336,6 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         // Zasieg zdalny wart jest oznaczenia na karcie: uzytkownik nie musi
         // wnioskowac z opisu, ze nie trzeba nikad jechac (R10).
         const servesRemotely = coverage === 'online' || coverage === 'hybrid';
-
-        // Bramka MUSI wymieniac kazda siec renderowana nizej. Wczesniej pomijala
-        // `linkedin`, wiec firma majaca wylacznie LinkedIna nie pokazywala go wcale.
-        const hasSocials =
-            socials &&
-            (socials.facebook ||
-                socials.instagram ||
-                socials.tiktok ||
-                socials.linkedin ||
-                socials.x);
 
         // Telegram nie jest tu ikona obok Facebooka, tylko przyciskiem akcji obok
         // WhatsAppa — dla czesci wpisow (np. firm bez biura w Polsce) to glowny,
@@ -659,36 +591,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             </div>
                         )}
 
-                        {/* Social media */}
-                        {hasSocials && (
-                            <div className="flex gap-3">
-                                {socials.facebook && (
-                                    <SocialLink href={socials.facebook} label="Facebook" className="bg-[#1877F2]">
-                                        <FacebookIcon />
-                                    </SocialLink>
-                                )}
-                                {socials.instagram && (
-                                    <SocialLink href={socials.instagram} label="Instagram" className="bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF]">
-                                        <InstagramIcon className="text-white" />
-                                    </SocialLink>
-                                )}
-                                {socials.tiktok && (
-                                    <SocialLink href={socials.tiktok} label="TikTok" className="bg-black dark:bg-gray-900">
-                                        <TikTokIcon />
-                                    </SocialLink>
-                                )}
-                                {socials?.linkedin && (
-                                    <SocialLink href={socials.linkedin} label="LinkedIn" className="bg-[#0A66C2]">
-                                        <LinkedInIcon />
-                                    </SocialLink>
-                                )}
-                                {socials.x && (
-                                    <SocialLink href={socials.x} label="X" className="bg-black dark:bg-gray-900">
-                                        <XIcon />
-                                    </SocialLink>
-                                )}
-                            </div>
-                        )}
+                        <ServiceSocials socials={socials} />
 
                         {/* Action buttons */}
                         <div

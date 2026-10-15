@@ -55,6 +55,7 @@ export type Socials = {
     facebook?: string;
     youtube?: string;
     viber?: string;
+    threads?: string;
     whatsapp?: string;
     tripadvisor?: string;
     linkedin?: string;

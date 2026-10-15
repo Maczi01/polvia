@@ -77,6 +77,7 @@ export const serviceLocationsTable = pgTable('service_locations', {
         linkedin?: string;
         youtube?: string;
         viber?: string;
+        threads?: string;
         whatsapp?: string;
         tripadvisor?: string;
         /** Dawniej Twitter. Klucz `x`, bo taka jest dzis nazwa serwisu i domena. */

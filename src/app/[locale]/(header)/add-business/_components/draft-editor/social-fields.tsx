@@ -26,6 +26,7 @@ const SERVICE_NAMES: Record<SocialKey, string> = {
     instagram: 'Instagram',
     tiktok: 'TikTok',
     youtube: 'YouTube',
+    threads: 'Threads',
     linkedin: 'LinkedIn',
     viber: 'Viber',
     tripadvisor: 'Tripadvisor',
@@ -33,7 +34,13 @@ const SERVICE_NAMES: Record<SocialKey, string> = {
 };
 
 /** Serwisy, w ktorych serwer zamienia uchwyt `@nazwa` na URL (`owner-socials-schema.ts`). */
-const HANDLE_KEYS: ReadonlySet<SocialKey> = new Set(['telegram', 'instagram', 'tiktok', 'x']);
+const HANDLE_KEYS: ReadonlySet<SocialKey> = new Set([
+    'telegram',
+    'instagram',
+    'tiktok',
+    'x',
+    'threads',
+]);
 
 /** Pole `socials.whatsapp` (link) od razu ukrywamy — numer obsluguje pole `whatsappNumber`. */
 const PRIMARY_LINK_KEYS: readonly SocialKey[] = PRIMARY_SOCIAL_KEYS.filter(

@@ -550,6 +550,10 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                         <Input id="socials.youtube" name="socials.youtube" placeholder="https://youtube.com/..." defaultValue={d?.socials?.youtube} />
                     </div>
                     <div className="space-y-2">
+                        <Label htmlFor="socials.threads">Threads</Label>
+                        <Input id="socials.threads" name="socials.threads" placeholder="https://www.threads.com/@..." defaultValue={d?.socials?.threads} />
+                    </div>
+                    <div className="space-y-2">
                         <Label htmlFor="socials.viber">Viber</Label>
                         <Input id="socials.viber" name="socials.viber" placeholder="Viber link or number" defaultValue={d?.socials?.viber} />
                     </div>

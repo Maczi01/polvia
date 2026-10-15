@@ -55,6 +55,7 @@ const ALL_SOCIALS: Required<Socials> = {
     instagram: 'https://www.instagram.com/ola/',
     tiktok: 'https://www.tiktok.com/@ola',
     youtube: 'https://www.youtube.com/@ola',
+    threads: 'https://www.threads.com/@ola',
     linkedin: 'https://www.linkedin.com/company/ola',
     viber: 'https://invite.viber.com/?g2=ola',
     tripadvisor: 'https://www.tripadvisor.com/Restaurant_Review-g1-d2',

@@ -26,6 +26,8 @@ const SOCIAL_HOSTS: Record<SocialKey, readonly string[]> = {
     instagram: ['instagram.com'],
     tiktok: ['tiktok.com'],
     youtube: ['youtube.com', 'youtu.be'],
+    /** `threads.net` przekierowuje dzis na `threads.com`; w obiegu sa oba. */
+    threads: ['threads.com', 'threads.net'],
     linkedin: ['linkedin.com'],
     viber: ['viber.com', 'vb.me'],
     tripadvisor: [],

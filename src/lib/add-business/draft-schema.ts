@@ -172,6 +172,7 @@ const draftSocialsSchema = z
         instagram: socialUrlSchema,
         tiktok: socialUrlSchema,
         youtube: socialUrlSchema,
+        threads: socialUrlSchema,
         linkedin: socialUrlSchema,
         viber: socialUrlSchema,
         tripadvisor: socialUrlSchema,

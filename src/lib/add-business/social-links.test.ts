@@ -16,6 +16,8 @@ describe('socialKeyForUrl', () => {
         ['https://t.me/workupeu', 'telegram'],
         ['https://www.tiktok.com/@workupeu', 'tiktok'],
         ['https://youtu.be/abc', 'youtube'],
+        ['https://www.threads.com/@ikonastone', 'threads'],
+        ['https://www.threads.net/@ikonastone', 'threads'],
         ['https://pl.linkedin.com/company/nowak', 'linkedin'],
         ['https://twitter.com/ifiora', 'x'],
         ['https://www.tripadvisor.co.uk/Restaurant_Review-g1', 'tripadvisor'],

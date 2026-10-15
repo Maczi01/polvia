@@ -38,6 +38,11 @@ const HANDLE_URLS: Partial<Record<SocialKey, { pattern: RegExp; url: (name: stri
             url: name => `https://www.tiktok.com/@${name}`,
         },
         x: { pattern: /^@?([A-Za-z0-9_]{1,15})$/, url: name => `https://x.com/${name}` },
+        // Threads dziedziczy nazwe konta z Instagrama, wiec i jej reguly.
+        threads: {
+            pattern: /^@?([A-Za-z0-9._]{1,30})$/,
+            url: name => `https://www.threads.com/@${name}`,
+        },
     };
 
 const HAS_SCHEME = /^[a-z][a-z0-9+.-]*:/i;
@@ -80,6 +85,7 @@ const socialFields = {
     instagram: socialField('instagram'),
     tiktok: socialField('tiktok'),
     youtube: socialField('youtube'),
+    threads: socialField('threads'),
     linkedin: socialField('linkedin'),
     viber: socialField('viber'),
     tripadvisor: socialField('tripadvisor'),

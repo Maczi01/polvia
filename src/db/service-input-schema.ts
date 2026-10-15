@@ -54,6 +54,7 @@ const socialsSchema = z
         linkedin: z.string().url().optional(),
         youtube: z.string().url().optional(),
         viber: z.string().url().optional(),
+        threads: z.string().url().optional(),
         whatsapp: z.string().url().optional(),
         tripadvisor: z.string().url().optional(),
         /** Dawniej Twitter. Klucz `x`, bo taka jest dzis nazwa serwisu i domena. */

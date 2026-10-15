@@ -55,6 +55,22 @@ describe('parseOwnerEdits — social media', () => {
         });
     });
 
+    it('Threads: uchwyt @nazwa zamienia na threads.com, link threads.net zostawia', () => {
+        expect(parsedData({ 'socials.threads': '@ikona.stone' }).socials).toEqual({
+            threads: 'https://www.threads.com/@ikona.stone',
+        });
+        expect(parsedData({ 'socials.threads': 'https://www.threads.net/@nowak' }).socials).toEqual({
+            threads: 'https://www.threads.net/@nowak',
+        });
+    });
+
+    it('Threads: link do Instagrama w polu Threads to blad wrongSocialService', () => {
+        expect(parseOwnerEdits(form({ 'socials.threads': 'https://www.instagram.com/nowak/' }))).toEqual({
+            ok: false,
+            fieldErrors: { 'socials.threads': OWNER_EDIT_ERRORS.wrongSocialService },
+        });
+    });
+
     it('link bez schematu dostaje https://', () => {
         expect(parsedData({ 'socials.facebook': 'facebook.com/nowak' }).socials).toEqual({
             facebook: 'https://facebook.com/nowak',

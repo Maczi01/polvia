@@ -36,6 +36,7 @@ const SOCIAL_HOSTS: readonly string[] = [
     'whatsapp.com',
     'viber.com',
     'threads.net',
+    'threads.com',
     'pinterest.com',
     'maps.app.goo.gl',
     'g.page',

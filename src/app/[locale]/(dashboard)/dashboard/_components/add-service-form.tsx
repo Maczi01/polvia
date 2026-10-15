@@ -454,6 +454,10 @@ export function AddServiceForm({ tags: initialTags }: { tags: Tag[] }) {
                         <Input id="socials.youtube" name="socials.youtube" placeholder="https://youtube.com/..." />
                     </div>
                     <div className="space-y-2">
+                        <Label htmlFor="socials.threads">Threads</Label>
+                        <Input id="socials.threads" name="socials.threads" placeholder="https://www.threads.com/@..." />
+                    </div>
+                    <div className="space-y-2">
                         <Label htmlFor="socials.viber">Viber</Label>
                         <Input id="socials.viber" name="socials.viber" placeholder="Viber link or number" />
                     </div>

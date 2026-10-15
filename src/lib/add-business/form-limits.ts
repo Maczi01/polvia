@@ -38,6 +38,7 @@ export const SOCIAL_KEYS = [
     'instagram',
     'tiktok',
     'youtube',
+    'threads',
     'linkedin',
     'viber',
     'tripadvisor',

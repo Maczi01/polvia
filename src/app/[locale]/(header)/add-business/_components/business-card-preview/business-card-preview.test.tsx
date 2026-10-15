@@ -121,10 +121,26 @@ describe('<BusinessCardPreview />', () => {
             .getAllByRole('img')
             .map(node => node.getAttribute('aria-label'))
             .filter(label => label === 'Facebook' || label === 'X' || label === 'YouTube');
-        expect(icons).toEqual(['Facebook', 'X']);
+        expect(icons).toEqual(['Facebook', 'YouTube', 'X']);
         expect(screen.getByText('WhatsApp')).toBeInTheDocument();
         expect(screen.queryByText('Telegram')).not.toBeInTheDocument();
         expect(screen.queryByRole('link', { name: 'Facebook' })).not.toBeInTheDocument();
+    });
+
+    it('Threads i Viber pokazuje jak karta katalogu', () => {
+        renderPreview({
+            preview: {
+                ...PREVIEW_FIXTURE,
+                socials: {
+                    threads: 'https://www.threads.com/@kawiarnia',
+                    viber: 'https://invite.viber.com/?g2=kawiarnia',
+                },
+            },
+        });
+
+        expect(screen.getByRole('img', { name: 'Threads' })).toBeInTheDocument();
+        expect(screen.getByRole('img', { name: 'Viber' })).toBeInTheDocument();
+        expect(screen.queryByRole('link', { name: 'Threads' })).not.toBeInTheDocument();
     });
 
     it('bez social media nie ma pustego rzedu', () => {
