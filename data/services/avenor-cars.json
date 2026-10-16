@@ -1,0 +1,103 @@
+{
+    "name": "Avenor Cars",
+    "category": "mechanics",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "avenor-cars.png",
+    "languages": [
+        "pl",
+        "uk",
+        "ru"
+    ],
+    "translations": {
+        "pl": {
+            "description": "Avenor Cars to warsztat samochodowy zlokalizowany przy ul. Chełmżyńskiej 5 w Warszawie (Rembertów). Specjalizuje się w diagnostyce, serwisie i naprawie samochodów, w tym marek grupy VAG, BMW, Volvo i Ford. Oferuje kompleksową obsługę od diagnozy po naprawę, z gwarancją na części i pracę. Obsługa dostępna w językach polskim, ukraińskim i rosyjskim."
+        },
+        "uk": {
+            "description": "Avenor Cars — це автосервіс, розташований на вулиці Chełmżyńska 5 у Варшаві (Рембертів). Спеціалізується на діагностиці, обслуговуванні та ремонті автомобілів, зокрема марок групи VAG, BMW, Volvo та Ford. Пропонує комплексне обслуговування від діагностики до ремонту з гарантією на запчастини та роботу. Обслуговування доступне польською, українською та російською мовами."
+        },
+        "en": {
+            "description": "Avenor Cars is a car repair workshop located at Chełmżyńska 5 in Warsaw (Rembertów). It specializes in diagnostics, servicing, and repairs of vehicles, including brands from the VAG group, BMW, Volvo, and Ford. The service covers everything from diagnosis to repair with a warranty on parts and labor. Customer service is available in Polish, Ukrainian, and Russian."
+        },
+        "ru": {
+            "description": "Avenor Cars — автосервис, расположенный по адресу Chełmżyńska 5 в Варшаве (Рембертów). Специализируется на диагностике, обслуживании и ремонте автомобилей, включая марки группы VAG, BMW, Volvo и Ford. Предлагает комплексное обслуживание от диагностики до ремонта с гарантией на запчасти и работу. Обслуживание доступно на польском, украинском и русском языках."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Diagnostyka samochodu",
+            "uk": "Діагностика автомобіля",
+            "en": "Car diagnostics",
+            "ru": "Диагностика автомобиля"
+        },
+        {
+            "pl": "Wymiana oleju i filtrów",
+            "uk": "Заміна олії та фільтрів",
+            "en": "Oil and filter change",
+            "ru": "Замена масла и фильтров"
+        },
+        {
+            "pl": "Naprawa zawieszenia",
+            "uk": "Ремонт підвіски",
+            "en": "Suspension repair",
+            "ru": "Ремонт подвески"
+        },
+        {
+            "pl": "Serwis hamulców",
+            "uk": "Обслуговування гальм",
+            "en": "Brake service",
+            "ru": "Обслуживание тормозов"
+        },
+        {
+            "pl": "Wymiana sprzęgła",
+            "uk": "Заміна зчеплення",
+            "en": "Clutch replacement",
+            "ru": "Замена сцепления"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "Chełmżyńska 5",
+            "voivodeship": "mazowieckie",
+            "postcode": "04-247",
+            "latitude": 52.242113,
+            "longitude": 21.1349669,
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "19:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "19:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "19:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "19:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "19:00"
+                },
+                "saturday": {
+                    "open": "09:00",
+                    "close": "12:00"
+                }
+            },
+            "phoneNumber": "+48 453 225 773",
+            "webpage": "https://avenorcars.pl/",
+            "socials": {
+                "facebook": "https://www.facebook.com/avenorcars",
+                "instagram": "https://www.instagram.com/avenor_cars/"
+            },
+            "whatsappNumber": "+48453225773",
+            "isMainLocation": true
+        }
+    ]
+}
