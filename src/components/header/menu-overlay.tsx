@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef } from 'react';
 import { ROUTES } from '@/lib/consts';
+import { isMapPathname } from '@/lib/map-pathname';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button/button';
 import { Link } from '@/i18n/navigation';
@@ -93,7 +94,7 @@ export const MenuOverlay = ({ isOpen, onClose, pathname, locale }: MenuOverlayPr
             title: t(route.name),
         }));
 
-    const isMapPage = pathname === '/map' || pathname.includes('/mapa');
+    const isMapPage = isMapPathname(pathname);
     const isListView = view === 'list';
     const isMapView = view === 'map' || (view === '' && isMapPage);
 

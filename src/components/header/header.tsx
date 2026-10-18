@@ -14,6 +14,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { MenuOverlay } from './menu-overlay';
 import { AppPathnames } from '@/i18n/routing';
 import { CATEGORIES } from '@/lib/categories';
+import { isMapPathname } from '@/lib/map-pathname';
 import { buildMapUrl } from '@/lib/map-url-builder';
 
 const fadeInKeyframes = `
@@ -275,7 +276,7 @@ export const Header = () => {
 
                         {/* Map link - third */}
                         {mapLinks.map(({ href, title }) => {
-                            const isMapActive = pathname === href || pathname.startsWith(href + '/');
+                            const isMapActive = isMapPathname(pathname);
                             return (
                                 <li key={href} className="flex items-center">
                                     <Button
