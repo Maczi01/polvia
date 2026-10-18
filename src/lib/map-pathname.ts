@@ -57,3 +57,14 @@ export function mapFiltersFromPathname(pathname: string, locale: Locale): MapFil
     const result = parseMapSlug(slug, locale, basePath);
     return result.success ? result.filters : NO_FILTERS;
 }
+
+/**
+ * Czy sciezka z `usePathname()` (next-intl) wskazuje strone mapy — z filtrami lub bez.
+ *
+ * next-intl tlumaczy na sciezke wewnetrzna tylko dokladne `/mapa` → `/map`.
+ * Podsciezki `/mapa/**` obsluguje reczny rewrite w `src/middleware.ts`, wiec dla
+ * `pl` z filtrami hook zwraca `/mapa/finansowe`, a dla pozostalych locale `/map/financial`.
+ */
+export function isMapPathname(pathname: string): boolean {
+    return /^\/mapa?(\/|$)/.test(pathname);
+}

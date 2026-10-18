@@ -1,4 +1,4 @@
-import { mapFiltersFromPathname, parseMapPathname } from '@/lib/map-pathname';
+import { isMapPathname, mapFiltersFromPathname, parseMapPathname } from '@/lib/map-pathname';
 
 describe('parseMapPathname — rozbior sciezki mapy', () => {
     it('rozpoznaje /mapa/{slug} jako locale pl', () => {
@@ -111,5 +111,32 @@ describe('mapFiltersFromPathname — filtry z adresu przegladarki', () => {
     it('nie myli mapy z podobnymi sciezkami', () => {
         expect(mapFiltersFromPathname('/mapamania/online', 'pl')).toEqual(noFilters);
         expect(mapFiltersFromPathname('/blog/online', 'pl')).toEqual(noFilters);
+    });
+});
+
+describe('isMapPathname — czy usePathname() wskazuje strone mapy', () => {
+    it('rozpoznaje mape bez filtrow', () => {
+        expect(isMapPathname('/map')).toBe(true);
+    });
+
+    it('rozpoznaje mape z filtrami na pl — next-intl zwraca wtedy /mapa/** bez tlumaczenia', () => {
+        expect(isMapPathname('/mapa/finansowe')).toBe(true);
+        expect(isMapPathname('/mapa/prawne/online')).toBe(true);
+    });
+
+    it('rozpoznaje mape z filtrami w pozostalych locale', () => {
+        expect(isMapPathname('/map/financial')).toBe(true);
+        expect(isMapPathname('/map/law/online')).toBe(true);
+    });
+
+    it('odrzuca sciezki, ktore tylko zaczynaja sie od "map"', () => {
+        expect(isMapPathname('/mapping')).toBe(false);
+        expect(isMapPathname('/mapax/finansowe')).toBe(false);
+    });
+
+    it('odrzuca sciezki niebedace mapa', () => {
+        expect(isMapPathname('/')).toBe(false);
+        expect(isMapPathname('/contact')).toBe(false);
+        expect(isMapPathname('/blog/mapa')).toBe(false);
     });
 });
