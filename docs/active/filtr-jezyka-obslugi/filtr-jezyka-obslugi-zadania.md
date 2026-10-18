@@ -1,7 +1,7 @@
 # Zadania: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-18
+**Ostatnia aktualizacja:** 2026-10-19
 
 ## Źródła
 
@@ -26,23 +26,23 @@
 **Delegate to:** `feature-builder-web-fullstack` · **Nakład:** M · **Zależności:** brak
 **Wymagania:** R3, R4, R16, R17, R18
 
-- [ ] Stwórz `src/lib/languages.ts` (bez importów runtime'owych): kody pl, uk, ru, en, be w tej kolejności, typ, guard, ścieżka flagi i endonim per kod
-- [ ] `src/lib/add-business/form-limits.ts` — reeksport z `languages.ts` zamiast własnej listy
-- [ ] `business-card-preview.tsx` i `generated-summary.tsx` — locale treści przez `locales`/`Locale` z `@/i18n/config`; mapa flag z `languages.ts`
-- [ ] `languages-field.tsx` — lista z modułu (jeśli ma własną)
-- [ ] `src/lib/add-business/llm-draft.ts` — reguła `LANGUAGES` w prompcie wymienia `be`
-- [ ] `submission-emails.ts` — nazwa `be` w mailu potwierdzającym
-- [ ] `service-card.tsx` — mapa flag z `languages.ts`, alt z tłumaczeń
-- [ ] Dashboard: opcja `be` w `add-service-form.tsx` i `service-form.tsx`
-- [ ] `public/icons/by.svg` → flaga biało-czerwono-biała (512×512, okrągła maska jak `pl.svg`)
-- [ ] `messages/{pl,en,ru,uk}.json` — `addBusiness.languages.be`, `addBusiness.confirmationEmail.languages.be`
-- [ ] Grep wszystkich miejsc renderujących flagi/listy języków — żadne nie zostaje z własną listą bez `be`
-- [ ] `Test:` guard akceptuje pl/uk/ru/en/be, odrzuca `de`, `''`, `PL`
-- [ ] `Test:` każdy kod ma ścieżkę flagi i niepusty endonim
-- [ ] `Test:` `owner-edits-schema` przyjmuje `['be']`; `'de'` dalej odrzucone
-- [ ] `Test:` podgląd karty z `['pl','be']` — dwie flagi z alt z tłumaczeń; opisy wg locale strony (brak indeksowania `descriptions['be']`)
-- [ ] `Test:` karta usługi z `be` — alt przetłumaczony; `jest-axe` bez naruszeń
-- [ ] `Test:` mail potwierdzający wymienia białoruski w języku maila
+- [x] Stwórz `src/lib/languages.ts` (bez importów runtime'owych): kody pl, uk, ru, en, be w tej kolejności, typ, guard, ścieżka flagi i endonim per kod
+- [x] `src/lib/add-business/form-limits.ts` — reeksport z `languages.ts` zamiast własnej listy
+- [x] `business-card-preview.tsx` i `generated-summary.tsx` — locale treści przez `locales`/`Locale` z `@/i18n/config`; mapa flag z `languages.ts`
+- [x] `languages-field.tsx` — lista z modułu (jeśli ma własną)
+- [x] `src/lib/add-business/llm-draft.ts` — reguła `LANGUAGES` w prompcie wymienia `be`
+- [x] `submission-emails.ts` — nazwa `be` w mailu potwierdzającym
+- [x] `service-card.tsx` — mapa flag z `languages.ts`, alt z tłumaczeń
+- [x] Dashboard: opcja `be` w `add-service-form.tsx` i `service-form.tsx`
+- [x] `public/icons/by.svg` → flaga biało-czerwono-biała (512×512, okrągła maska jak `pl.svg`)
+- [x] `messages/{pl,en,ru,uk}.json` — `addBusiness.languages.be`, `addBusiness.confirmationEmail.languages.be`
+- [x] Grep wszystkich miejsc renderujących flagi/listy języków — żadne nie zostaje z własną listą bez `be`
+- [x] `Test:` guard akceptuje pl/uk/ru/en/be, odrzuca `de`, `''`, `PL`
+- [x] `Test:` każdy kod ma ścieżkę flagi i niepusty endonim
+- [x] `Test:` `owner-edits-schema` przyjmuje `['be']`; `'de'` dalej odrzucone
+- [x] `Test:` podgląd karty z `['pl','be']` — dwie flagi z alt z tłumaczeń; opisy wg locale strony (brak indeksowania `descriptions['be']`)
+- [x] `Test:` karta usługi z `be` — alt przetłumaczony; `jest-axe` bez naruszeń
+- [x] `Test:` mail potwierdzający wymienia białoruski w języku maila
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` testy `src/lib/languages`, `src/lib/add-business`, podglądu karty i karty usługi przechodzą
 - [ ] `Weryfikacja:` grep — `be` w `addBusiness.languages` we wszystkich czterech `messages/*.json`

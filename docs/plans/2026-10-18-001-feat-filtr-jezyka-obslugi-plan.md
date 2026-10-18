@@ -162,7 +162,7 @@ Brak — repo ma silne lokalne wzorce (oś `coverage`, nuqs dla `query`).
 
 ## Implementation Units
 
-- [ ] **Unit 1: Moduł języków obsługi + białoruski w formularzach i na kartach**
+- [x] **Unit 1: Moduł języków obsługi + białoruski w formularzach i na kartach**
 
 **Cel:** Jedno źródło prawdy o językach obsługi (z `be`), białoruski wybieralny w „Dodaj firmę" i
 dashboardzie, flaga biało-czerwono-biała, karty używają wspólnej mapy flag.

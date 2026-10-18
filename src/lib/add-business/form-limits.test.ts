@@ -3,8 +3,14 @@
  */
 import sharp from 'sharp';
 
-import { LOGO_ACCEPTED_TYPES, LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
+import { DRAFT_JSON_SCHEMA } from '@/lib/add-business/draft-schema';
+import {
+    LANGUAGE_CODES,
+    LOGO_ACCEPTED_TYPES,
+    LOGO_MAX_BYTES,
+} from '@/lib/add-business/form-limits';
 import { processLogoUpload } from '@/lib/add-business/logo';
+import { SERVICE_LANGUAGES } from '@/lib/languages';
 
 type SharpFormat = 'png' | 'jpeg' | 'webp' | 'gif';
 
@@ -57,5 +63,18 @@ describe('LOGO_MAX_BYTES', () => {
         });
 
         expect(await processLogoUpload(file)).toEqual({ ok: false, code: 'LOGO_TOO_LARGE' });
+    });
+});
+
+describe('LANGUAGE_CODES', () => {
+    it('to lista jezykow obslugi z @/lib/languages, z bialoruskim', () => {
+        expect(LANGUAGE_CODES).toBe(SERVICE_LANGUAGES);
+        expect(LANGUAGE_CODES).toContain('be');
+    });
+
+    it('schemat JSON szkicu dla modelu dopuszcza wszystkie jezyki obslugi', () => {
+        expect(JSON.stringify(DRAFT_JSON_SCHEMA)).toContain(
+            `"enum":${JSON.stringify(SERVICE_LANGUAGES)}`,
+        );
     });
 });

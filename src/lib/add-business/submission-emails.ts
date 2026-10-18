@@ -3,7 +3,6 @@ import 'server-only';
 import { createTranslator } from 'next-intl';
 
 import type { Locale } from '@/i18n/config';
-import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/draft-schema';
 import { operatorText } from '@/lib/add-business/operator-email-text';
 import {
     bulletList,
@@ -12,6 +11,7 @@ import {
     line,
     type SubmissionEmailInput,
 } from '@/lib/add-business/submission-email-format';
+import { isServiceLanguage } from '@/lib/languages';
 import { getOperatorInbox, type MailMessage, toHeaderText } from '@/lib/mailer';
 
 import en from '../../../messages/en.json';
@@ -39,12 +39,6 @@ export type {
  */
 
 const MESSAGES = { pl, en, ru, uk } satisfies Record<Locale, unknown>;
-
-const LANGUAGE_CODE_SET: ReadonlySet<string> = new Set(LANGUAGE_CODES);
-
-function isLanguageCode(value: string): value is LanguageCode {
-    return LANGUAGE_CODE_SET.has(value);
-}
 
 export function buildOperatorEmail(input: SubmissionEmailInput): MailMessage {
     const { entry, submitterEmail, logo } = input;
@@ -86,7 +80,7 @@ export function buildOwnerConfirmationEmail(input: SubmissionEmailInput): MailMe
 
     const hours = formatHours(location?.openingHours, day => t(`days.${day}`));
     const languages = (json.languages ?? []).map(code =>
-        isLanguageCode(code) ? t(`languages.${code}`) : code,
+        isServiceLanguage(code) ? t(`languages.${code}`) : code,
     );
     const facts = [
         line(t('fields.name'), name),

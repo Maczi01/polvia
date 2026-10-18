@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utilities';
+import { isServiceLanguage, LANGUAGE_FLAG_PATHS } from '@/lib/languages';
 import { Button } from '@/components/ui/button/button';
 import { mapCategoryToBadgeColor, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
 import { Clock, Globe, Mail, MapPin, Phone, MessageCircle, Navigation, Send } from 'lucide-react';
@@ -40,14 +41,6 @@ const MOBILE_COLLAPSED_TAG_LIMIT = 2;
 
 /** Czytaj wylacznie w event handlerach — nigdy w renderze. */
 const isMobileViewport = (): boolean => window.innerWidth < MOBILE_BREAKPOINT_PX;
-
-const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
-    pl: { src: '/icons/pl.svg', alt: 'Polish' },
-    en: { src: '/icons/gb.svg', alt: 'English' },
-    ru: { src: '/icons/ru.svg', alt: 'Russian' },
-    uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
-    be: { src: '/icons/by.svg', alt: 'Belarusian' },
-};
 
 const FacebookIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
@@ -188,6 +181,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const [isExpanding, setIsExpanding] = useState(false);
         const t = useTranslations('MapCard');
         const tCounties = useTranslations('MapPage.counties');
+        const tLanguages = useTranslations('addBusiness.languages');
 
         const COLLAPSE_MS = 300;
 
@@ -626,20 +620,16 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                                         {t('languages')}
                                     </span>
                                     <div className="mt-1.5 flex gap-1.5">
-                                        {languages.map(lang => {
-                                            const flag = LANGUAGE_FLAGS[lang];
-                                            if (!flag) return null;
-                                            return (
-                                                <Image
-                                                    key={lang}
-                                                    src={flag.src}
-                                                    alt={flag.alt}
-                                                    width={28}
-                                                    height={20}
-                                                    className="rounded-sm"
-                                                />
-                                            );
-                                        })}
+                                        {languages.filter(isServiceLanguage).map(lang => (
+                                            <Image
+                                                key={lang}
+                                                src={LANGUAGE_FLAG_PATHS[lang]}
+                                                alt={tLanguages(lang)}
+                                                width={28}
+                                                height={20}
+                                                className="rounded-sm"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             )}

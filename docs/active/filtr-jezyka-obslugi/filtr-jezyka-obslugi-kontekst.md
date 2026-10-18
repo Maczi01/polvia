@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-18
+**Ostatnia aktualizacja:** 2026-10-19
 
 ## Źródła
 
@@ -81,3 +81,32 @@
 - Brak nowych paczek; brak zmian schematu bazy.
 - U2 ← U1 (typ języka), U3 ← U2 (predykat, liczniki), U4 ← U3 (hook, `languageCounts`).
 - Brak `.env.e2e` → weryfikacja przeglądarkowa ręczna (`Operator:`).
+
+## Postęp
+
+### Faza 1 — U1 (2026-10-19) → `feature-builder-web-fullstack` → completed
+
+- `src/lib/languages.ts`: `SERVICE_LANGUAGES` (pl, uk, ru, en, be), `ServiceLanguage`,
+  `isServiceLanguage`, `LANGUAGE_FLAG_PATHS`, `LANGUAGE_ENDONYMS`. `form-limits.ts` reeksportuje
+  jako `LANGUAGE_CODES`/`LanguageCode` — schematy Zod (`llmDraftSchema`, `businessDraftSchema`,
+  enum `DRAFT_JSON_SCHEMA`, `owner-edits-schema`) przyjęły `be` automatycznie.
+- `business-card-preview.tsx`, `generated-summary.tsx`: locale treści przez `locales` z
+  `@/i18n/config` — `descriptions['be']` nigdy nie jest indeksowane.
+- `service-card.tsx`: lokalna mapa flag usunięta; `languages.filter(isServiceLanguage)`, alt z
+  `addBusiness.languages` (jedno źródło nazw języków na stronę). Nieznane kody (np. `de` w seedzie)
+  pomijane jak wcześniej.
+- `submission-emails.ts`: lokalny guard zastąpiony `isServiceLanguage`.
+- Dashboard: opcja `be` z etykietą „Belarusian" (dashboard nie ma i18n — spójnie z resztą).
+- `by.svg`: biało-czerwono-biała, kolory `#eee`/`#d80027` jak `pl.svg`/`ru.svg`.
+- messages ×4: `addBusiness.languages.be`, `addBusiness.confirmationEmail.languages.be`.
+- Świadomie BEZ `be` (to locale stron, nie języki obsługi): `src/components/language-switcher.tsx`,
+  `LANGUAGES` w `src/db/add-service.ts`.
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest` 104/104 suites, 1169/1169
+testów; `npx next lint` 0 błędów (preegzystujące warningi). `npm run build` NIE uruchomiony —
+dev server na :3000 aktywny (learned pattern: build nadpisuje `.next`).
+
+**Odchylenia:** brak zmiany scope'u. Prettier nie przeformatował plików, które już wcześniej nie
+przechodziły (CRLF) — tylko zmienione fragmenty.
+
+**Dług odnotowany (poza scope):** angielskie alty flag w `language-switcher.tsx`.

@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select/select';
 import { createService, updateService, createTag, type ActionResult, type Tag, type ServiceEditData } from '../_actions';
 import { CATEGORY_VALUES } from '@/lib/categories';
+import type { ServiceLanguage } from '@/lib/languages';
 
 const statuses = ['active', 'inactive', 'pending'] as const;
 
@@ -61,7 +62,8 @@ const languages = [
     { value: 'en', label: 'English' },
     { value: 'uk', label: 'Ukrainian' },
     { value: 'ru', label: 'Russian' },
-];
+    { value: 'be', label: 'Belarusian' },
+] satisfies readonly { value: ServiceLanguage; label: string }[];
 
 const initialState: ActionResult = { success: false, message: '' };
 

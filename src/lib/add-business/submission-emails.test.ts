@@ -151,6 +151,22 @@ describe('buildOwnerConfirmationEmail', () => {
         expect(mail.text).not.toContain(plTexts.review);
     });
 
+    it('wymienia bialoruski w jezyku maila', () => {
+        const entry: BuiltServiceEntry = {
+            ...ENTRY,
+            json: { ...ENTRY.json, languages: ['pl', 'be'] },
+        };
+
+        const ukMail = buildOwnerConfirmationEmail(
+            input({ entry, stored: { ...input().stored, locale: 'uk' } }),
+        );
+        const plMail = buildOwnerConfirmationEmail(input({ entry }));
+
+        expect(ukMail.text).toContain(uk.addBusiness.confirmationEmail.languages.be);
+        expect(plMail.text).toContain(pl.addBusiness.confirmationEmail.languages.be);
+        expect(plMail.text).not.toMatch(/: pl, be$/m);
+    });
+
     it('zawiera fakty, ale nie opisy w czterech jezykach', () => {
         const { text } = buildOwnerConfirmationEmail(input());
 
