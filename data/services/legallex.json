@@ -1,0 +1,99 @@
+{
+    "name": "Kancelaria Adwokacka LEGALLEX",
+    "category": "law",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "legallex.png",
+    "languages": ["pl", "en", "ru", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Kancelaria adwokacka działająca od 1998 roku, z siedzibą w Warszawie i filiami w Płońsku, Łodzi, Gdańsku i Pelplinie. Ma osobny dział obsługi cudzoziemców: karty pobytu, karta rezydenta UE, obywatelstwo, PESEL i meldunek, deportacja, wymiana prawa jazdy, rejestracja i prowadzenie firmy w Polsce. Prowadzi też sprawy gospodarcze, karne, cywilne i rodzinne oraz kredyty frankowe. Konsultacje w biurach i online. Obsługa po polsku, angielsku, rosyjsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Адвокатська канцелярія, що працює з 1998 року: головний офіс у Варшаві, філії в Плоньську, Лодзі, Гданську та Пельпліні. Має окремий відділ для іноземців — карта побиту, карта резидента ЄС, громадянство, PESEL і прописка, депортація, обмін посвідчення водія, реєстрація та ведення бізнесу в Польщі. Також веде господарські, кримінальні, цивільні та сімейні справи, справи щодо кредитів у франках. Консультації в офісах і онлайн. Обслуговування польською, англійською, російською та українською."
+        },
+        "en": {
+            "description": "Law firm (adwokat) founded in 1998, headquartered in Warsaw with branches in Płońsk, Łódź, Gdańsk and Pelplin. It runs a dedicated department for foreigners: residence cards, EU long-term resident cards, citizenship, PESEL and residence registration, deportation proceedings, driving licence exchange, and setting up and running a business in Poland. It also handles commercial, criminal, civil and family cases and Swiss franc mortgage disputes. Consultations at the offices and online. Service in Polish, English, Russian and Ukrainian."
+        },
+        "ru": {
+            "description": "Адвокатская канцелярия, работающая с 1998 года: главный офис в Варшаве, филиалы в Плоньске, Лодзи, Гданьске и Пельплине. Есть отдельный отдел по работе с иностранцами — карта побыта, карта резидента ЕС, гражданство, PESEL и прописка, депортация, обмен водительского удостоверения, регистрация и ведение бизнеса в Польше. Также ведёт хозяйственные, уголовные, гражданские и семейные дела, споры по кредитам во франках. Консультации в офисах и онлайн. Обслуживание на польском, английском, русском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Obywatelstwo", "uk": "Громадянство", "en": "Citizenship", "ru": "Гражданство" },
+        { "pl": "Rejestracja firmy", "uk": "Реєстрація фірми", "en": "Business Registration", "ru": "Регистрация фирмы" },
+        { "pl": "Prawo karne", "uk": "Кримінальне право", "en": "Criminal law", "ru": "Уголовное право" },
+        { "pl": "Kredyty frankowe", "uk": "Кредити у франках", "en": "Swiss franc loans", "ru": "Кредиты во франках" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Elbląska 14/207",
+            "voivodeship": "mazowieckie",
+            "postcode": "01-737",
+            "latitude": 52.2661941,
+            "longitude": 20.9632657,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "17:00" },
+                "tuesday": { "open": "09:00", "close": "17:00" },
+                "wednesday": { "open": "09:00", "close": "17:00" },
+                "thursday": { "open": "09:00", "close": "17:00" },
+                "friday": { "open": "09:00", "close": "17:00" }
+            },
+            "phoneNumber": "+48 512 010 810",
+            "email": "kancelaria@legallex.pl",
+            "webpage": "https://www.legallex.pl",
+            "whatsappNumber": "+48 512 010 810",
+            "isMainLocation": true
+        },
+        {
+            "city": "Płońsk",
+            "street": "ul. Żołnierzy Wyklętych 20B",
+            "voivodeship": "mazowieckie",
+            "postcode": "09-100",
+            "latitude": 52.6322944,
+            "longitude": 20.3802102,
+            "phoneNumber": "+48 512 010 810",
+            "email": "kancelaria@legallex.pl",
+            "webpage": "https://www.legallex.pl"
+        },
+        {
+            "city": "Łódź",
+            "street": "ul. Piotrkowska 111",
+            "voivodeship": "lodzkie",
+            "postcode": "90-425",
+            "latitude": 51.7639617,
+            "longitude": 19.4560101,
+            "phoneNumber": "+48 512 010 810",
+            "email": "kancelaria@legallex.pl",
+            "webpage": "https://www.legallex.pl"
+        },
+        {
+            "city": "Gdańsk",
+            "street": "ul. Rybaki Górne 4/6",
+            "voivodeship": "pomorskie",
+            "postcode": "80-861",
+            "latitude": 54.3584707,
+            "longitude": 18.6552399,
+            "phoneNumber": "+48 512 010 810",
+            "email": "kancelaria@legallex.pl",
+            "webpage": "https://www.legallex.pl"
+        },
+        {
+            "city": "Pelplin",
+            "street": "pl. Grunwaldzki 9/1",
+            "voivodeship": "pomorskie",
+            "postcode": "83-130",
+            "latitude": 53.9283315,
+            "longitude": 18.698397,
+            "phoneNumber": "+48 512 010 810",
+            "email": "kancelaria@legallex.pl",
+            "webpage": "https://www.legallex.pl"
+        }
+    ]
+}
