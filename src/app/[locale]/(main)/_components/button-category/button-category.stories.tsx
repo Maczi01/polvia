@@ -108,3 +108,11 @@ export const Others: Story = {
         variant: 'mojito',
     },
 };
+export const WithCount: Story = {
+    args: {
+        text: 'Remonty',
+        image: '/icons/renovation.svg',
+        variant: 'blue',
+        count: 52,
+    },
+};

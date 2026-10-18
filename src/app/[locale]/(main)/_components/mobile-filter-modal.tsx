@@ -180,7 +180,7 @@ export const MobileFilterModal = ({
                         />
                     </div>
 
-                    <div className="mt-3 flex flex-col gap-y-1.5">
+                    <div className="mt-3 flex flex-col gap-y-2.5">
                         <ButtonCategory
                             image={'/icons/remove.svg'}
                             text={t('Categories.RemoveFilterMobile')}

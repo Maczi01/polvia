@@ -2,10 +2,11 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import Image from 'next/image';
+import { CountBadge } from '@/components/ui/count-badge/count-badge';
 import { cn } from '@/lib/utilities';
 
 const buttonVariants = cva(
-    'inline-flex items-center md:justify-around justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium ' +
+    'relative inline-flex items-center md:justify-around justify-start gap-2 whitespace-nowrap rounded-md text-sm font-medium ' +
     'transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ' +
     'disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ' +
     'active:scale-95',
@@ -107,7 +108,16 @@ const ButtonCategory = React.forwardRef<HTMLButtonElement, ButtonProps>(
                     className={cn('transition-all duration-200')}
                 />
                 <span className={cn('transition-colors')}>{text}</span>
-                {count !== undefined && <span className="tabular-nums">({count})</span>}
+                {count !== undefined && (
+                    <>
+                        <CountBadge
+                            count={count}
+                            aria-hidden="true"
+                            className="absolute -right-1.5 -top-1.5 h-5 min-w-5 text-xs"
+                        />
+                        <span className="sr-only">{` (${count})`}</span>
+                    </>
+                )}
             </Comp>
         );
     },
