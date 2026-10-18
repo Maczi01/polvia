@@ -27,6 +27,14 @@ describe('<ButtonCategory />', () => {
         expect(screen.getByRole('button', { name: 'Uroda (8)' })).toBeInTheDocument();
     });
 
+    it('liczba jest widoczna w kolku w prawym gornym rogu, jak na pinie mapy', () => {
+        render(<ButtonCategory text="Uroda" image="/icons/beauty.svg" count={8} />);
+
+        const badge = screen.getByText('8');
+        expect(badge).toHaveClass('rounded-full', 'bg-black', 'absolute', '-right-1.5', '-top-1.5');
+        expect(badge).toHaveAttribute('aria-hidden', 'true');
+    });
+
     it('zero tez jest pokazywane, a przycisk zostaje aktywny', () => {
         render(<ButtonCategory text="Urzędowe" image="/icons/gov.svg" count={0} />);
 

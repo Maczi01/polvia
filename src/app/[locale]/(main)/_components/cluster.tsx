@@ -1,5 +1,6 @@
 import { Marker as GLMarker } from 'react-map-gl/mapbox';
 import React, { CSSProperties, useEffect, useState } from 'react';
+import { CountBadge } from '@/components/ui/count-badge/count-badge';
 import { categoryImage } from '../_components/overview-map/utility';
 
 type ClusterProps = {
@@ -106,13 +107,7 @@ export const Cluster = ({
             >
                 {counter && (
                     <div style={counterStyle}>
-                        <div
-                            className="absolute -top-4 left-6 size-6 rounded-full
-                        border-2 border-gray-300 bg-black px-0
-                        text-center font-bold text-white"
-                        >
-                            {counter}
-                        </div>
+                        <CountBadge count={counter} className="absolute -top-4 left-6" />
                     </div>
                 )}
                 <img src={imageSource} alt="cluster icon" style={markerStyle} />

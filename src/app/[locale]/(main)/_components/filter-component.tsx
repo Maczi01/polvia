@@ -475,7 +475,7 @@ export function FilterComponent({
 
                             <div
                                 ref={categoryReference}
-                                className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden pr-4"
+                                className="scrollbar-hide flex min-w-0 flex-1 gap-x-4 overflow-hidden py-1.5 pr-4"
                             >
                                 {CATEGORIES.map(({ text, key, image, variant }) => {
                                     const isSelected = key === selectedCategory?.toLowerCase();
