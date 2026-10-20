@@ -77,15 +77,15 @@ P2 #1–#2 naprawić przed fazą 2: filtr zależy od poprawnych kodów w bazie.
 
 > Test-first — po jednym teście na zachowanie, pionowo.
 
-- [ ] `src/lib/service-coverage.ts` — pole `language` (nullable) w `CoverageFilters`, eksportowany `matchesLanguage`, warunek w `matching`
-- [ ] `src/lib/result-counts.ts` — `countCardsByLanguage` (lustro `countCardsByCategory`, wszystkie 5 kodów)
-- [ ] `Test:` `language: 'ru'` zostawia tylko wpisy z `ru` w obu kubełkach
-- [ ] `Test:` `language: null` = zachowanie sprzed zmiany
-- [ ] `Test:` koniunkcja kategoria + miasto + język
-- [ ] `Test:` `countCardsByLanguage` zwraca 5 kodów, `be: 0` gdy brak wpisów
-- [ ] `Test:` `countCardsByLanguage` liczy karty, nie lokalizacje
-- [ ] `Test:` `countCardsByCategory` z aktywnym językiem liczy tylko wpisy w tym języku
-- [ ] `Test:` `buildMapMetadataPath` nie zawiera `lang` ani `?` (regresja R9)
+- [x] `src/lib/service-coverage.ts` — pole `language` (nullable) w `CoverageFilters`, eksportowany `matchesLanguage`, warunek w `matching`
+- [x] `src/lib/result-counts.ts` — `countCardsByLanguage` (lustro `countCardsByCategory`, wszystkie 5 kodów)
+- [x] `Test:` `language: 'ru'` zostawia tylko wpisy z `ru` w obu kubełkach
+- [x] `Test:` `language: null` = zachowanie sprzed zmiany
+- [x] `Test:` koniunkcja kategoria + miasto + język
+- [x] `Test:` `countCardsByLanguage` zwraca 5 kodów, `be: 0` gdy brak wpisów
+- [x] `Test:` `countCardsByLanguage` liczy karty, nie lokalizacje
+- [x] `Test:` `countCardsByCategory` z aktywnym językiem liczy tylko wpisy w tym języku
+- [x] `Test:` `buildMapMetadataPath` nie zawiera `lang` ani `?` (regresja R9)
 - [ ] `Weryfikacja:` `npx jest src/lib/service-coverage src/lib/result-counts src/lib/map-metadata` przechodzi
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 

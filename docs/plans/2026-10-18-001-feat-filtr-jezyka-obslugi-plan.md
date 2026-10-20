@@ -226,7 +226,7 @@ rozszerz typ i daj typecheckowi wskazać wszystkie miejsca do poprawy.
   `languages`) — plik skilla, poza zakresem builderów.
 - [ ] Wizualna akceptacja nowej flagi `by.svg` (proporcje, okrągła maska jak pozostałe).
 
-- [ ] **Unit 2: Predykat języka i liczniki per język**
+- [x] **Unit 2: Predykat języka i liczniki per język**
 
 **Cel:** Język staje się częścią `CoverageFilters`; wszystkie kubełki i liczniki go respektują;
 nowy licznik per język.

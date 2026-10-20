@@ -1,5 +1,6 @@
 import { CATEGORIES } from '@/lib/categories';
 import { groupServicesByCompany } from '@/lib/group-services-by-company';
+import { SERVICE_LANGUAGES, type ServiceLanguage } from '@/lib/languages';
 import { type CoverageFilters, splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
 
@@ -53,4 +54,22 @@ export function countCardsByCategory(
             return [key, countListCards(localResults) + countListCards(onlineResults)];
         }),
     );
+}
+
+/**
+ * Liczba kart dla kazdego jezyka obslugi przy POZOSTALYCH aktywnych filtrach (R5).
+ *
+ * Lustro `countCardsByCategory`: aktywny jezyk jest podmieniany na liczony, a karty
+ * liczone ta sama definicja. Rekord ma wszystkie jezyki — jezyk bez wynikow dostaje
+ * zero, nie znika z filtra.
+ */
+export function countCardsByLanguage(
+    services: PartialService[],
+    filters: CoverageFilters,
+): Record<ServiceLanguage, number> {
+    const counts: Record<ServiceLanguage, number> = { pl: 0, uk: 0, ru: 0, en: 0, be: 0 };
+    for (const language of SERVICE_LANGUAGES) {
+        counts[language] = countVisibleCards(services, { ...filters, language });
+    }
+    return counts;
 }

@@ -144,3 +144,26 @@ E2E pominięte — faza 1 nie ma checkboxów przeglądarkowych. 0 × P1, 3 × P2
 
 **Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest` 106/106 suites, 1187/1187;
 `npx next lint` 0 błędów. Build pominięty (dev server :3000).
+
+### Faza 2 — U2 (2026-10-20) → `feature-builder-web-data` → completed
+
+- `src/lib/service-coverage.ts`: `CoverageFilters.language?: ServiceLanguage | null`; eksportowany
+  `matchesLanguage(item, language)` (brak języka → true, inaczej `languages.includes`); warunek w
+  predykacie `matching` — obowiązuje w obu kubełkach (local/online).
+- `src/lib/result-counts.ts`: `countCardsByLanguage(services, filters): Record<ServiceLanguage, number>`
+  — podmienia język na liczony i liczy przez `countVisibleCards` (ta sama definicja karty co lista).
+  Literał `{ pl: 0, … be: 0 }` zamiast `Object.fromEntries` (bez `as`; nowy kod w
+  `SERVICE_LANGUAGES` = błąd typecheckera).
+- `countCardsByCategory`/`countVisibleCards` respektują język bez zmian w kodzie (przez
+  `splitServicesByCoverage`) — potwierdzone testami. Test R9 w `map-metadata.test.ts`: canonical bez
+  `?`/`lang` dla wszystkich locale.
+- **Kontrakt dla U3:** `?lang` z URL-a zawęzić do `ServiceLanguage | null` (parser nuqs /
+  `isServiceLanguage`) przed włożeniem do `CoverageFilters.language`; `matchesLanguage` dołożyć w
+  `filteredEmbeddingResults` (semantyka nie przechodzi przez `splitServicesByCoverage`).
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0 (błąd TS2353 zgłoszony przez hook Stop był
+stanem RED w trakcie test-first — zniknął po implementacji); `npx jest` 106/106 suites, 1201/1201;
+`npx next lint` 0 błędów. Build pominięty (dev server :3000).
+
+**Odchylenia:** brak. Testy liczników z aktywnym językiem i R9 były zielone od razu (zachowanie
+dziedziczone przez istniejący przepływ) — brak fazy RED dla nich, odnotowane przez buildera.

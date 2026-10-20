@@ -52,6 +52,24 @@ describe('buildMapMetadataPath', () => {
         expect(buildMapMetadataPath(NO_FILTERS, 'pl')).toBe('/mapa');
         expect(buildMapMetadataPath(NO_FILTERS, 'uk')).toBe('/uk/map');
     });
+
+    // Jezyk obslugi zyje w `?lang`, a canonical wskazuje wersje bez niego (R9).
+    it('canonical nigdy nie zawiera query stringu ani jezyka obslugi', () => {
+        const filterSets: MapFilters[] = [
+            NO_FILTERS,
+            BEAUTY_WARSAW,
+            { ...NO_FILTERS, county: 'pomorskie' },
+            { ...NO_FILTERS, category: 'law', onlineOnly: true },
+        ];
+
+        for (const locale of locales) {
+            for (const filters of filterSets) {
+                const path = buildMapMetadataPath(filters, locale);
+                expect(path).not.toContain('?');
+                expect(path).not.toMatch(/lang/i);
+            }
+        }
+    });
 });
 
 describe('buildMapTitleSuffix', () => {

@@ -1,5 +1,11 @@
+import { SERVICE_LANGUAGES } from '@/lib/languages';
 import { buildListRows } from '@/lib/map-list-rows';
-import { countCardsByCategory, countListCards, countVisibleCards } from '@/lib/result-counts';
+import {
+    countCardsByCategory,
+    countCardsByLanguage,
+    countListCards,
+    countVisibleCards,
+} from '@/lib/result-counts';
 import { type CoverageFilters, splitServicesByCoverage } from '@/lib/service-coverage';
 import type { PartialService } from '@/types';
 
@@ -145,5 +151,75 @@ describe('countCardsByCategory', () => {
         const counts = countCardsByCategory(catalog, NO_FILTERS);
 
         expect(counts.education).toBe(0);
+    });
+});
+
+describe('countCardsByLanguage', () => {
+    const catalog = [
+        ...branches('rosyjska-siec', 3, { languages: ['pl', 'ru'], category: 'law' }),
+        service({ languages: ['uk'], category: 'law' }),
+        service({ languages: ['pl', 'uk'], category: 'beauty' }),
+        service({ languages: ['en', 'en'], coverage: 'online', latitude: null, longitude: null }),
+        service({ languages: ['de'], category: 'law' }),
+    ];
+
+    it('zwraca wszystkie piec jezykow, z zerem dla jezyka bez wpisow', () => {
+        const counts = countCardsByLanguage(catalog, NO_FILTERS);
+
+        expect(Object.keys(counts).sort()).toEqual([...SERVICE_LANGUAGES].sort());
+        expect(counts.be).toBe(0);
+    });
+
+    it('liczy firmy, nie lokalizacje', () => {
+        const counts = countCardsByLanguage(catalog, NO_FILTERS);
+
+        // siec (3 punkty = 1 karta)
+        expect(counts.ru).toBe(1);
+        // siec + uk/law + pl/uk/beauty
+        expect(counts.pl).toBe(2);
+        expect(counts.uk).toBe(2);
+        // zdublowany kod w bazie to nadal jedna karta
+        expect(counts.en).toBe(1);
+    });
+
+    it('liczba przy jezyku zgadza sie z liczba kart po wybraniu tego jezyka', () => {
+        const filters = { ...NO_FILTERS, category: 'law' };
+
+        const counts = countCardsByLanguage(catalog, filters);
+
+        for (const language of SERVICE_LANGUAGES) {
+            expect(counts[language]).toBe(renderedCardCount(catalog, { ...filters, language }));
+        }
+    });
+
+    it('ignoruje aktywny jezyk, ale respektuje pozostale filtry', () => {
+        const counts = countCardsByLanguage(catalog, { ...NO_FILTERS, category: 'law', language: 'ru' });
+
+        expect(counts.ru).toBe(1);
+        expect(counts.uk).toBe(1);
+        expect(counts.pl).toBe(1);
+        expect(counts.en).toBe(0);
+    });
+});
+
+describe('liczniki z aktywnym jezykiem (R12)', () => {
+    const catalog = [
+        service({ category: 'law', languages: ['ru'] }),
+        service({ category: 'law', languages: ['pl'] }),
+        service({ category: 'beauty', languages: ['ru'], coverage: 'online' }),
+        service({ category: 'beauty', languages: ['uk'] }),
+    ];
+
+    it('countCardsByCategory liczy tylko wpisy w wybranym jezyku', () => {
+        const counts = countCardsByCategory(catalog, { ...NO_FILTERS, language: 'ru' });
+
+        expect(counts.law).toBe(1);
+        expect(counts.beauty).toBe(1);
+    });
+
+    it('countVisibleCards liczy tylko wpisy w wybranym jezyku', () => {
+        expect(countVisibleCards(catalog, { ...NO_FILTERS, language: 'ru' })).toBe(2);
+        expect(countVisibleCards(catalog, { ...NO_FILTERS, language: 'be' })).toBe(0);
+        expect(countVisibleCards(catalog, NO_FILTERS)).toBe(4);
     });
 });
