@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-19
+**Ostatnia aktualizacja:** 2026-10-20
 
 ## Źródła
 
@@ -110,3 +110,15 @@ dev server na :3000 aktywny (learned pattern: build nadpisuje `.next`).
 przechodziły (CRLF) — tylko zmienione fragmenty.
 
 **Dług odnotowany (poza scope):** angielskie alty flag w `language-switcher.tsx`.
+
+### Review fazy 1 (2026-10-20) — ⚠️ kontynuuj z zastrzeżeniami
+
+Raport: `review-faza-1.md`. 4 perspektywy (security, performance, architektura/TS, scenariusze);
+E2E pominięte — faza 1 nie ma checkboxów przeglądarkowych. 0 × P1, 3 × P2, 10 × P3.
+
+- Security i performance czyste: granice Zod ścisłe, mail to plain text, klient bez zoda/drizzle.
+- P2: dashboard (lista języków bez sprawdzenia kompletności i zduplikowana; schema przyjmuje
+  dowolny string + `as`), brak testu `be` w ścieżce LLM.
+- **Wniosek dla fazy 2:** filtr dopasowuje dokładne kody, więc dashboard musi przestać wpuszczać do
+  bazy kody spoza `SERVICE_LANGUAGES` — P2 #1–#2 przed U2.
+- Wszystkie 3 `Weryfikacja:` fazy 1 odznaczone (tsc exit 0; 35/35 suites, 460 testów; grep ×4).

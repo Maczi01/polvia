@@ -1,7 +1,7 @@
 # Zadania: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-19
+**Ostatnia aktualizacja:** 2026-10-20
 
 ## Źródła
 
@@ -43,11 +43,27 @@
 - [x] `Test:` podgląd karty z `['pl','be']` — dwie flagi z alt z tłumaczeń; opisy wg locale strony (brak indeksowania `descriptions['be']`)
 - [x] `Test:` karta usługi z `be` — alt przetłumaczony; `jest-axe` bez naruszeń
 - [x] `Test:` mail potwierdzający wymienia białoruski w języku maila
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` testy `src/lib/languages`, `src/lib/add-business`, podglądu karty i karty usługi przechodzą
-- [ ] `Weryfikacja:` grep — `be` w `addBusiness.languages` we wszystkich czterech `messages/*.json`
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` testy `src/lib/languages`, `src/lib/add-business`, podglądu karty i karty usługi przechodzą
+- [x] `Weryfikacja:` grep — `be` w `addBusiness.languages` we wszystkich czterech `messages/*.json`
 - [ ] `Operator:` dopisać `be` do sekcji `languages` w `.claude/skills/dodaj/references/klasyfikacja.md`
 - [ ] `Operator:` wizualna akceptacja nowej flagi `by.svg`
+
+## Do poprawy po review fazy 1
+
+Raport: [review-faza-1.md](review-faza-1.md) — ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 3 × P2).
+P2 #1–#2 naprawić przed fazą 2: filtr zależy od poprawnych kodów w bazie.
+
+- [ ] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_components/add-service-form.tsx:41`, `service-form.tsx:61`** — lista języków nie jest sprawdzana pod kątem kompletności (`satisfies` na tablicy), skopiowana w dwóch plikach, kolejność ≠ kanoniczna; `Record<ServiceLanguage, string>` z etykietami + `SERVICE_LANGUAGES.map(...)`, jedna definicja
+- [ ] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_service-schema.ts:41, :120`** — `z.array(z.string())` + `as string[]` wpuszcza do bazy dowolny kod; `z.array(z.enum(SERVICE_LANGUAGES))` bez rzutowania (+ test: `be` przyjęte, `de` odrzucone)
+- [ ] 🟠 [important] **`src/lib/add-business/llm-draft.test.ts`** — brak testu, że odpowiedź modelu z `['be','be']` daje w szkicu `['be']` (schema + `normalizeLanguages`)
+- [ ] 🟡 [nit] **`draft-editor.test.tsx`** — test: checkbox białoruskiego z przetłumaczoną etykietą, zaznaczenie wkłada `be` do FormData
+- [ ] 🟡 [nit] **`generated-summary.tsx:25`** — test regresji: tagi wybierane po locale strony, nie po języku obsługi
+- [ ] 🟡 [nit] **`service-card.tsx:623`** — deduplikacja kodów (`['be','be']` → zduplikowany `key`) + test `languages: []`
+- [ ] 🟡 [nit] **`submission-emails.test.ts`** — usunąć słabą asercję `not.toMatch(/: pl, be$/m)` (pozytywne `toContain` wystarcza)
+- [ ] 🟡 [nit] **`service-card.tsx:184`** — rozważyć neutralną przestrzeń `Languages.*` zamiast `addBusiness.languages` (decyzja przy U4)
+- [ ] 🟡 [nit] **`src/lib/languages.ts` / `form-limits.ts` / `draft-schema.ts:31`** — dwie nazwy jednej listy; kandydat na późniejszy rename (dług, nie teraz)
+- [ ] 🟡 [nit] **`src/db/service-input-schema.ts:124`** — `db:add` przyjmuje dowolny kod; poza scope fazy, do rozważenia
 
 ---
 
