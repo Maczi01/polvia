@@ -16,6 +16,14 @@ export function isServiceLanguage(value: string): value is ServiceLanguage {
     return SERVICE_LANGUAGE_SET.has(value);
 }
 
+/**
+ * Kody z bazy (kolumna `text[]`) do wyswietlenia: bez duplikatow i bez kodow spoza listy
+ * (stare wpisy moga miec np. `de`). Kolejnosc pierwszego wystapienia.
+ */
+export function toServiceLanguages(codes: readonly string[]): ServiceLanguage[] {
+    return [...new Set(codes)].filter(isServiceLanguage);
+}
+
 /** Flaga per jezyk (pliki w `public/icons/`, kod kraju, nie jezyka). */
 export const LANGUAGE_FLAG_PATHS: Readonly<Record<ServiceLanguage, string>> = {
     pl: '/icons/pl.svg',

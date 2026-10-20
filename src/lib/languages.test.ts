@@ -3,6 +3,7 @@ import {
     LANGUAGE_ENDONYMS,
     LANGUAGE_FLAG_PATHS,
     SERVICE_LANGUAGES,
+    toServiceLanguages,
 } from '@/lib/languages';
 
 describe('SERVICE_LANGUAGES', () => {
@@ -44,5 +45,19 @@ describe('LANGUAGE_ENDONYMS', () => {
             en: 'English',
             be: 'Беларуская',
         });
+    });
+});
+
+describe('toServiceLanguages', () => {
+    it('usuwa duplikaty, zachowujac kolejnosc pierwszego wystapienia', () => {
+        expect(toServiceLanguages(['be', 'pl', 'be'])).toEqual(['be', 'pl']);
+    });
+
+    it('pomija kody spoza listy jezykow obslugi', () => {
+        expect(toServiceLanguages(['pl', 'de', 'by'])).toEqual(['pl']);
+    });
+
+    it('pusta lista daje pusta liste', () => {
+        expect(toServiceLanguages([])).toEqual([]);
     });
 });

@@ -284,6 +284,28 @@ describe('<ServiceCard /> — jezyki obslugi', () => {
         expect(screen.queryByRole('img', { name: 'de' })).not.toBeInTheDocument();
     });
 
+    it('zduplikowany kod daje jedna flage, bez ostrzezenia o zduplikowanym key', () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        renderCard({ languages: ['be', 'be'] });
+
+        expect(screen.getAllByRole('img', { name: 'be' })).toHaveLength(1);
+        expect(consoleError).not.toHaveBeenCalled();
+        consoleError.mockRestore();
+    });
+
+    it('pusta lista jezykow nie renderuje sekcji jezykow', () => {
+        renderCard({ languages: [] });
+
+        expect(screen.queryByText('languages')).not.toBeInTheDocument();
+    });
+
+    it('lista bez znanego kodu nie renderuje pustej sekcji jezykow', () => {
+        renderCard({ languages: ['de'] });
+
+        expect(screen.queryByText('languages')).not.toBeInTheDocument();
+    });
+
     it('przechodzi asercje jest-axe z flaga bialoruska', async () => {
         const { container } = renderCard({ languages: ['pl', 'uk', 'ru', 'en', 'be'] });
 

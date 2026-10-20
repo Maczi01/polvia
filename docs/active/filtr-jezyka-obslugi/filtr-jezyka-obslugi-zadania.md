@@ -54,16 +54,17 @@
 Raport: [review-faza-1.md](review-faza-1.md) — ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 3 × P2).
 P2 #1–#2 naprawić przed fazą 2: filtr zależy od poprawnych kodów w bazie.
 
-- [ ] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_components/add-service-form.tsx:41`, `service-form.tsx:61`** — lista języków nie jest sprawdzana pod kątem kompletności (`satisfies` na tablicy), skopiowana w dwóch plikach, kolejność ≠ kanoniczna; `Record<ServiceLanguage, string>` z etykietami + `SERVICE_LANGUAGES.map(...)`, jedna definicja
-- [ ] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_service-schema.ts:41, :120`** — `z.array(z.string())` + `as string[]` wpuszcza do bazy dowolny kod; `z.array(z.enum(SERVICE_LANGUAGES))` bez rzutowania (+ test: `be` przyjęte, `de` odrzucone)
-- [ ] 🟠 [important] **`src/lib/add-business/llm-draft.test.ts`** — brak testu, że odpowiedź modelu z `['be','be']` daje w szkicu `['be']` (schema + `normalizeLanguages`)
-- [ ] 🟡 [nit] **`draft-editor.test.tsx`** — test: checkbox białoruskiego z przetłumaczoną etykietą, zaznaczenie wkłada `be` do FormData
-- [ ] 🟡 [nit] **`generated-summary.tsx:25`** — test regresji: tagi wybierane po locale strony, nie po języku obsługi
-- [ ] 🟡 [nit] **`service-card.tsx:623`** — deduplikacja kodów (`['be','be']` → zduplikowany `key`) + test `languages: []`
-- [ ] 🟡 [nit] **`submission-emails.test.ts`** — usunąć słabą asercję `not.toMatch(/: pl, be$/m)` (pozytywne `toContain` wystarcza)
+- [x] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_components/add-service-form.tsx:41`, `service-form.tsx:61`** — lista języków nie jest sprawdzana pod kątem kompletności (`satisfies` na tablicy), skopiowana w dwóch plikach, kolejność ≠ kanoniczna; `Record<ServiceLanguage, string>` z etykietami + `SERVICE_LANGUAGES.map(...)`, jedna definicja → `_components/language-options.ts` (+ test)
+- [x] 🟠 [important] **`src/app/[locale]/(dashboard)/dashboard/_service-schema.ts:41, :120`** — `z.array(z.string())` + `as string[]` wpuszcza do bazy dowolny kod; `z.array(z.enum(SERVICE_LANGUAGES))` bez rzutowania (+ test: `be` przyjęte, `de` odrzucone) → `filter(isText)` zamiast `as`; zapis z nieznanym kodem odrzucany błędem walidacji
+- [x] 🟠 [important] **`src/lib/add-business/llm-draft.test.ts`** — brak testu, że odpowiedź modelu z `['be','be']` daje w szkicu `['be']` (schema + `normalizeLanguages`)
+- [x] 🟡 [nit] **`draft-editor.test.tsx`** — test: checkbox białoruskiego z przetłumaczoną etykietą, zaznaczenie wkłada `be` do FormData
+- [x] 🟡 [nit] **`generated-summary.tsx:25`** — test regresji: tagi wybierane po locale strony, nie po języku obsługi → nowy `generated-summary.test.tsx`
+- [x] 🟡 [nit] **`service-card.tsx:623`** — deduplikacja kodów (`['be','be']` → zduplikowany `key`) + test `languages: []` → `toServiceLanguages` w `src/lib/languages.ts`; sekcja ukryta też gdy wszystkie kody są nieznane
+- [ ] 🟡 [nit] **`submission-emails.test.ts`** — usunąć słabą asercję `not.toMatch(/: pl, be$/m)` (pozytywne `toContain` wystarcza) — NIE ROBIONE: usunięcie asercji = osłabienie testu (reguła repo)
 - [ ] 🟡 [nit] **`service-card.tsx:184`** — rozważyć neutralną przestrzeń `Languages.*` zamiast `addBusiness.languages` (decyzja przy U4)
 - [ ] 🟡 [nit] **`src/lib/languages.ts` / `form-limits.ts` / `draft-schema.ts:31`** — dwie nazwy jednej listy; kandydat na późniejszy rename (dług, nie teraz)
 - [ ] 🟡 [nit] **`src/db/service-input-schema.ts:124`** — `db:add` przyjmuje dowolny kod; poza scope fazy, do rozważenia
+- [ ] 🟡 [nit] **`src/app/[locale]/(dashboard)/dashboard/_service-schema.ts`** — (odkryte przy poprawkach) `serviceSchema` używa `as [string, ...string[]]` dla enumów, `parseRawServiceData` ma `formData.get(x) as string` dla pozostałych pól (klasa problemu z learned patterns `z.coerce`/FormData); poza scope, osobne zadanie
 
 ---
 

@@ -122,3 +122,25 @@ E2E pominięte — faza 1 nie ma checkboxów przeglądarkowych. 0 × P1, 3 × P2
 - **Wniosek dla fazy 2:** filtr dopasowuje dokładne kody, więc dashboard musi przestać wpuszczać do
   bazy kody spoza `SERVICE_LANGUAGES` — P2 #1–#2 przed U2.
 - Wszystkie 3 `Weryfikacja:` fazy 1 odznaczone (tsc exit 0; 35/35 suites, 460 testów; grep ×4).
+
+### Poprawki po review fazy 1 (2026-10-20) → `feature-builder-web-fullstack` → completed
+
+- Dashboard: `_components/language-options.ts` — `Record<ServiceLanguage, string>` (angielskie
+  etykiety) + `LANGUAGE_OPTIONS` z `SERVICE_LANGUAGES.map`; oba formularze z jednej definicji,
+  kolejność kanoniczna.
+- `_service-schema.ts`: `z.array(z.enum(SERVICE_LANGUAGES))`, `getAll('languages').filter(isText)`
+  zamiast `as`. **Decyzja:** zapis z nieznanym kodem → odrzucony błędem walidacji (spójnie z
+  `category`/`coverage`). Wczytanie starych wierszy (np. `de`) działa — `ServiceEditData.languages`
+  zostaje `string[]`; nieznany kod nie ma checkboxa, więc znika z bazy przy następnym zapisie.
+- `src/lib/languages.ts`: nowy `toServiceLanguages(codes)` — dedup + odrzucenie nieznanych kodów,
+  kolejność pierwszego wystąpienia. Używany przez kartę; **faza 2 może go użyć do sanityzacji**.
+- Karta: sekcja języków ukryta, gdy po filtrze lista pusta (wcześniej `['de']` dawał pusty
+  nagłówek).
+- Nowe testy: `language-options.test.ts`, `generated-summary.test.tsx`, przypadki w
+  `_service-schema.test.ts`, `llm-draft.test.ts`, `draft-editor.test.tsx`, `service-card.test.tsx`,
+  `languages.test.ts`.
+- Celowo NIE: usunięcie asercji w `submission-emails.test.ts` (osłabienie testu), namespace
+  `Languages.*` (decyzja przy U4), rename `LANGUAGE_CODES`, `service-input-schema.ts`.
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest` 106/106 suites, 1187/1187;
+`npx next lint` 0 błędów. Build pominięty (dev server :3000).
