@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-20
+**Ostatnia aktualizacja:** 2026-10-21
 
 ## Źródła
 
@@ -182,3 +182,30 @@ E2E pominięte — czysta warstwa danych. 0 × P1, 0 × P2, 10 × P3.
 - **Wskazówki dla U3:** parser `?lang` bez `as` (R10); `countCardsByLanguage` w osobnym `useMemo`;
   `useDeferredValue(searchInput)` do rozważenia.
 - Obie `Weryfikacja:` fazy 2 odznaczone (3/3 suites, 71 testów; tsc exit 0).
+
+### Faza 3 — U3 (2026-10-21) → `feature-builder-web-ui` → completed
+
+- `src/hooks/use-language-filter.ts`: `useLanguageFilter()` →
+  `useQueryState('lang', parseAsStringLiteral(SERVICE_LANGUAGES).withOptions({ history: 'push' }))`,
+  zwraca `[ServiceLanguage | null, setLanguage]`. Jedyne miejsce parsera; bez wartości domyślnej i
+  bez odczytu locale (R10, R11).
+- `map-page-client.tsx`: wspólny `countFilters = { ...currentFilters, query, language }` dla
+  `categoryCounts`, `totalCount` i nowego `languageCounts` (osobny `useMemo`). `languageCounts`
+  jeszcze nieprzekazany — **U4 podpina do `FilterComponent` → `MobileFilterModal`**.
+- `services-client-component.tsx`: język w `coverageFilters`; ręczna kopia filtra embeddingów
+  zastąpiona czystą `filterSemanticResults(results, filters)` w `src/lib/service-coverage.ts`
+  (lokalizacja + kategoria + język, bez tekstu; 4 testy). Plik −12 linii.
+- Piny zawężone językiem przez `filteredServices` (lokalne + online + semantyczne) — test:
+  `?lang=ru` → 2 z 4 pinów.
+- `page.tsx`: legacy redirect zachowuje `lang`.
+- `?lang` przeżywa klik kategorii (`navigateWithFilters` zachowuje `location.search`) — test.
+  `resetAllFilters` też zachowuje search → **U4 musi jawnie `setLanguage(null)`**.
+- Poprawki po review fazy 2: B1–B5, B7 zrobione; B6 inaczej (jawne `undefined` = błąd lintu
+  `unicorn/no-useless-undefined`); B4 przez lokalnie rozszerzony katalog (wspólny złamałby
+  istniejące asercje). `useDeferredValue` pominięty (opcjonalny).
+- Odkryte: semantyczne API nie dostaje języka — limit wyników może się zapełnić wpisami, które
+  potem odpadną (nit w zadaniach, poza scope).
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest` 107/107 suites, 1219/1219;
+`npx next lint` 0 błędów (1 nowe ostrzeżenie: nieużyte `languageCounts` — znika w U4). Build
+pominięty (dev server :3000).

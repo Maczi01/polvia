@@ -1,7 +1,7 @@
 # Zadania: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-20
+**Ostatnia aktualizacja:** 2026-10-21
 
 ## Źródła
 
@@ -94,16 +94,17 @@ P2 #1–#2 naprawić przed fazą 2: filtr zależy od poprawnych kodów w bazie.
 Raport: [review-faza-2.md](review-faza-2.md) — ✅ gotowe do kontynuacji (0 × P1, 0 × P2, 10 × P3).
 Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
 
-- [ ] 🟡 [nit] **`src/lib/service-coverage.ts:159-161`** — kolejność w `&&`: `matchesCategory`/`matchesLanguage` przed drogim `matchesQuery` (te same wyniki, mniej normalizacji w licznikach)
-- [ ] 🟡 [nit] **`src/lib/result-counts.ts:59-65`** — docstring `countCardsByLanguage`: wyniki semantyczne nie są liczone (jak w `countCardsByCategory`)
-- [ ] 🟡 [nit] **`src/lib/service-coverage.test.ts:379`** — testy `onlineOnly: true` + `language` oraz `query` + `language`
-- [ ] 🟡 [nit] **`src/lib/result-counts.test.ts:157`** — wpis `hybrid` w katalogu `countCardsByLanguage`
-- [ ] 🟡 [nit] **`src/lib/map-metadata.test.ts:57`** — komentarz: test R9 pilnuje kontraktu (`MapFilters` bez języka), dziś nie może failować
-- [ ] 🟡 [nit] **`src/lib/service-coverage.test.ts:436-438`** — `matchesLanguage(service(...), undefined)` zamiast zmiennej `bezJezyka`
-- [ ] 🟡 [nit] **`result-counts.test.ts:196`, `service-coverage.test.ts:415`** — dwie nowe linie > 100 znaków (Prettier)
+- [x] 🟡 [nit] **`src/lib/service-coverage.ts:159-161`** — kolejność w `&&`: `matchesCategory`/`matchesLanguage` przed drogim `matchesQuery` (te same wyniki, mniej normalizacji w licznikach)
+- [x] 🟡 [nit] **`src/lib/result-counts.ts:59-65`** — docstring `countCardsByLanguage`: wyniki semantyczne nie są liczone (jak w `countCardsByCategory`)
+- [x] 🟡 [nit] **`src/lib/service-coverage.test.ts:379`** — testy `onlineOnly: true` + `language` oraz `query` + `language`
+- [x] 🟡 [nit] **`src/lib/result-counts.test.ts:157`** — wpis `hybrid` w katalogu `countCardsByLanguage` → katalog rozszerzony lokalnie w nowym teście (dopisanie do wspólnego złamałoby istniejące asercje)
+- [x] 🟡 [nit] **`src/lib/map-metadata.test.ts:57`** — komentarz: test R9 pilnuje kontraktu (`MapFilters` bez języka), dziś nie może failować
+- [x] 🟡 [nit] **`src/lib/service-coverage.test.ts:436-438`** — `matchesLanguage(service(...), undefined)` zamiast zmiennej `bezJezyka` → jawne `undefined` to błąd `unicorn/no-useless-undefined`; zostaje obiekt, przemianowany na `filtersWithoutLanguage` z komentarzem
+- [x] 🟡 [nit] **`result-counts.test.ts:196`, `service-coverage.test.ts:415`** — dwie nowe linie > 100 znaków (Prettier)
 - [ ] 🟡 [nit] **`src/lib/result-counts.ts`** — normalizacja `query` powtarzana w 16 przebiegach; filtr po query raz przy wzroście N (nie teraz)
-- [ ] 🧭 [U3] parser `?lang` przez `parseAsStringLiteral(SERVICE_LANGUAGES)` / `isServiceLanguage`, nigdy `as` (R10)
-- [ ] 🧭 [U3] `countCardsByLanguage` w osobnym `useMemo` (`[services, currentFilters, searchInput]`), `language` w stanie filtrów; rozważyć `useDeferredValue(searchInput)`
+- [x] 🧭 [U3] parser `?lang` przez `parseAsStringLiteral(SERVICE_LANGUAGES)` / `isServiceLanguage`, nigdy `as` (R10)
+- [x] 🧭 [U3] `countCardsByLanguage` w osobnym `useMemo` (`[services, currentFilters, searchInput]`), `language` w stanie filtrów; rozważyć `useDeferredValue(searchInput)` → `useMemo` zrobione; `useDeferredValue` pominięty (opcjonalny)
+- [ ] 🟡 [nit] **wyszukiwanie semantyczne + `?lang`** — (odkryte w U3) API `/api/services` nie dostaje języka, wynik filtrowany po stronie klienta: limit wyników semantycznych może się zapełnić wpisami, które potem odpadną; krótsza lista lokalna przy `?lang` częściej odpala semantykę. Do rozważenia: parametr `lang` w API (poza scope)
 
 ---
 
@@ -114,16 +115,16 @@ Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** M · **Zależności:** U2
 **Wymagania:** R1, R7, R8, R10, R11, R12
 
-- [ ] Stwórz `src/hooks/use-language-filter.ts` — `useQueryState('lang', parseAsStringLiteral(kody).withOptions({ history: 'push' }))`
-- [ ] `map-page-client.tsx` — język w `categoryCounts`/`totalCount`; `languageCounts` przekazywane w dół
-- [ ] `services-client-component.tsx` — język w `coverageFilters`; `matchesLanguage` w `filteredEmbeddingResults`
-- [ ] `map/[[...slug]]/page.tsx` — legacy redirect zachowuje `lang`
-- [ ] Brak inicjalizacji z locale; niepoprawna wartość bez `notFound()`/redirectu
-- [ ] `Test:` hook — `?lang=ru` → `'ru'`; `?lang=xx` → `null`; brak → `null`
-- [ ] `Test:` `map-page-client` z `?lang=ru` — tylko wpisy z `ru` na liście i jako piny; liczniki kategorii = liczba kart
-- [ ] `Test:` `?lang=xx` — pełna lista
-- [ ] `Test:` wynik semantyczny bez wybranego języka nie pojawia się przy aktywnym `?lang`
-- [ ] `Test:` locale `uk` bez `?lang` nie zawęża wyników
+- [x] Stwórz `src/hooks/use-language-filter.ts` — `useQueryState('lang', parseAsStringLiteral(kody).withOptions({ history: 'push' }))`
+- [x] `map-page-client.tsx` — język w `categoryCounts`/`totalCount`; `languageCounts` przekazywane w dół
+- [x] `services-client-component.tsx` — język w `coverageFilters`; `matchesLanguage` w `filteredEmbeddingResults`
+- [x] `map/[[...slug]]/page.tsx` — legacy redirect zachowuje `lang`
+- [x] Brak inicjalizacji z locale; niepoprawna wartość bez `notFound()`/redirectu
+- [x] `Test:` hook — `?lang=ru` → `'ru'`; `?lang=xx` → `null`; brak → `null`
+- [x] `Test:` `map-page-client` z `?lang=ru` — tylko wpisy z `ru` na liście i jako piny; liczniki kategorii = liczba kart
+- [x] `Test:` `?lang=xx` — pełna lista
+- [x] `Test:` wynik semantyczny bez wybranego języka nie pojawia się przy aktywnym `?lang`
+- [x] `Test:` locale `uk` bez `?lang` nie zawęża wyników
 - [ ] `Weryfikacja:` testy `map-page-client` i `use-language-filter` przechodzą (ścieżki escapowane, liczba `Test Suites:` zgodna)
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Operator:` `/mapa?lang=ru` → tylko firmy z RU; klik „Prawne" → `/mapa/prawne?lang=ru`, filtr zachowany
@@ -139,6 +140,7 @@ Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** M · **Zależności:** U3
 **Wymagania:** R2, R3, R4, R5, R13, R14, R15
 
+- [ ] `map-page-client.tsx` — przekaż `languageCounts` do `<FilterComponent>` (wyliczone w U3, dziś nieużyte → ostrzeżenie lintu); `FilterComponentProps.languageCounts` → dalej do `MobileFilterModal` jak `categoryCounts`; `useLanguageFilter()` w `FilterComponent`
 - [ ] Stwórz `src/app/[locale]/(main)/_components/language-select/language-select.tsx` (kontrolowany, prymitywy `Select*`, „Dowolny język" + 5 języków: flaga, endonim, `CountBadge`, `sr-only` liczba)
 - [ ] Stwórz `language-select.test.tsx` i `language-select.stories.tsx`
 - [ ] `filter-component.tsx` — dropdown obok „Wybierz lokalizację"; `hasActiveFilters` i `resetAllFilters` uwzględniają język

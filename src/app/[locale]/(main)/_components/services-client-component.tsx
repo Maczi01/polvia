@@ -15,7 +15,12 @@ import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import { buildSemanticSearchParams } from '@/lib/semantic-search-request';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
-import { matchesServiceLocation, splitServicesByCoverage } from '@/lib/service-coverage';
+import {
+    filterSemanticResults,
+    matchesServiceLocation,
+    splitServicesByCoverage,
+} from '@/lib/service-coverage';
+import { useLanguageFilter } from '@/hooks/use-language-filter';
 
 type Props = {
     services: PartialService[];
@@ -36,6 +41,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const [searchInput] = useQueryState('query', { defaultValue: '' });
     const [viewParam] = useQueryState('view', { defaultValue: 'map' });
     const [selectedSlug, setSelectedSlug] = useQueryState('place', { defaultValue: '' });
+    const [language] = useLanguageFilter();
 
     // Use filters from URL slugs (passed as props)
     const selectedCounty = initialFilters?.county || '';
@@ -78,8 +84,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             county: selectedCounty,
             city: selectedCity,
             onlineOnly,
+            language,
         }),
-        [searchInput, selectedCategory, selectedCounty, selectedCity, onlineOnly],
+        [searchInput, selectedCategory, selectedCounty, selectedCity, onlineOnly, language],
     );
 
     // Lista lokalna NIE moze zalezec od wynikow semantycznych — jej dlugosc steruje
@@ -200,30 +207,11 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         fetchEmbeddingResults,
     ]);
 
-    // Wyniki semantyczne zawezone tak samo jak wczesniej — filtr geograficzny i kategoria.
-    const filteredEmbeddingResults = useMemo(() => {
-        return embeddingResults.filter(service => {
-            if (selectedCity) {
-                if (service.city?.toLowerCase() !== selectedCity.toLowerCase()) {
-                    return false;
-                }
-            } else if (
-                selectedCounty &&
-                service.voivodeship?.toLowerCase() !== selectedCounty.toLowerCase()
-            ) {
-                return false;
-            }
-
-            if (
-                selectedCategory &&
-                service.category?.toLowerCase() !== selectedCategory.toLowerCase()
-            ) {
-                return false;
-            }
-
-            return true;
-        });
-    }, [embeddingResults, selectedCounty, selectedCity, selectedCategory]);
+    // Wyniki semantyczne zawezone tymi samymi predykatami co lista: miejsce, kategoria, jezyk.
+    const filteredEmbeddingResults = useMemo(
+        () => filterSemanticResults(embeddingResults, coverageFilters),
+        [embeddingResults, coverageFilters],
+    );
 
     // Sekcja online odejmuje to, co juz widac na ekranie: liste lokalna ORAZ wyniki
     // semantyczne (R6). Drugie wywolanie tej samej, przetestowanej funkcji — tanie

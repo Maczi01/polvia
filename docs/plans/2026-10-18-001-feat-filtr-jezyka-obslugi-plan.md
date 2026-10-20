@@ -268,7 +268,7 @@ nowy licznik per język.
 - `npx jest src/lib/service-coverage src/lib/result-counts src/lib/map-metadata` przechodzi.
 - `npx tsc --noEmit` bez błędów.
 
-- [ ] **Unit 3: Stan `?lang` wpięty w mapę, listę i wyniki semantyczne**
+- [x] **Unit 3: Stan `?lang` wpięty w mapę, listę i wyniki semantyczne**
 
 **Cel:** Wartość `?lang` z URL-a zawęża piny, listę, wyniki semantyczne i liczniki — zanim istnieje
 kontrolka (działa przez ręczne wpisanie `?lang=ru`).

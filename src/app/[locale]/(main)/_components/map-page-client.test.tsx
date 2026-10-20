@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { AppRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
@@ -82,19 +82,26 @@ const ROUTER_STUB = {
     prefetch: jest.fn(),
 };
 
+type RenderOptions = {
+    /** Query string widziany przez nuqs, np. `?lang=ru`. */
+    searchParams?: string;
+    locale?: string;
+};
+
 async function renderMapPage(
     pathname: string,
     initialFilters: MapFilters,
     services: Service[] = SERVICES,
+    { searchParams = '', locale = 'pl' }: RenderOptions = {},
 ): Promise<void> {
-    window.history.replaceState({}, '', pathname);
+    window.history.replaceState({}, '', `${pathname}${searchParams}`);
     // Mapa i modal filtrow ida przez next/dynamic (React.lazy) — async act czeka,
     // az leniwe moduly sie rozwiaza, zanim test zacznie asercje.
     await act(async () => {
         render(
             <AppRouterContext.Provider value={ROUTER_STUB}>
-                <NextIntlClientProvider locale="pl" messages={messages}>
-                    <NuqsTestingAdapter>
+                <NextIntlClientProvider locale={locale} messages={messages}>
+                    <NuqsTestingAdapter searchParams={searchParams}>
                         <MapPageClient services={services} initialFilters={initialFilters} />
                     </NuqsTestingAdapter>
                 </NextIntlClientProvider>
@@ -256,5 +263,105 @@ describe('<MapPageClient /> — pusta mapa na mobile tlumaczy swoja pustke', () 
         await renderMapPage('/mapa/podlaskie', PODLASKIE, [WROCLAW_LOCAL]);
 
         expect(screen.getByRole('status')).toHaveTextContent(messages.EmptyList.description);
+    });
+});
+
+// Jezyk obslugi zyje w `?lang` (nuqs), nie w sciezce — i zaweza wszystko naraz (R12).
+describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
+    // Rozne miasta, zeby piny nie zlepily sie w klaster.
+    const RU_LAW = service({
+        name: 'Kancelaria Rosyjska',
+        category: 'law',
+        languages: ['pl', 'ru'],
+    });
+    const PL_FINANCIAL = service({
+        name: 'Biuro Polskie',
+        category: 'financial',
+        languages: ['pl'],
+        city: 'Gdansk',
+        voivodeship: 'pomorskie',
+        latitude: 54.352,
+        longitude: 18.6466,
+    });
+    const RU_FINANCIAL = service({
+        name: 'Ksiegowa Rosyjska',
+        category: 'financial',
+        languages: ['ru'],
+        city: 'Krakow',
+        voivodeship: 'malopolskie',
+        latitude: 50.0647,
+        longitude: 19.945,
+    });
+    const UK_LAW = service({
+        name: 'Prawnik Ukrainski',
+        category: 'law',
+        languages: ['uk'],
+        city: 'Wroclaw',
+        voivodeship: 'dolnoslaskie',
+        latitude: 51.1079,
+        longitude: 17.0385,
+    });
+    const CATALOG = [RU_LAW, PL_FINANCIAL, RU_FINANCIAL, UK_LAW];
+    const ALL_NAMES = CATALOG.map(({ name }) => name);
+
+    const listedNames = (): string[] =>
+        ALL_NAMES.filter(name => screen.queryByText(name) !== null);
+    const pins = (): HTMLElement[] => screen.queryAllByAltText('shop icon');
+    // Nazwa dostepna przycisku kategorii to etykieta + liczba z `sr-only`, np. "Prawne (1)".
+    // Przycisk jest dwa razy: w pasku desktop i w arkuszu mobilnym — oba licza to samo.
+    const categoryButtonsNamed = (name: string): HTMLElement[] =>
+        screen.queryAllByRole('button', { name });
+    const desktopCategoryButton = (label: string): HTMLElement => {
+        const [button] = screen.getAllByRole('button', { name: new RegExp(`^${label} `) });
+        return button;
+    };
+
+    it('?lang=ru zostawia na liscie i na mapie tylko wpisy z jezykiem ru', async () => {
+        await renderMapPage('/mapa', NO_FILTERS, CATALOG, { searchParams: '?lang=ru' });
+
+        expect(listedNames()).toEqual(['Kancelaria Rosyjska', 'Ksiegowa Rosyjska']);
+        expect(pins()).toHaveLength(2);
+    });
+
+    it('liczniki kategorii licza tylko wpisy w wybranym jezyku', async () => {
+        await renderMapPage('/mapa', NO_FILTERS, CATALOG, { searchParams: '?lang=ru' });
+
+        // Bez jezyka bylyby po 2 — po jednej karcie z ru w kazdej kategorii.
+        expect(categoryButtonsNamed('Prawne (1)')).toHaveLength(2);
+        expect(categoryButtonsNamed('Finansowe (1)')).toHaveLength(2);
+    });
+
+    it('licznik kategorii zgadza sie z liczba kart po jej wybraniu', async () => {
+        await renderMapPage('/mapa/prawne', LAW_FILTERS, CATALOG, { searchParams: '?lang=ru' });
+
+        expect(listedNames()).toEqual(['Kancelaria Rosyjska']);
+        expect(categoryButtonsNamed('Prawne (1)')).toHaveLength(2);
+    });
+
+    it('nieznany kod ?lang=xx to brak filtra — pelna lista (R10)', async () => {
+        await renderMapPage('/mapa', NO_FILTERS, CATALOG, { searchParams: '?lang=xx' });
+
+        expect(listedNames()).toEqual(ALL_NAMES);
+        expect(pins()).toHaveLength(4);
+        expect(categoryButtonsNamed('Prawne (2)')).toHaveLength(2);
+    });
+
+    it('locale uk bez ?lang nie zaweza wynikow (R11)', async () => {
+        await renderMapPage('/uk/map', NO_FILTERS, CATALOG, { locale: 'uk' });
+
+        expect(listedNames()).toEqual(ALL_NAMES);
+        expect(pins()).toHaveLength(4);
+    });
+
+    it('klik kategorii zmienia sciezke i zachowuje ?lang w adresie', async () => {
+        await renderMapPage('/mapa', NO_FILTERS, CATALOG, { searchParams: '?lang=ru' });
+
+        act(() => {
+            fireEvent.click(desktopCategoryButton('Prawne'));
+        });
+
+        expect(window.location.pathname).toBe('/mapa/prawne');
+        expect(window.location.search).toBe('?lang=ru');
+        expect(listedNames()).toEqual(['Kancelaria Rosyjska']);
     });
 });

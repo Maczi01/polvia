@@ -54,6 +54,8 @@ describe('buildMapMetadataPath', () => {
     });
 
     // Jezyk obslugi zyje w `?lang`, a canonical wskazuje wersje bez niego (R9).
+    // Dzis ten test nie moze failowac — `MapFilters` nie ma pola jezyka. Pilnuje kontraktu:
+    // gdy ktos dolozy jezyk do filtrow sciezki, canonical nadal ma go pominac.
     it('canonical nigdy nie zawiera query stringu ani jezyka obslugi', () => {
         const filterSets: MapFilters[] = [
             NO_FILTERS,

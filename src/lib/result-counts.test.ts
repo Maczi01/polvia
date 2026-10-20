@@ -193,12 +193,38 @@ describe('countCardsByLanguage', () => {
     });
 
     it('ignoruje aktywny jezyk, ale respektuje pozostale filtry', () => {
-        const counts = countCardsByLanguage(catalog, { ...NO_FILTERS, category: 'law', language: 'ru' });
+        const counts = countCardsByLanguage(catalog, {
+            ...NO_FILTERS,
+            category: 'law',
+            language: 'ru',
+        });
 
         expect(counts.ru).toBe(1);
         expect(counts.uk).toBe(1);
         expect(counts.pl).toBe(1);
         expect(counts.en).toBe(0);
+    });
+
+    it('hybryda spoza wybranego miasta liczy sie przez sekcje online', () => {
+        const hybrydaGdansk = service({
+            languages: ['be'],
+            coverage: 'hybrid',
+            city: 'Gdansk',
+            voivodeship: 'pomorskie',
+        });
+        const withHybrid = [...catalog, hybrydaGdansk];
+        const filters = { ...NO_FILTERS, city: 'Warszawa' };
+
+        const counts = countCardsByLanguage(withHybrid, filters);
+
+        expect(counts.be).toBe(1);
+        expect(counts.be).toBe(renderedCardCount(withHybrid, { ...filters, language: 'be' }));
+        const { localResults, onlineResults } = splitServicesByCoverage(withHybrid, {
+            ...filters,
+            language: 'be',
+        });
+        expect(localResults).toHaveLength(0);
+        expect(onlineResults).toEqual([hybrydaGdansk]);
     });
 });
 

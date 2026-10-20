@@ -133,6 +133,26 @@ export function matchesServiceLocation(
 }
 
 /**
+ * Wyniki semantyczne zawezone tymi samymi predykatami co lista: miejsce, kategoria i jezyk.
+ *
+ * Bez filtra tekstowego — to juz sa wyniki wyszukiwania — i bez kubelkowania po zasiegu.
+ * Wczesniej komponent powtarzal tu regule miejsca i kategorii; jedna funkcja, zeby os
+ * jezyka (i kazda nastepna) nie musiala byc dopisywana w dwoch miejscach.
+ */
+export function filterSemanticResults(
+    results: PartialService[],
+    filters: CoverageFilters,
+): PartialService[] {
+    const category = filters.category ?? '';
+    return results.filter(
+        item =>
+            matchesServiceLocation(item, filters) &&
+            matchesCategory(item, category) &&
+            matchesLanguage(item, filters.language),
+    );
+}
+
+/**
  * Dzieli uslugi na dwa kubelki wyswietlane na jednym ekranie.
  *
  * @param services     Pelna lista z zapytania, w kolejnosci ustalonej przez baze.
@@ -156,9 +176,9 @@ export function splitServicesByCoverage(
     // Kategoria, tekst i jezyk dzialaja na OBA kubelki — zasieg jest ortogonalny (R2, R7).
     const matching = services.filter(
         item =>
-            matchesQuery(item, terms) &&
             matchesCategory(item, category) &&
-            matchesLanguage(item, filters.language),
+            matchesLanguage(item, filters.language) &&
+            matchesQuery(item, terms),
     );
 
     // Lista lokalna: tylko wpisy, ktore mozna odwiedzic, i tylko w wybranym miejscu.

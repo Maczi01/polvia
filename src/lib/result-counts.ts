@@ -61,7 +61,8 @@ export function countCardsByCategory(
  *
  * Lustro `countCardsByCategory`: aktywny jezyk jest podmieniany na liczony, a karty
  * liczone ta sama definicja. Rekord ma wszystkie jezyki — jezyk bez wynikow dostaje
- * zero, nie znika z filtra.
+ * zero, nie znika z filtra. Wyniki semantyczne nie wchodza — jak w `countCardsByCategory`,
+ * to podpowiedzi doladowywane po wpisaniu tekstu, nie efekt filtra.
  */
 export function countCardsByLanguage(
     services: PartialService[],
