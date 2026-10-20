@@ -86,8 +86,24 @@ P2 #1–#2 naprawić przed fazą 2: filtr zależy od poprawnych kodów w bazie.
 - [x] `Test:` `countCardsByLanguage` liczy karty, nie lokalizacje
 - [x] `Test:` `countCardsByCategory` z aktywnym językiem liczy tylko wpisy w tym języku
 - [x] `Test:` `buildMapMetadataPath` nie zawiera `lang` ani `?` (regresja R9)
-- [ ] `Weryfikacja:` `npx jest src/lib/service-coverage src/lib/result-counts src/lib/map-metadata` przechodzi
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/service-coverage src/lib/result-counts src/lib/map-metadata` przechodzi
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+
+## Do poprawy po review fazy 2
+
+Raport: [review-faza-2.md](review-faza-2.md) — ✅ gotowe do kontynuacji (0 × P1, 0 × P2, 10 × P3).
+Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
+
+- [ ] 🟡 [nit] **`src/lib/service-coverage.ts:159-161`** — kolejność w `&&`: `matchesCategory`/`matchesLanguage` przed drogim `matchesQuery` (te same wyniki, mniej normalizacji w licznikach)
+- [ ] 🟡 [nit] **`src/lib/result-counts.ts:59-65`** — docstring `countCardsByLanguage`: wyniki semantyczne nie są liczone (jak w `countCardsByCategory`)
+- [ ] 🟡 [nit] **`src/lib/service-coverage.test.ts:379`** — testy `onlineOnly: true` + `language` oraz `query` + `language`
+- [ ] 🟡 [nit] **`src/lib/result-counts.test.ts:157`** — wpis `hybrid` w katalogu `countCardsByLanguage`
+- [ ] 🟡 [nit] **`src/lib/map-metadata.test.ts:57`** — komentarz: test R9 pilnuje kontraktu (`MapFilters` bez języka), dziś nie może failować
+- [ ] 🟡 [nit] **`src/lib/service-coverage.test.ts:436-438`** — `matchesLanguage(service(...), undefined)` zamiast zmiennej `bezJezyka`
+- [ ] 🟡 [nit] **`result-counts.test.ts:196`, `service-coverage.test.ts:415`** — dwie nowe linie > 100 znaków (Prettier)
+- [ ] 🟡 [nit] **`src/lib/result-counts.ts`** — normalizacja `query` powtarzana w 16 przebiegach; filtr po query raz przy wzroście N (nie teraz)
+- [ ] 🧭 [U3] parser `?lang` przez `parseAsStringLiteral(SERVICE_LANGUAGES)` / `isServiceLanguage`, nigdy `as` (R10)
+- [ ] 🧭 [U3] `countCardsByLanguage` w osobnym `useMemo` (`[services, currentFilters, searchInput]`), `language` w stanie filtrów; rozważyć `useDeferredValue(searchInput)`
 
 ---
 

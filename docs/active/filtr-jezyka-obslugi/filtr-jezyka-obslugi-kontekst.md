@@ -167,3 +167,18 @@ stanem RED w trakcie test-first — zniknął po implementacji); `npx jest` 106/
 
 **Odchylenia:** brak. Testy liczników z aktywnym językiem i R9 były zielone od razu (zachowanie
 dziedziczone przez istniejący przepływ) — brak fazy RED dla nich, odnotowane przez buildera.
+
+### Review fazy 2 (2026-10-20) — ✅ gotowe do kontynuacji
+
+Raport: `review-faza-2.md`. 4 perspektywy (security, performance, architektura/TS, scenariusze);
+E2E pominięte — czysta warstwa danych. 0 × P1, 0 × P2, 10 × P3.
+
+- Security czyste: najgorszy efekt nieznanego kodu to pusta lista; rekord liczników kluczowany tylko
+  stałą listą; wejście już po `isPublicService`.
+- Performance: ~16 liniowych przebiegów na zmianę filtra, przy ~350–400 wierszach < 5 ms —
+  single-pass przedwczesny. Tani nit: tanie predykaty przed `matchesQuery`.
+- `languages` jest per usługa (`servicesTable`), nie per lokalizacja — zgrupowana karta nie może
+  pasować „przez jedną lokalizację".
+- **Wskazówki dla U3:** parser `?lang` bez `as` (R10); `countCardsByLanguage` w osobnym `useMemo`;
+  `useDeferredValue(searchInput)` do rozważenia.
+- Obie `Weryfikacja:` fazy 2 odznaczone (3/3 suites, 71 testów; tsc exit 0).
