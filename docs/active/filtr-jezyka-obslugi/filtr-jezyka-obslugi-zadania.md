@@ -125,11 +125,27 @@ Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
 - [x] `Test:` `?lang=xx` — pełna lista
 - [x] `Test:` wynik semantyczny bez wybranego języka nie pojawia się przy aktywnym `?lang`
 - [x] `Test:` locale `uk` bez `?lang` nie zawęża wyników
-- [ ] `Weryfikacja:` testy `map-page-client` i `use-language-filter` przechodzą (ścieżki escapowane, liczba `Test Suites:` zgodna)
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` testy `map-page-client` i `use-language-filter` przechodzą (ścieżki escapowane, liczba `Test Suites:` zgodna)
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Operator:` `/mapa?lang=ru` → tylko firmy z RU; klik „Prawne" → `/mapa/prawne?lang=ru`, filtr zachowany
 - [ ] `Operator:` przełączenie strony na `uk` przy `?lang=ru` → `/uk/map…?lang=ru`, filtr działa
 - [ ] `Operator:` `/mapa?lang=xx` → pełna lista, status 200, zero błędów konsoli
+
+## Do poprawy po review fazy 3
+
+Raport: [review-faza-3.md](review-faza-3.md) — ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1 × P2, 11 × P3).
+P2 naprawić przed U4 lub razem z U4 (ten sam obszar: filtr języka zmieniany z kontrolki).
+
+- [ ] 🟠 [important] **`src/app/[locale]/(main)/_components/services-client-component.tsx:157-208`** — zmiana `?lang` przy aktywnym zapytaniu kasuje wyniki semantyczne (`setEmbeddingResults([])`, l.166) i nie pobiera ich ponownie: klucz deduplikacji (l.160) nie zawiera języka. Dodać `language` do klucza + test komponentu („prawnik" + zmiana języka → wyniki semantyczne ponownie pobrane i przefiltrowane)
+- [ ] 🟡 [nit] **`src/app/[locale]/(main)/map/[[...slug]]/page.tsx:121-128`** — `lang` jako parametr `buildMapUrl` (nie doklejany po), przepuszczany tylko gdy `isServiceLanguage`; drugi redirect legacy (`/_/`, l.101-105) też zachowuje `lang`; test
+- [ ] 🟡 [nit] **testy komponentu** — `totalCount` przy `?lang`; `/mapa/online?lang=en`; `?lang=be` bez wpisów → empty state
+- [ ] 🟡 [nit] **testy** — hook dla `?lang=RU` i `?lang=` (→ `null`); R8 (przełącznik locale zachowuje `?lang`, `language-switcher.tsx` bez testów)
+- [ ] 🟡 [nit] **`map-page-client.test.tsx`** — 367 linii; blok `describe` języka do osobnego pliku
+- [ ] 🟡 [nit] **`use-language-filter.test.tsx:10`** — `RenderHookResult<…>` zamiast nieczytelnego `ReturnType<typeof renderHook<…>>`
+- [ ] 🟡 [nit] **`use-language-filter.ts:16`** — alias typu stanu w hooku, żeby kontrolka (U4) nie importowała typów nuqs (decyzja przy U4)
+- [ ] 🟡 [nit] **`services-client-component.tsx:23`, `map-page-client.tsx:8`** — kolejność importów `@/hooks`
+- [ ] 🟡 [nit] **`page.tsx:111-113`** — (preegzystujące) `query`/`place` `as string`: powtórzone `?query=a&query=b` w legacy URL → 500; guard `typeof === 'string'`
+- [ ] 🟡 [nit] **semantyka + zmiana miasta** — (preegzystujące) `city` też nie jest w kluczu deduplikacji efektu semantycznego; ten sam mechanizm co P2 — naprawić razem
 
 ---
 

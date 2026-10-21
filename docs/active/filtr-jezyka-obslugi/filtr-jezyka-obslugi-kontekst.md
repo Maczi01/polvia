@@ -209,3 +209,19 @@ E2E pominięte — czysta warstwa danych. 0 × P1, 0 × P2, 10 × P3.
 **Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest` 107/107 suites, 1219/1219;
 `npx next lint` 0 błędów (1 nowe ostrzeżenie: nieużyte `languageCounts` — znika w U4). Build
 pominięty (dev server :3000).
+
+### Review fazy 3 (2026-10-21) — ⚠️ kontynuuj z zastrzeżeniami
+
+Raport: `review-faza-3.md`. 4 perspektywy; E2E pominięte (tylko CLI w `Weryfikacja:`).
+0 × P1, 1 × P2, 11 × P3.
+
+- **P2 (zweryfikowany w kodzie):** efekt semantyczny w `services-client-component.tsx` zależy od
+  `localResults.length`, ale klucz deduplikacji nie zawiera języka — zmiana `?lang` przy aktywnej
+  frazie czyści wyniki semantyczne i ich nie pobiera. Prawdopodobnie ten sam błąd sprzed fazy 3
+  dla zmiany miasta. Naprawić przed/razem z U4.
+- Security czyste: redirect legacy same-origin, `lang` kodowany przez `URLSearchParams`, brak
+  soft-404. Preegzystujące: powtórzone `?query=` w legacy URL → 500.
+- Memoizacja liczników poprawna (`countFilters` memoizowany; hover/pan nie przeliczają).
+- Wniosek ogólny: każda nowa oś filtra musi trafić do klucza deduplikacji efektu semantycznego —
+  kandydat na `/dev-compound` po zakończeniu zadania.
+- Obie `Weryfikacja:` fazy 3 odznaczone (2/2 suites, 17 testów; tsc exit 0).
