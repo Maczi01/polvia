@@ -1,7 +1,7 @@
 # Zadania: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-21
+**Ostatnia aktualizacja:** 2026-10-22
 
 ## Źródła
 
@@ -136,16 +136,18 @@ Wskazówki 🧭 dla U3 przenieść do promptu buildera fazy 3.
 Raport: [review-faza-3.md](review-faza-3.md) — ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1 × P2, 11 × P3).
 P2 naprawić przed U4 lub razem z U4 (ten sam obszar: filtr języka zmieniany z kontrolki).
 
-- [ ] 🟠 [important] **`src/app/[locale]/(main)/_components/services-client-component.tsx:157-208`** — zmiana `?lang` przy aktywnym zapytaniu kasuje wyniki semantyczne (`setEmbeddingResults([])`, l.166) i nie pobiera ich ponownie: klucz deduplikacji (l.160) nie zawiera języka. Dodać `language` do klucza + test komponentu („prawnik" + zmiana języka → wyniki semantyczne ponownie pobrane i przefiltrowane)
+- [x] 🟠 [important] **`src/app/[locale]/(main)/_components/services-client-component.tsx:157-208`** — zmiana `?lang` przy aktywnym zapytaniu kasuje wyniki semantyczne (`setEmbeddingResults([])`, l.166) i nie pobiera ich ponownie: klucz deduplikacji (l.160) nie zawiera języka. Dodać `language` do klucza + test komponentu („prawnik" + zmiana języka → wyniki semantyczne ponownie pobrane i przefiltrowane) → `src/lib/semantic-search-key.ts` (wszystkie osie, w tym miasto i `onlineOnly`) + test komponentu (bez poprawki pada)
 - [ ] 🟡 [nit] **`src/app/[locale]/(main)/map/[[...slug]]/page.tsx:121-128`** — `lang` jako parametr `buildMapUrl` (nie doklejany po), przepuszczany tylko gdy `isServiceLanguage`; drugi redirect legacy (`/_/`, l.101-105) też zachowuje `lang`; test
-- [ ] 🟡 [nit] **testy komponentu** — `totalCount` przy `?lang`; `/mapa/online?lang=en`; `?lang=be` bez wpisów → empty state
-- [ ] 🟡 [nit] **testy** — hook dla `?lang=RU` i `?lang=` (→ `null`); R8 (przełącznik locale zachowuje `?lang`, `language-switcher.tsx` bez testów)
-- [ ] 🟡 [nit] **`map-page-client.test.tsx`** — 367 linii; blok `describe` języka do osobnego pliku
-- [ ] 🟡 [nit] **`use-language-filter.test.tsx:10`** — `RenderHookResult<…>` zamiast nieczytelnego `ReturnType<typeof renderHook<…>>`
-- [ ] 🟡 [nit] **`use-language-filter.ts:16`** — alias typu stanu w hooku, żeby kontrolka (U4) nie importowała typów nuqs (decyzja przy U4)
+- [ ] 🟡 [nit] **testy komponentu** — `totalCount` przy `?lang`; `/mapa/online?lang=en`; `?lang=be` bez wpisów → empty state — częściowo: empty state `?lang=be` i „Pokaż N wyników" przy `?lang` zrobione; `/mapa/online?lang=en` dalej bez testu komponentu
+- [ ] 🟡 [nit] **testy** — hook dla `?lang=RU` i `?lang=` (→ `null`); R8 (przełącznik locale zachowuje `?lang`, `language-switcher.tsx` bez testów) — hook zrobiony; R8 dalej bez testu
+- [x] 🟡 [nit] **`map-page-client.test.tsx`** — 367 linii; blok `describe` języka do osobnego pliku → `map-page-client.language.test.tsx` + `map-page-client.fixtures.tsx` (190 linii)
+- [x] 🟡 [nit] **`use-language-filter.test.tsx:10`** — `RenderHookResult<…>` zamiast nieczytelnego `ReturnType<typeof renderHook<…>>`
+- [x] 🟡 [nit] **`use-language-filter.ts:16`** — alias typu stanu w hooku, żeby kontrolka (U4) nie importowała typów nuqs (decyzja przy U4) → `export type LanguageFilterState`
 - [ ] 🟡 [nit] **`services-client-component.tsx:23`, `map-page-client.tsx:8`** — kolejność importów `@/hooks`
 - [ ] 🟡 [nit] **`page.tsx:111-113`** — (preegzystujące) `query`/`place` `as string`: powtórzone `?query=a&query=b` w legacy URL → 500; guard `typeof === 'string'`
-- [ ] 🟡 [nit] **semantyka + zmiana miasta** — (preegzystujące) `city` też nie jest w kluczu deduplikacji efektu semantycznego; ten sam mechanizm co P2 — naprawić razem
+- [x] 🟡 [nit] **semantyka + zmiana miasta** — (preegzystujące) `city` też nie jest w kluczu deduplikacji efektu semantycznego; ten sam mechanizm co P2 — naprawić razem → w `semanticSearchKey`
+- [ ] 🟡 [nit] **`messages/en.json`, `ru.json`, `uk.json`** — (preegzystujące, odkryte w U4) klucz najwyższego poziomu `serviceWrapper` tylko w `pl.json` — potencjalny runtime error na en/ru/uk
+- [ ] 🟡 [nit] **testy `AddBusinessFlow` („limit wysylek…")** — flaky przy równoległym `npx jest` pod obciążeniem (1 fail), zielone przy `--runInBand` (110/110); prawdopodobnie ten sam objaw co niezidentyfikowane faile z review fazy 1 — ustabilizować timing
 
 ---
 
@@ -156,18 +158,18 @@ P2 naprawić przed U4 lub razem z U4 (ten sam obszar: filtr języka zmieniany z 
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** M · **Zależności:** U3
 **Wymagania:** R2, R3, R4, R5, R13, R14, R15
 
-- [ ] `map-page-client.tsx` — przekaż `languageCounts` do `<FilterComponent>` (wyliczone w U3, dziś nieużyte → ostrzeżenie lintu); `FilterComponentProps.languageCounts` → dalej do `MobileFilterModal` jak `categoryCounts`; `useLanguageFilter()` w `FilterComponent`
-- [ ] Stwórz `src/app/[locale]/(main)/_components/language-select/language-select.tsx` (kontrolowany, prymitywy `Select*`, „Dowolny język" + 5 języków: flaga, endonim, `CountBadge`, `sr-only` liczba)
-- [ ] Stwórz `language-select.test.tsx` i `language-select.stories.tsx`
-- [ ] `filter-component.tsx` — dropdown obok „Wybierz lokalizację"; `hasActiveFilters` i `resetAllFilters` uwzględniają język
-- [ ] `mobile-filter-modal.tsx` — props: wybrany język, zmiana, liczniki; `clearCategories` bez zmian
-- [ ] `messages/{pl,en,ru,uk}.json` — `MapPage.languageFilter`, `MapPage.anyLanguage`
-- [ ] `Test:` 5 endonimów + „Dowolny język" z licznikami; nazwa dostępna zawiera liczbę; `jest-axe` bez naruszeń
-- [ ] `Test:` wybór „Русский" → onChange `'ru'`; „Dowolny język" → `null`
-- [ ] `Test:` język z licznikiem 0 klikalny (nie `disabled`)
-- [ ] `Test:` `filter-component` — przy samym `?lang=ru` „Usuń filtry" aktywny; klik czyści `lang`
-- [ ] `Test:` `mobile-filter-modal` — zmiana języka aktualizuje „pokaż wyniki"; „wyczyść kategorie" nie rusza języka
-- [ ] `Test:` etykiety renderują się na `pl` i `uk`
+- [x] `map-page-client.tsx` — przekaż `languageCounts` do `<FilterComponent>` (wyliczone w U3, dziś nieużyte → ostrzeżenie lintu); `FilterComponentProps.languageCounts` → dalej do `MobileFilterModal` jak `categoryCounts`; `useLanguageFilter()` w `FilterComponent`
+- [x] Stwórz `src/app/[locale]/(main)/_components/language-select/language-select.tsx` (kontrolowany, prymitywy `Select*`, „Dowolny język" + 5 języków: flaga, endonim, `CountBadge`, `sr-only` liczba)
+- [x] Stwórz `language-select.test.tsx` i `language-select.stories.tsx`
+- [x] `filter-component.tsx` — dropdown obok „Wybierz lokalizację"; `hasActiveFilters` i `resetAllFilters` uwzględniają język
+- [x] `mobile-filter-modal.tsx` — props: wybrany język, zmiana, liczniki; `clearCategories` bez zmian
+- [x] `messages/{pl,en,ru,uk}.json` — `MapPage.languageFilter`, `MapPage.anyLanguage`
+- [x] `Test:` 5 endonimów + „Dowolny język" z licznikami; nazwa dostępna zawiera liczbę; `jest-axe` bez naruszeń
+- [x] `Test:` wybór „Русский" → onChange `'ru'`; „Dowolny język" → `null`
+- [x] `Test:` język z licznikiem 0 klikalny (nie `disabled`)
+- [x] `Test:` `filter-component` — przy samym `?lang=ru` „Usuń filtry" aktywny; klik czyści `lang`
+- [x] `Test:` `mobile-filter-modal` — zmiana języka aktualizuje „pokaż wyniki"; „wyczyść kategorie" nie rusza języka
+- [x] `Test:` etykiety renderują się na `pl` i `uk`
 - [ ] `Weryfikacja:` testy `language-select`, `filter-component`, `mobile-filter-modal` przechodzą (3 suites)
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów, `npx next lint` bez błędów
 - [ ] `Weryfikacja:` grep — `languageFilter` i `anyLanguage` we wszystkich czterech `messages/*.json`

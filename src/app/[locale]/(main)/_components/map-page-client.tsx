@@ -54,8 +54,8 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
         [services, countFilters],
     );
 
-    // Liczba kart per jezyk obslugi dla kontrolki jezyka (U4: FilterComponent i arkusz
-    // mobilny dostana ja jako prop). Osobny memo — piec przebiegow po calej liscie.
+    // Liczba kart per jezyk obslugi dla kontrolki jezyka (pasek desktop i arkusz mobilny).
+    // Osobny memo — piec przebiegow po calej liscie.
     const languageCounts = useMemo(
         () => countCardsByLanguage(services, countFilters),
         [services, countFilters],
@@ -80,6 +80,7 @@ export function MapPageClient({ services, initialFilters }: MapPageClientProps) 
                     onFiltersChange={setCurrentFilters}
                     categoryCounts={categoryCounts}
                     totalCount={totalCount}
+                    languageCounts={languageCounts}
                 />
             </div>
 

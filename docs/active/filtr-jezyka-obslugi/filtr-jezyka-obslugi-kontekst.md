@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-21
+**Ostatnia aktualizacja:** 2026-10-22
 
 ## Źródła
 
@@ -225,3 +225,43 @@ Raport: `review-faza-3.md`. 4 perspektywy; E2E pominięte (tylko CLI w `Weryfika
 - Wniosek ogólny: każda nowa oś filtra musi trafić do klucza deduplikacji efektu semantycznego —
   kandydat na `/dev-compound` po zakończeniu zadania.
 - Obie `Weryfikacja:` fazy 3 odznaczone (2/2 suites, 17 testów; tsc exit 0).
+
+### Faza 4 — U4 (2026-10-22) → `feature-builder-web-ui` → completed
+
+- `language-select/language-select.tsx` (+ test, stories): kontrolowany, prymitywy `Select*`;
+  `null` na zewnątrz, sentinel `ANY_LANGUAGE` wewnątrz (Radix wymaga niepustej wartości), zawężanie
+  przez `isServiceLanguage`. Opcja: flaga (`alt=""`) + endonim z atrybutem `lang` + `CountBadge`
+  (`aria-hidden`) + `sr-only " (n)"` — nazwa dostępna „Русский (3)". Zera klikalne (R5).
+- **Desktop (R15):** dropdown obok lokalizacji; lewy blok `w-1/4` → `w-1/3`, pasek kategorii
+  `w-3/4` → `w-2/3` (i tak się przewija). **Mobile:** tylko w arkuszu filtrów pod lokalizacją — w
+  górnym pasku przy 375 px trzecia kontrolka miałaby ~110 px. `?lang` aktywuje mobilny „Resetuj".
+- R13: `hasActiveFilters` uwzględnia język, `resetAllFilters` jawnie `setLanguage(null)`;
+  `clearCategories` bez zmian (test).
+- Klucze `MapPage.languageFilter` / `MapPage.anyLanguage` ×4 locale.
+- **Poprawka P2 z review fazy 3:** `src/lib/semantic-search-key.ts` — `semanticSearchKey(filters)`
+  ze wszystkich osi (query, category, county, city, onlineOnly, language); `coverageFilters` w
+  zależnościach efektu. Test komponentu (bez poprawki pada) + test per oś. Naprawia też
+  preegzystujący przypadek zmiany miasta.
+- `LanguageFilterState` eksportowany z hooka; testy `?lang=RU` / `?lang=` → `null`.
+- `map-page-client.test.tsx` podzielony: `map-page-client.language.test.tsx` +
+  `map-page-client.fixtures.tsx` (nazwa poza `testMatch`).
+
+**Odchylenia (zaakceptowane):** `setupAfterEnv.ts` — stuby Pointer Capture API dla Radix Select w
+jsdom (obok istniejących stubów `ResizeObserver`/`scrollTo`); plik fixtures spoza `Pliki:`; lokalny
+stub `AbortSignal.timeout` w teście semantycznym (jsdom 20). `filter-component.tsx` 524 → 547,
+`services-client-component.tsx` 674 → 678 linii (oba już ponad limitem).
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx next lint` 0 błędów; i18n ×4 OK.
+`npx jest` równolegle: 109/110 suites — 1 fail `AddBusinessFlow › limit wysylek…` (nietknięty
+przez U4); `npx jest --runInBand`: **110/110 suites** → flaky pod obciążeniem, zadanie dopisane.
+Build pominięty.
+
+**Środowisko:** dev server na :3000 (PID 54400) zwraca 500 („Jest worker encountered child process
+exceptions" wg buildera) — learned pattern: zabrudzony `.next` / rywalizacja procesów. Weryfikacja
+w przeglądarce nie wykonana; wymaga restartu serwera przez użytkownika.
+
+**Ryzyka do sprawdzenia w przeglądarce (Operator U4):** z-index listy opcji w arkuszu mobilnym
+(`SelectContent` `z-[105]` vs arkusz `z-[999]` — dotyczyłoby też istniejącego selecta województw),
+Escape w otwartym selekcie a zamknięcie arkusza, ciasnota trzech kontrolek przy 768 px.
+
+**Kandydat do `/dev-compound`:** każda nowa oś filtra musi trafić do `semanticSearchKey`.

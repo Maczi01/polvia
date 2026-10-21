@@ -13,6 +13,7 @@ import { useLocale } from 'next-intl';
 import { calculateServicesBounds } from '@/lib/map-utils';
 import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
+import { semanticSearchKey } from '@/lib/semantic-search-key';
 import { buildSemanticSearchParams } from '@/lib/semantic-search-request';
 import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
 import {
@@ -157,7 +158,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     useEffect(() => {
         const debounceMs = 800;
 
-        const currentSearchParams = `${searchInput}-${selectedCategory}-${selectedCounty}`;
+        // Kazda os zmieniajaca liste lokalna — inaczej zmiana jezyka/miasta czysci wyniki
+        // ponizej, a pominiety klucz blokuje ponowne zapytanie.
+        const currentSearchParams = semanticSearchKey(coverageFilters);
 
         if (debounceTimeoutRef.current) {
             clearTimeout(debounceTimeoutRef.current);
@@ -200,6 +203,7 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             }
         };
     }, [
+        coverageFilters,
         searchInput,
         selectedCategory,
         selectedCounty,

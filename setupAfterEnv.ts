@@ -29,3 +29,15 @@ if (typeof Element !== 'undefined') {
         }
     }
 }
+
+// jsdom nie implementuje Pointer Capture API, a Radix Select wola
+// `hasPointerCapture`/`releasePointerCapture` na wyzwalaczu przy kazdym kliknieciu.
+// Bez tego otwarcie selecta w tescie rzuca "hasPointerCapture is not a function".
+// Brak przechwytywania to dokladnie stan, ktory przegladarka zglasza po zwolnieniu.
+if (typeof Element !== 'undefined' && typeof Element.prototype.hasPointerCapture !== 'function') {
+    Element.prototype.hasPointerCapture = function hasPointerCapture(): boolean {
+        return false;
+    };
+    Element.prototype.setPointerCapture = function setPointerCapture(): void {};
+    Element.prototype.releasePointerCapture = function releasePointerCapture(): void {};
+}

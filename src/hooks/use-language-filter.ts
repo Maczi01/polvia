@@ -9,10 +9,13 @@ import { SERVICE_LANGUAGES, type ServiceLanguage } from '@/lib/languages';
  */
 const languageParser = parseAsStringLiteral(SERVICE_LANGUAGES).withOptions({ history: 'push' });
 
+/** Krotka `[jezyk | null, setter]` — konsumenci nie importuja typow nuqs. */
+export type LanguageFilterState = UseQueryStateReturn<ServiceLanguage, undefined>;
+
 /**
  * Wybrany jezyk obslugi z adresu. Celowo bez wartosci domyslnej i bez odczytu locale
  * strony — filtr nigdy nie wlacza sie sam (R11).
  */
-export function useLanguageFilter(): UseQueryStateReturn<ServiceLanguage, undefined> {
+export function useLanguageFilter(): LanguageFilterState {
     return useQueryState('lang', languageParser);
 }

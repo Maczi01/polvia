@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, type RenderHookResult } from '@testing-library/react';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 
-import { useLanguageFilter } from './use-language-filter';
+import { type LanguageFilterState, useLanguageFilter } from './use-language-filter';
 
 function renderLanguageFilter(
     searchParams: string,
     onUrlUpdate?: (event: UrlUpdateEvent) => void,
-): ReturnType<typeof renderHook<ReturnType<typeof useLanguageFilter>, unknown>> {
+): RenderHookResult<LanguageFilterState, unknown> {
     const wrapper = ({ children }: { children: ReactNode }): ReactNode => (
         <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
             {children}
@@ -25,6 +25,18 @@ describe('useLanguageFilter', () => {
 
     it('nieznany kod to brak filtra, nie pusty wynik (R10)', () => {
         const { result } = renderLanguageFilter('?lang=xx');
+
+        expect(result.current[0]).toBeNull();
+    });
+
+    it('kod wielkimi literami to brak filtra — parser rozroznia wielkosc liter (R10)', () => {
+        const { result } = renderLanguageFilter('?lang=RU');
+
+        expect(result.current[0]).toBeNull();
+    });
+
+    it('pusty ?lang= to brak filtra (R10)', () => {
+        const { result } = renderLanguageFilter('?lang=');
 
         expect(result.current[0]).toBeNull();
     });

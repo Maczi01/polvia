@@ -70,6 +70,8 @@
     "showList": "Список",
     "filter": "Фильтры",
     "selectCounty": "Выберите локацию",
+    "languageFilter": "Язык обслуживания",
+    "anyLanguage": "Любой язык",
     "search": "Поиск...",
     "title": "Карта услуг - Polvia",
     "titleSuffix": "Карта",

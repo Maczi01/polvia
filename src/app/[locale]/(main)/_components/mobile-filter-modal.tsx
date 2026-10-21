@@ -9,7 +9,9 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
 import { SelectScrollable } from '@/components/ui/select/select-scrollable';
+import type { ServiceLanguage } from '@/lib/languages';
 import { ButtonCategory } from './button-category/button-category';
+import { LanguageSelect } from './language-select/language-select';
 
 const FOCUSABLE_SELECTOR =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -52,6 +54,11 @@ interface MobileFilterModalProps {
      * stopce te sama nazwe co strzalce w naglowku (dwa „Zamknij filtry").
      */
     totalCount: number;
+    /** Wybrany jezyk obslugi; `null` = bez filtra. */
+    selectedLanguage: ServiceLanguage | null;
+    onLanguageChange: (language: ServiceLanguage | null) => void;
+    /** Liczba kart per jezyk przy pozostalych aktywnych filtrach. */
+    languageCounts?: Record<ServiceLanguage, number>;
 }
 
 export const MobileFilterModal = ({
@@ -68,6 +75,9 @@ export const MobileFilterModal = ({
                                       clearCategories,
                                       categoryCounts,
                                       totalCount,
+                                      selectedLanguage,
+                                      onLanguageChange,
+                                      languageCounts,
                                   }: MobileFilterModalProps) => {
     const t = useTranslations('MapPage');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -176,6 +186,13 @@ export const MobileFilterModal = ({
                             onValueChange={onCountyChange}
                             placeholder={t('selectCounty')}
                             ariaLabel={t('selectCounty')}
+                            className="w-full"
+                        />
+
+                        <LanguageSelect
+                            value={selectedLanguage}
+                            onChange={onLanguageChange}
+                            counts={languageCounts}
                             className="w-full"
                         />
                     </div>

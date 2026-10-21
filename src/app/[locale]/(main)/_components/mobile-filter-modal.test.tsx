@@ -33,6 +33,8 @@ function renderModal(overrides: Partial<ModalProps> = {}): ReturnType<typeof ren
         onOnlineToggle: jest.fn(),
         clearCategories: jest.fn(),
         totalCount: 0,
+        selectedLanguage: null,
+        onLanguageChange: jest.fn(),
         ...overrides,
     };
     return render(<MobileFilterModal {...props} />);
@@ -171,6 +173,26 @@ describe('<MobileFilterModal />', () => {
             expect(screen.getByRole('button', { name: nazwa })).toBeEnabled();
         });
 
+        it('nie rusza wybranego jezyka obslugi', async () => {
+            const clearCategories = jest.fn();
+            const onLanguageChange = jest.fn();
+            renderModal({
+                isOpen: true,
+                selectedCategory: 'law',
+                selectedLanguage: 'ru',
+                clearCategories,
+                onLanguageChange,
+            });
+
+            await userEvent.click(screen.getByRole('button', { name: nazwa }));
+
+            expect(clearCategories).toHaveBeenCalledTimes(1);
+            expect(onLanguageChange).not.toHaveBeenCalled();
+            expect(screen.getByRole('combobox', { name: 'languageFilter' })).toHaveTextContent(
+                'Русский',
+            );
+        });
+
         it('czysci kategorie, nie reszte filtrow', async () => {
             const clearCategories = jest.fn();
             renderModal({ isOpen: true, selectedCategory: 'law', clearCategories });
@@ -178,6 +200,40 @@ describe('<MobileFilterModal />', () => {
             await userEvent.click(screen.getByRole('button', { name: nazwa }));
 
             expect(clearCategories).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    // R14: ten sam filtr jezyka co na desktopie, z licznikami per jezyk.
+    describe('filtr jezyka obslugi', () => {
+        it('arkusz ma wybor jezyka z licznikami', async () => {
+            renderModal({
+                isOpen: true,
+                languageCounts: { pl: 4, uk: 2, ru: 1, en: 0, be: 0 },
+            });
+
+            const select = screen.getByRole('combobox', { name: 'languageFilter' });
+            expect(select).toHaveTextContent('anyLanguage');
+            await userEvent.click(select);
+
+            expect(screen.getByRole('option', { name: 'Українська (2)' })).toBeInTheDocument();
+        });
+
+        it('wybor jezyka oddaje kod rodzicowi i nie zamyka arkusza', async () => {
+            const onClose = jest.fn();
+            const onLanguageChange = jest.fn();
+            renderModal({ isOpen: true, onClose, onLanguageChange });
+
+            await userEvent.click(screen.getByRole('combobox', { name: 'languageFilter' }));
+            await userEvent.click(screen.getByRole('option', { name: 'Русский' }));
+
+            expect(onLanguageChange).toHaveBeenCalledWith('ru');
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        it('otwarty arkusz z wybranym jezykiem nie ma naruszen dostepnosci', async () => {
+            const { container } = renderModal({ isOpen: true, selectedLanguage: 'be' });
+
+            expect(await axe(container)).toHaveNoViolations();
         });
     });
 });

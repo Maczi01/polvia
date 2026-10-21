@@ -70,6 +70,8 @@
     "showList": "List",
     "filter": "Filters",
     "selectCounty": "Select location",
+    "languageFilter": "Service language",
+    "anyLanguage": "Any language",
     "search": "Search...",
     "title": "Services Map - Polvia",
     "titleSuffix": "Map",

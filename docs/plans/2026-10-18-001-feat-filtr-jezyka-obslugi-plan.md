@@ -317,7 +317,7 @@ kontrolka (działa przez ręczne wpisanie `?lang=ru`).
 - [ ] [Manual] Przełącz język strony na `uk` przy `?lang=ru` → URL `/uk/map…?lang=ru`, filtr działa.
 - [ ] [Manual] `/mapa?lang=xx` → pełna lista, status 200, zero błędów konsoli.
 
-- [ ] **Unit 4: Kontrolka języka — desktop, mobilny arkusz, „Usuń filtry"**
+- [x] **Unit 4: Kontrolka języka — desktop, mobilny arkusz, „Usuń filtry"**
 
 **Cel:** Użytkownik wybiera język z dropdownu (endonimy, flagi, liczniki), także w mobilnym arkuszu;
 „Usuń filtry" go czyści.
