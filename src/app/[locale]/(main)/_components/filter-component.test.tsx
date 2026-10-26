@@ -174,8 +174,13 @@ describe('<FilterComponent /> — jezyk obslugi a „Usuń filtry"', () => {
     it('dropdown jezyka stoi w pasku desktop z wybranym jezykiem i bez naruszen a11y', async () => {
         const { container } = await renderFilters(NO_FILTERS, { searchParams: '?lang=uk' });
 
-        const [desktopSelect] = screen.getAllByRole('combobox', { name: 'Język obsługi' });
-        expect(desktopSelect).toHaveTextContent('Українська');
+        // Arkusz mobilny stoi w DOM przed paskiem desktop — pasek bierzemy spoza dialogu.
+        const desktopSelect = screen
+            .getAllByRole('combobox', { name: 'Język obsługi: Українська' })
+            .find(element => !element.closest('[role="dialog"]'));
+        // Kompaktowy wyzwalacz: kod zamiast endonimu, endonim niesie nazwa dostepna.
+        expect(desktopSelect).toHaveTextContent('UK');
+        expect(desktopSelect).not.toHaveTextContent('Українська');
         expect(await axe(container)).toHaveNoViolations();
     });
 });

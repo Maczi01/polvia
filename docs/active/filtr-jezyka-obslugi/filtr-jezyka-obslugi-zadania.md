@@ -1,7 +1,7 @@
 # Zadania: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-26
+**Ostatnia aktualizacja:** 2026-10-27
 
 ## Źródła
 
@@ -176,7 +176,7 @@ P2 naprawić przed U4 lub razem z U4 (ten sam obszar: filtr języka zmieniany z 
 - [ ] `Operator:` desktop `/mapa` — wybór „English" → `?lang=en`, liczniki chipów maleją, „wstecz" przywraca stan
 - [ ] `Operator:` mobile 390px — dropdown w arkuszu; „pokaż wyniki (N)" = lista; **lista opcji nad arkuszem (P2 #2), Escape w otwartym selekcie nie zamyka arkusza (P2 #1)** — sprawdzone 2026-10-26 przez orkiestratora (chrome-devtools, 375 px, :3001): dropdown w arkuszu ✓, wartość „Русский" z `?lang=ru` ✓, „Resetuj" aktywny przy samym `?lang` ✓, Escape ✓; lista opcji pod arkuszem ✗ (P2 #2)
 - [ ] `Operator:` `/uk/map` — etykiety po ukraińsku, endonimy bez zmian; „Беларуская 0" → empty state, reset czyści język
-- [ ] `Operator:` desktop 768–1024 px — trzy kontrolki (szukaj, lokalizacja, język) czytelne, nieobcięte (P2 #5)
+- [x] `Operator:` desktop 768–1024 px — trzy kontrolki (szukaj, lokalizacja, język) czytelne, nieobcięte (P2 #5) — sprawdzone 2026-10-27 (chrome-devtools, :3001): 1024 i 1440 OK; przy 768 „Wybierz lokalizację" nadal lekko obcięte (122 px) → P3 niżej
 
 ## Do poprawy po review fazy 4
 
@@ -184,16 +184,17 @@ Raport: [review-faza-4.md](review-faza-4.md) — ⚠️ kontynuuj z zastrzeżeni
 Ostatnia faza — **P2 naprawić przed merge**. #2 i #5 najpierw potwierdzić w przeglądarce (wymaga działającego dev servera).
 
 - [x] 🟠 [important] **`src/app/[locale]/(main)/_components/mobile-filter-modal.tsx:99-104`** — Escape (i Tab) z otwartej listy selecta bąbelkuje przez portal do `onKeyDown` dialogu → zamyka cały arkusz; ignorować zdarzenia spoza `containerRef` + test (dotyczy też selecta województw) → filtr `containerRef.contains(target)`; 2 testy (failowały bez poprawki); **potwierdzone w przeglądarce** (Escape zamyka listę, arkusz zostaje)
-- [ ] 🟠 [important] **`src/components/ui/select/select.tsx:92` vs `mobile-filter-modal.tsx:123`** — lista opcji (`z-[105]`, portal) pod arkuszem (`z-[999]`) — **POTWIERDZONE w przeglądarce** (375 px, hit-test trafia w arkusz, zrzut `e2e-faza4-mobile-select-pod-arkuszem.png`); dotyczy też selecta województw → **filtr lokalizacji na mobile dziś bezużyteczny (preegzystujące)**; `z-[1000]` na `SelectContent` selectów w arkuszu (lokalnie, nie globalnie)
+- [x] 🟠 [important] **`src/components/ui/select/select.tsx:92` vs `mobile-filter-modal.tsx:123`** — lista opcji (`z-[105]`, portal) pod arkuszem (`z-[999]`) — **POTWIERDZONE w przeglądarce** (375 px, hit-test trafia w arkusz, zrzut `e2e-faza4-mobile-select-pod-arkuszem.png`); dotyczy też selecta województw → **filtr lokalizacji na mobile dziś bezużyteczny (preegzystujące)**; `z-[1000]` na `SelectContent` selectów w arkuszu (lokalnie, nie globalnie) → **NAPRAWIONE 2026-10-27:** `contentClassName` w `SelectScrollable` i `LanguageSelect`, stała `SHEET_SELECT_CONTENT_CLASS = 'z-[1000]'` w arkuszu; w przeglądarce obie listy (język, lokalizacja) nad arkuszem i klikalne — zrzut `e2e-faza4-po-poprawce-mobile-lista-nad-arkuszem.png`
 - [x] 🟠 [important] **`src/app/[locale]/(main)/_components/services-client-component.tsx:100-152`** — brak `AbortController`: starsza odpowiedź semantyczna nadpisuje nowszą i gasi loading; abort w cleanup i przed nowym fetchem, `AbortError` ignorowany + test (reguła §13) → hook `src/hooks/use-semantic-search.ts` (abort w ref, timeout 8 s na tym samym kontrolerze), 5 testów; komponent 678 → 554 linii
 - [x] 🟠 [important] **`src/lib/semantic-search-key.ts:12-20`** — osie wpisane ręcznie; wymusić kompletność `satisfies Record<keyof Required<CoverageFilters>, unknown>` (nowa oś bez klucza = błąd kompilacji) → `satisfies Record<keyof CoverageFilters, unknown>`, sprawdzone `tsc` na kopii typu (brak i nadmiar = błąd)
-- [ ] 🟠 [important] **`src/app/[locale]/(main)/_components/filter-component.tsx:426`** — **POTWIERDZONE w przeglądarce, szerzej niż zakładano:** lokalizacja/język 72 px przy 768, 100 px przy 1024, lokalizacja obcięta nawet przy 1440 (147 px), zrzut `e2e-faza4-desktop-768.png`. **Decyzja użytkownika (2026-10-26): kompaktowy wyzwalacz języka** — w stanie zamkniętym flaga + krótki kod (🌐 dla „Dowolny"), naturalna szerokość ~80 px; rozwinięta lista bez zmian (endonimy + liczniki)
-- [ ] 🟡 [nit] **`language-select.tsx:71`** — `aria-label` nadpisuje wybraną wartość w nazwie dostępnej (WCAG 2.5.3); `aria-labelledby` = etykieta + wartość
+- [x] 🟠 [important] **`src/app/[locale]/(main)/_components/filter-component.tsx:426`** — **POTWIERDZONE w przeglądarce, szerzej niż zakładano:** lokalizacja/język 72 px przy 768, 100 px przy 1024, lokalizacja obcięta nawet przy 1440 (147 px), zrzut `e2e-faza4-desktop-768.png`. **Decyzja użytkownika (2026-10-26): kompaktowy wyzwalacz języka** — w stanie zamkniętym flaga + krótki kod (🌐 dla „Dowolny"), naturalna szerokość ~80 px; rozwinięta lista bez zmian (endonimy + liczniki) → **NAPRAWIONE 2026-10-27:** `LanguageSelect variant="compact"` w pasku (96 px, flaga + kod, glob dla „Dowolny"), lewy blok `w-1/2 xl:w-2/5`; zmierzone w przeglądarce: szukaj/lokalizacja 122 / 186 / 219 px przy 768 / 1024 / 1440 — zrzut `e2e-faza4-po-poprawce-desktop-1440.png`
+- [x] 🟡 [nit] **`language-select.tsx:71`** — `aria-label` nadpisuje wybraną wartość w nazwie dostępnej (WCAG 2.5.3); `aria-labelledby` = etykieta + wartość → nazwa dostępna „Język obsługi: {endonim}" w obu wariantach (+ `title`)
 - [ ] 🟡 [nit] **testy** — reset przy slugu kategorii + `?lang` (realne `window.location.search`); endonimy na liście w scenariuszu `uk` — (`global.fetch` przywracany po teście: zrobione)
 - [x] 🟡 [nit] **`services-client-component.tsx:205-209`** — nadmiarowe zależności efektu obok `coverageFilters` → zależności hooka `[filters, localResults, locale]`
 - [ ] 🟡 [nit] **`filter-component.tsx:319`** — `hasActiveFilters` jako `boolean`
 - [ ] 🟡 [nit] **`filter-component.tsx`** — 547 linii; wydzielić pasek desktopowy (`desktop-filter-bar/`) — dług
-- [ ] 🟡 [nit] **`language-select.stories.tsx`** — tytuł wg konwencji `component/...`, story bez `counts`; `map-page-client.fixtures.tsx` → `tests/fixtures/`; alias `renderWithServices`
+- [ ] 🟡 [nit] **`language-select.stories.tsx`** — tytuł wg konwencji `component/...`, story bez `counts`; `map-page-client.fixtures.tsx` → `tests/fixtures/`; alias `renderWithServices` — stories: tytuł `component/languageSelect` + `WithoutCounts` zrobione; fixtures i alias `renderWithServices` otwarte
+- [ ] 🟡 [nit] **`filter-component.tsx` @768 px** — (po poprawce P2 #5) „Wybierz lokalizację" lekko obcięte przy 122 px; szerszy lewy blok zjadłby przewijany pasek kategorii — do rozważenia przy wydzieleniu paska desktopowego
 - [ ] 🟡 [nit] **dotyk** — tap w opcję może przelecieć do overlaya (`onClick={onClose}`) — sprawdzić na urządzeniu
 - [ ] 🟡 [nit] **limit `/api/services`** — refetch przy zmianie miasta/języka zużywa 30/min szybciej; 429 bez komunikatu (zbieżne z „`lang` w API")
 

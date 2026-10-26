@@ -13,6 +13,11 @@ import type { ServiceLanguage } from '@/lib/languages';
 import { ButtonCategory } from './button-category/button-category';
 import { LanguageSelect } from './language-select/language-select';
 
+// Lista opcji selecta portaluje sie do `body`, wiec staje w jednym stosie z nakladka
+// arkusza (`z-[999]` ponizej). Domyslne `z-[105]` z `SelectContent` chowa ja POD arkuszem —
+// zmiana z-indexu nakladki wymaga zmiany tej wartosci (zawsze wyzej niz nakladka).
+const SHEET_SELECT_CONTENT_CLASS = 'z-[1000]';
+
 const FOCUSABLE_SELECTOR =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -193,6 +198,7 @@ export const MobileFilterModal = ({
                             placeholder={t('selectCounty')}
                             ariaLabel={t('selectCounty')}
                             className="w-full"
+                            contentClassName={SHEET_SELECT_CONTENT_CLASS}
                         />
 
                         <LanguageSelect
@@ -200,6 +206,7 @@ export const MobileFilterModal = ({
                             onChange={onLanguageChange}
                             counts={languageCounts}
                             className="w-full"
+                            contentClassName={SHEET_SELECT_CONTENT_CLASS}
                         />
                     </div>
 

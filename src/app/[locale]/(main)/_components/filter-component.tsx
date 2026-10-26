@@ -423,7 +423,7 @@ export function FilterComponent({
             <div className="hidden md:block">
                 <div className="w-full max-w-full overflow-x-hidden bg-[#F6F6F7] px-3 pb-4 pt-2 dark:bg-[#111827]">
                     <div className="flex flex-row flex-nowrap items-center gap-x-4">
-                        <div className="flex w-1/3 flex-none items-center gap-x-4">
+                        <div className="flex w-1/2 flex-none items-center gap-x-4 xl:w-2/5">
                             <div className="min-w-0 flex-1">
                                 <Input
                                     value={searchInput || ''}
@@ -448,17 +448,17 @@ export function FilterComponent({
                                 />
                             </div>
                             {/* R15: kompaktowy dropdown obok lokalizacji, nie kolejne chipy. */}
-                            <div className="min-w-0 flex-1">
+                            <div className="flex-none">
                                 <LanguageSelect
                                     value={language}
                                     onChange={setLanguage}
                                     counts={languageCounts}
-                                    className="w-full"
+                                    variant="compact"
                                 />
                             </div>
                         </div>
 
-                        <div className="flex w-2/3 min-w-0 items-center gap-x-4">
+                        <div className="flex min-w-0 flex-1 items-center gap-x-4">
                             {isScrollable && (
                                 <button
                                     className="flex-none rounded-full border border-gray-200 bg-white p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"

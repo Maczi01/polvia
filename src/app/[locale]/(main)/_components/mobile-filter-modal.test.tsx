@@ -201,7 +201,7 @@ describe('<MobileFilterModal />', () => {
 
             expect(clearCategories).toHaveBeenCalledTimes(1);
             expect(onLanguageChange).not.toHaveBeenCalled();
-            expect(screen.getByRole('combobox', { name: 'languageFilter' })).toHaveTextContent(
+            expect(screen.getByRole('combobox', { name: /^languageFilter: / })).toHaveTextContent(
                 'Русский',
             );
         });
@@ -224,7 +224,7 @@ describe('<MobileFilterModal />', () => {
                 languageCounts: { pl: 4, uk: 2, ru: 1, en: 0, be: 0 },
             });
 
-            const select = screen.getByRole('combobox', { name: 'languageFilter' });
+            const select = screen.getByRole('combobox', { name: /^languageFilter: / });
             expect(select).toHaveTextContent('anyLanguage');
             await userEvent.click(select);
 
@@ -236,7 +236,7 @@ describe('<MobileFilterModal />', () => {
             const onLanguageChange = jest.fn();
             renderModal({ isOpen: true, onClose, onLanguageChange });
 
-            await userEvent.click(screen.getByRole('combobox', { name: 'languageFilter' }));
+            await userEvent.click(screen.getByRole('combobox', { name: /^languageFilter: / }));
             await userEvent.click(screen.getByRole('option', { name: 'Русский' }));
 
             expect(onLanguageChange).toHaveBeenCalledWith('ru');
@@ -250,7 +250,7 @@ describe('<MobileFilterModal />', () => {
             const onClose = jest.fn();
             renderModal({ isOpen: true, onClose });
 
-            await userEvent.click(screen.getByRole('combobox', { name: 'languageFilter' }));
+            await userEvent.click(screen.getByRole('combobox', { name: /^languageFilter: / }));
             expect(screen.getByRole('listbox')).toBeInTheDocument();
 
             await userEvent.keyboard('{Escape}');
@@ -264,5 +264,26 @@ describe('<MobileFilterModal />', () => {
 
             expect(await axe(container)).toHaveNoViolations();
         });
+
+        // Regresja (review fazy 4, P2): lista opcji portaluje sie do `body` i stoi w jednym
+        // stosie z nakladka arkusza. jsdom nie liczy stosu (elementFromPoint, z-index), wiec
+        // wyjatkowo porownujemy klasy: z-index listy musi byc wyzszy niz nakladki arkusza.
+        it.each([
+            ['jezyka', /^languageFilter: /],
+            ['lokalizacji', 'selectCounty'],
+        ])('lista selecta %s otwiera sie NAD arkuszem', async (_nazwa, comboboxName) => {
+            renderModal({ isOpen: true });
+            const overlay = screen.getByRole('dialog').parentElement;
+
+            await userEvent.click(screen.getByRole('combobox', { name: comboboxName }));
+
+            expect(zIndexOf(screen.getByRole('listbox'))).toBeGreaterThan(zIndexOf(overlay));
+        });
     });
 });
+
+function zIndexOf(element: Element | null): number {
+    const match = element?.className.match(/(?:^|\s)z-\[(\d+)\]/);
+    if (!match) throw new Error('Element nie ma klasy z-[N]');
+    return Number(match[1]);
+}

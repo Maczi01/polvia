@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-26
+**Ostatnia aktualizacja:** 2026-10-27
 
 ## Źródła
 
@@ -313,4 +313,30 @@ tylko CLI). 0 × P1, 5 × P2, 15 × P3.
 - **P2 #5 potwierdzone szerzej:** lokalizacja/język 72 px @768, 100 px @1024, lokalizacja obcięta
   nawet @1440 (147 px). **Decyzja użytkownika: kompaktowy wyzwalacz języka** (flaga + krótki kod,
   🌐 dla „Dowolny"; lista bez zmian).
+- Konsola bez błędów.
+
+### Poprawki P2 po review fazy 4 — część 2 (2026-10-27) → `feature-builder-web-ui` → completed
+
+- P2 #2: `contentClassName` w `SelectScrollable` i `LanguageSelect` → `SelectContent`;
+  `mobile-filter-modal.tsx` przekazuje `SHEET_SELECT_CONTENT_CLASS = 'z-[1000]'` (komentarz wiąże ją
+  z `z-[999]` arkusza; test porównuje liczbowo z-index listy i nakładki). `select.tsx` bez zmian,
+  desktop bez zmian. **Naprawia też preegzystujący bug: filtr lokalizacji w arkuszu mobilnym był
+  bezużyteczny.**
+- P2 #5 (decyzja użytkownika — kompaktowy wyzwalacz): `LanguageSelect variant?: 'full' | 'compact'`;
+  pasek desktopowy `compact` (`w-24`, flaga + kod wielkimi literami, `Globe` dla „Dowolny"), arkusz
+  `full`. Lista bez zmian. Pasek: lewy blok `w-1/2 xl:w-2/5`, prawy `flex-1`.
+- P3 #6 (WCAG 2.5.3): nazwa dostępna wyzwalacza „Język obsługi: {endonim}" w obu wariantach (+
+  `title`); kod „RU" `aria-hidden`. Brak nowego klucza tłumaczeń.
+- Stories: tytuł `component/languageSelect`, `WithoutCounts`, `CompactAnyLanguage`, `CompactSelected`.
+- **Odkryte i naprawione przez buildera:** testy „desktop" w `filter-component.test.tsx` i
+  `map-page-client.language.test.tsx` sprawdzały w rzeczywistości select z arkusza (zamknięty arkusz
+  stoi wcześniej w DOM, `getAllByRole(...)[0]`). Helper `desktopLanguageSelect()` wybiera select
+  spoza `[role="dialog"]`; asercje mocniejsze.
+
+**Weryfikacja w przeglądarce (orkiestrator, chrome-devtools, :3001):**
+- 375 px: lista języka i lokalizacji w arkuszu nad arkuszem (`z-index 1000`, hit-test w opcjach ✓),
+  nazwa wyzwalacza „Język obsługi: Русский" ✓, Escape zamyka tylko listę ✓.
+- Desktop szukaj/lokalizacja: 122 / 186 / 219 px przy 768 / 1024 / 1440 (wcześniej 72 / 100 /
+  147); wyzwalacz języka 96 px „UK" bez obcięcia ✓. Przy 768 „Wybierz lokalizację" nadal lekko
+  obcięte → P3.
 - Konsola bez błędów.

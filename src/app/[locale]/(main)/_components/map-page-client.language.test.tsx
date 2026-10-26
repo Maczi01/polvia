@@ -11,6 +11,9 @@ import {
 } from './map-page-client.fixtures';
 import messages from '../../../../../messages/pl.json';
 
+// Nazwa dostepna wyzwalacza = „etykieta: wybrana wartosc" (WCAG 2.5.3, kompaktowy pasek).
+const LANGUAGE_FILTER_NAME = new RegExp(`^${messages.MapPage.languageFilter}: `);
+
 // react-map-gl to zewnetrzna biblioteka WebGL, ktorej jsdom nie uruchomi — ten sam stub
 // co w map-page-client.test.tsx (jest.mock hoistuje sie tylko w module testu).
 jest.mock('react-map-gl/mapbox', () => {
@@ -138,8 +141,15 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
         expect(listedNames()).toEqual(['Kancelaria Rosyjska']);
     });
 
-    const languageSelects = (): HTMLElement[] =>
-        screen.getAllByRole('combobox', { name: messages.MapPage.languageFilter });
+    // Arkusz mobilny (zamkniety, ale zamontowany) stoi w DOM przed paskiem desktop,
+    // wiec „pierwszy combobox" to select z arkusza — pasek bierzemy spoza dialogu.
+    const desktopLanguageSelect = (): HTMLElement => {
+        const select = screen
+            .getAllByRole('combobox', { name: LANGUAGE_FILTER_NAME })
+            .find(element => !element.closest('[role="dialog"]'));
+        if (!select) throw new Error('Brak selecta jezyka w pasku desktop');
+        return select;
+    };
 
     async function pickLanguage(select: HTMLElement, optionName: RegExp): Promise<void> {
         await userEvent.click(select);
@@ -148,7 +158,7 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
 
     it('wybor jezyka w pasku desktop zaweza liste, a „Usuń filtry" ja przywraca (R13)', async () => {
         await renderMapPage('/mapa', NO_FILTERS, CATALOG);
-        const [desktopSelect] = languageSelects();
+        const desktopSelect = desktopLanguageSelect();
 
         await pickLanguage(desktopSelect, /^Русский/);
         expect(listedNames()).toEqual(['Kancelaria Rosyjska', 'Ksiegowa Rosyjska']);
@@ -157,7 +167,10 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
             fireEvent.click(screen.getByRole('button', { name: /Usuń filtry$/ }));
         });
         expect(listedNames()).toEqual(ALL_NAMES);
-        expect(languageSelects()[0]).toHaveTextContent(messages.MapPage.anyLanguage);
+        // Pasek desktop ma kompaktowy wyzwalacz (glob zamiast tekstu) — wartosc niesie nazwa.
+        expect(desktopLanguageSelect()).toHaveAccessibleName(
+            `${messages.MapPage.languageFilter}: ${messages.MapPage.anyLanguage}`,
+        );
     });
 
     it('stopka arkusza liczy karty przy ?lang', async () => {
@@ -173,7 +186,7 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
         expect(within(sheet).getByRole('button', { name: 'Pokaż 4 wyniki' })).toBeInTheDocument();
 
         await pickLanguage(
-            within(sheet).getByRole('combobox', { name: messages.MapPage.languageFilter }),
+            within(sheet).getByRole('combobox', { name: LANGUAGE_FILTER_NAME }),
             /^Українська/,
         );
 
@@ -232,7 +245,7 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
             await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1), { timeout: 3000 });
             expect(await screen.findByText('Tlumacz Polski')).toBeInTheDocument();
 
-            await pickLanguage(languageSelects()[0], /^Русский/);
+            await pickLanguage(desktopLanguageSelect(), /^Русский/);
 
             await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2), { timeout: 3000 });
             const [firstUrl] = fetchMock.mock.calls[0];
