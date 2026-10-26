@@ -284,3 +284,33 @@ tylko CLI). 0 × P1, 5 × P2, 15 × P3.
   — handler dialogu musi filtrować po `containerRef`.
 - Wszystkie 3 `Weryfikacja:` fazy 4 odznaczone (3/3 suites, 33 testy; tsc exit 0; lint 0 błędów;
   i18n ×4). Do kroków Operatora dopisano sprawdzenie P2 #1, #2, #5.
+
+### Poprawki P2 po review fazy 4 — część 1 (2026-10-26) → `feature-builder-web-fullstack` → completed
+
+- P2 #1: `mobile-filter-modal.tsx` — `handleKeyDown` obsługuje tylko zdarzenia z `target` wewnątrz
+  `containerRef` (portal Radix ignorowany). 2 testy, failowały bez poprawki. Potwierdzone w
+  przeglądarce.
+- P2 #3: logika fetch/debounce/abort wyekstrahowana do `src/hooks/use-semantic-search.ts`
+  (`useReducer`, `AbortController` w ref, timeout 8 s przez `setTimeout` na tym samym kontrolerze —
+  `AbortSignal.any` nie ma w jsdom ani Safari < 17.4). Przerwane zapytanie nie czyści wyników i nie
+  gasi loadingu; cleanup przy przerwaniu zeruje klucz deduplikacji. 5 testów (wyścig failował bez
+  poprawki). `services-client-component.tsx` 678 → 554 linii; `EmbeddingMeta` eksportowany z hooka.
+- P2 #4: `semanticSearchKey` z obiektu `satisfies Record<keyof CoverageFilters, unknown>` —
+  sprawdzone `tsc` na kopii typu (brak/nadmiar osi = błąd kompilacji).
+- P3: nadmiarowe zależności efektu usunięte; `global.fetch` przywracany po teście, martwy stub
+  `AbortSignal.timeout` usunięty.
+
+**Walidacja orkiestratora:** `npx tsc --noEmit` exit 0; `npx jest --runInBand` **111/111 suites,
+1259/1259**; `npx next lint` 0 błędów.
+
+**Weryfikacja w przeglądarce (orkiestrator, chrome-devtools, dev server :3001):** stary serwer
+(PID 54400, :3000, 500 od 19.10) zatrzymany za zgodą użytkownika — zostaje jeden serwer.
+- Mobile 375 px `/mapa?lang=ru`: „Resetuj" aktywny ✓, w arkuszu „Język obsługi" = „Русский" ✓,
+  liczniki ✓, Escape w otwartej liście zamyka tylko listę ✓.
+- **P2 #2 potwierdzone:** lista opcji (`z-index 105`) pod arkuszem (`999`) — hit-test w środku opcji
+  trafia w treść arkusza; to samo dla selecta województw → **filtr lokalizacji w arkuszu mobilnym
+  jest dziś bezużyteczny (preegzystujący bug produkcyjny)**.
+- **P2 #5 potwierdzone szerzej:** lokalizacja/język 72 px @768, 100 px @1024, lokalizacja obcięta
+  nawet @1440 (147 px). **Decyzja użytkownika: kompaktowy wyzwalacz języka** (flaga + krótki kod,
+  🌐 dla „Dowolny"; lista bez zmian).
+- Konsola bez błędów.

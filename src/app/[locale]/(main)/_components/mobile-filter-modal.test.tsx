@@ -80,6 +80,19 @@ describe('<MobileFilterModal />', () => {
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 
+    it('Escape z otwartej listy wojewodztw zamyka liste, nie arkusz', async () => {
+        const onClose = jest.fn();
+        renderModal({ isOpen: true, onClose });
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'selectCounty' }));
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(screen.queryByRole('listbox')).toBeNull();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
     it('Tab na ostatniej kontrolce wraca na pierwsza, Shift+Tab na pierwszej idzie na ostatnia', async () => {
         renderModal({ isOpen: true });
         const buttons = screen.getAllByRole('button');
@@ -227,6 +240,22 @@ describe('<MobileFilterModal />', () => {
             await userEvent.click(screen.getByRole('option', { name: 'Русский' }));
 
             expect(onLanguageChange).toHaveBeenCalledWith('ru');
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        // Regresja (review fazy 4, P2): zdarzenia React bablkuja przez portal wzdluz
+        // drzewa komponentow, wiec Escape z listy opcji (portal do `body`) trafial do
+        // `onKeyDown` dialogu — select zamykal sie razem z calym arkuszem.
+        it('Escape z otwartej listy jezykow zamyka liste, nie arkusz', async () => {
+            const onClose = jest.fn();
+            renderModal({ isOpen: true, onClose });
+
+            await userEvent.click(screen.getByRole('combobox', { name: 'languageFilter' }));
+            expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+            await userEvent.keyboard('{Escape}');
+
+            expect(screen.queryByRole('listbox')).toBeNull();
             expect(onClose).not.toHaveBeenCalled();
         });
 

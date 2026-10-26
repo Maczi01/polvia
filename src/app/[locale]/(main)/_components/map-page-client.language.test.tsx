@@ -208,20 +208,22 @@ describe('<MapPageClient /> — filtr jezyka obslugi z ?lang', () => {
     describe('wyniki semantyczne po zmianie jezyka', () => {
         const SEMANTIC_RU = service({ name: 'Tlumacz Rosyjski', languages: ['ru'] });
         const SEMANTIC_PL = service({ name: 'Tlumacz Polski', languages: ['pl'] });
+        const originalFetch = global.fetch;
         let fetchMock: jest.Mock;
 
         beforeEach(() => {
-            // /api/services to granica systemu — mockujemy tylko ja.
+            // /api/services to granica systemu — mockujemy tylko ja. Timeout zapytania
+            // idzie przez AbortController + setTimeout, wiec jsdom nie potrzebuje
+            // `AbortSignal.timeout`.
             fetchMock = jest.fn().mockResolvedValue({
                 ok: true,
                 json: async () => ({ success: true, services: [SEMANTIC_RU, SEMANTIC_PL] }),
             });
             global.fetch = fetchMock;
-            // jsdom 20 nie ma AbortSignal.timeout — bez niego fetch nie startuje wcale,
-            // a blad ginie w catch komponentu. Sygnal bez timeoutu wystarczy: fetch jest mockiem.
-            if (typeof AbortSignal.timeout !== 'function') {
-                AbortSignal.timeout = (): AbortSignal => new AbortController().signal;
-            }
+        });
+
+        afterEach(() => {
+            global.fetch = originalFetch;
         });
 
         it('pobiera wyniki ponownie z nowym excludeIds i filtruje je jezykiem', async () => {

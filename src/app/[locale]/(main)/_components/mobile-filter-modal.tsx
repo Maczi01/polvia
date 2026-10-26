@@ -97,6 +97,12 @@ export const MobileFilterModal = ({
     }, [isOpen]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+        // Zdarzenia React bablkuja przez portale wzdluz drzewa komponentow, wiec trafia
+        // tu tez klawisz z listy opcji selecta (Radix portaluje ja do `body`). Te obsluguje
+        // sam Radix — inaczej Escape zamykalby liste razem z calym arkuszem.
+        const { target } = event;
+        if (!(target instanceof Node) || !containerRef.current?.contains(target)) return;
+
         if (event.key === 'Escape') {
             event.stopPropagation();
             onClose();
