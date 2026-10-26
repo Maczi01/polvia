@@ -1,7 +1,7 @@
 # Kontekst: Filtr języka obsługi + białoruski
 
 **Branch:** `feature/filtr-jezyka-obslugi`
-**Ostatnia aktualizacja:** 2026-10-22
+**Ostatnia aktualizacja:** 2026-10-26
 
 ## Źródła
 
@@ -265,3 +265,22 @@ w przeglądarce nie wykonana; wymaga restartu serwera przez użytkownika.
 Escape w otwartym selekcie a zamknięcie arkusza, ciasnota trzech kontrolek przy 768 px.
 
 **Kandydat do `/dev-compound`:** każda nowa oś filtra musi trafić do `semanticSearchKey`.
+
+### Review fazy 4 (2026-10-26) — ⚠️ kontynuuj z zastrzeżeniami (ostatnia faza: P2 przed merge)
+
+Raport: `review-faza-4.md`. 4 perspektywy; E2E pominięte (dev server :3000 zwraca 500, `Weryfikacja:`
+tylko CLI). 0 × P1, 5 × P2, 15 × P3.
+
+- Logika i testy solidne: 6/6 scenariuszy + B1, 59/59 testów, przeniesione testy bez utraty asercji,
+  security czyste (rate-limit 30/min/IP na `/api/services`, `?lang` nie trafia surowy do DOM).
+- **P2 to warstwa, której jsdom nie modeluje:** Escape z portalu Radix zamyka arkusz (potwierdzone
+  w kodzie — `onKeyDown` dialogu łapie zdarzenia bąbelkujące przez portal React); lista opcji
+  `z-[105]` vs arkusz `z-[999]` (do potwierdzenia w przeglądarce); ciasny pasek przy 768 px (z
+  obliczenia). Oba problemy arkusza dotyczą też preegzystującego selecta województw.
+- **P2 w danych:** brak `AbortController` w fetchu semantycznym (wyścig odpowiedzi — B1 uczynił go
+  łatwym do trafienia); ręczna lista osi w `semanticSearchKey` (brak gwarancji kompilatora).
+- **Wnioski do `/dev-compound`:** (1) każda oś filtra w kluczu deduplikacji efektu — wymuszona
+  typem; (2) zdarzenia klawiatury z portali (Radix Select/Popover) bąbelkują do handlerów dialogu
+  — handler dialogu musi filtrować po `containerRef`.
+- Wszystkie 3 `Weryfikacja:` fazy 4 odznaczone (3/3 suites, 33 testy; tsc exit 0; lint 0 błędów;
+  i18n ×4). Do kroków Operatora dopisano sprawdzenie P2 #1, #2, #5.
