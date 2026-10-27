@@ -128,7 +128,14 @@ export async function getCatalogStats(): Promise<CatalogStats> {
     const [row] = await db
         .select({
             companiesCount: sql<number>`COUNT(DISTINCT ${servicesTable.id})::int`,
-            citiesCount: sql<number>`COUNT(DISTINCT LOWER(NULLIF(TRIM(${serviceLocationsTable.city}), '')))::int`,
+            // Tylko miasta w Polsce (lokalizacja z wojewodztwem) — obok stoi „1 kraj: Polska",
+            // a katalog ma tez wpisy z Kijowa.
+            citiesCount: sql<number>`
+              (
+                COUNT(DISTINCT LOWER(NULLIF(TRIM(${serviceLocationsTable.city}), '')))
+                  FILTER (WHERE ${serviceLocationsTable.voivodeship} IS NOT NULL)
+              )::int
+            `,
         })
         .from(servicesTable)
         .leftJoin(serviceLocationsTable, eq(serviceLocationsTable.serviceId, servicesTable.id))

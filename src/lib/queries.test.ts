@@ -5,7 +5,12 @@
 import { PgDialect } from 'drizzle-orm/pg-core';
 import { is, SQL } from 'drizzle-orm';
 
-import { findServiceByDomain, getHomepageServices, type HomepageService } from './queries';
+import {
+    findServiceByDomain,
+    getCatalogStats,
+    getHomepageServices,
+    type HomepageService,
+} from './queries';
 
 interface CandidateRow {
     name: string;
@@ -19,6 +24,7 @@ const mockQuery: {
     limit: number | undefined;
     orderBy: unknown[][];
     limits: number[];
+    selected: Record<string, unknown>;
     rows: unknown[];
     failure: Error | undefined;
 } = {
@@ -26,6 +32,7 @@ const mockQuery: {
     limit: undefined,
     orderBy: [],
     limits: [],
+    selected: {},
     rows: [],
     failure: undefined,
 };
@@ -36,9 +43,10 @@ jest.mock('@/db', () => {
         from: () => chain,
         innerJoin: () => chain,
         leftJoin: () => chain,
+        // Zapytanie bez `limit` (np. `getCatalogStats`) jest awaitowane wprost po `where`.
         where: (condition: SQL | undefined) => {
             mockQuery.where = condition;
-            return chain;
+            return Object.assign(Promise.resolve(mockQuery.rows), chain);
         },
         $dynamic: () => chain,
         orderBy: (...columns: unknown[]) => {
@@ -52,7 +60,14 @@ jest.mock('@/db', () => {
             return mockQuery.rows.slice(0, count);
         },
     };
-    return { db: { select: () => chain } };
+    return {
+        db: {
+            select: (fields: Record<string, unknown> = {}) => {
+                mockQuery.selected = fields;
+                return chain;
+            },
+        },
+    };
 });
 
 function renderedWhere(): { sql: string; params: unknown[] } {
@@ -69,6 +84,7 @@ beforeEach(() => {
     mockQuery.limit = undefined;
     mockQuery.orderBy = [];
     mockQuery.limits = [];
+    mockQuery.selected = {};
     mockQuery.rows = [];
     mockQuery.failure = undefined;
 });
@@ -174,5 +190,33 @@ describe('getHomepageServices', () => {
         mockQuery.failure = new Error('connection refused');
 
         await expect(getHomepageServices('pl')).rejects.toThrow('connection refused');
+    });
+});
+
+describe('getCatalogStats', () => {
+    function renderedSelected(field: string): string {
+        const column = mockQuery.selected[field];
+        if (!is(column, SQL)) throw new Error(`getCatalogStats nie wybralo ${field} jako SQL`);
+        return new PgDialect().sqlToQuery(column).sql;
+    }
+
+    it('zwraca liczby z bazy', async () => {
+        mockQuery.rows = [{ companiesCount: 173, citiesCount: 52 }];
+
+        expect(await getCatalogStats()).toEqual({ companiesCount: 173, citiesCount: 52 });
+    });
+
+    it('liczy tylko miasta w Polsce (lokalizacje z wojewodztwem)', async () => {
+        mockQuery.rows = [{ companiesCount: 1, citiesCount: 1 }];
+
+        await getCatalogStats();
+
+        expect(renderedSelected('citiesCount')).toMatch(
+            /FILTER \(WHERE "service_locations"\."voivodeship" IS NOT NULL\)/,
+        );
+    });
+
+    it('pusty wynik daje zera zamiast bledu', async () => {
+        expect(await getCatalogStats()).toEqual({ companiesCount: 0, citiesCount: 0 });
     });
 });
