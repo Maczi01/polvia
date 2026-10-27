@@ -1,7 +1,7 @@
 ---
 title: 'feat: Filtr języka obsługi na mapie i liście + białoruski jako język obsługi'
 type: feat
-status: active
+status: completed
 date: 2026-10-18
 origin: docs/brainstorms/2026-10-18-filtr-jezyka-obslugi-requirements.md
 design_md: null
