@@ -1,1 +1,15 @@
-import { getMostPopular } from '@/lib/queries';import {    PopularServicesGridClient,} from '@/app/[locale]/(header)/_components/popular-services-card';interface PopularServicesProps {    params: any;}export async function PopularServices({ params }: PopularServicesProps) {    const resolvedParams = await params;    const locale = resolvedParams?.locale;    const services = await getMostPopular(locale);    return <PopularServicesGridClient services={services} />;}
+import type { JSX } from 'react';
+
+import { PopularServicesGridClient } from '@/app/[locale]/(header)/_components/popular-services-card';
+import { getHomepageServices } from '@/lib/queries';
+
+interface PopularServicesProps {
+    params: Promise<{ locale: string }>;
+}
+
+export async function PopularServices({ params }: PopularServicesProps): Promise<JSX.Element> {
+    const { locale } = await params;
+    const { popular, newest } = await getHomepageServices(locale);
+
+    return <PopularServicesGridClient popular={popular} newest={newest} />;
+}

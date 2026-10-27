@@ -200,57 +200,46 @@ export async function getFeaturedServices(locale: string): Promise<FeaturedServi
 //     }
 // }
 
-export async function getMostPopular(locale: string) {
-    const results = await db
+export const HOMEPAGE_SERVICES_LIMIT = 5;
+
+export type HomepageService = {
+    serviceId: string;
+    /** Slug glownej lokalizacji — argument `place` mapy. */
+    slug: string;
+    name: string;
+    category: string;
+    image: string | null;
+};
+
+export type HomepageServices = {
+    popular: HomepageService[];
+    newest: HomepageService[];
+};
+
+/**
+ * Jeden wiersz na firme, nie na lokalizacje: siec z kilkoma punktami nie moze
+ * zajac wszystkich miejsc. Dlatego zadnego joina, ktory mnozy wiersze — lokalizacja
+ * i klikniecia ida przez podzapytania (`service_engagements` nie ma unikalnosci
+ * na `service_id`).
+ */
+function selectHomepageServices(locale: string) {
+    return db
         .select({
-            id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
-            slug: serviceLocationsTable.slug,
-
-            name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
-                'name',
-            ),
-
-            description: servicesTranslationsAlias.description,
-
-            category: servicesTable.category,
-            coverage: servicesTable.coverage,
-            city: serviceLocationsTable.city,
-            street: serviceLocationsTable.street,
-            voivodeship: serviceLocationsTable.voivodeship,
-            postcode: serviceLocationsTable.postcode,
-            latitude: serviceLocationsTable.latitude,
-            longitude: serviceLocationsTable.longitude,
-            openingHours: serviceLocationsTable.openingHours,
-            phoneNumber: serviceLocationsTable.phoneNumber,
-            email: serviceLocationsTable.email,
-            webpage: serviceLocationsTable.webpage,
-            image: servicesTable.image,
-            languages: servicesTable.languages,
-            socials: serviceLocationsTable.socials,
-            whatsappNumber: serviceLocationsTable.whatsappNumber,
-            verified: servicesTable.verified,
-
-            priority: sql<number>`COALESCE(${promotedServicesTable.priority}, 0)`.as('priority'),
-            clicks: sql<number>`COALESCE(${serviceEngagementsTable.clicks}, 0)`.as('clicks'),
-
-            tags: sql<string[]>`
+            slug: sql<string>`
               (
-                SELECT array_agg(ttt.name)
-                FROM ${servicesTagsTable} st
-                JOIN ${tagsTable} t
-                  ON t.id = st.tag_id
-                JOIN ${tagsTranslationsTable} ttt
-                  ON ttt.tag_id = t.id
-                WHERE st.service_id = ${servicesTable.id}
-                  AND ttt.language_code = ${locale}
+                SELECT ${serviceLocationsTable.slug}
+                FROM ${serviceLocationsTable}
+                WHERE ${serviceLocationsTable.serviceId} = ${servicesTable.id}
+                ORDER BY ${serviceLocationsTable.isMainLocation} DESC, ${serviceLocationsTable.slug}
+                LIMIT 1
               )
-            `.as('tags'),
+            `,
+            name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`,
+            category: servicesTable.category,
+            image: servicesTable.image,
         })
         .from(servicesTable)
-
-        .innerJoin(serviceLocationsTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
-
         .leftJoin(
             servicesTranslationsAlias,
             and(
@@ -258,22 +247,40 @@ export async function getMostPopular(locale: string) {
                 eq(servicesTranslationsAlias.languageCode, locale),
             ),
         )
-
-        .leftJoin(
-            promotedServicesTable,
+        .where(
             and(
-                eq(servicesTable.id, promotedServicesTable.serviceId),
-                gt(promotedServicesTable.expiresAt, sql`NOW()`),
+                isPublicService,
+                sql`
+                  EXISTS (
+                    SELECT 1 FROM ${serviceLocationsTable}
+                    WHERE ${serviceLocationsTable.serviceId} = ${servicesTable.id}
+                  )
+                `,
             ),
         )
-        .leftJoin(serviceEngagementsTable, eq(servicesTable.id, serviceEngagementsTable.serviceId))
-        .where(isPublicService)
-        .orderBy(
-            desc(sql`COALESCE(${serviceEngagementsTable.clicks}, 0)`),
-        )
-        .limit(5);
+        .$dynamic();
+}
 
-    return results as Service[];
+export async function getHomepageServices(locale: string): Promise<HomepageServices> {
+    const [popular, newest] = await Promise.all([
+        selectHomepageServices(locale)
+            .orderBy(
+                desc(sql`
+                  (
+                    SELECT COALESCE(SUM(${serviceEngagementsTable.clicks}), 0)
+                    FROM ${serviceEngagementsTable}
+                    WHERE ${serviceEngagementsTable.serviceId} = ${servicesTable.id}
+                  )
+                `),
+                servicesTable.id,
+            )
+            .limit(HOMEPAGE_SERVICES_LIMIT),
+        selectHomepageServices(locale)
+            .orderBy(desc(servicesTable.createdAt), servicesTable.id)
+            .limit(HOMEPAGE_SERVICES_LIMIT),
+    ]);
+
+    return { popular, newest };
 }
 
 /**

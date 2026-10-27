@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { Service } from '@/types';
+import type { HomepageService } from '@/lib/queries';
 import { Badge } from '@/components/ui/badge/badge';
 import { useTranslations } from 'next-intl';
 import { mapCategoryToBadgeColor } from '@/lib/consts';
@@ -110,53 +110,73 @@ const PopularServiceCard = ({
     return <div className={baseClasses}>{content}</div>;
 };
 
+const imageMap = (image: string | null): string =>
+    image ? `/services/${image.trimEnd()}` : '/default.png';
+
+const ServicesGrid = ({
+    headingId,
+    heading,
+    services,
+}: {
+    headingId: string;
+    heading: string;
+    services: HomepageService[];
+}) => (
+    <div role="group" aria-labelledby={headingId}>
+        <div className="mb-8">
+            <h2
+                id={headingId}
+                className="text-left text-2xl font-bold text-gray-900 dark:text-gray-100"
+            >
+                {heading}
+            </h2>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-6 xl:grid-cols-5">
+            {services.map(service => (
+                <PopularServiceCard
+                    key={service.serviceId}
+                    href={{ pathname: '/map', query: { place: service.slug } }}
+                    icon={imageMap(service.image)}
+                    name={service.name}
+                    category={service.category}
+                />
+            ))}
+        </div>
+    </div>
+);
+
 type PopularServicesGridClientProps = {
-    services: Service[];
+    popular: HomepageService[];
+    newest: HomepageService[];
 };
 
-export function PopularServicesGridClient({ services }: PopularServicesGridClientProps) {
+export function PopularServicesGridClient({ popular, newest }: PopularServicesGridClientProps) {
     const t = useTranslations('Main');
-
-    const imageMap = (image: string) => {
-        return image ? `/services/${image.trimEnd()}` : '/default.png';
-    };
-
-    // Ensure we only show top 5 services
-    const topServices = services.slice(0, 5);
 
     return (
         <section
             className="w-full bg-gradient-to-b from-white to-gray-50 dark:from-[#111827] dark:to-gray-900"
             aria-labelledby="popular-companies-heading"
         >
-            <div className="mx-auto max-w-[1500px] px-4 py-12 sm:px-6 lg:px-8">
-                <div className="mb-8">
-                    <h2
-                        id="popular-companies-heading"
-                        className="text-left text-2xl font-bold text-gray-900 dark:text-gray-100"
-                    >
-                        {t('popularCompanies')}
-                    </h2>
-                </div>
-
-                {/* Grid Layout - Responsive */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3 lg:gap-6 xl:grid-cols-5">
-                    {topServices.map((service, index) => (
-                        <PopularServiceCard
-                            key={service.id}
-                            href={{
-                                pathname: '/map' as AppPathnames,
-                                query: { slug: service.slug },
-                            }}
-                            icon={imageMap(service.image!)}
-                            name={service.name}
-                            category={service.category}
-                        />
-                    ))}
-                </div>
+            <div className="mx-auto flex max-w-[1500px] flex-col gap-12 px-4 py-12 sm:px-6 lg:px-8">
+                {popular.length > 0 && (
+                    <ServicesGrid
+                        headingId="popular-companies-heading"
+                        heading={t('popularCompanies')}
+                        services={popular}
+                    />
+                )}
+                {newest.length > 0 && (
+                    <ServicesGrid
+                        headingId="recently-added-heading"
+                        heading={t('recentlyAdded')}
+                        services={newest}
+                    />
+                )}
 
                 {/* Optional: Add a "View All Services" link */}
-                <div className="mt-12 text-center">
+                <div className="text-center">
                     <Link
                         href="/map"
                         className="inline-flex items-center rounded-xl bg-green px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-green-700 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-500/30"
