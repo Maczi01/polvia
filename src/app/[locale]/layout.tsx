@@ -7,7 +7,7 @@ import { locales } from '@/i18n/config';
 import { notFound } from 'next/navigation';
 import { getMessages, getTranslations, setRequestLocale } from 'next-intl/server';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import { Newsletter } from '@/components/newsletter';
+// import { Newsletter } from '@/components/newsletter'; // NEWSLETTER TYMCZASOWO WYLACZONY
 import { ThemeProviderWrapper } from '@/providers/theme-provider-wrapper';
 import Script from 'next/script';
 import { env } from '../../../env';
@@ -164,7 +164,7 @@ export default async function RootLayout({
         <ThemeProviderWrapper>
             <NextIntlClientProvider locale={locale} messages={messages}>
                 <NuqsAdapter>{children}</NuqsAdapter>
-                <Newsletter position="bottom-left" />
+                {/* <Newsletter position="bottom-left" /> NEWSLETTER TYMCZASOWO WYLACZONY */}
                 <CookieConsentBanner />
             </NextIntlClientProvider>
         </ThemeProviderWrapper>

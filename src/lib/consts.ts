@@ -4,7 +4,9 @@ export function formatDate(date: string) {
         month: 'long',
         year: 'numeric'
     })
-}import { z } from 'zod';
+}
+// NEWSLETTER TYMCZASOWO WYLACZONY
+// import { z } from 'zod';
 
 import { CATEGORY_DEFINITIONS, type CategoryDefinition, isCategory } from '@/lib/categories';
 
@@ -86,15 +88,16 @@ export const mapCategoryToBadgeColor = (category: string): CategoryDefinition['b
 export type Route = (typeof ROUTES)[keyof typeof ROUTES];
 
 
-export const newsletterSchema = z.object({
-    email: z
-        .string()
-        .min(1, { message: "Email is required" })
-        .email({ message: "Invalid email address" })
-        .max(100, { message: "Email must be less than 100 characters" }),
-});
-
-export type NewsletterFormData = z.infer<typeof newsletterSchema>;
+// NEWSLETTER TYMCZASOWO WYLACZONY
+// export const newsletterSchema = z.object({
+//     email: z
+//         .string()
+//         .min(1, { message: "Email is required" })
+//         .email({ message: "Invalid email address" })
+//         .max(100, { message: "Email must be less than 100 characters" }),
+// });
+//
+// export type NewsletterFormData = z.infer<typeof newsletterSchema>;
 
 // lib/format-address.ts
 import { PartialService } from '@/types';

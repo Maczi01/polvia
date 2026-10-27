@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import {
-    newsletterTable,
+    // newsletterTable, // NEWSLETTER TYMCZASOWO WYLACZONY
     promotedServicesTable,
     serviceEngagementsTable,
     serviceLocationsTable,
@@ -181,23 +181,24 @@ export async function getFeaturedServices(locale: string): Promise<FeaturedServi
     return pickFeaturedServices(popular, newest);
 }
 
-export async function addEmailToNewsletter(email: string) {
-    try {
-        const result = await db.insert(newsletterTable)
-            .values({ email })
-            .onConflictDoNothing()
-            .returning();
-
-        if (result.length === 0) {
-            return { success: false, message: 'Email already subscribed' };
-        }
-
-        return { success: true, message: 'Subscription successful' };
-    } catch (error) {
-        console.error('Database error:', error);
-        return { success: false, message: 'Database error' };
-    }
-}
+// NEWSLETTER TYMCZASOWO WYLACZONY
+// export async function addEmailToNewsletter(email: string) {
+//     try {
+//         const result = await db.insert(newsletterTable)
+//             .values({ email })
+//             .onConflictDoNothing()
+//             .returning();
+//
+//         if (result.length === 0) {
+//             return { success: false, message: 'Email already subscribed' };
+//         }
+//
+//         return { success: true, message: 'Subscription successful' };
+//     } catch (error) {
+//         console.error('Database error:', error);
+//         return { success: false, message: 'Database error' };
+//     }
+// }
 
 export async function getMostPopular(locale: string) {
     const results = await db

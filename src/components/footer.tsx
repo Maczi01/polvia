@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from '@/i18n/navigation';
-import { FooterNewsletter } from '@/app/[locale]/(header)/_components/footer-newsletter';
+// import { FooterNewsletter } from '@/app/[locale]/(header)/_components/footer-newsletter'; // NEWSLETTER TYMCZASOWO WYLACZONY
 import { getTranslations } from 'next-intl/server';
 import { Logo } from './logo';
 import { serviceName } from '@/lib/consts';
@@ -62,7 +62,7 @@ export const Footer = async () => {
                         </Link>
                     </nav>
 
-                    {/* Newsletter section */}
+                    {/* NEWSLETTER TYMCZASOWO WYLACZONY — Newsletter section
                     <div
                         className="w-full sm:w-auto lg:max-w-sm lg:shrink-0"
                         role="region"
@@ -80,6 +80,7 @@ export const Footer = async () => {
                             </div>
                         </div>
                     </div>
+                    */}
                 </div>
 
                 {/* Bottom footer section */}
