@@ -266,6 +266,54 @@ describe('<ServiceCard /> — przyciski akcji', () => {
     });
 });
 
+describe('<ServiceCard /> — jezyki obslugi', () => {
+    it('renderuje flage bialoruska z altem z tlumaczen, nie zahardkodowanym angielskim', () => {
+        renderCard({ languages: ['pl', 'be'] });
+
+        // Mock next-intl zwraca klucz — alt `be` dowodzi, ze idzie przez `t()`.
+        const flag = screen.getByRole('img', { name: 'be' });
+        expect(flag.getAttribute('src')).toContain('by.svg');
+        expect(screen.getByRole('img', { name: 'pl' })).toBeInTheDocument();
+        expect(screen.queryByRole('img', { name: 'Belarusian' })).not.toBeInTheDocument();
+    });
+
+    it('pomija kod spoza listy jezykow obslugi', () => {
+        renderCard({ languages: ['pl', 'de'] });
+
+        expect(screen.getByRole('img', { name: 'pl' })).toBeInTheDocument();
+        expect(screen.queryByRole('img', { name: 'de' })).not.toBeInTheDocument();
+    });
+
+    it('zduplikowany kod daje jedna flage, bez ostrzezenia o zduplikowanym key', () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        renderCard({ languages: ['be', 'be'] });
+
+        expect(screen.getAllByRole('img', { name: 'be' })).toHaveLength(1);
+        expect(consoleError).not.toHaveBeenCalled();
+        consoleError.mockRestore();
+    });
+
+    it('pusta lista jezykow nie renderuje sekcji jezykow', () => {
+        renderCard({ languages: [] });
+
+        expect(screen.queryByText('languages')).not.toBeInTheDocument();
+    });
+
+    it('lista bez znanego kodu nie renderuje pustej sekcji jezykow', () => {
+        renderCard({ languages: ['de'] });
+
+        expect(screen.queryByText('languages')).not.toBeInTheDocument();
+    });
+
+    it('przechodzi asercje jest-axe z flaga bialoruska', async () => {
+        const { container } = renderCard({ languages: ['pl', 'uk', 'ru', 'en', 'be'] });
+
+        const results = await axe(container);
+        expect(results).toHaveNoViolations();
+    });
+});
+
 describe('<ServiceCard /> — dostepnosc', () => {
     const warianty: Coverage[] = ['local', 'online', 'hybrid'];
 

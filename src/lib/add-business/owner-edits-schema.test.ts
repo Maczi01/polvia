@@ -167,6 +167,13 @@ describe('parseOwnerEdits', () => {
         });
     });
 
+    it('bialoruski jest dozwolonym jezykiem obslugi', () => {
+        const result = parseOwnerEdits(validForm({ languages: ['be'] }));
+
+        if (!result.ok) throw new Error(JSON.stringify(result.fieldErrors));
+        expect(result.data.languages).toEqual(['be']);
+    });
+
     it('powtorzony kod jezyka trafia do wyniku raz', () => {
         const result = parseOwnerEdits(validForm({ languages: ['uk', 'uk', 'pl'] }));
 

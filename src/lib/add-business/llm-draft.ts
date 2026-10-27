@@ -65,7 +65,7 @@ COVERAGE — zasieg. Kryterium: czy klient moze przyjsc i zostac obsluzony?
 - hybrid: tak, a do tego obsluguje zdalnie klientow z calej Polski;
 - online: nie — brak punktu obslugi, nawet jesli firma podaje adres siedziby.
 
-LANGUAGES — jezyki, w ktorych firma obsluguje klienta (kody pl, uk, en, ru), nie jezyki jej strony. Dopisz jezyk tylko wtedy, gdy dane wprost mowia o obsludze w nim. Bez takiej informacji: ["pl"].
+LANGUAGES — jezyki, w ktorych firma obsluguje klienta (kody pl, uk, ru, en, be), nie jezyki jej strony. Dopisz jezyk tylko wtedy, gdy dane wprost mowia o obsludze w nim. Bez takiej informacji: ["pl"].
 
 TAGS — 3 do 5 tagow, kazdy w czterech jezykach (pl, uk, en, ru). Tag to konkretna usluga albo produkt, wezej niz kategoria (np. "Legalizacja pobytu", "Manicure hybrydowy", "Wymiana opon"). Nie powtarzaj kategorii ani miasta.
 

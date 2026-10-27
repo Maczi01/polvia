@@ -118,6 +118,13 @@ export default async function MapPage(props: PageProps) {
             locale as Locale,
         );
 
+        // Jezyk obslugi przechodzi bez walidacji — parser `?lang` po stronie klienta
+        // i tak zignoruje nieznany kod (R10).
+        const { lang } = searchParams;
+        if (typeof lang === 'string' && lang.length > 0) {
+            newUrl.query = { ...newUrl.query, lang };
+        }
+
         const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as Locale);
         redirect(`${localePrefix}${localizedUrl}`);
     }

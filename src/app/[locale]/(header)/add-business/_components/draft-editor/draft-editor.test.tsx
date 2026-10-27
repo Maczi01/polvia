@@ -4,7 +4,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { LOGO_MAX_BYTES } from '@/lib/add-business/form-limits';
 
-import { renderEditor } from './render-editor';
+import { renderEditor, submitEditor } from './render-editor';
 
 expect.extend(toHaveNoViolations);
 
@@ -183,6 +183,19 @@ describe('<DraftEditor />', () => {
         expect(formData.get('pinLat')).toBe('');
         expect(formData.get('pinLng')).toBe('');
         expect(formData.get('category')).toBeNull();
+    });
+
+    it('zaznaczony bialoruski trafia do wysylki jako kod be', async () => {
+        const onSubmit = jest.fn();
+        await renderEditor({ onSubmit });
+
+        const belarusian = screen.getByRole('checkbox', { name: 'białoruski' });
+        expect(belarusian).not.toBeChecked();
+        await userEvent.click(belarusian);
+        await submitEditor();
+
+        const formData: FormData = onSubmit.mock.calls[0][0];
+        expect(formData.getAll('languages')).toEqual(['pl', 'uk', 'be']);
     });
 
     it('w trakcie wysylki nie wysyla ponownie i oglasza stan', async () => {

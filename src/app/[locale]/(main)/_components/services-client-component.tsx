@@ -13,29 +13,25 @@ import { useLocale } from 'next-intl';
 import { calculateServicesBounds } from '@/lib/map-utils';
 import { LngLatBoundsLike } from 'mapbox-gl';
 import type { MapFilters } from '@/lib/map-slug-parser';
-import { buildSemanticSearchParams } from '@/lib/semantic-search-request';
-import { shouldRunSemanticSearch } from '@/lib/semantic-search-trigger';
-import { matchesServiceLocation, splitServicesByCoverage } from '@/lib/service-coverage';
+import {
+    filterSemanticResults,
+    matchesServiceLocation,
+    splitServicesByCoverage,
+} from '@/lib/service-coverage';
+import { useLanguageFilter } from '@/hooks/use-language-filter';
+import { useSemanticSearch } from '@/hooks/use-semantic-search';
 
 type Props = {
     services: PartialService[];
     initialFilters?: MapFilters;
 };
 
-type EmbeddingMeta = {
-    executionTime?: number;
-    contextualQuery?: string;
-    relevanceThreshold?: number;
-    count?: number;
-    query?: string;
-    category?: string;
-} | null;
-
 export function ServicesClientComponent({ services: initialServices, initialFilters }: Props) {
     const locale = useLocale();
     const [searchInput] = useQueryState('query', { defaultValue: '' });
     const [viewParam] = useQueryState('view', { defaultValue: 'map' });
     const [selectedSlug, setSelectedSlug] = useQueryState('place', { defaultValue: '' });
+    const [language] = useLanguageFilter();
 
     // Use filters from URL slugs (passed as props)
     const selectedCounty = initialFilters?.county || '';
@@ -46,12 +42,6 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
     const [selectedService, setSelectedService] = useState<PartialService | null>(null);
     const [isMobile, setIsMobile] = useState(false);
     const [pendingScrollAfterViewChange, setPendingScrollAfterViewChange] = useState(false);
-    const [embeddingResults, setEmbeddingResults] = useState<PartialService[]>([]);
-    const [isLoadingEmbeddings, setIsLoadingEmbeddings] = useState(false);
-    const [embeddingMeta, setEmbeddingMeta] = useState<EmbeddingMeta>(null);
-
-    const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const lastSearchParamsRef = useRef<string>('');
 
     useEffect(() => {
         const checkMobile = () => {
@@ -78,8 +68,9 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
             county: selectedCounty,
             city: selectedCity,
             onlineOnly,
+            language,
         }),
-        [searchInput, selectedCategory, selectedCounty, selectedCity, onlineOnly],
+        [searchInput, selectedCategory, selectedCounty, selectedCity, onlineOnly, language],
     );
 
     // Lista lokalna NIE moze zalezec od wynikow semantycznych — jej dlugosc steruje
@@ -89,141 +80,18 @@ export function ServicesClientComponent({ services: initialServices, initialFilt
         [initialServices, coverageFilters],
     );
 
-    const fetchEmbeddingResults = useCallback(
-        async (query: string, category?: string, county?: string, excludeIds: string[] = []) => {
-            try {
-                // `/api/services` czyta `voivodeship` — pod `county` filtr byl po cichu
-                // ignorowany, a limit zapelnialy wyniki z innych wojewodztw.
-                const params = buildSemanticSearchParams({
-                    query,
-                    locale,
-                    category,
-                    voivodeship: county,
-                    excludeIds,
-                });
+    // Debounce, deduplikacja kluczem osi i przerywanie zapytan w locie — w hooku.
+    const { embeddingResults, isLoadingEmbeddings, embeddingMeta } = useSemanticSearch({
+        filters: coverageFilters,
+        localResults,
+        locale,
+    });
 
-                const response = await fetch(`/api/services?${params}`, {
-                    signal: AbortSignal.timeout(8000),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API responded with ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.success) {
-                    setEmbeddingResults(data.services);
-
-                    // Enhanced metadata with all available information
-                    setEmbeddingMeta({
-                        executionTime: data.executionTime,
-                        contextualQuery: data.contextualQuery,
-                        relevanceThreshold: data.relevanceThreshold,
-                        count: data.count,
-                        query: data.query,
-                        category: data.filters?.category,
-                    });
-                } else {
-                    // Zostaje jako `error`, nie `log`: to jedyna sciezka, w ktorej
-                    // wyszukiwanie semantyczne cicho oddaje pusta liste. Bez tego
-                    // brak wynikow jest nieodroznialny od braku dopasowan.
-                    console.error('Semantic search failed', {
-                        query,
-                        category: category ?? null,
-                        code: data.error?.code,
-                    });
-                    setEmbeddingResults([]);
-                    setEmbeddingMeta(null);
-                }
-            } catch (error) {
-                console.error('❌ Semantic search error:', error);
-                setEmbeddingResults([]);
-                setEmbeddingMeta(null);
-            } finally {
-                setIsLoadingEmbeddings(false);
-            }
-        },
-        [locale],
+    // Wyniki semantyczne zawezone tymi samymi predykatami co lista: miejsce, kategoria, jezyk.
+    const filteredEmbeddingResults = useMemo(
+        () => filterSemanticResults(embeddingResults, coverageFilters),
+        [embeddingResults, coverageFilters],
     );
-
-    useEffect(() => {
-        const debounceMs = 800;
-
-        const currentSearchParams = `${searchInput}-${selectedCategory}-${selectedCounty}`;
-
-        if (debounceTimeoutRef.current) {
-            clearTimeout(debounceTimeoutRef.current);
-        }
-
-        setEmbeddingResults([]);
-        setEmbeddingMeta(null);
-
-        // Te same parametry nie odpytuja API drugi raz; reszte reguly dzieli ze skryptem pomiaru.
-        const shouldTriggerEmbeddingSearch =
-            currentSearchParams !== lastSearchParamsRef.current &&
-            shouldRunSemanticSearch({
-                query: searchInput,
-                localResultsCount: localResults.length,
-                category: selectedCategory,
-            });
-
-        if (shouldTriggerEmbeddingSearch) {
-            setIsLoadingEmbeddings(true);
-
-            debounceTimeoutRef.current = setTimeout(() => {
-                const excludeIds = localResults.map(s => s.serviceId);
-                fetchEmbeddingResults(
-                    searchInput.trim(),
-                    selectedCategory || undefined,
-                    selectedCounty || undefined,
-                    excludeIds,
-                );
-
-                lastSearchParamsRef.current = currentSearchParams;
-            }, debounceMs);
-        } else {
-            setIsLoadingEmbeddings(false);
-            lastSearchParamsRef.current = currentSearchParams;
-        }
-
-        return () => {
-            if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current);
-            }
-        };
-    }, [
-        searchInput,
-        selectedCategory,
-        selectedCounty,
-        localResults.length,
-        fetchEmbeddingResults,
-    ]);
-
-    // Wyniki semantyczne zawezone tak samo jak wczesniej — filtr geograficzny i kategoria.
-    const filteredEmbeddingResults = useMemo(() => {
-        return embeddingResults.filter(service => {
-            if (selectedCity) {
-                if (service.city?.toLowerCase() !== selectedCity.toLowerCase()) {
-                    return false;
-                }
-            } else if (
-                selectedCounty &&
-                service.voivodeship?.toLowerCase() !== selectedCounty.toLowerCase()
-            ) {
-                return false;
-            }
-
-            if (
-                selectedCategory &&
-                service.category?.toLowerCase() !== selectedCategory.toLowerCase()
-            ) {
-                return false;
-            }
-
-            return true;
-        });
-    }, [embeddingResults, selectedCounty, selectedCity, selectedCategory]);
 
     // Sekcja online odejmuje to, co juz widac na ekranie: liste lokalna ORAZ wyniki
     // semantyczne (R6). Drugie wywolanie tej samej, przetestowanej funkcji — tanie

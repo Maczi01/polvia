@@ -205,3 +205,45 @@ describe('serviceSchema — social media', () => {
         expect(result.success).toBe(true);
     });
 });
+
+describe('serviceSchema — jezyki obslugi', () => {
+    const parseWithLanguages = (languages: string[]) => {
+        const formData = buildFormData();
+        for (const language of languages) formData.append('languages', language);
+        return serviceSchema.safeParse(parseRawServiceData(formData));
+    };
+
+    it('przyjmuje bialoruski obok polskiego', () => {
+        const result = parseWithLanguages(['pl', 'be']);
+
+        expect(result.success).toBe(true);
+        if (!result.success) return;
+        expect(result.data.languages).toEqual(['pl', 'be']);
+    });
+
+    it('odrzuca kod spoza SERVICE_LANGUAGES z bledem na polu languages', () => {
+        const result = parseWithLanguages(['pl', 'de']);
+
+        expect(result.success).toBe(false);
+        expect(errorPaths(result)).toContain('languages.1');
+    });
+
+    it('brak pola languages daje domyslnie polski', () => {
+        const result = parseWithLanguages([]);
+
+        expect(result.success).toBe(true);
+        if (!result.success) return;
+        expect(result.data.languages).toEqual(['pl']);
+    });
+
+    it('plik w polu languages jest pomijany (nie rzutowany na string) — zostaje domyslny polski', () => {
+        const formData = buildFormData();
+        formData.append('languages', new Blob(['pl']), 'pl.txt');
+
+        const result = serviceSchema.safeParse(parseRawServiceData(formData));
+
+        expect(result.success).toBe(true);
+        if (!result.success) return;
+        expect(result.data.languages).toEqual(['pl']);
+    });
+});

@@ -35,6 +35,8 @@ interface SelectScrollableProps {
     defaultOptionTranslateKey?: string;
     translationPrefix?: string;
     ariaLabel?: string;
+    /** Klasy listy opcji (portal do `body`) — np. z-index wyzszy niz warstwa rodzica. */
+    contentClassName?: string;
 }
 
 export function SelectScrollable({
@@ -48,6 +50,7 @@ export function SelectScrollable({
     defaultOptionTranslateKey = 'allVoivodeships',
     translationPrefix = 'counties',
     ariaLabel,
+    contentClassName,
 }: SelectScrollableProps) {
     const t = useTranslations(translationNamespace);
 
@@ -104,7 +107,7 @@ export function SelectScrollable({
             >
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className={contentClassName}>
                 {showDefault && <SelectItem value="all-voivodeships">{defaultOptionLabel}</SelectItem>}
 
                 {isGroupedOptions(options) ? (

@@ -3,8 +3,8 @@
 import { hasLocale, useLocale, useTranslations } from 'next-intl';
 import type { JSX } from 'react';
 
+import { locales } from '@/i18n/config';
 import type { LocalizedText } from '@/lib/add-business/draft-schema';
-import { LANGUAGE_CODES } from '@/lib/add-business/form-limits';
 import { type Category, CATEGORY_DEFINITIONS } from '@/lib/categories';
 import type { Coverage } from '@/lib/coverage';
 
@@ -22,7 +22,7 @@ export function GeneratedSummary({ category, coverage, tags }: GeneratedSummaryP
     const t = useTranslations('addBusiness');
     const tCategories = useTranslations('MapPage.Categories');
     const locale = useLocale();
-    const language = hasLocale(LANGUAGE_CODES, locale) ? locale : 'pl';
+    const contentLocale = hasLocale(locales, locale) ? locale : 'pl';
 
     return (
         <section
@@ -48,7 +48,7 @@ export function GeneratedSummary({ category, coverage, tags }: GeneratedSummaryP
                 <dd className="text-gray-900 dark:text-gray-100">{t(`coverage.${coverage}`)}</dd>
                 <dt className="font-medium text-gray-600 dark:text-gray-400">{t('editor.tags')}</dt>
                 <dd className="text-gray-900 dark:text-gray-100">
-                    {tags.map(tag => tag[language]).join(', ')}
+                    {tags.map(tag => tag[contentLocale]).join(', ')}
                 </dd>
             </dl>
             <p className="text-xs text-gray-500 dark:text-gray-400">{t('editor.generatedNote')}</p>

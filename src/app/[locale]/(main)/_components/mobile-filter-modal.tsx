@@ -9,7 +9,14 @@ import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
 import { SelectScrollable } from '@/components/ui/select/select-scrollable';
+import type { ServiceLanguage } from '@/lib/languages';
 import { ButtonCategory } from './button-category/button-category';
+import { LanguageSelect } from './language-select/language-select';
+
+// Lista opcji selecta portaluje sie do `body`, wiec staje w jednym stosie z nakladka
+// arkusza (`z-[999]` ponizej). Domyslne `z-[105]` z `SelectContent` chowa ja POD arkuszem —
+// zmiana z-indexu nakladki wymaga zmiany tej wartosci (zawsze wyzej niz nakladka).
+const SHEET_SELECT_CONTENT_CLASS = 'z-[1000]';
 
 const FOCUSABLE_SELECTOR =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -52,6 +59,11 @@ interface MobileFilterModalProps {
      * stopce te sama nazwe co strzalce w naglowku (dwa „Zamknij filtry").
      */
     totalCount: number;
+    /** Wybrany jezyk obslugi; `null` = bez filtra. */
+    selectedLanguage: ServiceLanguage | null;
+    onLanguageChange: (language: ServiceLanguage | null) => void;
+    /** Liczba kart per jezyk przy pozostalych aktywnych filtrach. */
+    languageCounts?: Record<ServiceLanguage, number>;
 }
 
 export const MobileFilterModal = ({
@@ -68,6 +80,9 @@ export const MobileFilterModal = ({
                                       clearCategories,
                                       categoryCounts,
                                       totalCount,
+                                      selectedLanguage,
+                                      onLanguageChange,
+                                      languageCounts,
                                   }: MobileFilterModalProps) => {
     const t = useTranslations('MapPage');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -87,6 +102,12 @@ export const MobileFilterModal = ({
     }, [isOpen]);
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>): void => {
+        // Zdarzenia React bablkuja przez portale wzdluz drzewa komponentow, wiec trafia
+        // tu tez klawisz z listy opcji selecta (Radix portaluje ja do `body`). Te obsluguje
+        // sam Radix — inaczej Escape zamykalby liste razem z calym arkuszem.
+        const { target } = event;
+        if (!(target instanceof Node) || !containerRef.current?.contains(target)) return;
+
         if (event.key === 'Escape') {
             event.stopPropagation();
             onClose();
@@ -177,6 +198,15 @@ export const MobileFilterModal = ({
                             placeholder={t('selectCounty')}
                             ariaLabel={t('selectCounty')}
                             className="w-full"
+                            contentClassName={SHEET_SELECT_CONTENT_CLASS}
+                        />
+
+                        <LanguageSelect
+                            value={selectedLanguage}
+                            onChange={onLanguageChange}
+                            counts={languageCounts}
+                            className="w-full"
+                            contentClassName={SHEET_SELECT_CONTENT_CLASS}
                         />
                     </div>
 

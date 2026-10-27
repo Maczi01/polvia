@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { categoryEnum, coverageEnum, statusEnum, voivodeshipEnum } from '@/db/schema';
+import { SERVICE_LANGUAGES } from '@/lib/languages';
 
 /**
  * Czysta warstwa walidacji formularza uslugi.
@@ -38,7 +39,7 @@ export const serviceSchema = z
         status: z.enum(statusValues as [string, ...string[]]).default('active'),
         webpage: optionalText(255),
         nip: optionalText(10),
-        languages: z.array(z.string()).default(['pl']),
+        languages: z.array(z.enum(SERVICE_LANGUAGES)).default(['pl']),
         whatsappNumber: optionalText(20),
         socials: z
             .object({
@@ -109,6 +110,12 @@ export const serviceSchema = z
 
 export type ServiceFormData = z.infer<typeof serviceSchema>;
 
+/**
+ * `FormData.getAll()` zwraca `FormDataEntryValue[]` (string | File). Plik w polu tekstowym
+ * pomijamy zamiast rzutowac — poprawnosc samych kodow sprawdza dopiero Zod (`z.enum`).
+ */
+const isText = (value: FormDataEntryValue): value is string => typeof value === 'string';
+
 export function parseRawServiceData(formData: FormData) {
     const raw = {
         name: formData.get('name') as string,
@@ -117,7 +124,7 @@ export function parseRawServiceData(formData: FormData) {
         status: (formData.get('status') as string) || 'active',
         webpage: formData.get('webpage') as string,
         nip: formData.get('nip') as string,
-        languages: formData.getAll('languages') as string[],
+        languages: formData.getAll('languages').filter(isText),
         whatsappNumber: formData.get('whatsappNumber') as string,
         socials: {
             instagram: formData.get('socials.instagram') as string,

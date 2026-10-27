@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { cn } from '@/lib/utilities';
+import { LANGUAGE_FLAG_PATHS, toServiceLanguages } from '@/lib/languages';
 import { Button } from '@/components/ui/button/button';
 import { mapCategoryToBadgeColor, VOIVODESHIP_TO_MESSAGE_KEY } from '@/lib/consts';
 import { Clock, Globe, Mail, MapPin, Phone, MessageCircle, Navigation, Send } from 'lucide-react';
@@ -40,14 +41,6 @@ const MOBILE_COLLAPSED_TAG_LIMIT = 2;
 
 /** Czytaj wylacznie w event handlerach — nigdy w renderze. */
 const isMobileViewport = (): boolean => window.innerWidth < MOBILE_BREAKPOINT_PX;
-
-const LANGUAGE_FLAGS: Record<string, { src: string; alt: string }> = {
-    pl: { src: '/icons/pl.svg', alt: 'Polish' },
-    en: { src: '/icons/gb.svg', alt: 'English' },
-    ru: { src: '/icons/ru.svg', alt: 'Russian' },
-    uk: { src: '/icons/ua.svg', alt: 'Ukrainian' },
-    be: { src: '/icons/by.svg', alt: 'Belarusian' },
-};
 
 const FacebookIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 24 24" className={className} width="18" height="18" fill="currentColor">
@@ -188,6 +181,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         const [isExpanding, setIsExpanding] = useState(false);
         const t = useTranslations('MapCard');
         const tCounties = useTranslations('MapPage.counties');
+        const tLanguages = useTranslations('addBusiness.languages');
 
         const COLLAPSE_MS = 300;
 
@@ -198,6 +192,7 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
         }, [voivodeship, tCounties]);
 
         const todayHours = useMemo(() => getTodayHours(openingHours), [openingHours]);
+        const serviceLanguages = useMemo(() => toServiceLanguages(languages), [languages]);
 
         useEffect(() => {
             const content = contentRef.current;
@@ -620,26 +615,22 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
                             </div>
 
                             {/* Languages - top right */}
-                            {languages && languages.length > 0 && (
+                            {serviceLanguages.length > 0 && (
                                 <div className="flex shrink-0 flex-col items-end">
                                     <span className="text-xs font-semibold tracking-wider text-gray-400 dark:text-gray-500">
                                         {t('languages')}
                                     </span>
                                     <div className="mt-1.5 flex gap-1.5">
-                                        {languages.map(lang => {
-                                            const flag = LANGUAGE_FLAGS[lang];
-                                            if (!flag) return null;
-                                            return (
-                                                <Image
-                                                    key={lang}
-                                                    src={flag.src}
-                                                    alt={flag.alt}
-                                                    width={28}
-                                                    height={20}
-                                                    className="rounded-sm"
-                                                />
-                                            );
-                                        })}
+                                        {serviceLanguages.map(lang => (
+                                            <Image
+                                                key={lang}
+                                                src={LANGUAGE_FLAG_PATHS[lang]}
+                                                alt={tLanguages(lang)}
+                                                width={28}
+                                                height={20}
+                                                className="rounded-sm"
+                                            />
+                                        ))}
                                     </div>
                                 </div>
                             )}

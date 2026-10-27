@@ -6,9 +6,14 @@
  * a klient bierze stad wylacznie liczby i listy.
  */
 
-/** Jezyki obslugi klienta — te same kody co locale katalogu (`klasyfikacja.md`). */
-export const LANGUAGE_CODES = ['pl', 'uk', 'en', 'ru'] as const;
-export type LanguageCode = (typeof LANGUAGE_CODES)[number];
+/**
+ * Jezyki obslugi klienta — lista z `@/lib/languages` (z `be`, ktory NIE jest locale katalogu).
+ * Nazwy `LANGUAGE_CODES`/`LanguageCode` zostaja, zeby importerzy formularza ich nie zmieniali.
+ */
+export {
+    SERVICE_LANGUAGES as LANGUAGE_CODES,
+    type ServiceLanguage as LanguageCode,
+} from '@/lib/languages';
 
 /** Uwagi wlasciciela dla operatora (krok edycji). */
 export const NOTES_MAX_LENGTH = 2000;

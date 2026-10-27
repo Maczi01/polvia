@@ -70,6 +70,8 @@
     "showList": "List",
     "filter": "Filters",
     "selectCounty": "Select location",
+    "languageFilter": "Service language",
+    "anyLanguage": "Any language",
     "search": "Search...",
     "title": "Services Map - Polvia",
     "titleSuffix": "Map",
@@ -684,7 +686,8 @@
       "pl": "Polish",
       "uk": "Ukrainian",
       "en": "English",
-      "ru": "Russian"
+      "ru": "Russian",
+      "be": "Belarusian"
     },
     "coverage": {
       "local": "On site",
@@ -816,7 +819,8 @@
         "pl": "Polish",
         "uk": "Ukrainian",
         "en": "English",
-        "ru": "Russian"
+        "ru": "Russian",
+        "be": "Belarusian"
       },
       "review": "The listing will appear in the directory after our team has reviewed it. If we have any questions, we will write to this address.",
       "correction": "If anything is incorrect, simply reply to this message.",

@@ -42,6 +42,22 @@ describe('<BusinessCardPreview />', () => {
         expect(screen.queryByText('do uzupełnienia')).not.toBeInTheDocument();
     });
 
+    it('bialoruski jako jezyk obslugi: flaga z altem w jezyku strony, opis dalej po locale', () => {
+        renderPreview({ preview: { ...PREVIEW_FIXTURE, languages: ['pl', 'be'] } });
+
+        expect(screen.getByRole('img', { name: 'polski' })).toHaveAttribute(
+            'src',
+            expect.stringContaining('pl.svg'),
+        );
+        expect(screen.getByRole('img', { name: 'białoruski' })).toHaveAttribute(
+            'src',
+            expect.stringContaining('by.svg'),
+        );
+        expect(
+            screen.getByText('Kawiarnia z ukraińskimi wypiekami w centrum Gdańska.'),
+        ).toBeInTheDocument();
+    });
+
     it('pole niepotwierdzone ma widoczny znacznik „do uzupelnienia" przy etykiecie', () => {
         renderPreview({
             preview: { ...PREVIEW_FIXTURE, phoneNumber: null },

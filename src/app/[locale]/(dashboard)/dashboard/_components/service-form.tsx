@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select/select';
 import { createService, updateService, createTag, type ActionResult, type Tag, type ServiceEditData } from '../_actions';
 import { CATEGORY_VALUES } from '@/lib/categories';
+import { LANGUAGE_OPTIONS } from './language-options';
 
 const statuses = ['active', 'inactive', 'pending'] as const;
 
@@ -55,13 +56,6 @@ const voivodeships = [
     { value: 'wielkopolskie', label: 'Wielkopolskie' },
     { value: 'zachodniopomorskie', label: 'Zachodniopomorskie' },
 ] as const;
-
-const languages = [
-    { value: 'pl', label: 'Polish' },
-    { value: 'en', label: 'English' },
-    { value: 'uk', label: 'Ukrainian' },
-    { value: 'ru', label: 'Russian' },
-];
 
 const initialState: ActionResult = { success: false, message: '' };
 
@@ -267,7 +261,7 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                 <div className="space-y-2">
                     <Label>Languages</Label>
                     <div className="flex flex-wrap gap-3">
-                        {languages.map((lang) => (
+                        {LANGUAGE_OPTIONS.map((lang) => (
                             <label key={lang.value} className="flex cursor-pointer items-center gap-2">
                                 <input
                                     type="checkbox"

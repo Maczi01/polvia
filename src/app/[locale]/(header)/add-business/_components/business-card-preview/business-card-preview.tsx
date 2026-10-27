@@ -7,10 +7,11 @@ import type { JSX, ReactNode } from 'react';
 
 import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
+import { type Locale, locales } from '@/i18n/config';
 import type { FactField } from '@/lib/add-business/draft-schema';
-import { LANGUAGE_CODES, type LanguageCode } from '@/lib/add-business/form-limits';
 import type { BusinessPreview, DraftPin } from '@/lib/add-business/types';
 import { CATEGORY_DEFINITIONS } from '@/lib/categories';
+import { LANGUAGE_FLAG_PATHS } from '@/lib/languages';
 import { cn } from '@/lib/utilities';
 import { WEEKDAY_KEYS } from '@/lib/weekdays';
 
@@ -29,13 +30,6 @@ import { StaticMapPin } from './static-map-pin';
  * bywa prostokatne), dni tygodnia z malej litery (karta szuka `Monday` i nie pokazuje
  * godzin — znany dlug, plan U9).
  */
-
-const LANGUAGE_FLAGS: Record<LanguageCode, string> = {
-    pl: '/icons/pl.svg',
-    en: '/icons/gb.svg',
-    ru: '/icons/ru.svg',
-    uk: '/icons/ua.svg',
-};
 
 const DEFAULT_LOGO = '/default.png';
 
@@ -103,7 +97,8 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
     const t = useTranslations('addBusiness');
     const tCard = useTranslations('MapCard');
     const locale = useLocale();
-    const language: LanguageCode = hasLocale(LANGUAGE_CODES, locale) ? locale : 'pl';
+    // Locale TRESCI (opisy, tagi), nie jezyk obslugi — `be` nie ma wersji katalogu.
+    const contentLocale: Locale = hasLocale(locales, locale) ? locale : 'pl';
 
     const isPending = (...fields: FactField[]): boolean =>
         fields.some(field => unconfirmed.includes(field));
@@ -112,7 +107,7 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
     const servesRemotely = preview.coverage === 'online' || preview.coverage === 'hybrid';
     const badgeColor = CATEGORY_DEFINITIONS[preview.category].badgeColor;
     const image = logoSrc ?? DEFAULT_LOGO;
-    const description = preview.descriptions[language];
+    const description = preview.descriptions[contentLocale];
 
     return (
         <Card
@@ -216,7 +211,7 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
                                 {preview.languages.map(code => (
                                     <Image
                                         key={code}
-                                        src={LANGUAGE_FLAGS[code]}
+                                        src={LANGUAGE_FLAG_PATHS[code]}
                                         alt={t(`languages.${code}`)}
                                         width={28}
                                         height={20}
@@ -231,7 +226,7 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
                 {preview.tags.length > 0 && (
                     <div className="flex flex-wrap gap-2">
                         {preview.tags.map(tag => (
-                            <Badge key={tag.pl} label={tag[language]} variant={badgeColor} />
+                            <Badge key={tag.pl} label={tag[contentLocale]} variant={badgeColor} />
                         ))}
                     </div>
                 )}

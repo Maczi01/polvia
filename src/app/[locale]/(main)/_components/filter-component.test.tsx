@@ -1,11 +1,14 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { axe, toHaveNoViolations } from 'jest-axe';
 import { AppRouterContext } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { NextIntlClientProvider } from 'next-intl';
-import { NuqsTestingAdapter } from 'nuqs/adapters/testing';
+import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 
 import { FilterComponent } from './filter-component';
 import messages from '../../../../../messages/pl.json';
 import type { MapFilters } from '@/lib/map-slug-parser';
+
+expect.extend(toHaveNoViolations);
 
 // useRouter z next/navigation rzuca bez zamontowanego App Routera. Filtry nie
 // nawiguja routerem (pushState), wiec stub tylko musi istniec.
@@ -50,20 +53,32 @@ function mockGeometry(tileLeft: number): void {
     });
 }
 
-async function renderFilters(initialFilters: MapFilters): Promise<void> {
+type RenderOptions = {
+    /** Query string widziany przez nuqs, np. `?lang=ru`. */
+    searchParams?: string;
+    onUrlUpdate?: (event: UrlUpdateEvent) => void;
+};
+
+async function renderFilters(
+    initialFilters: MapFilters,
+    { searchParams = '', onUrlUpdate }: RenderOptions = {},
+): Promise<ReturnType<typeof render>> {
+    let result: ReturnType<typeof render> | undefined;
     // Modal filtrow idzie przez next/dynamic (React.lazy) — async act czeka, az
     // leniwy modul sie rozwiaze, zanim test zacznie asercje.
     await act(async () => {
-        render(
+        result = render(
             <AppRouterContext.Provider value={ROUTER_STUB}>
                 <NextIntlClientProvider locale="pl" messages={messages}>
-                    <NuqsTestingAdapter>
+                    <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate}>
                         <FilterComponent initialFilters={initialFilters} totalCount={0} />
                     </NuqsTestingAdapter>
                 </NextIntlClientProvider>
             </AppRouterContext.Provider>,
         );
     });
+    if (!result) throw new Error('render() nie zwrocil wyniku');
+    return result;
 }
 
 describe('<FilterComponent /> — pasek kategorii', () => {
@@ -117,5 +132,55 @@ describe('<FilterComponent /> — pasek kategorii', () => {
         const prawne = screen.getAllByRole('button', { name: /Prawne/ });
         expect(prawne.length).toBeGreaterThan(0);
         prawne.forEach(button => expect(button).toHaveAttribute('aria-pressed', 'true'));
+    });
+});
+
+// R13: „Usuń filtry" obejmuje jezyk obslugi, ktory zyje w `?lang`, a nie w sciezce.
+describe('<FilterComponent /> — jezyk obslugi a „Usuń filtry"', () => {
+    beforeAll(() => {
+        jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    });
+
+    // Desktopowy kafel ma nazwe z samego tekstu; mobilny przycisk to „Resetuj".
+    const removeFilters = (): HTMLElement => screen.getByRole('button', { name: 'Usuń filtry' });
+
+    it('bez zadnego filtra przycisk jest nieaktywny', async () => {
+        await renderFilters(NO_FILTERS);
+
+        expect(removeFilters()).toBeDisabled();
+    });
+
+    it('sam ?lang=ru wlacza przycisk na desktopie i reset na mobile', async () => {
+        await renderFilters(NO_FILTERS, { searchParams: '?lang=ru' });
+
+        expect(removeFilters()).toBeEnabled();
+        expect(screen.getByRole('button', { name: /Resetuj/ })).toBeInTheDocument();
+    });
+
+    it('klik zdejmuje ?lang z adresu', async () => {
+        const onUrlUpdate = jest.fn<void, [UrlUpdateEvent]>();
+        await renderFilters(NO_FILTERS, { searchParams: '?lang=ru', onUrlUpdate });
+
+        await act(async () => {
+            fireEvent.click(removeFilters());
+        });
+
+        expect(onUrlUpdate).toHaveBeenCalled();
+        const lastUpdate = onUrlUpdate.mock.calls.at(-1)?.[0];
+        expect(lastUpdate?.searchParams.has('lang')).toBe(false);
+        expect(removeFilters()).toBeDisabled();
+    });
+
+    it('dropdown jezyka stoi w pasku desktop z wybranym jezykiem i bez naruszen a11y', async () => {
+        const { container } = await renderFilters(NO_FILTERS, { searchParams: '?lang=uk' });
+
+        // Arkusz mobilny stoi w DOM przed paskiem desktop — pasek bierzemy spoza dialogu.
+        const desktopSelect = screen
+            .getAllByRole('combobox', { name: 'Język obsługi: Українська' })
+            .find(element => !element.closest('[role="dialog"]'));
+        // Kompaktowy wyzwalacz: kod zamiast endonimu, endonim niesie nazwa dostepna.
+        expect(desktopSelect).toHaveTextContent('UK');
+        expect(desktopSelect).not.toHaveTextContent('Українська');
+        expect(await axe(container)).toHaveNoViolations();
     });
 });

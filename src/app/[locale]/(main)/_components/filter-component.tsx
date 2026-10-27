@@ -11,6 +11,8 @@ import { useQueryState } from 'nuqs';
 import { ViewSwitcher } from '@/app/[locale]/(main)/_components/view-switcher/view-switcher';
 import { Button } from '@/components/ui/button/button';
 import { ButtonCategory } from '@/app/[locale]/(main)/_components/button-category/button-category';
+import { LanguageSelect } from '@/app/[locale]/(main)/_components/language-select/language-select';
+import { useLanguageFilter } from '@/hooks/use-language-filter';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from '@/i18n/navigation';
@@ -18,6 +20,7 @@ import { buildMapUrl, localePathPrefix, localizedMapBasePath, localizeMapPath } 
 import { normalizeCountySlug } from '@/lib/slug-mappings';
 import type { MapFilters } from '@/lib/map-slug-parser';
 import type { Locale } from '@/i18n/config';
+import type { ServiceLanguage } from '@/lib/languages';
 
 const MobileFilterModal = dynamic(
     () =>
@@ -34,6 +37,8 @@ type FilterComponentProps = {
     categoryCounts?: Record<string, number>;
     /** Suma kart przy aktualnych filtrach — etykieta stopki arkusza mobilnego. */
     totalCount: number;
+    /** Liczba kart per jezyk obslugi przy pozostalych aktywnych filtrach. */
+    languageCounts?: Record<ServiceLanguage, number>;
 };
 
 export function FilterComponent({
@@ -41,6 +46,7 @@ export function FilterComponent({
     onFiltersChange,
     categoryCounts,
     totalCount,
+    languageCounts,
 }: FilterComponentProps) {
     const t = useTranslations('MapPage');
     const locale = useLocale() as Locale;
@@ -56,6 +62,8 @@ export function FilterComponent({
     // Keep query params for search, id, and view
     const [searchInput, setSearchInput] = useQueryState('query', { defaultValue: '' });
     const [selectedId, setSelectedId] = useQueryState('id', { defaultValue: '' });
+    // Jezyk zyje w `?lang`, nie w sciezce — pushState filtrow go zachowuje (R7).
+    const [language, setLanguage] = useLanguageFilter();
 
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
@@ -141,6 +149,9 @@ export function FilterComponent({
         // Clear query params
         setSearchInput(null);
         setSelectedId(null);
+        // Jawnie: pushState nizej przepisuje `window.location.search`, wiec bez tego
+        // `?lang` przezylby reset (R13).
+        setLanguage(null);
 
         // Clear filter state immediately
         setSelectedCategory(null);
@@ -155,7 +166,7 @@ export function FilterComponent({
         // query i id czysci nuqs wyzej; zostaje reszta, np. view
         const basePath = localizedMapBasePath(locale);
         window.history.pushState({}, '', `${basePath}${window.location.search}`);
-    }, [setSearchInput, setSelectedId, locale, onFiltersChange]);
+    }, [setSearchInput, setSelectedId, setLanguage, locale, onFiltersChange]);
 
     const clearCategories = useCallback(() => {
         // Navigate to update URL (state will sync via useEffect)
@@ -306,7 +317,7 @@ export function FilterComponent({
     }, []);
 
     const hasActiveFilters =
-        selectedCategory || searchInput || selectedCounty || selectedCity || onlineOnly;
+        selectedCategory || searchInput || selectedCounty || selectedCity || onlineOnly || language;
 
     return (
         <>
@@ -328,6 +339,9 @@ export function FilterComponent({
                 clearCategories={clearCategories}
                 categoryCounts={categoryCounts}
                 totalCount={totalCount}
+                selectedLanguage={language}
+                onLanguageChange={setLanguage}
+                languageCounts={languageCounts}
             />
 
 
@@ -409,8 +423,8 @@ export function FilterComponent({
             <div className="hidden md:block">
                 <div className="w-full max-w-full overflow-x-hidden bg-[#F6F6F7] px-3 pb-4 pt-2 dark:bg-[#111827]">
                     <div className="flex flex-row flex-nowrap items-center gap-x-4">
-                        <div className="flex w-1/4 flex-none items-center gap-x-4">
-                            <div className="w-1/2">
+                        <div className="flex w-1/2 flex-none items-center gap-x-4 xl:w-2/5">
+                            <div className="min-w-0 flex-1">
                                 <Input
                                     value={searchInput || ''}
                                     onChange={event => setSearchInput(event.target.value)}
@@ -424,7 +438,7 @@ export function FilterComponent({
                                     }}
                                 />
                             </div>
-                            <div className="w-1/2">
+                            <div className="min-w-0 flex-1">
                                 <SelectScrollable
                                     value={selectedCity ? `city:${selectedCity}` : selectedCounty || ''}
                                     onValueChange={handleCountyChange}
@@ -433,9 +447,18 @@ export function FilterComponent({
                                     className="w-36 md:w-full"
                                 />
                             </div>
+                            {/* R15: kompaktowy dropdown obok lokalizacji, nie kolejne chipy. */}
+                            <div className="flex-none">
+                                <LanguageSelect
+                                    value={language}
+                                    onChange={setLanguage}
+                                    counts={languageCounts}
+                                    variant="compact"
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex w-3/4 min-w-0 items-center gap-x-4">
+                        <div className="flex min-w-0 flex-1 items-center gap-x-4">
                             {isScrollable && (
                                 <button
                                     className="flex-none rounded-full border border-gray-200 bg-white p-2 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"

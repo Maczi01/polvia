@@ -70,6 +70,8 @@
     "showList": "Lista",
     "filter": "Filtry",
     "selectCounty": "Wybierz lokalizację",
+    "languageFilter": "Język obsługi",
+    "anyLanguage": "Dowolny język",
     "search": "Szukaj...",
     "title": "Mapa Usług - Polvia",
     "titleSuffix": "- mapa",
@@ -685,7 +687,8 @@
       "pl": "polski",
       "uk": "ukraiński",
       "en": "angielski",
-      "ru": "rosyjski"
+      "ru": "rosyjski",
+      "be": "białoruski"
     },
     "coverage": {
       "local": "Na miejscu",
@@ -817,7 +820,8 @@
         "pl": "polski",
         "uk": "ukraiński",
         "en": "angielski",
-        "ru": "rosyjski"
+        "ru": "rosyjski",
+        "be": "białoruski"
       },
       "review": "Wpis pojawi się w katalogu po weryfikacji przez nasz zespół. Jeśli będziemy mieć pytania, napiszemy na ten adres.",
       "correction": "Jeśli coś się nie zgadza, po prostu odpowiedz na tę wiadomość.",

@@ -1,3 +1,4 @@
+import type { ServiceLanguage } from '@/lib/languages';
 import { foldForSearch } from '@/lib/search-text';
 import type { PartialService } from '@/types';
 
@@ -20,6 +21,8 @@ export type CoverageFilters = {
     city?: string | null;
     /** Zawezenie do samych uslug zdalnych — oproznia liste lokalna. */
     onlineOnly?: boolean | null;
+    /** Jezyk obslugi — trzecia os obok kategorii i zasiegu, dziala na oba kubelki (R1). */
+    language?: ServiceLanguage | null;
 };
 
 export type CoverageBuckets = {
@@ -94,6 +97,21 @@ function matchesCategory(item: PartialService, category: string): boolean {
 }
 
 /**
+ * Czy wpis obsluguje klienta w wybranym jezyku. Brak wyboru przepuszcza kazdy wpis.
+ *
+ * Eksportowana, bo te sama regule stosuja wyniki semantyczne — jeden predykat,
+ * zero kopii (lekcja z `matchesServiceLocation`). Dopasowanie "zawiera" jest odporne
+ * na duplikaty i nieznane kody w kolumnie `languages` — danych nie przepisujemy.
+ */
+export function matchesLanguage(
+    item: PartialService,
+    language: ServiceLanguage | null | undefined,
+): boolean {
+    if (!language) return true;
+    return item.languages.includes(language);
+}
+
+/**
  * Czy wpis lezy w miejscu wybranym w filtrach. Miasto ma priorytet nad wojewodztwem.
  *
  * Eksportowana, bo tej samej reguly potrzebuje mapa. Sekcja online celowo ignoruje
@@ -112,6 +130,26 @@ export function matchesServiceLocation(
     if (county) return item.voivodeship?.toLowerCase() === county.toLowerCase();
 
     return true;
+}
+
+/**
+ * Wyniki semantyczne zawezone tymi samymi predykatami co lista: miejsce, kategoria i jezyk.
+ *
+ * Bez filtra tekstowego — to juz sa wyniki wyszukiwania — i bez kubelkowania po zasiegu.
+ * Wczesniej komponent powtarzal tu regule miejsca i kategorii; jedna funkcja, zeby os
+ * jezyka (i kazda nastepna) nie musiala byc dopisywana w dwoch miejscach.
+ */
+export function filterSemanticResults(
+    results: PartialService[],
+    filters: CoverageFilters,
+): PartialService[] {
+    const category = filters.category ?? '';
+    return results.filter(
+        item =>
+            matchesServiceLocation(item, filters) &&
+            matchesCategory(item, category) &&
+            matchesLanguage(item, filters.language),
+    );
 }
 
 /**
@@ -135,9 +173,12 @@ export function splitServicesByCoverage(
     const terms = toSearchTerms(filters.query ?? '');
     const category = filters.category ?? '';
 
-    // Kategoria i tekst dzialaja na OBA kubelki — zasieg jest ortogonalny (R2, R7).
+    // Kategoria, tekst i jezyk dzialaja na OBA kubelki — zasieg jest ortogonalny (R2, R7).
     const matching = services.filter(
-        item => matchesQuery(item, terms) && matchesCategory(item, category),
+        item =>
+            matchesCategory(item, category) &&
+            matchesLanguage(item, filters.language) &&
+            matchesQuery(item, terms),
     );
 
     // Lista lokalna: tylko wpisy, ktore mozna odwiedzic, i tylko w wybranym miejscu.

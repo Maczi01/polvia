@@ -33,6 +33,8 @@ function renderModal(overrides: Partial<ModalProps> = {}): ReturnType<typeof ren
         onOnlineToggle: jest.fn(),
         clearCategories: jest.fn(),
         totalCount: 0,
+        selectedLanguage: null,
+        onLanguageChange: jest.fn(),
         ...overrides,
     };
     return render(<MobileFilterModal {...props} />);
@@ -76,6 +78,19 @@ describe('<MobileFilterModal />', () => {
         await userEvent.keyboard('{Escape}');
 
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('Escape z otwartej listy wojewodztw zamyka liste, nie arkusz', async () => {
+        const onClose = jest.fn();
+        renderModal({ isOpen: true, onClose });
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'selectCounty' }));
+        expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+        await userEvent.keyboard('{Escape}');
+
+        expect(screen.queryByRole('listbox')).toBeNull();
+        expect(onClose).not.toHaveBeenCalled();
     });
 
     it('Tab na ostatniej kontrolce wraca na pierwsza, Shift+Tab na pierwszej idzie na ostatnia', async () => {
@@ -171,6 +186,26 @@ describe('<MobileFilterModal />', () => {
             expect(screen.getByRole('button', { name: nazwa })).toBeEnabled();
         });
 
+        it('nie rusza wybranego jezyka obslugi', async () => {
+            const clearCategories = jest.fn();
+            const onLanguageChange = jest.fn();
+            renderModal({
+                isOpen: true,
+                selectedCategory: 'law',
+                selectedLanguage: 'ru',
+                clearCategories,
+                onLanguageChange,
+            });
+
+            await userEvent.click(screen.getByRole('button', { name: nazwa }));
+
+            expect(clearCategories).toHaveBeenCalledTimes(1);
+            expect(onLanguageChange).not.toHaveBeenCalled();
+            expect(screen.getByRole('combobox', { name: /^languageFilter: / })).toHaveTextContent(
+                'Русский',
+            );
+        });
+
         it('czysci kategorie, nie reszte filtrow', async () => {
             const clearCategories = jest.fn();
             renderModal({ isOpen: true, selectedCategory: 'law', clearCategories });
@@ -180,4 +215,75 @@ describe('<MobileFilterModal />', () => {
             expect(clearCategories).toHaveBeenCalledTimes(1);
         });
     });
+
+    // R14: ten sam filtr jezyka co na desktopie, z licznikami per jezyk.
+    describe('filtr jezyka obslugi', () => {
+        it('arkusz ma wybor jezyka z licznikami', async () => {
+            renderModal({
+                isOpen: true,
+                languageCounts: { pl: 4, uk: 2, ru: 1, en: 0, be: 0 },
+            });
+
+            const select = screen.getByRole('combobox', { name: /^languageFilter: / });
+            expect(select).toHaveTextContent('anyLanguage');
+            await userEvent.click(select);
+
+            expect(screen.getByRole('option', { name: 'Українська (2)' })).toBeInTheDocument();
+        });
+
+        it('wybor jezyka oddaje kod rodzicowi i nie zamyka arkusza', async () => {
+            const onClose = jest.fn();
+            const onLanguageChange = jest.fn();
+            renderModal({ isOpen: true, onClose, onLanguageChange });
+
+            await userEvent.click(screen.getByRole('combobox', { name: /^languageFilter: / }));
+            await userEvent.click(screen.getByRole('option', { name: 'Русский' }));
+
+            expect(onLanguageChange).toHaveBeenCalledWith('ru');
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        // Regresja (review fazy 4, P2): zdarzenia React bablkuja przez portal wzdluz
+        // drzewa komponentow, wiec Escape z listy opcji (portal do `body`) trafial do
+        // `onKeyDown` dialogu — select zamykal sie razem z calym arkuszem.
+        it('Escape z otwartej listy jezykow zamyka liste, nie arkusz', async () => {
+            const onClose = jest.fn();
+            renderModal({ isOpen: true, onClose });
+
+            await userEvent.click(screen.getByRole('combobox', { name: /^languageFilter: / }));
+            expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+            await userEvent.keyboard('{Escape}');
+
+            expect(screen.queryByRole('listbox')).toBeNull();
+            expect(onClose).not.toHaveBeenCalled();
+        });
+
+        it('otwarty arkusz z wybranym jezykiem nie ma naruszen dostepnosci', async () => {
+            const { container } = renderModal({ isOpen: true, selectedLanguage: 'be' });
+
+            expect(await axe(container)).toHaveNoViolations();
+        });
+
+        // Regresja (review fazy 4, P2): lista opcji portaluje sie do `body` i stoi w jednym
+        // stosie z nakladka arkusza. jsdom nie liczy stosu (elementFromPoint, z-index), wiec
+        // wyjatkowo porownujemy klasy: z-index listy musi byc wyzszy niz nakladki arkusza.
+        it.each([
+            ['jezyka', /^languageFilter: /],
+            ['lokalizacji', 'selectCounty'],
+        ])('lista selecta %s otwiera sie NAD arkuszem', async (_nazwa, comboboxName) => {
+            renderModal({ isOpen: true });
+            const overlay = screen.getByRole('dialog').parentElement;
+
+            await userEvent.click(screen.getByRole('combobox', { name: comboboxName }));
+
+            expect(zIndexOf(screen.getByRole('listbox'))).toBeGreaterThan(zIndexOf(overlay));
+        });
+    });
 });
+
+function zIndexOf(element: Element | null): number {
+    const match = element?.className.match(/(?:^|\s)z-\[(\d+)\]/);
+    if (!match) throw new Error('Element nie ma klasy z-[N]');
+    return Number(match[1]);
+}

@@ -1,4 +1,11 @@
-import { matchesServiceLocation, splitServicesByCoverage } from '@/lib/service-coverage';
+import { SERVICE_LANGUAGES } from '@/lib/languages';
+import {
+    type CoverageFilters,
+    filterSemanticResults,
+    matchesLanguage,
+    matchesServiceLocation,
+    splitServicesByCoverage,
+} from '@/lib/service-coverage';
 import type { Coverage, PartialService } from '@/types';
 
 let counter = 0;
@@ -368,6 +375,165 @@ describe('splitServicesByCoverage', () => {
 
         expect(localResults).toHaveLength(0);
         expect(onlineResults).toHaveLength(0);
+    });
+
+    describe('jezyk obslugi jest trzecia osia filtra (R1, R6, R12)', () => {
+        it('wybrany jezyk zostawia tylko wpisy z tym jezykiem w obu kubelkach', () => {
+            const localRu = service({ coverage: 'local', languages: ['pl', 'ru'] });
+            const localPl = service({ coverage: 'local', languages: ['pl'] });
+            const onlineRu = service({ coverage: 'online', languages: ['ru'] });
+            const onlineUk = service({ coverage: 'online', languages: ['uk', 'en'] });
+
+            const { localResults, onlineResults } = splitServicesByCoverage(
+                [localRu, localPl, onlineRu, onlineUk],
+                { ...NO_FILTERS, language: 'ru' },
+            );
+
+            expect(ids(localResults)).toEqual([localRu.id]);
+            expect(ids(onlineResults)).toEqual([onlineRu.id]);
+        });
+
+        it('language: null i brak pola daja wynik sprzed wprowadzenia osi jezyka', () => {
+            const catalog = [
+                service({ coverage: 'local', languages: ['pl'] }),
+                service({ coverage: 'local', languages: [] }),
+                service({ coverage: 'online', languages: ['de'] }),
+                service({ coverage: 'hybrid', city: 'Gdansk', voivodeship: 'pomorskie' }),
+            ];
+
+            const withNull = splitServicesByCoverage(catalog, { ...NO_FILTERS, language: null });
+            const withoutField = splitServicesByCoverage(catalog, NO_FILTERS);
+
+            expect(withNull.localResults).toHaveLength(3);
+            expect(withNull.onlineResults).toHaveLength(1);
+            expect(ids(withoutField.localResults)).toEqual(ids(withNull.localResults));
+            expect(ids(withoutField.onlineResults)).toEqual(ids(withNull.onlineResults));
+        });
+
+        it('kategoria + miasto + jezyk zaweza do przeciecia', () => {
+            const trafiony = service({ category: 'law', city: 'Warszawa', languages: ['ru'] });
+            const innyJezyk = service({ category: 'law', city: 'Warszawa', languages: ['pl'] });
+            const innaKategoria = service({
+                category: 'beauty',
+                city: 'Warszawa',
+                languages: ['ru'],
+            });
+            const inneMiasto = service({
+                category: 'law',
+                city: 'Krakow',
+                voivodeship: 'malopolskie',
+                languages: ['ru'],
+            });
+
+            const { localResults, onlineResults } = splitServicesByCoverage(
+                [trafiony, innyJezyk, innaKategoria, inneMiasto],
+                { ...NO_FILTERS, category: 'law', city: 'Warszawa', language: 'ru' },
+            );
+
+            expect(ids(localResults)).toEqual([trafiony.id]);
+            expect(onlineResults).toHaveLength(0);
+        });
+
+        it('onlineOnly + jezyk: lista lokalna pusta, sekcja online zawezona jezykiem', () => {
+            const localRu = service({ coverage: 'local', languages: ['ru'] });
+            const onlineRu = service({ coverage: 'online', languages: ['ru'] });
+            const onlinePl = service({ coverage: 'online', languages: ['pl'] });
+            const hybridRu = service({ coverage: 'hybrid', languages: ['ru', 'pl'] });
+
+            const { localResults, onlineResults } = splitServicesByCoverage(
+                [localRu, onlineRu, onlinePl, hybridRu],
+                { ...NO_FILTERS, onlineOnly: true, language: 'ru' },
+            );
+
+            expect(localResults).toHaveLength(0);
+            expect(ids(onlineResults)).toEqual([onlineRu.id, hybridRu.id]);
+        });
+
+        it('tekst + jezyk: wpis musi trafic w zapytanie ORAZ obslugiwac jezyk', () => {
+            const notariuszRu = service({ name: 'Notariusz Kowalski', languages: ['ru'] });
+            const notariuszPl = service({ name: 'Notariusz Nowak', languages: ['pl'] });
+            const fryzjerRu = service({ name: 'Fryzjer Iwanow', languages: ['ru'] });
+
+            const { localResults } = splitServicesByCoverage(
+                [notariuszRu, notariuszPl, fryzjerRu],
+                { ...NO_FILTERS, query: 'notariusz', language: 'ru' },
+            );
+
+            expect(ids(localResults)).toEqual([notariuszRu.id]);
+        });
+    });
+});
+
+// Wyniki semantyczne nie przechodza przez kubelkowanie, wiec dostaja osobna funkcje —
+// z tymi samymi predykatami miejsca, kategorii i jezyka co lista.
+describe('filterSemanticResults', () => {
+    it('bez filtrow zwraca wszystkie wyniki w kolejnosci wejsciowej', () => {
+        const pierwszy = service({ coverage: 'online' });
+        const drugi = service({ coverage: 'local' });
+
+        expect(ids(filterSemanticResults([pierwszy, drugi], NO_FILTERS))).toEqual([
+            pierwszy.id,
+            drugi.id,
+        ]);
+    });
+
+    it('wynik bez wybranego jezyka odpada przy aktywnym filtrze jezyka', () => {
+        const ru = service({ languages: ['pl', 'ru'] });
+        const pl = service({ languages: ['pl'] });
+
+        const result = filterSemanticResults([ru, pl], { ...NO_FILTERS, language: 'ru' });
+
+        expect(ids(result)).toEqual([ru.id]);
+    });
+
+    it('zaweza po miescie przed wojewodztwem i po kategorii bez wzgledu na wielkosc liter', () => {
+        const trafiony = service({ category: 'law', city: 'Warszawa' });
+        const inneMiasto = service({ category: 'law', city: 'Radom' });
+        const innaKategoria = service({ category: 'beauty', city: 'Warszawa' });
+
+        const result = filterSemanticResults([trafiony, inneMiasto, innaKategoria], {
+            ...NO_FILTERS,
+            category: 'LAW',
+            county: 'mazowieckie',
+            city: 'warszawa',
+        });
+
+        expect(ids(result)).toEqual([trafiony.id]);
+    });
+
+    it('nie stosuje filtra tekstowego — wynik semantyczny nie musi zawierac slow zapytania', () => {
+        const wynik = service({ name: 'Kancelaria Lex' });
+
+        const result = filterSemanticResults([wynik], { ...NO_FILTERS, query: 'prawnik' });
+
+        expect(ids(result)).toEqual([wynik.id]);
+    });
+});
+
+describe('matchesLanguage', () => {
+    it('bez wybranego jezyka przepuszcza kazdy wpis, takze bez jezykow', () => {
+        expect(matchesLanguage(service({ languages: [] }), null)).toBe(true);
+        // Pole nieobecne w filtrach (`undefined`) — przez obiekt, bo literalny `undefined`
+        // jako argument blokuje `unicorn/no-useless-undefined`.
+        const filtersWithoutLanguage: CoverageFilters = {};
+        const plOnly = service({ languages: ['pl'] });
+        expect(matchesLanguage(plOnly, filtersWithoutLanguage.language)).toBe(true);
+    });
+
+    it('przepuszcza wpis, ktorego lista zawiera wybrany jezyk (takze z duplikatami)', () => {
+        expect(matchesLanguage(service({ languages: ['pl', 'ru', 'ru'] }), 'ru')).toBe(true);
+    });
+
+    it('wpis bez jezykow nie pasuje do wybranego jezyka', () => {
+        expect(matchesLanguage(service({ languages: [] }), 'pl')).toBe(false);
+    });
+
+    it('wpis z samym nieznanym kodem nie pasuje do zadnego jezyka', () => {
+        const niemiecki = service({ languages: ['de'] });
+
+        for (const language of SERVICE_LANGUAGES) {
+            expect(matchesLanguage(niemiecki, language)).toBe(false);
+        }
     });
 });
 

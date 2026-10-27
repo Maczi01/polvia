@@ -165,6 +165,14 @@ describe('fromPage', () => {
 
         expect(draft.languages).toEqual(['pl']);
     });
+
+    it('bialoruski od modelu przechodzi przez schemat i jest deduplikowany', async () => {
+        const client = clientReturning({ ...MODEL_DRAFT, languages: ['be', 'be'] });
+
+        const draft = await fromPage(client, PAGE_INPUT);
+
+        expect(draft.languages).toEqual(['be']);
+    });
 });
 
 describe('fromPage — bledy', () => {
