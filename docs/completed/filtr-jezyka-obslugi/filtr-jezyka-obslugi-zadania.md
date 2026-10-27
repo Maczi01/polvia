@@ -174,7 +174,7 @@ P2 naprawić przed U4 lub razem z U4 (ten sam obszar: filtr języka zmieniany z 
 - [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów, `npx next lint` bez błędów
 - [x] `Weryfikacja:` grep — `languageFilter` i `anyLanguage` we wszystkich czterech `messages/*.json`
 - [ ] `Operator:` desktop `/mapa` — wybór „English" → `?lang=en`, liczniki chipów maleją, „wstecz" przywraca stan
-- [ ] `Operator:` mobile 390px — dropdown w arkuszu; „pokaż wyniki (N)" = lista; **lista opcji nad arkuszem (P2 #2), Escape w otwartym selekcie nie zamyka arkusza (P2 #1)** — sprawdzone 2026-10-26 przez orkiestratora (chrome-devtools, 375 px, :3001): dropdown w arkuszu ✓, wartość „Русский" z `?lang=ru` ✓, „Resetuj" aktywny przy samym `?lang` ✓, Escape ✓; lista opcji pod arkuszem ✗ (P2 #2)
+- [x] `Operator:` mobile 390px — dropdown w arkuszu; „pokaż wyniki (N)" = lista; **lista opcji nad arkuszem (P2 #2), Escape w otwartym selekcie nie zamyka arkusza (P2 #1)** — sprawdzone 2026-10-26 przez orkiestratora (chrome-devtools, 375 px, :3001): dropdown w arkuszu ✓, wartość „Русский" z `?lang=ru` ✓, „Resetuj" aktywny przy samym `?lang` ✓, Escape ✓; lista opcji pod arkuszem ✗ (P2 #2); po poprawce 2026-10-27: lista języka i lokalizacji nad arkuszem ✓
 - [ ] `Operator:` `/uk/map` — etykiety po ukraińsku, endonimy bez zmian; „Беларуская 0" → empty state, reset czyści język
 - [x] `Operator:` desktop 768–1024 px — trzy kontrolki (szukaj, lokalizacja, język) czytelne, nieobcięte (P2 #5) — sprawdzone 2026-10-27 (chrome-devtools, :3001): 1024 i 1440 OK; przy 768 „Wybierz lokalizację" nadal lekko obcięte (122 px) → P3 niżej
 
@@ -202,7 +202,7 @@ Ostatnia faza — **P2 naprawić przed merge**. #2 i #5 najpierw potwierdzić w 
 
 ## Quality gate (przed merge)
 
-- [ ] `Weryfikacja:` `npx tsc --noEmit` — 0 błędów
-- [ ] `Weryfikacja:` `npx jest` — wszystkie testy zielone
-- [ ] `Weryfikacja:` `npx next lint` — 0 błędów
-- [ ] `Weryfikacja:` brak nowych `any`, `console.log`, sekretów poza `env.ts`
+- [x] `Weryfikacja:` `npx tsc --noEmit` — 0 błędów — PASS na zmergowanym master `af573f4` (2026-10-27)
+- [x] `Weryfikacja:` `npx jest` — wszystkie testy zielone — PASS na zmergowanym master `af573f4` (2026-10-27)
+- [x] `Weryfikacja:` `npx next lint` — 0 błędów — PASS na zmergowanym master `af573f4` (2026-10-27)
+- [x] `Weryfikacja:` brak nowych `any`, `console.log`, sekretów poza `env.ts` — PASS na zmergowanym master `af573f4` (2026-10-27)

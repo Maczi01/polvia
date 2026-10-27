@@ -107,6 +107,14 @@ Query mieszkają w `src/lib/queries.ts` (i siostrzanych modułach) z `import 'se
 
 Konsekwencje w kodzie: `serviceLocationsTable.latitude`/`longitude` są **nullowalne**; mapa pokazuje piny tylko dla wpisów odwiedzalnych (`createPoints`); wyniki dzieli czysta funkcja `src/lib/service-coverage.ts`.
 
+### Język obsługi to trzecia oś filtra
+
+`servicesTable.languages` (kody z `src/lib/languages.ts`: pl, uk, ru, en, be) filtruje się przez query param **`?lang=`** (ta sama nazwa we wszystkich locale, nie segment ścieżki). Jedyny parser: `useLanguageFilter` (`src/hooks/use-language-filter.ts`); jedyny predykat: `matchesLanguage` w `src/lib/service-coverage.ts`.
+
+- **Język obsługi ≠ locale treści.** `be` jest językiem obsługi, ale nie wersją katalogu — opisy/tagi indeksuj `locales` z `@/i18n/config`, nigdy listą języków obsługi.
+- **Nowa oś filtra = wpis w `semanticSearchKey`** (`src/lib/semantic-search-key.ts`). Typ wymusza komplet osi `CoverageFilters`; oś spoza klucza czyściła wyniki semantyczne bez ponownego zapytania.
+- **Select w arkuszu mobilnym** potrzebuje `contentClassName` z wyższym z-index (lista Radix jest w portalu, arkusz ma `z-[999]`) — wzorzec w `mobile-filter-modal.tsx`.
+
 ### Mutacje
 - **Server Action** (`_actions.ts` z `'use server'`) — mutacja z UI tego repo. Zawsze: walidacja Zod + sprawdzenie uprawnień + `revalidatePath` po zapisie.
 - **Route handler** (`src/app/api/**/route.ts`) — endpoint dla zewnętrznych konsumentów. Zawsze: walidacja Zod + rate limiting (wzorzec: `src/app/api/submit-contact-query/route.ts`).
