@@ -221,7 +221,6 @@
     "titleHighlight": "Ukrainian",
     "titleEnd": "Businesses ",
     "titleSecondLine": "and Services in Poland",
-    "title": "Directory of Ukrainian Businesses and Services in Poland",
     "subtitle1": "Find businesses, specialists, and services —",
     "subtitle2": "for the Ukrainian community and for Poles looking for Ukrainian businesses.",
     "exploreMap": "Explore map",
@@ -338,7 +337,6 @@
   "Blog": {
     "title": "Blog",
     "readMore": "Read more →",
-    "noArticles": "No articles available",
     "metaTitle": "Blog - Ukrainian businesses in Poland",
     "searchPlaceholder": "Search articles...",
     "metaDescription": "Read our latest articles about Ukrainian businesses in Poland. Find local businesses, driving directions, and more.",
@@ -478,8 +476,7 @@
       "Education": "Education - Ukrainian schools and education category icon",
       "IT": "IT & Computers - Ukrainian IT and computer services category icon",
       "Others": "Other - Other Ukrainian services category icon"
-    },
-    "serviceWrapper": " logo of Ukrainian company "
+    }
   },
   "MapList": {
     "multi_location": "Multiple locations",

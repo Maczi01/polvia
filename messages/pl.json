@@ -93,7 +93,6 @@
     "contact": "Kontakt",
     "tools": "Narzędzia",
     "Newsletter": "Newsletter",
-    "Get the latest updates about our services": "Otrzymuj najnowsze informacje o naszych usługach",
     "Your email": "Twój email",
     "Cancel": "Anuluj",
     "Subscribe": "Zapisz się",
@@ -246,7 +245,6 @@
     "IT": "IT i komputery",
     "Others": "Inne",
     "RemoveFilter": "Usuń filtry",
-    "Remove": "Resetuj",
     "Categories": {
       "grocery": "Spożywcze",
       "gastronomy": "Gastronomia",
@@ -339,7 +337,6 @@
   "Blog": {
     "title": "Blog",
     "readMore": "Czytaj więcej →",
-    "noPosts": "Brak postów do wyświetlenia",
     "metaTitle": "Blog - Ukraińskie firmy w Polsce",
     "searchPlaceholder": "Szukaj artykułów",
     "metaDescription": "Blog o ukraińskich firmach w Polsce. Znajdź porady, aktualności i ciekawe historie związane z ukraińskim biznesem.",
@@ -481,7 +478,6 @@
       "Others": "Inne - ikona kategorii innych ukraińskich usług"
     }
   },
-  "serviceWrapper": " logo ukraińskiej firmy ",
   "MapList": {
     "multi_location": "Wiele lokalizacji",
     "group_locations": "{locations, plural, one {# punkt} few {# punkty} many {# punktów} other {# punktu}} w {cities, plural, one {# mieście} few {# miastach} many {# miastach} other {# miasta}}",

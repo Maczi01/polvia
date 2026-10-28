@@ -6,12 +6,9 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { env } from '../../../../../../env';
 import { Metadata } from 'next';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
+import { legacyMapRedirectPath } from '@/lib/legacy-map-redirect';
 import { buildMapMetadataPath, buildMapTitleSuffix } from '@/lib/map-metadata';
-import {
-    extractFiltersFromQueryParams,
-    type MapFilters,
-    parseMapSlug,
-} from '@/lib/map-slug-parser';
+import { type MapFilters, parseMapSlug } from '@/lib/map-slug-parser';
 import {
     buildMapUrl,
     localizedMapBasePath,
@@ -101,32 +98,9 @@ export default async function MapPage(props: PageProps) {
     }
 
     // Check for old query-based URLs and redirect to slug-based URLs
-    if (searchParams.category || searchParams.county) {
-        const oldFilters = extractFiltersFromQueryParams({
-            category: searchParams.category,
-            county: searchParams.county,
-        });
-
-        const newUrl = buildMapUrl(
-            {
-                category: oldFilters.category,
-                county: oldFilters.county,
-                query: searchParams.query as string | undefined,
-                place: searchParams.place as string | undefined,
-                view: searchParams.view as 'map' | 'list' | undefined,
-            },
-            locale as Locale,
-        );
-
-        // Jezyk obslugi przechodzi bez walidacji — parser `?lang` po stronie klienta
-        // i tak zignoruje nieznany kod (R10).
-        const { lang } = searchParams;
-        if (typeof lang === 'string' && lang.length > 0) {
-            newUrl.query = { ...newUrl.query, lang };
-        }
-
-        const localizedUrl = localizeMapPath(stringifyMapUrl(newUrl), locale as Locale);
-        redirect(`${localePrefix}${localizedUrl}`);
+    const legacyRedirect = legacyMapRedirectPath(searchParams, locale as Locale);
+    if (legacyRedirect) {
+        redirect(legacyRedirect);
     }
 
     // Parse slug-based route
