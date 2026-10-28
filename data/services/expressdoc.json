@@ -1,0 +1,61 @@
+{
+    "name": "ExpressDOC",
+    "category": "law",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "expressdoc.png",
+    "languages": ["pl", "uk", "ru"],
+
+    "translations": {
+        "pl": {
+            "description": "ExpressDOC to biuro w centrum Warszawy, przy Nowogrodzkiej, które pomaga cudzoziemcom w legalizacji pobytu. Sprawdza podstawę i dokumenty, pomaga przygotować wniosek o kartę pobytu składany przez MOS, a w wybranym pakiecie prowadzi też korespondencję i odpowiada na wezwania urzędu. Organizuje tłumaczenia przysięgłe i apostille, pomaga z PESEL, meldunkiem, Profilem Zaufanym i odwołaniami od odmowy. Pierwsza konsultacja jest bezpłatna, wizyta po wcześniejszym umówieniu. Obsługa po polsku, ukraińsku i rosyjsku."
+        },
+        "uk": {
+            "description": "ExpressDOC — офіс у центрі Варшави, на вулиці Nowogrodzka, який допомагає іноземцям із легалізацією перебування. Тут перевіряють підставу й документи, допомагають підготувати заяву на карту побиту через MOS, а в обраному пакеті ведуть листування та відповідають на запити управління. Організовують присяжні переклади й апостиль, допомагають з PESEL, мельдунком, Profil Zaufany та оскарженням відмови. Перша консультація безкоштовна, візит за попереднім записом. Обслуговування польською, українською та російською."
+        },
+        "en": {
+            "description": "ExpressDOC is an office in central Warsaw, on Nowogrodzka Street, helping foreigners legalise their stay. The team checks the legal basis and documents, helps prepare the residence card application filed via MOS, and in the chosen package also handles correspondence and responds to the office's requests. It arranges sworn translations and apostilles, and helps with PESEL, meldunek, Profil Zaufany and appeals against refusals. The first consultation is free; visits by appointment only. Service in Polish, Ukrainian and Russian."
+        },
+        "ru": {
+            "description": "ExpressDOC — офис в центре Варшавы, на улице Nowogrodzka, который помогает иностранцам с легализацией пребывания. Здесь проверяют основание и документы, помогают подготовить заявление на карту побыту через MOS, а в выбранном пакете ведут переписку и отвечают на запросы управления. Организуют присяжные переводы и апостиль, помогают с PESEL, мельдунком, Profil Zaufany и обжалованием отказа. Первая консультация бесплатная, визит по предварительной записи. Обслуживание на польском, украинском и русском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Tłumaczenia przysięgłe", "uk": "Присяжний переклад", "en": "Sworn Translations", "ru": "Присяжный перевод" },
+        { "pl": "Apostille dokumentów", "uk": "Апостиль документів", "en": "Document Apostille", "ru": "Апостиль документов" },
+        { "pl": "PESEL", "uk": "PESEL", "en": "PESEL", "ru": "PESEL" },
+        { "pl": "Meldunek", "uk": "Прописка", "en": "Residence registration", "ru": "Прописка" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Nowogrodzka 31, lok. 212",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-511",
+            "latitude": 52.2287793,
+            "longitude": 21.0137305,
+            "openingHours": {
+                "monday": { "open": "10:00", "close": "17:00" },
+                "tuesday": { "open": "10:00", "close": "17:00" },
+                "wednesday": { "open": "10:00", "close": "17:00" },
+                "thursday": { "open": "10:00", "close": "17:00" },
+                "friday": { "open": "10:00", "close": "17:00" }
+            },
+            "phoneNumber": "+48 696 890 730",
+            "email": "expressdocpl@gmail.com",
+            "webpage": "https://expressdoc.pl/uk/",
+            "nip": "9512588515",
+            "whatsappNumber": "+48696890730",
+            "socials": {
+                "telegram": "https://t.me/Olga_expressdocpl",
+                "instagram": "https://www.instagram.com/expressdoc_karta_pobytu/",
+                "youtube": "https://www.youtube.com/@Karta-pobyru-warszawa"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

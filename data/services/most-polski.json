@@ -1,0 +1,82 @@
+{
+    "name": "MOST POLSKI",
+    "category": "financial",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "most-polski.png",
+    "languages": ["pl", "uk", "ru", "en"],
+
+    "translations": {
+        "pl": {
+            "description": "MOST POLSKI to grupa firm z biurami w Warszawie i Krakowie, wspierająca obcokrajowców prowadzących działalność w Polsce. Zakres usług: zakładanie JDG i spółek z o.o., księgowość i rozliczenia podatkowe, pełna obsługa kadrowo-płacowa, zatrudnianie cudzoziemców, delegowanie pracowników do krajów UE wraz z formularzem A1, ubezpieczenia firmowe i osobowe oraz usługi kancelarii prawnej. Działa od 2015 roku. Obsługa po polsku, ukraińsku, rosyjsku i angielsku."
+        },
+        "uk": {
+            "description": "MOST POLSKI — група компаній з офісами у Варшаві та Кракові, яка допомагає іноземцям вести бізнес у Польщі. Напрямки роботи: реєстрація ФОП (JDG) і компаній Sp. z o.o., бухгалтерський облік та податкова звітність, повне кадрове й зарплатне обслуговування, працевлаштування іноземців, відрядження працівників до країн ЄС разом із формуляром A1, страхування бізнесу й особисте, а також послуги юридичної фірми. Працює з 2015 року. Обслуговування польською, українською, російською та англійською."
+        },
+        "en": {
+            "description": "MOST POLSKI is a group of companies with offices in Warsaw and Kraków, helping foreigners run a business in Poland. Services cover sole trader (JDG) and Sp. z o.o. company registration, bookkeeping and tax filings, full HR and payroll support, employment of foreign nationals, posting workers to EU countries including the A1 form, business and personal insurance, and legal services. Operating since 2015. Client service in Polish, Ukrainian, Russian and English."
+        },
+        "ru": {
+            "description": "MOST POLSKI — группа компаний с офисами в Варшаве и Кракове, помогающая иностранцам вести бизнес в Польше. Направления работы: регистрация ИП (JDG) и компаний Sp. z o.o., бухгалтерский учёт и налоговая отчётность, полное кадровое и зарплатное обслуживание, трудоустройство иностранцев, командирование работников в страны ЕС вместе с формуляром A1, страхование бизнеса и личное, а также услуги юридической фирмы. Работает с 2015 года. Обслуживание на польском, украинском, русском и английском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Księgowość", "uk": "Бухгалтерія", "en": "Accounting", "ru": "Бухгалтерия" },
+        { "pl": "Podatki", "uk": "Податки", "en": "Tax", "ru": "Налоги" },
+        { "pl": "Rejestracja firmy", "uk": "Реєстрація фірми", "en": "Business Registration", "ru": "Регистрация фирмы" },
+        { "pl": "Kadry i płace", "uk": "Кадри та зарплата", "en": "HR & Payroll", "ru": "Кадры и зарплата" },
+        { "pl": "Prawo", "uk": "Право", "en": "Legal", "ru": "Право" }
+    ],
+
+    "locations": [
+        {
+            "city": "Kraków",
+            "street": "ul. Karmelicka 57, biuro 1",
+            "voivodeship": "malopolskie",
+            "postcode": "31-128",
+            "latitude": 50.0689235,
+            "longitude": 19.926987,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "17:00" },
+                "tuesday": { "open": "09:00", "close": "17:00" },
+                "wednesday": { "open": "09:00", "close": "17:00" },
+                "thursday": { "open": "09:00", "close": "17:00" },
+                "friday": { "open": "09:00", "close": "17:00" }
+            },
+            "phoneNumber": "+48 577 001 351",
+            "email": "biuro@mostpol.com",
+            "webpage": "https://www.mostpol.com",
+            "whatsappNumber": "+48 577 001 351",
+            "socials": {
+                "facebook": "https://www.facebook.com/EvoGroupConsulting",
+                "linkedin": "https://www.linkedin.com/company/biz-evolution-pl/"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Warszawa",
+            "street": "ul. Juliana Smulikowskiego 1/3, biuro 302",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-389",
+            "latitude": 52.2374593,
+            "longitude": 21.0312163,
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "17:00" },
+                "tuesday": { "open": "09:00", "close": "17:00" },
+                "wednesday": { "open": "09:00", "close": "17:00" },
+                "thursday": { "open": "09:00", "close": "17:00" },
+                "friday": { "open": "09:00", "close": "17:00" }
+            },
+            "phoneNumber": "+48 577 001 351",
+            "email": "biuro@mostpol.com",
+            "webpage": "https://www.mostpol.com",
+            "whatsappNumber": "+48 577 001 351",
+            "socials": {
+                "facebook": "https://www.facebook.com/EvoGroupConsulting",
+                "linkedin": "https://www.linkedin.com/company/biz-evolution-pl/"
+            }
+        }
+    ]
+}

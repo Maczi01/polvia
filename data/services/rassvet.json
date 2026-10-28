@@ -1,0 +1,59 @@
+{
+    "name": "Centrum Terapii RASsvet",
+    "category": "health",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "rasvet.png",
+    "languages": ["pl", "ru", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Centrum terapii i przedszkole terapeutyczne na Mokotowie dla dzieci w spektrum autyzmu, z ADHD, mózgowym porażeniem dziecięcym, opóźnionym rozwojem mowy i innymi trudnościami rozwojowymi. Prowadzi logopedię, terapię psychologiczną i neuropsychologiczną, terapię behawioralną ABA, integrację sensoryczną, osteopatię oraz Wczesne Wspomaganie Rozwoju (WWR). Organizuje szkolenia dla rodziców, a terapię dla dzieci spoza Warszawy prowadzi także online. Obsługa po polsku, rosyjsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Терапевтичний центр і терапевтичний дитячий садок на Мокотові для дітей з розладами аутистичного спектра, СДУГ, ДЦП, затримкою мовленнєвого розвитку та іншими труднощами розвитку. Тут працюють логопеди, психологи й нейропсихологи, проводять ABA-терапію, сенсорну інтеграцію, остеопатію та програму раннього розвитку WWR. Для батьків є навчання, а дітей з інших міст можна займатися й онлайн. Обслуговування польською, російською та українською."
+        },
+        "en": {
+            "description": "Therapy centre and therapeutic preschool in Mokotów, Warsaw, for children on the autism spectrum and with ADHD, cerebral palsy, delayed speech development and other developmental difficulties. Services include speech therapy, psychological and neuropsychological therapy, ABA behavioural therapy, sensory integration, osteopathy and the early development support programme (WWR). Runs training for parents and offers online therapy for children from outside Warsaw. Service in Polish, Russian and Ukrainian."
+        },
+        "ru": {
+            "description": "Терапевтический центр и терапевтический детский сад на Мокотуве для детей с расстройствами аутистического спектра, СДВГ, ДЦП, задержкой речевого развития и другими трудностями развития. Здесь работают логопеды, психологи и нейропсихологи, проводят ABA-терапию, сенсорную интеграцию, остеопатию и программу раннего развития WWR. Для родителей проводятся обучающие курсы, а детям из других городов доступны онлайн-занятия. Обслуживание на польском, русском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Logopeda", "uk": "Логопед", "en": "Speech therapist", "ru": "Логопед" },
+        { "pl": "Psycholog", "uk": "Психолог", "en": "Psychologist", "ru": "Психолог" },
+        { "pl": "Terapia ABA", "uk": "ABA-терапія", "en": "ABA therapy", "ru": "ABA-терапия" },
+        { "pl": "Integracja sensoryczna", "uk": "Сенсорна інтеграція", "en": "Sensory integration", "ru": "Сенсорная интеграция" },
+        { "pl": "Przedszkole", "uk": "Дитячий садок", "en": "Kindergarten", "ru": "Детский сад" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Podchorążych 35",
+            "voivodeship": "mazowieckie",
+            "postcode": "00-722",
+            "latitude": 52.2094261,
+            "longitude": 21.0443517,
+            "openingHours": {
+                "monday": { "open": "08:00", "close": "19:00" },
+                "tuesday": { "open": "08:00", "close": "19:00" },
+                "wednesday": { "open": "08:00", "close": "19:00" },
+                "thursday": { "open": "08:00", "close": "19:00" },
+                "friday": { "open": "08:00", "close": "19:00" },
+                "saturday": { "open": "09:00", "close": "16:00" }
+            },
+            "phoneNumber": "+48 539 839 219",
+            "email": "rassvet.mokotow@gmail.com",
+            "webpage": "https://www.rassvet.pl",
+            "socials": {
+                "facebook": "https://www.facebook.com/rassvet.mokotow/",
+                "instagram": "https://www.instagram.com/rassvet_mokotow"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

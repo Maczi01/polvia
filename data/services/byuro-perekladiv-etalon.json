@@ -1,0 +1,61 @@
+{
+    "name": "Бюро перекладів Еталон",
+    "category": "law",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "byuro-perekladiv-etalon.png",
+    "languages": ["uk", "en", "ru"],
+
+    "translations": {
+        "pl": {
+            "name": "Biuro Tłumaczeń Etalon",
+            "description": "Biuro tłumaczeń Etalon działa od 2010 roku, ma biura w Charkowie, Kijowie i Bratysławie. Ukraińcom w Polsce pomaga w pełni zdalnie: tłumaczenia przysięgłe na polski wykonują własni tłumacze przysięgli biura, a w razie potrzeby Etalon składa za klienta wniosek o apostille w Ukrainie. Typowy pakiet to zaświadczenie o niekaralności, dyplom, akty urodzenia i małżeństwa, dokumenty do karty pobytu i PESEL. Skany przyjmuje online, gotowe dokumenty wysyła kurierem lub Nova Poshta Global. Obsługa po ukraińsku, rosyjsku i angielsku."
+        },
+        "uk": {
+            "name": "Бюро перекладів «Еталон»",
+            "description": "Бюро перекладів «Еталон» працює з 2010 року, має офіси в Харкові, Києві та Братиславі. Українцям у Польщі допомагає повністю дистанційно: присяжний переклад польською виконують власні присяжні перекладачі бюро, а за потреби «Еталон» сам подає документи на апостиль в Україні. Типовий пакет — довідка про несудимість, диплом, свідоцтва про народження та шлюб, документи для карти побиту й PESEL. Скани приймає онлайн, готові документи надсилає кур'єром або Nova Poshta Global. Обслуговування українською, російською та англійською."
+        },
+        "en": {
+            "name": "Etalon Translation Agency",
+            "description": "Etalon Translation Agency has been operating since 2010, with offices in Kharkiv, Kyiv and Bratislava. It helps Ukrainians in Poland fully remotely: sworn translations into Polish are done by the agency's own sworn translators, and where needed Etalon files the apostille application in Ukraine on the client's behalf. A typical package includes a criminal record certificate, diploma, birth and marriage certificates, and documents for a residence card and PESEL. Scans are accepted online and finished documents are sent by courier or Nova Poshta Global. Service in Ukrainian, Russian and English."
+        },
+        "ru": {
+            "name": "Бюро переводов «Эталон»",
+            "description": "Бюро переводов «Эталон» работает с 2010 года, у него офисы в Харькове, Киеве и Братиславе. Украинцам в Польше помогает полностью дистанционно: присяжный перевод на польский делают собственные присяжные переводчики бюро, а при необходимости «Эталон» сам подаёт документы на апостиль в Украине. Типичный пакет — справка о несудимости, диплом, свидетельства о рождении и браке, документы для карты побыта и PESEL. Сканы принимает онлайн, готовые документы отправляет курьером или Nova Poshta Global. Обслуживание на украинском, русском и английском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Tłumaczenia przysięgłe", "uk": "Присяжний переклад", "en": "Sworn Translations", "ru": "Присяжный перевод" },
+        { "pl": "Apostille dokumentów", "uk": "Апостиль документів", "en": "Document Apostille", "ru": "Апостиль документов" },
+        { "pl": "Tłumaczenia dokumentów", "uk": "Переклад документів", "en": "Document Translation", "ru": "Перевод документов" },
+        { "pl": "Duplikaty świadectw", "uk": "Дублікати свідоцтв", "en": "Certificate Duplicates", "ru": "Дубликаты свидетельств" },
+        { "pl": "Zaświadczenie o niekaralności", "uk": "Довідка про несудимість", "en": "Criminal Record Certificate", "ru": "Справка о несудимости" }
+    ],
+
+    "locations": [
+        {
+            "city": "Kyiv",
+            "street": "вул. Софіївська, 3-Б",
+            "postcode": "01001",
+            "openingHours": {
+                "monday": { "open": "09:00", "close": "18:00" },
+                "tuesday": { "open": "09:00", "close": "18:00" },
+                "wednesday": { "open": "09:00", "close": "18:00" },
+                "thursday": { "open": "09:00", "close": "18:00" },
+                "friday": { "open": "09:00", "close": "18:00" }
+            },
+            "phoneNumber": "+380 50 698 86 69",
+            "email": "info@etalon-agency.com",
+            "webpage": "https://etalon-agency.com/uk/services/documents-for-poland",
+            "whatsappNumber": "+380506988669",
+            "socials": {
+                "telegram": "https://t.me/translationetalon",
+                "facebook": "https://www.facebook.com/etalonagency/",
+                "instagram": "https://www.instagram.com/etalonagencycom/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

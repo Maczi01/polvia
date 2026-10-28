@@ -1,0 +1,84 @@
+{
+    "name": "SKILLDOCS",
+    "category": "law",
+    "coverage": "local",
+    "status": "active",
+    "verified": false,
+    "image": "skilldocs-sp-z-oo.png",
+    "languages": ["pl", "uk", "en", "ru"],
+
+    "translations": {
+        "pl": {
+            "description": "SKILLDOCS to firma zajmująca się kompleksową obsługą cudzoziemców w Polsce. Pomaga w legalizacji pobytu: karty pobytu czasowego i stałego, Niebieska Karta UE, łączenie rodzin, obywatelstwo polskie. Rejestruje działalność gospodarczą (JDG, Sp. z o.o.), prowadzi księgowość, załatwia rejestrację samochodu i wymianę prawa jazdy, PESEL i Profil Zaufany. Biura w Warszawie, Wrocławiu i Poznaniu. Obsługa po polsku, ukraińsku, angielsku i rosyjsku."
+        },
+        "uk": {
+            "description": "SKILLDOCS — компанія, що комплексно супроводжує іноземців у Польщі. Допомагає з легалізацією: карта тимчасового й постійного побуту, Блакитна карта ЄС, возз'єднання сім'ї, польське громадянство. Реєструє бізнес (JDG, Sp. z o.o.), веде бухгалтерію, оформлює реєстрацію авто та обмін водійського посвідчення, PESEL і Profil Zaufany. Офіси у Варшаві, Вроцлаві та Познані. Обслуговування польською, українською, англійською та російською."
+        },
+        "en": {
+            "description": "SKILLDOCS provides end-to-end support for foreigners in Poland. It handles residence legalisation: temporary and permanent residence cards, the EU Blue Card, family reunification and Polish citizenship. It also registers businesses (JDG, Sp. z o.o.), provides accounting, and takes care of car registration, driving licence exchange, PESEL and Profil Zaufany. Offices in Warsaw, Wrocław and Poznań. Service in Polish, Ukrainian, English and Russian."
+        },
+        "ru": {
+            "description": "SKILLDOCS — компания, которая комплексно сопровождает иностранцев в Польше. Помогает с легализацией: карта временного и постоянного побыта, Голубая карта ЕС, воссоединение семьи, польское гражданство. Регистрирует бизнес (JDG, Sp. z o.o.), ведёт бухгалтерию, оформляет регистрацию авто и замену водительских прав, PESEL и Profil Zaufany. Офисы в Варшаве, Вроцлаве и Познани. Обслуживание на польском, украинском, английском и русском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Karta pobytu", "uk": "Карта побиту", "en": "Residence card", "ru": "Карта побыта" },
+        { "pl": "Obywatelstwo", "uk": "Громадянство", "en": "Citizenship", "ru": "Гражданство" },
+        { "pl": "Rejestracja firmy", "uk": "Реєстрація фірми", "en": "Business Registration", "ru": "Регистрация фирмы" },
+        { "pl": "Rejestracja pojazdu", "uk": "Реєстрація транспортного засобу", "en": "Vehicle registration", "ru": "Регистрация транспортного средства" },
+        { "pl": "Wymiana prawa jazdy", "uk": "Обмін водійського посвідчення", "en": "Driving licence exchange", "ru": "Замена водительского удостоверения" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Wincentego Rzymowskiego 30/323",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-697",
+            "latitude": 52.174695,
+            "longitude": 21.0032678,
+            "openingHours": {
+                "monday": { "open": "08:00", "close": "17:30" },
+                "tuesday": { "open": "08:00", "close": "17:30" },
+                "wednesday": { "open": "08:00", "close": "17:30" },
+                "thursday": { "open": "08:00", "close": "17:30" },
+                "friday": { "open": "08:00", "close": "17:30" }
+            },
+            "phoneNumber": "+48 570 804 478",
+            "email": "contact@skilldocs.pl",
+            "webpage": "https://skilldocs.pl",
+            "nip": "5252904413",
+            "socials": {
+                "telegram": "https://t.me/SkillDocs",
+                "instagram": "https://www.instagram.com/skilldocs/",
+                "tiktok": "https://www.tiktok.com/@skilldocs"
+            },
+            "isMainLocation": true
+        },
+        {
+            "city": "Wrocław",
+            "street": "ul. Marszałka Józefa Piłsudskiego 74",
+            "voivodeship": "dolnoslaskie",
+            "postcode": "50-020",
+            "latitude": 51.1012694,
+            "longitude": 17.032773,
+            "phoneNumber": "+48 537 097 502",
+            "email": "contact@skilldocs.pl",
+            "webpage": "https://skilldocs.pl",
+            "nip": "5252904413"
+        },
+        {
+            "city": "Poznań",
+            "street": "ul. Szkolna 1/308",
+            "voivodeship": "wielkopolskie",
+            "postcode": "61-832",
+            "latitude": 52.4074994,
+            "longitude": 16.9325321,
+            "phoneNumber": "+48 536 535 645",
+            "email": "contact@skilldocs.pl",
+            "webpage": "https://skilldocs.pl",
+            "nip": "5252904413"
+        }
+    ]
+}

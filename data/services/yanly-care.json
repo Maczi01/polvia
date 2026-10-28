@@ -1,0 +1,46 @@
+{
+    "name": "Yanly Care",
+    "category": "health",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "yanly-care.png",
+    "languages": ["uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Yanly Care to internetowy katalog specjalistów pracujących z dziećmi z ukraińskich rodzin w Ukrainie i za granicą, także w Polsce. Można w nim szukać logopedów, psychologów, terapeutów ABA i integracji sensorycznej, neurologów, psychiatrów, defektologów, korepetytorów i niań, z filtrem miasta i zajęć online. Przeglądanie katalogu jest bezpłatne, a konsultacje opłaca się osobno na warunkach danego specjalisty. W profilu widać, czy platforma sprawdziła wykształcenie. Serwis po ukraińsku."
+        },
+        "uk": {
+            "description": "Yanly Care — онлайн-каталог фахівців для дітей з українських родин в Україні та за кордоном, зокрема в Польщі. Тут можна знайти логопеда, психолога, АВА-терапевта, фахівця із сенсорної інтеграції, невролога, психіатра, дефектолога, репетитора чи няню — з фільтром за містом і форматом онлайн. Перегляд каталогу безкоштовний, консультації оплачуються окремо за умовами фахівця. У профілі видно, чи платформа перевірила освіту. Сервіс українською мовою."
+        },
+        "en": {
+            "description": "Yanly Care is an online directory of specialists working with children from Ukrainian families in Ukraine and abroad, including Poland. Parents can search for speech therapists, psychologists, ABA and sensory integration therapists, neurologists, psychiatrists, special educators, tutors and nannies, filtering by city or online sessions. Browsing is free; consultations are paid separately on each specialist's terms. Each profile shows whether the platform has verified the specialist's education. The service is in Ukrainian."
+        },
+        "ru": {
+            "description": "Yanly Care — онлайн-каталог специалистов для детей из украинских семей в Украине и за рубежом, в том числе в Польше. Здесь можно найти логопеда, психолога, АВА-терапевта, специалиста по сенсорной интеграции, невролога, психиатра, дефектолога, репетитора или няню — с фильтром по городу и формату онлайн. Просмотр каталога бесплатный, консультации оплачиваются отдельно на условиях специалиста. В профиле видно, проверила ли платформа образование. Сервис на украинском языке."
+        }
+    },
+
+    "tags": [
+        { "pl": "Logopeda", "uk": "Логопед", "en": "Speech therapist", "ru": "Логопед" },
+        { "pl": "Psycholog", "uk": "Психолог", "en": "Psychologist", "ru": "Психолог" },
+        { "pl": "Terapia ABA", "uk": "ABA-терапія", "en": "ABA therapy", "ru": "ABA-терапия" },
+        { "pl": "Integracja sensoryczna", "uk": "Сенсорна інтеграція", "en": "Sensory integration", "ru": "Сенсорная интеграция" },
+        { "pl": "Zajęcia dla dzieci", "uk": "Заняття для дітей", "en": "Activities for children", "ru": "Занятия для детей" }
+    ],
+
+    "locations": [
+        {
+            "city": "Kyiv",
+            "email": "yanly.care.support@gmail.com",
+            "webpage": "https://yanly.care/",
+            "socials": {
+                "telegram": "https://t.me/yanlycaresupport",
+                "facebook": "https://www.facebook.com/profile.php?id=61595239915851",
+                "instagram": "https://www.instagram.com/yanly.care/"
+            },
+            "isMainLocation": true
+        }
+    ]
+}
