@@ -6,6 +6,10 @@ const createJestConfig = nextJest({
 
 const customJestConfig = {
     testEnvironment: 'jest-environment-jsdom',
+    // Testy pelnych flow (edytor wpisu, mapa) trwaja 2–2,5 s samodzielnie, a przy
+    // rownoleglym `npx jest` na obciazonej maszynie 5–6 s — domyslne 5000 ms dawalo
+    // losowe "Exceeded timeout". Zawieszony test nadal failuje, tylko po 15 s.
+    testTimeout: 15_000,
     setupFilesAfterEnv: ['<rootDir>/jest.setup.js', '<rootDir>/setupAfterEnv.ts'],
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
