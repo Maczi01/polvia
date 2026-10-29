@@ -17,12 +17,8 @@ import slugify from 'slugify';
 import sharp from 'sharp';
 
 import {
-    categoryValues,
-    coverageValues,
     parseRawServiceData,
     serviceSchema,
-    statusValues,
-    voivodeshipValues,
     type ServiceFormData,
 } from './_service-schema';
 
@@ -269,10 +265,8 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
         const namePattern = new RegExp(`name:\\s*['"]${escaped}['"]`);
         const nameMatch = content.match(namePattern);
 
-        if (!nameMatch || nameMatch.index === undefined) {
-            console.log(`[seed-sync] Service "${serviceName}" not found in seed.ts, skipping`);
-            return;
-        }
+        // Wpisu dodanego z dashboardu nie ma w seed.ts — to normalny przypadek, nie blad.
+        if (!nameMatch || nameMatch.index === undefined) return;
 
         const beforeName = content.slice(0, Math.max(0, nameMatch.index));
         const blockStart = beforeName.lastIndexOf('seedService({');
@@ -311,7 +305,6 @@ async function updateSeedImage(serviceName: string, imageFilename: string): Prom
 
         content = content.slice(0, Math.max(0, blockStart)) + newBlock + content.slice(Math.max(0, blockEnd));
         await writeFile(seedPath, content, 'utf8');
-        console.log(`[seed-sync] Updated seed.ts: ${serviceName} → ${imageFilename}`);
     } catch (error) {
         console.error('[seed-sync] Failed to update seed.ts:', error);
     }
@@ -389,9 +382,9 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
             .insert(servicesTable)
             .values({
                 name: data.name,
-                category: data.category as typeof categoryValues[number],
-                coverage: data.coverage as typeof coverageValues[number],
-                status: data.status as typeof statusValues[number],
+                category: data.category,
+                coverage: data.coverage,
+                status: data.status,
                 image: imageFilename,
                 languages: data.languages,
             })
@@ -402,9 +395,7 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
             slug: slugify(data.name, { lower: true, strict: true }),
             city: data.city || null,
             street: data.street || null,
-            voivodeship: data.voivodeship
-                ? (data.voivodeship as typeof voivodeshipValues[number])
-                : null,
+            voivodeship: data.voivodeship || null,
             postcode: data.postcode || null,
             latitude: data.latitude,
             longitude: data.longitude,
@@ -470,9 +461,9 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
             .update(servicesTable)
             .set({
                 name: data.name,
-                category: data.category as typeof categoryValues[number],
-                coverage: data.coverage as typeof coverageValues[number],
-                status: data.status as typeof statusValues[number],
+                category: data.category,
+                coverage: data.coverage,
+                status: data.status,
                 image: imageFilename,
                 languages: data.languages,
                 updatedAt: new Date(),
@@ -485,9 +476,7 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
                 slug: slugify(data.name, { lower: true, strict: true }),
                 city: data.city || null,
                 street: data.street || null,
-                voivodeship: data.voivodeship
-                    ? (data.voivodeship as typeof voivodeshipValues[number])
-                    : null,
+                voivodeship: data.voivodeship || null,
                 postcode: data.postcode || null,
                 latitude: data.latitude,
                 longitude: data.longitude,

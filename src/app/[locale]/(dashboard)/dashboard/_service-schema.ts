@@ -34,9 +34,9 @@ const optionalText = (max: number) => z.string().max(max).optional().or(z.litera
 export const serviceSchema = z
     .object({
         name: z.string().min(1, 'Name is required').max(255),
-        category: z.enum(categoryValues as [string, ...string[]]),
-        coverage: z.enum(coverageValues as [string, ...string[]]).default('local'),
-        status: z.enum(statusValues as [string, ...string[]]).default('active'),
+        category: z.enum(categoryValues),
+        coverage: z.enum(coverageValues).default('local'),
+        status: z.enum(statusValues).default('active'),
         webpage: optionalText(255),
         nip: optionalText(10),
         languages: z.array(z.enum(SERVICE_LANGUAGES)).default(['pl']),
@@ -57,7 +57,7 @@ export const serviceSchema = z
         city: optionalText(255),
         street: optionalText(255),
         voivodeship: z
-            .enum(voivodeshipValues as [string, ...string[]])
+            .enum(voivodeshipValues)
             .optional()
             .or(z.literal('')),
         postcode: optionalText(20),
@@ -116,43 +116,52 @@ export type ServiceFormData = z.infer<typeof serviceSchema>;
  */
 const isText = (value: FormDataEntryValue): value is string => typeof value === 'string';
 
+/**
+ * Pole tekstowe bez rzutowania `as string`: nieobecne pole zostaje `null`, a plik
+ * podstawiony pod pole tekstowe tez daje `null` — w obu przypadkach odrzuca je Zod.
+ */
+const text = (formData: FormData, key: string): string | null => {
+    const value = formData.get(key);
+    return typeof value === 'string' ? value : null;
+};
+
 export function parseRawServiceData(formData: FormData) {
     const raw = {
-        name: formData.get('name') as string,
-        category: formData.get('category') as string,
-        coverage: (formData.get('coverage') as string) || 'local',
-        status: (formData.get('status') as string) || 'active',
-        webpage: formData.get('webpage') as string,
-        nip: formData.get('nip') as string,
+        name: text(formData, 'name'),
+        category: text(formData, 'category'),
+        coverage: text(formData, 'coverage') || 'local',
+        status: text(formData, 'status') || 'active',
+        webpage: text(formData, 'webpage'),
+        nip: text(formData, 'nip'),
         languages: formData.getAll('languages').filter(isText),
-        whatsappNumber: formData.get('whatsappNumber') as string,
+        whatsappNumber: text(formData, 'whatsappNumber'),
         socials: {
-            instagram: formData.get('socials.instagram') as string,
-            telegram: formData.get('socials.telegram') as string,
-            tiktok: formData.get('socials.tiktok') as string,
-            facebook: formData.get('socials.facebook') as string,
-            youtube: formData.get('socials.youtube') as string,
-            viber: formData.get('socials.viber') as string,
-            whatsapp: formData.get('socials.whatsapp') as string,
-            x: formData.get('socials.x') as string,
+            instagram: text(formData, 'socials.instagram'),
+            telegram: text(formData, 'socials.telegram'),
+            tiktok: text(formData, 'socials.tiktok'),
+            facebook: text(formData, 'socials.facebook'),
+            youtube: text(formData, 'socials.youtube'),
+            viber: text(formData, 'socials.viber'),
+            whatsapp: text(formData, 'socials.whatsapp'),
+            x: text(formData, 'socials.x'),
         },
-        city: formData.get('city') as string,
-        street: formData.get('street') as string,
-        voivodeship: formData.get('voivodeship') as string,
-        postcode: formData.get('postcode') as string,
-        latitude: formData.get('latitude') as string,
-        longitude: formData.get('longitude') as string,
-        phoneNumber: formData.get('phoneNumber') as string,
-        email: formData.get('email') as string,
-        namePl: formData.get('namePl') as string,
-        nameEn: formData.get('nameEn') as string,
-        nameUk: formData.get('nameUk') as string,
-        nameRu: formData.get('nameRu') as string,
-        descriptionPl: formData.get('descriptionPl') as string,
-        descriptionEn: formData.get('descriptionEn') as string,
-        descriptionUk: formData.get('descriptionUk') as string,
-        descriptionRu: formData.get('descriptionRu') as string,
-        tags: formData.getAll('tags') as string[],
+        city: text(formData, 'city'),
+        street: text(formData, 'street'),
+        voivodeship: text(formData, 'voivodeship'),
+        postcode: text(formData, 'postcode'),
+        latitude: text(formData, 'latitude'),
+        longitude: text(formData, 'longitude'),
+        phoneNumber: text(formData, 'phoneNumber'),
+        email: text(formData, 'email'),
+        namePl: text(formData, 'namePl'),
+        nameEn: text(formData, 'nameEn'),
+        nameUk: text(formData, 'nameUk'),
+        nameRu: text(formData, 'nameRu'),
+        descriptionPl: text(formData, 'descriptionPl'),
+        descriptionEn: text(formData, 'descriptionEn'),
+        descriptionUk: text(formData, 'descriptionUk'),
+        descriptionRu: text(formData, 'descriptionRu'),
+        tags: formData.getAll('tags').filter(isText),
     };
     if (raw.languages.length === 0) {
         raw.languages = ['pl'];
