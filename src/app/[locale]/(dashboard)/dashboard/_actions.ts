@@ -17,12 +17,8 @@ import slugify from 'slugify';
 import sharp from 'sharp';
 
 import {
-    categoryValues,
-    coverageValues,
     parseRawServiceData,
     serviceSchema,
-    statusValues,
-    voivodeshipValues,
     type ServiceFormData,
 } from './_service-schema';
 
@@ -389,9 +385,9 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
             .insert(servicesTable)
             .values({
                 name: data.name,
-                category: data.category as typeof categoryValues[number],
-                coverage: data.coverage as typeof coverageValues[number],
-                status: data.status as typeof statusValues[number],
+                category: data.category,
+                coverage: data.coverage,
+                status: data.status,
                 image: imageFilename,
                 languages: data.languages,
             })
@@ -402,9 +398,7 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
             slug: slugify(data.name, { lower: true, strict: true }),
             city: data.city || null,
             street: data.street || null,
-            voivodeship: data.voivodeship
-                ? (data.voivodeship as typeof voivodeshipValues[number])
-                : null,
+            voivodeship: data.voivodeship || null,
             postcode: data.postcode || null,
             latitude: data.latitude,
             longitude: data.longitude,
@@ -470,9 +464,9 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
             .update(servicesTable)
             .set({
                 name: data.name,
-                category: data.category as typeof categoryValues[number],
-                coverage: data.coverage as typeof coverageValues[number],
-                status: data.status as typeof statusValues[number],
+                category: data.category,
+                coverage: data.coverage,
+                status: data.status,
                 image: imageFilename,
                 languages: data.languages,
                 updatedAt: new Date(),
@@ -485,9 +479,7 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
                 slug: slugify(data.name, { lower: true, strict: true }),
                 city: data.city || null,
                 street: data.street || null,
-                voivodeship: data.voivodeship
-                    ? (data.voivodeship as typeof voivodeshipValues[number])
-                    : null,
+                voivodeship: data.voivodeship || null,
                 postcode: data.postcode || null,
                 latitude: data.latitude,
                 longitude: data.longitude,
