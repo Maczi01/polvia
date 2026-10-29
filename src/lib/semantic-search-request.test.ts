@@ -1,4 +1,28 @@
-import { buildSemanticSearchParams, SEMANTIC_RECOMMENDATIONS_LIMIT } from './semantic-search-request';
+import {
+    buildSemanticSearchParams,
+    MAX_EXCLUDE_IDS,
+    SEMANTIC_RECOMMENDATIONS_LIMIT,
+} from './semantic-search-request';
+
+describe('buildSemanticSearchParams — excludeIds', () => {
+    it('wysyla id firmy raz, choc lista ma wiersz na kazda jej lokalizacje', () => {
+        const params = buildSemanticSearchParams({
+            query: 'prawnik',
+            locale: 'pl',
+            excludeIds: ['legallex', 'legallex', 'etalon', 'legallex'],
+        });
+
+        expect(params.get('excludeIds')).toBe('legallex,etalon');
+    });
+
+    it('nie wysyla wiecej firm, niz przyjmuje endpoint', () => {
+        const ids = Array.from({ length: MAX_EXCLUDE_IDS + 10 }, (_, index) => `id-${index}`);
+
+        const params = buildSemanticSearchParams({ query: 'prawnik', locale: 'pl', excludeIds: ids });
+
+        expect(params.get('excludeIds')?.split(',')).toEqual(ids.slice(0, MAX_EXCLUDE_IDS));
+    });
+});
 
 describe('buildSemanticSearchParams', () => {
     it('przekazuje limit rekomendacji jawnie, zamiast zdawac sie na domyslny', () => {

@@ -17,6 +17,13 @@
  */
 export const SEMANTIC_RECOMMENDATIONS_LIMIT = 10;
 
+/**
+ * Ile firm z ekranu wolno wykluczyc jednym zapytaniem. Id ida w URL-u GET (UUID + `%2C`
+ * = 39 znakow), wiec 250 to ok. 10 KB — z zapasem pod limitem dlugosci URL-a na Vercelu.
+ * Wspolne dla klienta (przycina liste) i endpointu (waliduje), zeby nie mogly sie rozjechac.
+ */
+export const MAX_EXCLUDE_IDS = 250;
+
 export type SemanticSearchRequest = {
     query: string;
     locale: string;
@@ -40,6 +47,9 @@ export function buildSemanticSearchParams({
     params.set('locale', locale);
     params.set('semanticOnly', 'true');
     params.set('limit', String(SEMANTIC_RECOMMENDATIONS_LIMIT));
-    if (excludeIds.length > 0) params.set('excludeIds', excludeIds.join(','));
+    // Lista ma wiersz na kazda lokalizacje, wiec firma z 5 punktami dawala 5 kopii id.
+    // Ponad limitem wiecej firm z ekranu moze wrocic w rekomendacjach, ale zapytanie przechodzi.
+    const uniqueIds = [...new Set(excludeIds)].slice(0, MAX_EXCLUDE_IDS);
+    if (uniqueIds.length > 0) params.set('excludeIds', uniqueIds.join(','));
     return params;
 }
