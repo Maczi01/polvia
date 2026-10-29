@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 import { RELEVANCE_FLOOR } from '@/lib/search-relevance';
 import { DEFAULT_SEMANTIC_LIMIT, searchServicesSemantic } from '@/lib/semantic-search';
+import { MAX_EXCLUDE_IDS } from '@/lib/semantic-search-request';
 
 /**
  * Endpoint jest publiczny i kazde trafienie kosztuje jeden embedding w OpenAI,
@@ -44,8 +45,20 @@ const searchQuerySchema = z.object({
     voivodeship: z.string().max(50).nullish(),
     locale: z.string().max(5).default('en'),
     limit: z.coerce.number().int().min(1).max(MAX_LIMIT).default(DEFAULT_SEMANTIC_LIMIT),
-    excludeIds: z.string().max(2000).nullish(),
+    // Limit liczony w firmach, nie w znakach: 2000 znakow miescilo ~54 UUID-y, a przy
+    // wiekszej liscie 400 cicho kasowalo rekomendacje semantyczne na mapie.
+    excludeIds: z.preprocess(
+        value => (typeof value === 'string' ? splitIds(value) : []),
+        z.array(z.string().uuid()).max(MAX_EXCLUDE_IDS),
+    ),
 });
+
+function splitIds(value: string): string[] {
+    return value
+        .split(',')
+        .map(id => id.trim())
+        .filter(Boolean);
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -93,15 +106,7 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        const { query, category, voivodeship, locale, limit } = parsed.data;
-        const excludeIdsParam = parsed.data.excludeIds;
-
-        const excludeIds: string[] = excludeIdsParam
-            ? excludeIdsParam
-                  .split(',')
-                  .map(id => id.trim())
-                  .filter(Boolean)
-            : [];
+        const { query, category, voivodeship, locale, limit, excludeIds } = parsed.data;
 
         // Obecnosc OPENAI_API_KEY gwarantuje walidacja Zod w env.ts przy starcie —
         // osobny guard w handlerze bylby martwym kodem.

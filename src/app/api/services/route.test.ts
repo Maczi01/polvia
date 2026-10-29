@@ -5,6 +5,7 @@
 import { NextRequest } from 'next/server';
 
 import { searchServicesSemantic } from '@/lib/semantic-search';
+import { buildSemanticSearchParams, MAX_EXCLUDE_IDS } from '@/lib/semantic-search-request';
 
 import { createFakeRedis } from '../../../../tests/fixtures/add-business/fake-redis';
 import { GET } from './route';
@@ -83,6 +84,69 @@ describe('GET /api/services', () => {
         it('odrzuca limit powyzej gornej granicy', async () => {
             const response = await GET(
                 new NextRequest('https://www.polvia.pl/api/services?query=prawnik&limit=51'),
+            );
+
+            expect(response.status).toBe(400);
+            expect(searchServicesSemantic).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('excludeIds z ekranu mapy', () => {
+        const SHOWN_SERVICES = 60;
+
+        function shownIds(count: number): string[] {
+            return Array.from(
+                { length: count },
+                (_, index) => `00000000-0000-4000-8000-${String(index).padStart(12, '0')}`,
+            );
+        }
+
+        beforeEach(() => {
+            jest.mocked(searchServicesSemantic).mockReset().mockResolvedValue({
+                services: [],
+                contextualQuery: 'prawnik',
+                relevanceCheck: 'passed',
+            });
+        });
+
+        it('przyjmuje zapytanie mapy z wieloma firmami na ekranie i wyklucza je wszystkie', async () => {
+            const excludeIds = shownIds(SHOWN_SERVICES);
+            const params = buildSemanticSearchParams({
+                query: 'prawnik po ukrainsku',
+                locale: 'pl',
+                category: 'law',
+                excludeIds,
+            });
+
+            const response = await GET(
+                new NextRequest(`https://www.polvia.pl/api/services?${params}`),
+            );
+
+            expect(response.status).toBe(200);
+            expect(jest.mocked(searchServicesSemantic).mock.calls[0]?.[0].excludeIds).toEqual(
+                excludeIds,
+            );
+        });
+
+        it('odrzuca liste ponad limit firm', async () => {
+            const params = new URLSearchParams({
+                query: 'prawnik',
+                excludeIds: shownIds(MAX_EXCLUDE_IDS + 1).join(','),
+            });
+
+            const response = await GET(
+                new NextRequest(`https://www.polvia.pl/api/services?${params}`),
+            );
+
+            expect(response.status).toBe(400);
+            expect(searchServicesSemantic).not.toHaveBeenCalled();
+        });
+
+        it('odrzuca id, ktore nie jest UUID-em', async () => {
+            const response = await GET(
+                new NextRequest(
+                    'https://www.polvia.pl/api/services?query=prawnik&excludeIds=1%20OR%201%3D1',
+                ),
             );
 
             expect(response.status).toBe(400);
