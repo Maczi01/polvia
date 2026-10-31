@@ -1,6 +1,11 @@
 import type { PremiumSubscriptionState } from '@/lib/premium';
 
-import { selectProfileView, toPremiumProfileView } from './select-profile-view';
+import {
+    selectOgCoverPath,
+    selectProfileView,
+    shouldLoadSimilarServices,
+    toPremiumProfileView,
+} from './select-profile-view';
 import type { PremiumContent, ServiceProfileView } from './service-profile-types';
 
 const NOW = new Date('2026-10-31T12:00:00Z');
@@ -78,6 +83,19 @@ describe('selectProfileView', () => {
         expect(result).toEqual({ kind: 'free' });
     });
 
+    it('status active po karencji (wygaslo bez webhooka) z zachowana trescia daje profil free', () => {
+        const result = selectProfileView({
+            premiumContent: premiumContent({ template: 'gallery' }),
+            subscription: subscription({
+                status: 'active',
+                currentPeriodEnd: new Date('2026-10-27T12:00:00Z'),
+            }),
+            now: NOW,
+        });
+
+        expect(result).toEqual({ kind: 'free' });
+    });
+
     it('brak subskrypcji z trescia daje profil free', () => {
         const result = selectProfileView({
             premiumContent: premiumContent(),
@@ -86,6 +104,45 @@ describe('selectProfileView', () => {
         });
 
         expect(result).toEqual({ kind: 'free' });
+    });
+});
+
+describe('selectOgCoverPath', () => {
+    const COVER_SRC = '/services/mistrz-remontu/cover.jpg';
+
+    it('widok free z trescia z coverem nie wypuszcza coveru do Open Graph', () => {
+        expect(selectOgCoverPath({ kind: 'free' }, premiumContent())).toBeNull();
+    });
+
+    it('widok premium z coverem daje sciezke coveru', () => {
+        expect(selectOgCoverPath({ kind: 'premium', template: 'gallery' }, premiumContent())).toBe(
+            COVER_SRC,
+        );
+    });
+
+    it('widok premium bez tresci daje null', () => {
+        expect(selectOgCoverPath({ kind: 'premium', template: 'classic' }, null)).toBeNull();
+    });
+
+    it('widok premium z trescia bez coveru daje null', () => {
+        expect(
+            selectOgCoverPath(
+                { kind: 'premium', template: 'gallery' },
+                premiumContent({ coverImage: null }),
+            ),
+        ).toBeNull();
+    });
+});
+
+describe('shouldLoadSimilarServices', () => {
+    it('widok free pobiera podobne firmy', () => {
+        expect(shouldLoadSimilarServices({ kind: 'free' })).toBe(true);
+    });
+
+    it('widok premium nie pobiera podobnych firm', () => {
+        expect(shouldLoadSimilarServices({ kind: 'premium', template: 'professional' })).toBe(
+            false,
+        );
     });
 });
 

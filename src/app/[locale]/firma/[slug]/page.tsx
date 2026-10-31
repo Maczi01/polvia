@@ -8,7 +8,6 @@ import { defaultLocale, type Locale } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 import { getCategoryMessageKey } from '@/lib/categories';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
-import type { PremiumSubscriptionState } from '@/lib/premium';
 import type { PremiumTemplate } from '@/lib/premium-templates';
 import {
     buildProfileCanonicalUrl,
@@ -28,7 +27,9 @@ import { getHeaderCity, getMainLocation, toSameAs } from './_components/profile-
 import { ProfileFree } from './_components/profile-free/profile-free';
 import {
     type ProfileViewKind,
+    selectOgCoverPath,
     selectProfileView,
+    shouldLoadSimilarServices,
     toPremiumProfileView,
 } from './_components/select-profile-view';
 import type { PremiumProfileView, ServiceProfileView } from './_components/service-profile-types';
@@ -49,20 +50,17 @@ function toLocale(value: string): Locale {
 const getCachedServiceProfile = cache(getServiceProfile);
 
 /**
- * Zrodlo stanu subskrypcji premium. Tabela `service_subscriptions` powstanie w U8 —
- * do tego czasu kazdy wpis jest „bez subskrypcji”, czyli renderuje profil free.
- * U8 podmienia tylko to zrodlo; decyzja o widoku zostaje w `selectProfileView`.
+ * Jedna chwila na zadanie: na granicy karencji `generateMetadata` i strona musza podjac
+ * te sama decyzje widoku, inaczej cover premium trafilby do OG strony free (albo odwrotnie).
  */
-function getPremiumSubscription(): PremiumSubscriptionState | null {
-    return null;
-}
+const getRequestNow = cache((): Date => new Date());
 
 /** Ta sama decyzja widoku dla strony i `generateMetadata`. */
 function resolveProfileView(profile: ServiceProfile): ProfileViewKind {
     return selectProfileView({
         premiumContent: profile.premiumContent,
-        subscription: getPremiumSubscription(),
-        now: new Date(),
+        subscription: profile.subscription,
+        now: getRequestNow(),
     });
 }
 
@@ -117,8 +115,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         description: profile.description,
         fallbackDescription,
         imagePath: toServiceImagePath(profile.image),
-        coverImagePath:
-            viewKind.kind === 'premium' ? (profile.premiumContent?.coverImage?.src ?? null) : null,
+        coverImagePath: selectOgCoverPath(viewKind, profile.premiumContent),
     });
 }
 
@@ -136,19 +133,17 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
     if (!profile) notFound();
 
     const viewKind = resolveProfileView(profile);
-    // Premium nie pokazuje „Podobnych firm”, wiec ich nie pobieramy.
     // Lokalizacje przychodza glowna pierwsza — to miasto glowne, jak `mainCity` w zapytaniu.
-    const similarServices =
-        viewKind.kind === 'free'
-            ? await getSimilarServices(
-                  {
-                      serviceId: profile.id,
-                      category: profile.category,
-                      city: profile.locations[0]?.city ?? null,
-                  },
-                  locale,
-              )
-            : [];
+    const similarServices = shouldLoadSimilarServices(viewKind)
+        ? await getSimilarServices(
+              {
+                  serviceId: profile.id,
+                  category: profile.category,
+                  city: profile.locations[0]?.city ?? null,
+              },
+              locale,
+          )
+        : [];
     const view = toProfileView(profile, similarServices, locale);
     const mainLocation = getMainLocation(view.locations);
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;

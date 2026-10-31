@@ -215,6 +215,7 @@ describe('buildProfileMetadata', () => {
             description: 'Remonty mieszkan pod klucz.',
             fallbackDescription: FALLBACK,
             imagePath: '/services/remont.png',
+            coverImagePath: null,
             ...overrides,
         };
     }

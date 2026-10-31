@@ -91,10 +91,10 @@ export type ProfileMetadataInput = ProfileTitleInput & {
     /** Sciezka logo (`/services/<plik>`) albo `null` — wtedy bez obrazka w Open Graph. */
     imagePath: string | null;
     /**
-     * Sciezka coveru premium; podawana tylko przy widoku premium i wtedy zastepuje logo
-     * w Open Graph. Pominieta albo `null` — obrazkiem zostaje logo.
+     * Sciezka coveru premium (`selectOgCoverPath`); niepusta tylko przy widoku premium
+     * i wtedy zastepuje logo w Open Graph. `null` — obrazkiem zostaje logo.
      */
-    coverImagePath?: string | null;
+    coverImagePath: string | null;
 };
 
 /** `generateMetadata` profilu; `null` (brak aktywnego wpisu) daje `noindex`. */

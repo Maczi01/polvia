@@ -1,10 +1,14 @@
 import { isPremiumActive, type PremiumSubscriptionState } from '@/lib/premium';
 import type { PremiumTemplate } from '@/lib/premium-templates';
 
-import type { PremiumContent, PremiumProfileView, ServiceProfileView } from './service-profile-types';
+import type {
+    PremiumContent,
+    PremiumProfileView,
+    ServiceProfileView,
+} from './service-profile-types';
 
 /** Szablon premium, gdy wpis ma aktywne premium, a tresc nie jest jeszcze opublikowana. */
-export const DEFAULT_PREMIUM_TEMPLATE: PremiumTemplate = 'classic';
+const DEFAULT_PREMIUM_TEMPLATE: PremiumTemplate = 'classic';
 
 export type ProfileViewKind = { kind: 'free' } | { kind: 'premium'; template: PremiumTemplate };
 
@@ -27,6 +31,21 @@ export function selectProfileView({
     if (!isPremiumActive(subscription, now)) return { kind: 'free' };
 
     return { kind: 'premium', template: premiumContent?.template ?? DEFAULT_PREMIUM_TEMPLATE };
+}
+
+/** Cover w Open Graph tylko przy widoku premium: tresc wygaslego premium zostaje w bazie (R18). */
+export function selectOgCoverPath(
+    viewKind: ProfileViewKind,
+    content: Pick<PremiumContent, 'coverImage'> | null,
+): string | null {
+    if (viewKind.kind !== 'premium') return null;
+
+    return content?.coverImage?.src ?? null;
+}
+
+/** Szablony premium nie pokazuja „Podobnych firm”, wiec przy premium ich nie pobieramy. */
+export function shouldLoadSimilarServices(viewKind: ProfileViewKind): boolean {
+    return viewKind.kind === 'free';
 }
 
 const EMPTY_PREMIUM_CONTENT: PremiumContent = {
