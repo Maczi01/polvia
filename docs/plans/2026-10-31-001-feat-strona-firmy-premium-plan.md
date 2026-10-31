@@ -446,7 +446,7 @@ flowchart LR
 
 ### Faza 2 — Treść premium (concierge)
 
-- [ ] **Unit 6: Tabela treści premium, schemat JSON i CLI `db:premium`**
+- [x] **Unit 6: Tabela treści premium, schemat JSON i CLI `db:premium`**
 
 **Cel:** Founder publikuje i aktualizuje treść premium z bloku `premium` w `data/services/<slug>.json`. Treść przetrwa `db:reset` i zostaje po wygaśnięciu subskrypcji.
 
@@ -498,7 +498,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 7: Strona profilu renderuje szablon premium**
+- [x] **Unit 7: Strona profilu renderuje szablon premium**
 
 **Cel:** Przy aktywnym premium profil renderuje wybrany szablon z treścią premium i bez „Podobnych firm”. Bez premium, także po wygaśnięciu, renderuje profil free, a treść zostaje w bazie.
 

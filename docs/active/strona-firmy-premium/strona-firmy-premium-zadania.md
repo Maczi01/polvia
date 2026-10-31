@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 1)
+**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 2)
 
 ## Źródła
 
@@ -182,28 +182,28 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 **Delegate to:** `feature-builder-web-data` · **Nakład:** M · **Zależności:** U1
 **Wymagania:** R7, R8, R9, R13, R17, R18
 
-- [ ] `src/db/schema.ts`: enum `profile_template`, tabela `service_profiles`
+- [x] `src/db/schema.ts`: enum `profile_template`, tabela `service_profiles`
   - `serviceId` pk
   - `template`, `coverImage`
   - jsonb: `gallery`, `priceList`, `faq`
-- [ ] `src/db/premium-content-schema.ts`: Zod dla bloku `premium` (tłumaczenia pl/uk/en/ru, limity z `premium-templates.ts`, reeksport stałych)
-- [ ] `src/db/service-input-schema.ts`: opcjonalny klucz `premium` (strict nie odrzuca pliku)
-- [ ] `src/db/upsert-premium-content.ts`: idempotentny upsert po slugu usługi; brak pliku zdjęcia w `public/services/<slug>/` przerywa z listą brakujących
-- [ ] `src/db/publish-premium.ts` + skrypt `db:premium` w `package.json` (`--dry-run` wypisuje diff)
-- [ ] `src/db/seed.ts`: upsert treści premium dla każdego `data/services/*.json` z blokiem `premium`
-- [ ] `src/lib/service-profile-queries.ts`: `getServiceProfile` dołącza `premiumContent` (Zod `safeParse`; błąd daje `null` + log)
-- [ ] `.claude/skills/dodaj/SKILL.md`: sekcja „Wpis premium”:
+- [x] `src/db/premium-content-schema.ts`: Zod dla bloku `premium` (tłumaczenia pl/uk/en/ru, limity z `premium-templates.ts`, reeksport stałych)
+- [x] `src/db/service-input-schema.ts`: opcjonalny klucz `premium` (strict nie odrzuca pliku)
+- [x] `src/db/upsert-premium-content.ts`: idempotentny upsert po slugu usługi; brak pliku zdjęcia w `public/services/<slug>/` przerywa z listą brakujących
+- [x] `src/db/publish-premium.ts` + skrypt `db:premium` w `package.json` (`--dry-run` wypisuje diff)
+- [x] `src/db/seed.ts`: upsert treści premium dla każdego `data/services/*.json` z blokiem `premium`
+- [x] `src/lib/service-profile-queries.ts`: `getServiceProfile` dołącza `premiumContent` (Zod `safeParse`; błąd daje `null` + log)
+- [x] `.claude/skills/dodaj/SKILL.md`: sekcja „Wpis premium”:
   1. weryfikacja, że płaci właściciel,
   2. zdjęcia do `public/services/<slug>/`,
   3. `--dry-run`,
   4. stop i OK od usera,
   5. publikacja
-- [ ] `Test:` poprawny blok przechodzi; brak `ru` w pozycji FAQ odrzuca blok ze ścieżką błędu
-- [ ] `Test:` nieznany szablon odrzucony; galeria ponad limitem odrzucona
-- [ ] `Test:` upsert dla nieistniejącego slugu kończy się błędem typowanym (nie cichym no-op)
-- [ ] `Test:` dwa upserty tych samych danych dają jeden wiersz i identyczną treść
-- [ ] `Test:` brakujący plik w galerii przerywa z listą brakujących plików
-- [ ] `Test:` `getServiceProfile` z uszkodzonym jsonb zwraca `premiumContent: null`
+- [x] `Test:` poprawny blok przechodzi; brak `ru` w pozycji FAQ odrzuca blok ze ścieżką błędu
+- [x] `Test:` nieznany szablon odrzucony; galeria ponad limitem odrzucona
+- [x] `Test:` upsert dla nieistniejącego slugu kończy się błędem typowanym (nie cichym no-op)
+- [x] `Test:` dwa upserty tych samych danych dają jeden wiersz i identyczną treść
+- [x] `Test:` brakujący plik w galerii przerywa z listą brakujących plików
+- [x] `Test:` `getServiceProfile` z uszkodzonym jsonb zwraca `premiumContent: null`
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest src/db/premium-content-schema src/db/upsert-premium-content src/lib/service-profile-queries` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -214,12 +214,12 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** S · **Zależności:** U3, U6, U8 (`isPremiumActive`)
 **Wymagania:** R7, R8, R9, R10, R18
 
-- [ ] `_components/select-profile-view.ts`: czysta funkcja zwracająca `{ kind: 'free' } | { kind: 'premium', template }`
-- [ ] `page.tsx`: mapowanie rodzaju widoku na komponent; przy premium bez zapytania o podobne firmy i bez CTA
-- [ ] `src/lib/service-profile-metadata.ts`: `openGraph.images` = cover przy premium
-- [ ] `Test:` premium aktywne z `template='gallery'` → `{ kind: 'premium', template: 'gallery' }`
-- [ ] `Test:` premium aktywne bez `premiumContent` → `classic`
-- [ ] `Test:` premium wygasłe z zachowaną treścią → `{ kind: 'free' }`
+- [x] `_components/select-profile-view.ts`: czysta funkcja zwracająca `{ kind: 'free' } | { kind: 'premium', template }`
+- [x] `page.tsx`: mapowanie rodzaju widoku na komponent; przy premium bez zapytania o podobne firmy i bez CTA
+- [x] `src/lib/service-profile-metadata.ts`: `openGraph.images` = cover przy premium
+- [x] `Test:` premium aktywne z `template='gallery'` → `{ kind: 'premium', template: 'gallery' }`
+- [x] `Test:` premium aktywne bez `premiumContent` → `classic`
+- [x] `Test:` premium wygasłe z zachowaną treścią → `{ kind: 'free' }`
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -242,7 +242,8 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 - [ ] `env.ts` (server + `runtimeEnv`): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`
 - [ ] `src/lib/stripe.ts` (`server-only`, jawny timeout i `apiVersion`)
 - [ ] `src/db/schema.ts`: tabele `service_subscriptions` (1:1 z usługą) i `stripe_events` (`id` pk)
-- [ ] `src/lib/premium.ts`: `isPremiumActive`, `PREMIUM_GRACE_DAYS` (domyślnie 3), `premiumRankingExpiry`
+- [x] `src/lib/premium.ts`: `isPremiumActive`, `PREMIUM_GRACE_DAYS` (domyślnie 3), `premiumRankingExpiry` — **zrobione w fazie 2** (`e4c7f7e`); enum `subscription_status` buduj z `SUBSCRIPTION_STATUSES`
+- [ ] `page.tsx`: podmienić ciało `getPremiumSubscription()` (dziś `null`) na odczyt `service_subscriptions`
 - [ ] `src/lib/subscription-sync.ts`: `syncSubscriptionFromStripe(subscriptionId)`
   - pobiera subskrypcję,
   - w jednej transakcji: upsert `service_subscriptions` + upsert lub usunięcie `promoted_services`,
@@ -256,7 +257,7 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
   - odpowiedź `{ data, error }` bez surowych błędów
 - [ ] `src/db/sync-subscriptions.ts`: CLI odtwarzający stan ze Stripe
 - [ ] `src/lib/service-profile-queries.ts`: stan premium w `getServiceProfile` i `getServiceSlugStatus`
-- [ ] `Test:` `isPremiumActive`:
+- [x] `Test:` `isPremiumActive` (faza 2, `src/lib/premium.test.ts`):
   - `active` w okresie → true
   - `past_due` w karencji → true
   - `past_due` po karencji → false

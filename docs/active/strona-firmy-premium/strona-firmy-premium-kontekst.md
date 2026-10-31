@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 1)
+**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 2)
 
 ## Źródła
 
@@ -124,6 +124,10 @@
 - **Rate limit lookupu:** 120 zapytań na 60 s per IP klienta (`x-forwarded-for` przekazany z middleware). Przy 429 albo awarii store'u lookup przepuszcza żądanie (fail-open).
   - Po wdrożeniu sprawdzić w logach Vercela, czy route widzi IP klienta, a nie IP middleware. Jeśli widzi IP middleware, rozważyć nagłówek z sekretem (nowa zmienna env).
 
+- **2026-10-31: `src/lib/premium.ts` przeniesiony z U8 do fazy 2 (decyzja usera przy starcie fazy 2).** U7 wymaga `isPremiumActive`, a U8 czeka na zgodę na paczkę `stripe`.
+  - Teraz powstaje tylko czysta część: `isPremiumActive(sub, now)`, `PREMIUM_GRACE_DAYS`, `premiumRankingExpiry`. Test-first, bez Stripe. Typ subskrypcji jest strukturalny i lokalny dla modułu.
+  - Do czasu U8 `page.tsx` traktuje każdy wpis jako „bez subskrypcji”, więc w praktyce nikt nie dostaje premium. U8 podmienia to źródło na `service_subscriptions` i nie zmienia `premium.ts`.
+
 ## Log wykonania
 
 ### Faza 1 — Darmowy profil (2026-10-31)
@@ -198,6 +202,36 @@ Decyzje:
 - **Link do profilu:** `ServiceProfileLink` w `(main)/_components/` ma zawsze `prefetch={false}`.
 
 Odłożone (P3): #12, #16, #18, #20–#23, #25. Do tego `border-[#C52289]` w `service-card.tsx:425` i ujednolicenie `OpeningHours` z `add-business/jsonld-facts.ts`.
+
+### Faza 2 — Treść premium (2026-10-31)
+
+| Unit | Builder | Status | Commit |
+|---|---|---|---|
+| U6 `service_profiles` + `db:premium` | feature-builder-web-data | completed | `4e58899` |
+| `premium.ts` (z U8, decyzja usera) | feature-builder-web-data | completed | `e4c7f7e` |
+| U7 Wybór widoku free / premium | feature-builder-web-ui | completed | `1440555` |
+
+Bramka: `tsc` OK, `jest` 149 suite'ów / 1625 testów, `next lint` 0 błędów. `npm run build` pominięty z tego samego powodu co w fazie 1 (brak `.env` w worktree).
+
+Decyzje i odchylenia builderów (zaakceptowane):
+- **U6:**
+  - Slug usługi do upsertu szukany **po slugach lokalizacji z pliku**, nie przez `buildServiceSlug(name)`. Przy duplikacie nazwy wpis ma adres `nazwa-2`, a slug liczony z nazwy wpisałby treść premium do cudzego profilu.
+  - Baza trzyma wszystkie 4 tłumaczenia, lokalizacja przy odczycie (`localizePremiumContent`). Alt coveru = nazwa firmy w locale.
+  - Nazwa pliku zdjęcia walidowana regexem (bez `/` i `..`, tylko jpg/png/webp/avif), co zamyka path traversal.
+  - Limity długości tekstów: alt 200, cena 60, pytanie 200, odpowiedź 2000. Bez limitu liczby pozycji cennika i FAQ (plan go nie przewidywał).
+  - Seed pomija z ostrzeżeniem blok `premium` wpisu nieobecnego w bazie; błędny blok albo brak zdjęcia przerywa seed.
+  - Dodatkowe moduły dla limitu 300 linii: `src/db/premium-content-diff.ts`, `src/lib/service-profile-premium.ts`. Typowany błąd `PremiumContentError` ma kody `INVALID_ENTRY`, `SERVICE_NOT_FOUND`, `ENTRY_AMBIGUOUS`, `IMAGES_MISSING`.
+  - `console.error` z `eslint-disable` w `service-profile-premium.ts`, bo repo nie ma loggera.
+- **`premium.ts`:** `SUBSCRIPTION_STATUSES` (8 statusów Stripe) dla przyszłego enumu. `isPremiumActive` liczy granicę przez `premiumRankingExpiry`, więc ranking i widok się nie rozjadą. Granica jest ostra. `cancelAtPeriodEnd` nie wpływa na wynik.
+- **U7:**
+  - `resolveProfileView(profile)` w `page.tsx` jest wspólny dla strony i `generateMetadata`. Źródłem stanu jest `getPremiumSubscription()`, które zwraca `null`; U8 podmienia jego ciało (przy async trzeba dodać `await` w dwóch wywołaniach).
+  - Premium bez treści: `toPremiumProfileView` wstawia pustą treść `classic` (bez coveru: baner z gradientem, puste sekcje ukryte).
+  - `ProfileMetadataInput.coverImagePath` (opcjonalne). Obrazek OG = cover przy premium, inaczej logo. JSON-LD `image` zostaje logo.
+  - `to-profile-view.ts`: `premium: profile.premiumContent`.
+
+Ryzyko: `page.tsx` nie ma testu renderu. Przejście premium → szablon da się sprawdzić w przeglądarce dopiero po U8.
+
+**Kroki operatora fazy 2:** `npx drizzle-kit push` (enum `profile_template` + `service_profiles`, addytywne) razem z krokami fazy 1; przy pierwszej publikacji premium zacommitować zdjęcia z `public/services/<slug>/`.
 
 **Nowe kroki operatora** (dochodzą do kroków U1/U2):
 1. Wygenerować sekret: `openssl rand -hex 32`, zapisać jako `SERVICE_SLUG_LOOKUP_SECRET` w Vercel (Production + Preview) i w lokalnym `.env`.
