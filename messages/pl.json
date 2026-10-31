@@ -824,5 +824,59 @@
       "correction": "Jeśli coś się nie zgadza, po prostu odpowiedz na tę wiadomość.",
       "signature": "Zespół Polvia"
     }
+  },
+  "ServiceProfile": {
+    "logoAlt": "Logo firmy {name}",
+    "about": "O firmie",
+    "tags": "Specjalizacje",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "website": "Strona www",
+    "socials": "Media społecznościowe",
+    "call": "Zadzwoń",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "navigate": "Nawiguj",
+    "hours": "Godziny otwarcia",
+    "closed": "Zamknięte",
+    "address": "Adres",
+    "locations": "Lokalizacje",
+    "mainLocation": "Siedziba główna",
+    "showOnMap": "Pokaż na mapie",
+    "onlineOnly": "Firma obsługuje klientów wyłącznie zdalnie, bez punktu stacjonarnego.",
+    "languages": "Obsługa w językach",
+    "coverage": {
+      "online": "Online",
+      "hybrid": "Na miejscu i online"
+    },
+    "priceList": "Cennik usług",
+    "faq": "Najczęstsze pytania",
+    "gallery": "Galeria",
+    "galleryOpen": "Powiększ zdjęcie {index} z {total}: {alt}",
+    "galleryDialog": "Podgląd zdjęcia",
+    "galleryClose": "Zamknij podgląd",
+    "galleryPrevious": "Poprzednie zdjęcie",
+    "galleryNext": "Następne zdjęcie",
+    "galleryCounter": "{index} z {total}",
+    "similar": "Podobne firmy",
+    "upgrade": {
+      "eyebrow": "Dla właściciela",
+      "title": "To Twoja firma?",
+      "description": "Zamień ten profil w stronę firmową, którą chętnie podlinkujesz w bio i na wizytówce.",
+      "benefitPhotos": "Zdjęcie w nagłówku i galeria do {max} zdjęć",
+      "benefitPrices": "Cennik usług i odpowiedzi na częste pytania",
+      "benefitNoCompetitors": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
+      "cta": "To moja firma — ulepsz stronę"
+    },
+    "days": {
+      "monday": "Poniedziałek",
+      "tuesday": "Wtorek",
+      "wednesday": "Środa",
+      "thursday": "Czwartek",
+      "friday": "Piątek",
+      "saturday": "Sobota",
+      "sunday": "Niedziela"
+    }
   }
 }

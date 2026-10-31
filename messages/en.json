@@ -824,5 +824,59 @@
       "correction": "If anything is incorrect, simply reply to this message.",
       "signature": "The Polvia team"
     }
+  },
+  "ServiceProfile": {
+    "logoAlt": "{name} logo",
+    "about": "About",
+    "tags": "Specialties",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website",
+    "socials": "Social media",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "navigate": "Directions",
+    "hours": "Opening hours",
+    "closed": "Closed",
+    "address": "Address",
+    "locations": "Locations",
+    "mainLocation": "Main office",
+    "showOnMap": "Show on map",
+    "onlineOnly": "This business serves clients remotely only, with no physical location.",
+    "languages": "Languages spoken",
+    "coverage": {
+      "online": "Online",
+      "hybrid": "On-site and online"
+    },
+    "priceList": "Price list",
+    "faq": "Frequently asked questions",
+    "gallery": "Gallery",
+    "galleryOpen": "Enlarge photo {index} of {total}: {alt}",
+    "galleryDialog": "Photo preview",
+    "galleryClose": "Close preview",
+    "galleryPrevious": "Previous photo",
+    "galleryNext": "Next photo",
+    "galleryCounter": "{index} of {total}",
+    "similar": "Similar businesses",
+    "upgrade": {
+      "eyebrow": "For the owner",
+      "title": "Is this your business?",
+      "description": "Turn this profile into a business page you will be proud to link in your bio and on your business card.",
+      "benefitPhotos": "Header photo and a gallery of up to {max} photos",
+      "benefitPrices": "Price list and answers to common questions",
+      "benefitNoCompetitors": "No “Similar businesses” section — we do not promote competitors",
+      "cta": "This is my business — upgrade the page"
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
   }
 }

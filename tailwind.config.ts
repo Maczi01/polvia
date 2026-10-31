@@ -53,6 +53,9 @@ export default {
                     '4': 'hsl(var(--chart-4))',
                     '5': 'hsl(var(--chart-5))',
                 },
+                // Akcent marki (magenta z rozwinietej karty uslugi). Odcienie przez
+                // modyfikator przezroczystosci, np. `bg-brand/10`.
+                brand: '#C52289',
                 green: {
                     50: '#EFF6FF',
                     100: '#DBEAFE',
