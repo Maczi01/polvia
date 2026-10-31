@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 2)
+**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 2)
 
 ## Źródła
 
@@ -233,20 +233,20 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 
 Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 4 × P2, 20 × P3). P2-1 i P2-2 naprawić **przed U8**, bo U8 przejmuje ten kontrakt.
 
-- [ ] 🟠 [important] **`firma/[slug]/page.tsx:56-65`**: źródło subskrypcji jako stub bez `serviceId`, synchroniczny, w `page.tsx`.
+- [x] 🟠 [important] **`firma/[slug]/page.tsx:56-65`**: źródło subskrypcji jako stub bez `serviceId`, synchroniczny, w `page.tsx`.
   - `getServiceProfile` zwraca `subscription: PremiumSubscriptionState | null` (do U8 stałe `null` w zapytaniu, w U8 `leftJoin(service_subscriptions)`).
   - `resolveProfileView(profile)` zostaje synchroniczne; jedno `now` dla metadanych i strony.
   - W U8: test negatywny (subskrypcja usługi A nie włącza premium usłudze B).
-- [ ] 🟠 [important] **`firma/[slug]/page.tsx:120-121`, `:138-151`**: cover w OG tylko przy premium i pomijanie podobnych firm bez testu. Czyste funkcje (`selectOgCoverPath`, `shouldLoadSimilarServices`) w `select-profile-view.ts` z testami: free z treścią → `null`; premium z coverem → src; premium bez treści → `null`.
-- [ ] 🟠 [important] **`src/db/premium-content-schema.ts:115-151` vs `service-profile-types.ts:35-47`**: dwa ręcznie zsynchronizowane kształty treści premium, projekcja widoku w `src/db`.
+- [x] 🟠 [important] **`firma/[slug]/page.tsx:120-121`, `:138-151`**: cover w OG tylko przy premium i pomijanie podobnych firm bez testu. Czyste funkcje (`selectOgCoverPath`, `shouldLoadSimilarServices`) w `select-profile-view.ts` z testami: free z treścią → `null`; premium z coverem → src; premium bez treści → `null`.
+- [x] 🟠 [important] **`src/db/premium-content-schema.ts:115-151` vs `service-profile-types.ts:35-47`**: dwa ręcznie zsynchronizowane kształty treści premium, projekcja widoku w `src/db`.
   - `LocalizedPremiumContent`, `localizePremiumContent` i `premiumImagePath` przenieść do `src/lib/service-profile-premium.ts`.
   - `PremiumContent = LocalizedPremiumContent` (import type).
-- [ ] 🟠 [important] **`src/db/upsert-premium-content.ts:180`**: `JSON.parse` przed `hasPremiumBlock`, więc dowolny niepoprawny JSON w `data/services/` przerywa `db:reset` bez nazwy pliku. Owinąć parse (ostrzeżenie z nazwą pliku i pominięcie albo `INVALID_ENTRY` z nazwą) + test z plikiem `'{'`.
-- [ ] 🟡 [nit] **`premium-content-schema.ts:84-89`**: limit liczby pozycji `priceList`/`faq` (stałe w `premium-templates.ts`) i unikalność `file`/`name`/`q` przez `superRefine` (P3 #12, #13).
-- [ ] 🟡 [nit] **`upsert-premium-content.ts:74`**: sprawdzanie zdjęć wrażliwe na wielkość liter (Windows vs Vercel) (P3 #14).
-- [ ] 🟡 [nit] **`.claude/skills/dodaj/SKILL.md`**: blok `premium` w JSON dopiero po weryfikacji płacącego; katalog zdjęć zależy od slugu usługi (P3 #15, #16).
+- [x] 🟠 [important] **`src/db/upsert-premium-content.ts:180`**: `JSON.parse` przed `hasPremiumBlock`, więc dowolny niepoprawny JSON w `data/services/` przerywa `db:reset` bez nazwy pliku. Owinąć parse (ostrzeżenie z nazwą pliku i pominięcie albo `INVALID_ENTRY` z nazwą) + test z plikiem `'{'`.
+- [x] 🟡 [nit] **`premium-content-schema.ts:84-89`**: limit liczby pozycji `priceList`/`faq` (stałe w `premium-templates.ts`) i unikalność `file`/`name`/`q` przez `superRefine` (P3 #12, #13).
+- [x] 🟡 [nit] **`upsert-premium-content.ts:74`**: sprawdzanie zdjęć wrażliwe na wielkość liter (Windows vs Vercel) (P3 #14).
+- [x] 🟡 [nit] **`.claude/skills/dodaj/SKILL.md`**: blok `premium` w JSON dopiero po weryfikacji płacącego; katalog zdjęć zależy od slugu usługi (P3 #15, #16).
 - [ ] 🟡 [nit] **przed U8**: sprawdzić w `npm run build`, czy `/[locale]/firma/[slug]` jest dynamiczna; jeśli nie — `revalidatePath` w webhooku (P3 #17).
-- [ ] 🟡 [nit] Pozostałe P3 (#1–#11, #18–#20) według raportu, do rozważenia.
+- [ ] 🟡 [nit] Pozostałe P3 według raportu: zrobione #1 (jeden lookup + adapter w `premium-content-store.ts`), #2, #3, #7–#11, #19, #20; otwarte #4, #5, #6, #18 (do rozważenia).
 
 ---
 
@@ -264,7 +264,8 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [ ] `src/lib/stripe.ts` (`server-only`, jawny timeout i `apiVersion`)
 - [ ] `src/db/schema.ts`: tabele `service_subscriptions` (1:1 z usługą) i `stripe_events` (`id` pk)
 - [x] `src/lib/premium.ts`: `isPremiumActive`, `PREMIUM_GRACE_DAYS` (domyślnie 3), `premiumRankingExpiry` — **zrobione w fazie 2** (`e4c7f7e`); enum `subscription_status` buduj z `SUBSCRIPTION_STATUSES`
-- [ ] `page.tsx`: podmienić ciało `getPremiumSubscription()` (dziś `null`) na odczyt `service_subscriptions`
+- [ ] `src/lib/service-profile-queries.ts`: zamienić stałą `NO_SUBSCRIPTION` w `getServiceProfile` na `leftJoin(service_subscriptions)` po `service_id` (kontrakt `profile.subscription` gotowy po review fazy 2; `page.tsx` bez zmian)
+- [ ] `Test:` aktywna subskrypcja usługi A nie włącza premium usłudze B (test negatywny z review fazy 2)
 - [ ] `src/lib/subscription-sync.ts`: `syncSubscriptionFromStripe(subscriptionId)`
   - pobiera subskrypcję,
   - w jednej transakcji: upsert `service_subscriptions` + upsert lub usunięcie `promoted_services`,

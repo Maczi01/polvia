@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 2)
+**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 2)
 
 ## Źródła
 
@@ -253,6 +253,29 @@ Kluczowe wnioski:
 - **Jeden kształt treści premium.** Projekcja na locale przechodzi do `src/lib`, a typ widoku jest aliasem.
 - **Seed czyta teraz `data/services/`**, więc niepoprawny plik roboczy przerywa `db:reset`. Parse musi być odporny i wskazywać plik.
 - Bezpieczeństwo bez uwag: path traversal zamknięty, brak XSS, premium nie do włączenia bez subskrypcji.
+
+### Poprawki po review fazy 2 (2026-10-31)
+
+Wszystkie 4 × P2 naprawione, do tego P3 #1 (część), #2, #3, #7–#16, #19, #20. Bramka: `tsc` OK, `jest` 151 suite'ów / 1644 testów, `next lint` 0 błędów.
+
+| Commit | Builder | Zakres |
+|---|---|---|
+| `fbe8cf9` | feature-builder-web-data | P2-1 (dane), P2-3, P2-4, P3 #1–#3, #7, #9, #11–#16, #19, #20 |
+| `e861b55` | feature-builder-web-ui | P2-1 (UI), P2-2, P3 #8, #10, #19 (część) |
+
+Decyzje:
+- **Subskrypcja jest polem profilu.** `getServiceProfile` zwraca `subscription` (stała `NO_SUBSCRIPTION = null` do U8). `page.tsx` czyta `profile.subscription`, a `getRequestNow = cache(() => new Date())` daje jedną chwilę na żądanie. U8 zmienia tylko zapytanie (`leftJoin(service_subscriptions)`), checklista U8 zaktualizowana.
+- **Decyzje widoku premium** to `selectOgCoverPath` i `shouldLoadSimilarServices` w `select-profile-view.ts`, z testami.
+- **Treść premium ma jeden kształt:** `LocalizedPremiumContent` + projekcja na locale w `src/lib/service-profile-premium.ts`. `PremiumContent` w kontrakcie widoku jest aliasem.
+- **Seed:** nieparsowalny JSON w `data/services/` trafia do `skipped` z nazwą pliku (łapany tylko `SyntaxError`). `IMAGES_MISSING` i `ENTRY_AMBIGUOUS` przerywają seed (testy).
+- **Walidacja treści:**
+  - limity `PREMIUM_PRICE_LIST_MAX = 30` i `PREMIUM_FAQ_MAX = 20`;
+  - unikalność pliku galerii oraz nazwy i pytania w każdym locale;
+  - zdjęcia sprawdzane z wielkością liter (`readdir` zamiast `existsSync`).
+- **Lookup usługi to jedno zapytanie** (`findServicesByLocationSlugs` → `{ id, slug }`). Adapter Drizzle wydzielony do `src/db/premium-content-store.ts`, bo `upsert-premium-content.ts` przekroczył 300 linii. `findServiceIdBySlug` usunięte razem ze swoim testem; `SERVICE_NOT_FOUND` dalej pokryte.
+- `formatZodIssue` w `src/db/format-zod-issue.ts` (3 użycia).
+
+Otwarte: P3 #4, #5, #6, #18 (do rozważenia). Przed U8 zostaje #17: sprawdzić, czy trasa profilu jest dynamiczna. Wymaga `npm run build` z `.env`, więc dopiero na preview.
 
 ## Środowisko worktree
 
