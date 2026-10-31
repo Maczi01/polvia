@@ -108,7 +108,15 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
     const profile = await getCachedServiceProfile(slug, locale);
     if (!profile) notFound();
 
-    const similarServices = await getSimilarServices(profile.id, locale);
+    // Lokalizacje przychodza glowna pierwsza — to miasto glowne, jak `mainCity` w zapytaniu.
+    const similarServices = await getSimilarServices(
+        {
+            serviceId: profile.id,
+            category: profile.category,
+            city: profile.locations[0]?.city ?? null,
+        },
+        locale,
+    );
     const view = toProfileView(profile, similarServices, locale);
     const mainLocation = getMainLocation(view.locations);
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;

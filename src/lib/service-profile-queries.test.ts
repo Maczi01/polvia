@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { is, SQL } from 'drizzle-orm';
+import { Column, is, SQL, sql } from 'drizzle-orm';
 import { PgDialect } from 'drizzle-orm/pg-core';
 
 import { db } from '@/db';
@@ -13,12 +13,14 @@ import {
     getSimilarServices,
     type ServiceProfileLocation,
 } from './service-profile-queries';
+import { SIMILAR_SERVICES_LIMIT, type SimilarServicesSource } from './similar-services';
 
 /** Jedno zapytanie zbudowane na mocku: co wybralo, z jakim WHERE/JOIN i LIMIT. */
 interface RecordedQuery {
     selected: Record<string, unknown>;
     joins: unknown[];
     where: unknown;
+    orderBy: unknown[];
     limit: number | undefined;
 }
 
@@ -36,7 +38,13 @@ const mockDb: { queries: RecordedQuery[]; results: unknown[][]; failure: Error |
 jest.mock('@/db', () => {
     function createQuery(selected: Record<string, unknown>) {
         const index = mockDb.queries.length;
-        const record: RecordedQuery = { selected, joins: [], where: undefined, limit: undefined };
+        const record: RecordedQuery = {
+            selected,
+            joins: [],
+            where: undefined,
+            orderBy: [],
+            limit: undefined,
+        };
         mockDb.queries.push(record);
 
         // Wynik liczony po zbudowaniu calego lancucha (mikrozadanie), wiec widzi juz `limit`.
@@ -52,11 +60,18 @@ jest.mock('@/db', () => {
                 record.joins.push(condition);
                 return query;
             },
+            innerJoin: (_table: unknown, condition: unknown) => {
+                record.joins.push(condition);
+                return query;
+            },
             where: (condition: unknown) => {
                 record.where = condition;
                 return awaitable();
             },
-            orderBy: () => awaitable(),
+            orderBy: (...terms: unknown[]) => {
+                record.orderBy = terms;
+                return awaitable();
+            },
             limit: async (count: number) => {
                 if (mockDb.failure) throw mockDb.failure;
                 record.limit = count;
@@ -70,8 +85,10 @@ jest.mock('@/db', () => {
 });
 
 function render(condition: unknown): { sql: string; params: unknown[] } {
-    if (!is(condition, SQL)) throw new Error('oczekiwano wyrazenia SQL');
-    return new PgDialect().sqlToQuery(condition);
+    if (is(condition, SQL)) return new PgDialect().sqlToQuery(condition);
+    // Kolumna Drizzle (np. `servicesTable.id` w `orderBy`) — renderujemy przez `sql`.
+    if (is(condition, Column)) return new PgDialect().sqlToQuery(sql`${condition}`);
+    throw new Error('oczekiwano wyrazenia SQL albo kolumny');
 }
 
 function query(index: number): RecordedQuery {
@@ -127,7 +144,15 @@ describe('getServiceProfile', () => {
 
         expect(profile).toEqual({ ...SERVICE_ROW, slug: 'roza', locations: [location()] });
         expect(render(query(0).joins[0]).params).toContain('uk');
-        expect(render(query(1).where).params).toEqual(['svc-1']);
+    });
+
+    it('lokalizacje pobiera rownolegle, po slugu aktywnego wpisu (nie po id z pierwszego zapytania)', async () => {
+        mockDb.results = [[SERVICE_ROW], [location()]];
+
+        await getServiceProfile('roza', 'uk');
+
+        expect(mockDb.queries).toHaveLength(2);
+        expect(render(query(1).where).params).toEqual(['roza', 'active']);
     });
 
     it('przy braku tlumaczenia bierze services.name (COALESCE)', async () => {
@@ -135,9 +160,8 @@ describe('getServiceProfile', () => {
 
         await getServiceProfile('roza', 'uk');
 
-        expect(render(query(0).selected.name).sql).toBe(
-            'COALESCE("services_translations_alias"."name", "services"."name")',
-        );
+        const name = render(query(0).selected.name).sql;
+        expect(name).toMatch(/^COALESCE\(.*"name", "services"\."name"\)$/);
     });
 
     it('szuka po slugu wsrod aktywnych wpisow, a brak aktywnego daje null', async () => {
@@ -150,7 +174,6 @@ describe('getServiceProfile', () => {
         expect(where.sql).toContain('"services"."slug" = $1');
         expect(where.sql).toContain('"services"."status" = $2');
         expect(where.params).toEqual(['roza', 'active']);
-        expect(mockDb.queries).toHaveLength(1);
     });
 
     it('wpis online-only zwraca lokalizacje bez wspolrzednych bez bledu', async () => {
@@ -181,46 +204,64 @@ describe('getServiceProfile', () => {
 });
 
 describe('getSimilarServices', () => {
-    const SOURCE = { serviceId: 'svc-1', category: 'legal', city: 'Warszawa' };
+    const SOURCE: SimilarServicesSource = { serviceId: 'svc-1', category: 'law', city: ' Warszawa ' };
 
-    function candidate(id: string, city: string | null, category = 'legal') {
-        return { serviceId: id, slug: id, name: `Firma ${id}`, image: null, city, category };
+    function candidate(id: string, slug: string | null = id) {
+        return { serviceId: id, slug, name: `Firma ${id}`, image: null, city: 'Warszawa', category: 'law' };
     }
 
-    it('zwraca najwyzej 6 firm tej samej kategorii, z miasta zrodla na poczatku', async () => {
-        const others = Array.from({ length: 7 }, (_, index) => candidate(`k${index}`, 'Kraków'));
-        mockDb.results = [[SOURCE], [...others, candidate('w1', 'Warszawa')]];
+    it('jedno zapytanie z limitem w SQL, bez ponownego pobierania kategorii i miasta zrodla', async () => {
+        mockDb.results = [[candidate('a'), candidate('b')]];
 
-        const similar = await getSimilarServices('svc-1', 'pl');
+        const similar = await getSimilarServices(SOURCE, 'pl');
 
-        expect(similar).toHaveLength(6);
-        expect(similar[0]?.serviceId).toBe('w1');
-        expect(similar.map(item => item.serviceId)).not.toContain('svc-1');
+        expect(similar.map(item => item.serviceId)).toEqual(['a', 'b']);
+        expect(mockDb.queries).toHaveLength(1);
+        expect(query(0).limit).toBe(SIMILAR_SERVICES_LIMIT);
     });
 
     it('filtruje w SQL: aktywne, ta sama kategoria, bez wlasnego wpisu, ze slugiem', async () => {
-        mockDb.results = [[SOURCE], []];
+        await getSimilarServices(SOURCE, 'uk');
 
-        await getSimilarServices('svc-1', 'uk');
-
-        const where = render(query(1).where);
-        expect(where.params).toEqual(['active', 'legal', 'svc-1']);
+        const where = render(query(0).where);
+        expect(where.params).toEqual(['active', 'law', 'svc-1']);
         expect(where.sql).toContain('"services"."id" <> $3');
         expect(where.sql).toContain('"services"."slug" is not null');
-        expect(render(query(1).joins[0]).params).toContain('uk');
+        expect(render(query(0).joins[0]).params).toContain('uk');
+    });
+
+    it('sortuje najpierw po miescie zrodla (bez wielkosci liter i spacji), potem po nazwie', async () => {
+        await getSimilarServices(SOURCE, 'pl');
+
+        // Podzapytanie miasta ma znaki nowej linii — splaszczamy, zeby `.` w regexie je objal.
+        const [sameCity, byName, tieBreaker] = query(0)
+            .orderBy.map(render)
+            .map(term => ({ ...term, sql: term.sql.replaceAll(/\s+/g, ' ') }));
+        expect(sameCity?.sql).toMatch(/lower\(btrim\(.*"service_locations"\."city".*\)\) = lower\(\$\d+\)/);
+        expect(sameCity?.sql).toMatch(/^COALESCE\(.*, false\) DESC$/);
+        expect(sameCity?.params).toEqual(['Warszawa']);
+        expect(byName?.sql).toContain('COALESCE');
+        expect(tieBreaker?.sql).toBe('"services"."id"');
+    });
+
+    it.each([null, '', '   '])('zrodlo bez miasta (%p) nie promuje zadnego miasta', async city => {
+        await getSimilarServices({ ...SOURCE, city }, 'pl');
+
+        const sameCity = render(query(0).orderBy[0]);
+        expect(sameCity.sql).toBe('false DESC');
+        expect(sameCity.params).toEqual([]);
     });
 
     it('pomija kandydata bez slugu, nawet gdy baza go zwrocila', async () => {
-        mockDb.results = [[SOURCE], [{ ...candidate('a', 'Warszawa'), slug: null }]];
+        mockDb.results = [[candidate('a', null)]];
 
-        expect(await getSimilarServices('svc-1', 'pl')).toEqual([]);
+        expect(await getSimilarServices(SOURCE, 'pl')).toEqual([]);
     });
 
-    it('nieznana usluga zrodlowa daje pusta liste bez drugiego zapytania', async () => {
-        mockDb.results = [[]];
+    it('blad bazy przechodzi do wolajacego', async () => {
+        mockDb.failure = new Error('connection refused');
 
-        expect(await getSimilarServices('brak', 'pl')).toEqual([]);
-        expect(mockDb.queries).toHaveLength(1);
+        await expect(getSimilarServices(SOURCE, 'pl')).rejects.toThrow('connection refused');
     });
 });
 

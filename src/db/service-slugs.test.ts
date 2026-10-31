@@ -1,7 +1,9 @@
+import { isValidServiceSlug } from '../lib/service-slug-format';
 import {
     assignMissingServiceSlugs,
     createServiceSlugAllocator,
-    describeSlugConflicts,
+    planNewServiceSlug,
+    serviceSlugBase,
     type SlugCandidate,
 } from './service-slugs';
 
@@ -89,37 +91,60 @@ describe('createServiceSlugAllocator', () => {
     });
 });
 
-describe('describeSlugConflicts', () => {
-    it('zwraca null, gdy wszystkie slugi sa wolne', () => {
-        expect(
-            describeSlugConflicts({
-                serviceSlug: 'ifiora',
-                isServiceSlugTaken: false,
-                takenLocationSlugs: [],
-            }),
-        ).toBeNull();
+describe('planNewServiceSlug', () => {
+    const FREE = { takenServiceSlugs: [], takenLocationSlugs: [] };
+
+    it('wolna nazwa daje slug z nazwy, niezaleznie od bazy slugow lokalizacji z JSON', () => {
+        // np. data/services: name "Ifiora", slug (baza lokalizacji) "ifiora-warszawa"
+        expect(planNewServiceSlug({ ...FREE, name: 'Ifiora' })).toEqual({
+            ok: true,
+            serviceSlug: 'ifiora',
+        });
     });
 
-    it('zajety slug uslugi daje komunikat z nazwa slugu i wskazowka', () => {
-        const message = describeSlugConflicts({
-            serviceSlug: 'ifiora',
-            isServiceSlugTaken: true,
-            takenLocationSlugs: [],
+    it('zajety slug z nazwy dostaje pierwszy wolny sufiks, jak w seedzie i backfillu', () => {
+        const plan = planNewServiceSlug({
+            ...FREE,
+            name: 'Kwiaciarnia Roza',
+            takenServiceSlugs: ['kwiaciarnia-roza', 'kwiaciarnia-roza-2'],
         });
 
-        expect(message).toBe(
-            'slug uslugi "ifiora" jest juz zajety — to duplikat wpisu albo ustaw w JSON inny "slug"',
+        expect(plan).toEqual({ ok: true, serviceSlug: 'kwiaciarnia-roza-3' });
+    });
+
+    it('nazwa bez znakow [a-z0-9] dostaje zastepczy slug, takze przy kolizji', () => {
+        expect(planNewServiceSlug({ ...FREE, name: '!!!', takenServiceSlugs: ['firma'] })).toEqual(
+            { ok: true, serviceSlug: 'firma-2' },
         );
     });
 
-    it('wymienia zajete slugi lokalizacji obok zajetego slugu uslugi', () => {
-        const message = describeSlugConflicts({
-            serviceSlug: 'ifiora',
-            isServiceSlugTaken: true,
-            takenLocationSlugs: ['ifiora-warszawa'],
+    it('zajety slug lokalizacji przerywa z lista kolizji (duplikat wpisu)', () => {
+        const plan = planNewServiceSlug({
+            ...FREE,
+            name: 'Ifiora',
+            takenLocationSlugs: ['ifiora-warszawa', 'ifiora-krakow'],
         });
 
-        expect(message).toContain('slug uslugi "ifiora"');
-        expect(message).toContain('slug lokalizacji juz istnieje w bazie: ifiora-warszawa');
+        expect(plan.ok).toBe(false);
+        if (plan.ok) return;
+        expect(plan.message).toContain(
+            'slug lokalizacji juz istnieje w bazie: ifiora-warszawa, ifiora-krakow',
+        );
+    });
+
+    it.each(['Żłobek Słoneczko', 'Привіт Їжак', '- Studio -', '😀', '中文'])(
+        'slug dla %s ma format, ktory przepusci middleware',
+        name => {
+            const plan = planNewServiceSlug({ ...FREE, name });
+
+            expect(plan.ok && isValidServiceSlug(plan.serviceSlug)).toBe(true);
+        },
+    );
+});
+
+describe('serviceSlugBase', () => {
+    it('to slug z nazwy albo zastepczy, gdy nazwa nie daje znakow', () => {
+        expect(serviceSlugBase('Multi Cook')).toBe('multi-cook');
+        expect(serviceSlugBase('!!!')).toBe('firma');
     });
 });

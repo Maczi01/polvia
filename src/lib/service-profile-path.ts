@@ -2,6 +2,8 @@ import { type Locale, locales } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 import { localePathPrefix } from '@/lib/map-url-builder';
 
+export { isValidServiceSlug } from '@/lib/service-slug-format';
+
 /**
  * Sciezki profilu firmy `/firma/<slug>` — czysta logika dla middleware i sitemapy.
  *
@@ -11,12 +13,6 @@ import { localePathPrefix } from '@/lib/map-url-builder';
 
 /** Segment profilu — ten sam we wszystkich locale (`/firma/x`, `/uk/firma/x`). */
 export const SERVICE_PROFILE_SEGMENT = 'firma';
-
-/** Dlugosc kolumny `services.slug` (`varchar(255)`). */
-const MAX_SERVICE_SLUG_LENGTH = 255;
-
-/** Format `slugify(name, { lower: true, strict: true })`: grupy `[a-z0-9]` laczone myslnikiem. */
-const SERVICE_SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export type ServiceProfilePathname = {
     locale: Locale;
@@ -28,11 +24,6 @@ const LOCALE_SET: ReadonlySet<string> = new Set(locales);
 
 function isLocale(value: string): value is Locale {
     return LOCALE_SET.has(value);
-}
-
-/** Czy tekst ma format slugu uslugi. Nie mowi, czy wpis istnieje. */
-export function isValidServiceSlug(slug: string): boolean {
-    return slug.length <= MAX_SERVICE_SLUG_LENGTH && SERVICE_SLUG_PATTERN.test(slug);
 }
 
 /**

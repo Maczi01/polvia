@@ -24,6 +24,15 @@ export type SlugAssignment = {
     slug: string;
 };
 
+/**
+ * Baza slugu uslugi: `buildServiceSlug(name)`, a gdy nazwa nie daje znakow — `firma`.
+ * Kolizje dostaja sufiksy `<baza>-2`, `<baza>-3`…, wiec zajete slugi do sprawdzenia
+ * to `<baza>` i `<baza>-*`.
+ */
+export function serviceSlugBase(name: string): string {
+    return buildServiceSlug(name) || FALLBACK_SLUG_BASE;
+}
+
 function uniqueSlug(base: string, taken: ReadonlySet<string>): string {
     if (!taken.has(base)) return base;
 
@@ -45,7 +54,7 @@ export function createServiceSlugAllocator(
     const taken = new Set(takenSlugs);
 
     return name => {
-        const slug = uniqueSlug(buildServiceSlug(name) || FALLBACK_SLUG_BASE, taken);
+        const slug = uniqueSlug(serviceSlugBase(name), taken);
         taken.add(slug);
         return slug;
     };
@@ -72,33 +81,38 @@ export function assignMissingServiceSlugs(services: readonly SlugCandidate[]): S
     return pending.map(service => ({ id: service.id, slug: allocate(service.name) }));
 }
 
-export type SlugConflicts = {
-    serviceSlug: string;
-    isServiceSlugTaken: boolean;
+export type NewServiceSlugInput = {
+    /** `name` z pliku wpisu — jedyne zrodlo slugu uslugi. */
+    name: string;
+    /** Slugi uslug juz zajete w bazie (wystarcza `<baza>` i `<baza>-*`). */
+    takenServiceSlugs: Iterable<string>;
+    /** Slugi lokalizacji nowego wpisu, ktore juz istnieja w bazie. */
     takenLocationSlugs: readonly string[];
 };
 
+export type NewServiceSlugPlan = { ok: true; serviceSlug: string } | { ok: false; message: string };
+
 /**
- * Czytelny opis kolizji slugow wpisu z `data/services/*.json` albo `null`, gdy
- * wszystkie sa wolne. Zajety slug uslugi przerywa dodawanie: cicha zmiana na
- * `-2` dalaby firmie inny adres niz ten, ktory wpisano w JSON.
+ * Slug uslugi dla `db:add`: ta sama regula co seed i backfill (`createServiceSlugAllocator`
+ * zasilony zajetymi slugami), wiec wpis ma ten sam adres `/firma/<slug>` po `db:add`
+ * i po `db:reset`. Zajety slug uslugi nie jest bledem — dostaje sufiks `-2`, `-3`….
+ *
+ * Bledem jest zajety slug lokalizacji: lokalizacje licza sie z jawnej bazy (`slug` w JSON),
+ * wiec kolizja oznacza duplikat wpisu albo baze do zmiany.
  */
-export function describeSlugConflicts(conflicts: SlugConflicts): string | null {
-    const problems: string[] = [];
-
-    if (conflicts.isServiceSlugTaken) {
-        problems.push(
-            `slug uslugi "${conflicts.serviceSlug}" jest juz zajety — to duplikat wpisu ` +
-                'albo ustaw w JSON inny "slug"',
-        );
+export function planNewServiceSlug({
+    name,
+    takenServiceSlugs,
+    takenLocationSlugs,
+}: NewServiceSlugInput): NewServiceSlugPlan {
+    if (takenLocationSlugs.length > 0) {
+        return {
+            ok: false,
+            message:
+                `slug lokalizacji juz istnieje w bazie: ${takenLocationSlugs.join(', ')} ` +
+                '— to duplikat wpisu albo ustaw w JSON inny "slug" (baze slugow lokalizacji)',
+        };
     }
 
-    if (conflicts.takenLocationSlugs.length > 0) {
-        problems.push(
-            `slug lokalizacji juz istnieje w bazie: ${conflicts.takenLocationSlugs.join(', ')} ` +
-                '— to duplikat wpisu',
-        );
-    }
-
-    return problems.length > 0 ? problems.join('; ') : null;
+    return { ok: true, serviceSlug: createServiceSlugAllocator(takenServiceSlugs)(name) };
 }

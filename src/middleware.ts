@@ -11,6 +11,8 @@ import {
 } from '@/lib/service-profile-path';
 import { lookupServiceSlug } from '@/lib/service-slug-lookup';
 
+import { env } from '../env';
+
 const intlMiddleware = createMiddleware({
     ...routing,
     localeDetection: false
@@ -24,7 +26,13 @@ const intlMiddleware = createMiddleware({
  * Powod jak przy mapie: `[locale]/loading.tsx` sprawia, ze strona streamuje, wiec
  * `notFound()` w `page.tsx` daje soft-404 (status 200). Middleware na edge nie ma bazy,
  * wiec pyta `GET /api/service-slug/<slug>` (Node). Matcher wyklucza `/api`, wiec ten
- * `fetch` nie wraca do middleware.
+ * `fetch` nie wraca do middleware. Sekret w naglowku zwalnia lookup z limitu po IP:
+ * na Vercelu kazdy fetch z middleware ma ten sam adres wychodzacy (wspolny kubelek).
+ *
+ * Origin z `request.nextUrl` (naglowek `Host`), nie z `env.NEXT_PUBLIC_SITE_URL`: ta
+ * zmienna to adres produkcji, wiec dev i preview pytalyby kodu i bazy produkcji, a nie
+ * swojego deploymentu. Sekret nie wycieka do obcego hosta, bo na Vercelu zadanie trafia
+ * do deploymentu tylko przez domeny do niego przypisane — `Host` jest zawsze nasz.
  *
  * 404 to rewrite na sciezke, ktorej nie dopasuje zadna trasa: router Next ustawia 404
  * i renderuje globalne not-found przed jakimkolwiek streamowaniem layoutu `[locale]`.
@@ -41,8 +49,7 @@ async function handleServiceProfile(request: NextRequest): Promise<NextResponse 
     const result = await lookupServiceSlug({
         origin: request.nextUrl.origin,
         slug: profilePath.slug,
-        // Na Vercelu platforma nadpisuje ten naglowek adresem klienta — klient go nie podmieni.
-        forwardedFor: request.headers.get('x-forwarded-for'),
+        secret: env.SERVICE_SLUG_LOOKUP_SECRET,
     });
 
     // `unknown` (timeout, 5xx, 429) = fail-open: profil renderuje sie albo konczy

@@ -15,6 +15,12 @@ import { z } from 'zod';
 export const SERVICE_SLUG_LOOKUP_TIMEOUT_MS = 1500;
 
 /**
+ * Naglowek z sekretem `SERVICE_SLUG_LOOKUP_SECRET`: handler rozpoznaje po nim ruch
+ * z middleware. Wspolny dla obu stron, wiec mieszka w module bez zaleznosci od Node.
+ */
+export const SERVICE_SLUG_LOOKUP_SECRET_HEADER = 'x-service-slug-lookup-secret';
+
+/**
  * - `found` / `missing` — handler odpowiedzial poprawnie,
  * - `unknown` — timeout, blad sieci, status inny niz 2xx albo odpowiedz w zlym ksztalcie.
  *   Wolajacy przepuszcza wtedy zadanie (fail-open), zamiast blokowac profil.
@@ -26,24 +32,24 @@ export interface ServiceSlugLookupOptions {
     origin: string;
     /** Slug po walidacji formatu (`isValidServiceSlug`). */
     slug: string;
-    /** `x-forwarded-for` z zadania klienta: limit w handlerze liczy sie per klient, nie per serwer. */
-    forwardedFor: string | null;
+    /** `env.SERVICE_SLUG_LOOKUP_SECRET` — zaufany ruch omija limit po IP w handlerze. */
+    secret: string;
 }
 
 const lookupResponseSchema = z.object({ data: z.object({ exists: z.boolean() }) });
 
+/**
+ * Bez `cache: 'no-store'`: odpowiedz handlera niesie `Cache-Control` z `s-maxage`, wiec
+ * powtarzane lookupy tego samego slugu obsluguje CDN, a nie funkcja z baza.
+ */
 export async function lookupServiceSlug({
     origin,
     slug,
-    forwardedFor,
+    secret,
 }: ServiceSlugLookupOptions): Promise<ServiceSlugLookupResult> {
-    const headers = new Headers();
-    if (forwardedFor) headers.set('x-forwarded-for', forwardedFor);
-
     try {
         const response = await fetch(`${origin}/api/service-slug/${encodeURIComponent(slug)}`, {
-            headers,
-            cache: 'no-store',
+            headers: { [SERVICE_SLUG_LOOKUP_SECRET_HEADER]: secret },
             signal: AbortSignal.timeout(SERVICE_SLUG_LOOKUP_TIMEOUT_MS),
         });
 

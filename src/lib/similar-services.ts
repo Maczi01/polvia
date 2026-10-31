@@ -1,7 +1,10 @@
+import type { Category } from '@/lib/categories';
+
 /** Ile pozycji pokazuje sekcja „Podobne firmy” na darmowym profilu. */
 export const SIMILAR_SERVICES_LIMIT = 6;
 
-export type SimilarService = {
+/** Wiersz „Podobnych firm” z bazy (`getSimilarServices`), przed mapowaniem na widok profilu. */
+export type SimilarServiceRow = {
     serviceId: string;
     /** Slug uslugi — adres `/firma/<slug>`. */
     slug: string;
@@ -13,42 +16,16 @@ export type SimilarService = {
     category: string;
 };
 
+/**
+ * Stara nazwa wiersza, kolidujaca z typem widoku `SimilarService` w `service-profile-types.ts`.
+ * Zostaje tylko dla `to-profile-view.ts`; do usuniecia przy refaktorze typow widoku (#8).
+ */
+export type SimilarService = SimilarServiceRow;
+
+/** Profil, dla ktorego szukamy podobnych firm — strona ma te dane z `getServiceProfile`. */
 export type SimilarServicesSource = {
     serviceId: string;
-    category: string;
+    category: Category;
+    /** Miasto glownej lokalizacji zrodla; `null` = bez promowania firm z tego samego miasta. */
     city: string | null;
 };
-
-function normalizeCity(city: string | null): string {
-    return (city ?? '').trim().toLocaleLowerCase('pl');
-}
-
-/**
- * „Podobne firmy”: ta sama kategoria, bez samego wpisu, najpierw to samo miasto
- * co glowna lokalizacja zrodla, potem reszta — w kazdej grupie alfabetycznie.
- * Celowo bez rankingu premium: kolejnosc ma byc prosta i przewidywalna.
- *
- * Kandydaci przychodza juz przefiltrowani w SQL; filtr kategorii i wlasnego
- * wpisu powtarzamy tu, bo to on definiuje sekcje, a nie ksztalt zapytania.
- */
-export function pickSimilarServices(
-    source: SimilarServicesSource,
-    candidates: readonly SimilarService[],
-): SimilarService[] {
-    const sourceCity = normalizeCity(source.city);
-    const isSameCity = (service: SimilarService): boolean =>
-        sourceCity !== '' && normalizeCity(service.city) === sourceCity;
-
-    return candidates
-        .filter(
-            service =>
-                service.serviceId !== source.serviceId && service.category === source.category,
-        )
-        .toSorted(
-            (a, b) =>
-                Number(isSameCity(b)) - Number(isSameCity(a)) ||
-                a.name.localeCompare(b.name, 'pl') ||
-                a.serviceId.localeCompare(b.serviceId),
-        )
-        .slice(0, SIMILAR_SERVICES_LIMIT);
-}

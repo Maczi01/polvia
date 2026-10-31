@@ -21,14 +21,29 @@ jest.mock('@/lib/redis', () => ({
 jest.mock('@/lib/service-profile-queries', () => ({
     getServiceSlugStatus: jest.fn(),
 }));
+jest.mock('../../../../../env', () => ({
+    env: { SERVICE_SLUG_LOOKUP_SECRET: 's'.repeat(64) },
+}));
 
+const SECRET = 's'.repeat(64);
+const SECRET_HEADER = 'x-service-slug-lookup-secret';
 const CLIENT_IP = '203.0.113.7';
+const RATE_LIMIT = 120;
 
-function lookup(slug: string, ip = CLIENT_IP): ReturnType<typeof GET> {
-    const request = new NextRequest(`https://www.polvia.pl/api/service-slug/${slug}`, {
-        headers: { 'x-forwarded-for': ip },
-    });
+function lookupWith(slug: string, headers: Record<string, string>): ReturnType<typeof GET> {
+    const request = new NextRequest(`https://www.polvia.pl/api/service-slug/${slug}`, { headers });
     return GET(request, { params: Promise.resolve({ slug }) });
+}
+
+/** Klient publiczny z adresem ustawionym przez platforme (Vercel: `x-real-ip`). */
+function lookup(slug: string, ip = CLIENT_IP): ReturnType<typeof GET> {
+    return lookupWith(slug, { 'x-real-ip': ip });
+}
+
+async function exhaustLimit(headers: Record<string, string>): Promise<void> {
+    for (let index = 0; index < RATE_LIMIT; index += 1) {
+        expect((await lookupWith('kancelaria-nowak', headers)).status).toBe(200);
+    }
 }
 
 beforeEach(() => {
@@ -88,7 +103,7 @@ describe('GET /api/service-slug/[slug]', () => {
         expect(getServiceSlugStatus).not.toHaveBeenCalled();
     });
 
-    it('limit liczy sie per IP klienta z x-forwarded-for', async () => {
+    it('limit liczy sie per IP klienta z naglowka platformy', async () => {
         jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
 
         for (let index = 0; index < 121; index += 1) {
@@ -97,6 +112,96 @@ describe('GET /api/service-slug/[slug]', () => {
 
         expect((await lookup('kancelaria-nowak', CLIENT_IP)).status).toBe(429);
         expect((await lookup('kancelaria-nowak', '198.51.100.1')).status).toBe(200);
+        const viaVercelHeader = await lookupWith('kancelaria-nowak', {
+            'x-vercel-forwarded-for': '198.51.100.2',
+        });
+        expect(viaVercelHeader.status).toBe(200);
+    });
+
+    it('podrobiony x-forwarded-for bez sekretu nie omija limitu', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+
+        for (let index = 0; index < RATE_LIMIT; index += 1) {
+            await lookupWith('kancelaria-nowak', {
+                'x-real-ip': CLIENT_IP,
+                'x-forwarded-for': `10.0.0.${index}`,
+            });
+        }
+
+        const response = await lookupWith('kancelaria-nowak', {
+            'x-real-ip': CLIENT_IP,
+            'x-forwarded-for': '10.9.9.9',
+        });
+        expect(response.status).toBe(429);
+    });
+
+    it('bez naglowka platformy rotowany x-forwarded-for trafia do jednego kubelka', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+
+        for (let index = 0; index < RATE_LIMIT; index += 1) {
+            await lookupWith('kancelaria-nowak', { 'x-forwarded-for': `10.1.0.${index}` });
+        }
+
+        const response = await lookupWith('kancelaria-nowak', { 'x-forwarded-for': '10.1.1.1' });
+        expect(response.status).toBe(429);
+    });
+
+    it('poprawny sekret (ruch z middleware) omija limit po IP', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        // Wszystkie fetche z middleware maja jeden adres wychodzacy — ten sam kubelek.
+        const egressIp = '76.76.21.21';
+        await exhaustLimit({ 'x-real-ip': egressIp });
+
+        const response = await lookupWith('kancelaria-nowak', {
+            'x-real-ip': egressIp,
+            [SECRET_HEADER]: SECRET,
+        });
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({ data: { exists: true }, error: null });
+    });
+
+    it.each(['zly-sekret', `${'s'.repeat(64)}x`, 's'.repeat(63), ''])(
+        'zly sekret (%p) jest traktowany jak ruch publiczny',
+        async secret => {
+            jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+            const headers = { 'x-real-ip': CLIENT_IP, [SECRET_HEADER]: secret };
+            await exhaustLimit(headers);
+
+            expect((await lookupWith('kancelaria-nowak', headers)).status).toBe(429);
+        },
+    );
+
+    it('exists: true jest cache-owane w CDN dlugo, ze stale-while-revalidate', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+
+        const response = await lookup('kancelaria-nowak');
+
+        expect(response.headers.get('Cache-Control')).toBe(
+            'public, s-maxage=300, stale-while-revalidate=86400',
+        );
+    });
+
+    it('exists: false jest cache-owane krotko', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false });
+
+        const response = await lookup('nie-istnieje');
+
+        expect(response.headers.get('Cache-Control')).toBe('public, s-maxage=30');
+    });
+
+    it('429, 400 i 500 nie trafiaja do cache publicznego', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        await exhaustLimit({ 'x-real-ip': CLIENT_IP });
+        const limited = await lookup('kancelaria-nowak');
+        const badRequest = await lookupWith('ABC', { [SECRET_HEADER]: SECRET });
+        jest.mocked(getServiceSlugStatus).mockRejectedValue(new Error('db down'));
+        const failed = await lookupWith('kancelaria-nowak', { [SECRET_HEADER]: SECRET });
+
+        expect([limited.status, badRequest.status, failed.status]).toEqual([429, 400, 500]);
+        for (const response of [limited, badRequest, failed]) {
+            expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+        }
     });
 
     it('awaria store limitu nie blokuje lookupu (fail-open) i jest logowana', async () => {

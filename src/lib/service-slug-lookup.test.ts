@@ -2,9 +2,14 @@
  * @jest-environment node
  */
 // fetch, Response i AbortSignal.timeout z Node — jsdom ich nie ma.
-import { lookupServiceSlug, SERVICE_SLUG_LOOKUP_TIMEOUT_MS } from './service-slug-lookup';
+import {
+    lookupServiceSlug,
+    SERVICE_SLUG_LOOKUP_SECRET_HEADER,
+    SERVICE_SLUG_LOOKUP_TIMEOUT_MS,
+} from './service-slug-lookup';
 
-const OPTIONS = { origin: 'https://www.polvia.pl', slug: 'kancelaria-nowak', forwardedFor: '203.0.113.7' };
+const SECRET = 'a'.repeat(64);
+const OPTIONS = { origin: 'https://www.polvia.pl', slug: 'kancelaria-nowak', secret: SECRET };
 
 // Route handler za `fetch` to zewnetrzna (dla middleware) usluga HTTP.
 const fetchMock = jest.fn<Promise<Response>, Parameters<typeof fetch>>();
@@ -27,15 +32,23 @@ afterEach(() => {
 });
 
 describe('lookupServiceSlug', () => {
-    it('exists: true daje found; pyta handler tej samej aplikacji z IP klienta', async () => {
+    it('exists: true daje found; pyta handler tej samej aplikacji z sekretem', async () => {
         fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
 
         expect(await lookupServiceSlug(OPTIONS)).toBe('found');
 
         const [url, init] = fetchMock.mock.calls[0];
         expect(url).toBe('https://www.polvia.pl/api/service-slug/kancelaria-nowak');
-        expect(new Headers(init?.headers).get('x-forwarded-for')).toBe('203.0.113.7');
+        expect(new Headers(init?.headers).get(SERVICE_SLUG_LOOKUP_SECRET_HEADER)).toBe(SECRET);
         expect(init?.signal).toBeInstanceOf(AbortSignal);
+    });
+
+    it('nie wylacza cache HTTP — powtorzony slug moze obsluzyc CDN', async () => {
+        fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
+
+        await lookupServiceSlug(OPTIONS);
+
+        expect(fetchMock.mock.calls[0][1]?.cache).toBeUndefined();
     });
 
     it('exists: false daje missing', async () => {
@@ -44,10 +57,10 @@ describe('lookupServiceSlug', () => {
         expect(await lookupServiceSlug(OPTIONS)).toBe('missing');
     });
 
-    it('bez naglowka klienta nie wysyla pustego x-forwarded-for', async () => {
+    it('nie przekazuje x-forwarded-for — limit zaufanego ruchu nie zalezy od IP', async () => {
         fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
 
-        await lookupServiceSlug({ ...OPTIONS, forwardedFor: null });
+        await lookupServiceSlug(OPTIONS);
 
         expect(new Headers(fetchMock.mock.calls[0][1]?.headers).has('x-forwarded-for')).toBe(false);
     });

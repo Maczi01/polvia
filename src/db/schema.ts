@@ -35,6 +35,10 @@ export const servicesTable = pgTable('services', {
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
     // Adres profilu `/firma/<slug>`: unikalny i niezmienny (zmiana nazwy nie zmienia adresu).
+    // Regula: zawsze z `name` przez `createServiceSlugAllocator` (`service-slugs.ts`) —
+    // `buildServiceSlug(name)`, przy kolizji sufiks `-2`, `-3`… — w seedzie, backfillu
+    // i `db:add`. `slug` z `data/services/*.json` to tylko baza slugow lokalizacji.
+    // Format: `isValidServiceSlug` (`src/lib/service-slug-format.ts`), sprawdzany w middleware.
     // Nullowalny tylko na czas wdrozenia: najpierw `push` z ta kolumna, potem
     // `db:backfill-slugs`, a dopiero potem `.notNull()` w osobnym `push`.
     slug: varchar('slug', { length: 255 }).unique(),
@@ -97,6 +101,9 @@ export const serviceLocationsTable = pgTable('service_locations', {
     index('idx_location_longitude').on(table.longitude),
     index('idx_location_city').on(table.city),
     index('idx_location_voivodeship').on(table.voivodeship),
+    // Lokalizacje uslugi i jej glowne miasto (profil, „Podobne firmy”) — bez tego kazde
+    // zapytanie po `service_id` to skan calej tabeli.
+    index('idx_location_service_main').on(table.serviceId, table.isMainLocation),
 ]);
 
 export const serviceLocationsRelations = relations(serviceLocationsTable, ({ one }) => ({

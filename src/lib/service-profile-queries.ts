@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { and, eq, type InferSelectModel, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, eq, type InferSelectModel, isNotNull, ne, type SQL, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { servicesTranslationsAlias } from '@/db/aliases';
@@ -11,7 +11,11 @@ import {
     tagsTranslationsTable,
 } from '@/db/schema';
 import { isPublicService } from '@/lib/public-service-filter';
-import { pickSimilarServices, type SimilarService } from '@/lib/similar-services';
+import {
+    SIMILAR_SERVICES_LIMIT,
+    type SimilarServiceRow,
+    type SimilarServicesSource,
+} from '@/lib/similar-services';
 
 type ServiceRow = InferSelectModel<typeof servicesTable>;
 type LocationRow = InferSelectModel<typeof serviceLocationsTable>;
@@ -52,7 +56,7 @@ export type ServiceProfile = Pick<
 
 export type ServiceSlugStatus = { exists: boolean };
 
-export type { SimilarService } from '@/lib/similar-services';
+export type { SimilarService, SimilarServiceRow } from '@/lib/similar-services';
 
 /** Nazwa w locale z fallbackiem na nazwe bazowa — ten sam wzorzec co `getServices`. */
 const localizedName = sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`;
@@ -118,7 +122,11 @@ export async function getServiceProfileSitemapEntries(): Promise<ServiceProfileS
     return rows.flatMap(({ slug, updatedAt }) => (slug === null ? [] : [{ slug, updatedAt }]));
 }
 
-function getServiceLocations(serviceId: string): Promise<ServiceProfileLocation[]> {
+/**
+ * Lokalizacje aktywnego wpisu po slugu uslugi. Po slugu, a nie po `id`, zeby szly
+ * rownolegle z zapytaniem o sam wpis (jeden round-trip mniej na kazde wejscie na profil).
+ */
+function getServiceLocations(slug: string): Promise<ServiceProfileLocation[]> {
     return db
         .select({
             id: serviceLocationsTable.id,
@@ -138,7 +146,8 @@ function getServiceLocations(serviceId: string): Promise<ServiceProfileLocation[
             isMainLocation: serviceLocationsTable.isMainLocation,
         })
         .from(serviceLocationsTable)
-        .where(eq(serviceLocationsTable.serviceId, serviceId))
+        .innerJoin(servicesTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
+        .where(and(eq(servicesTable.slug, slug), isPublicService))
         .orderBy(sql`${serviceLocationsTable.isMainLocation} DESC`, serviceLocationsTable.slug);
 }
 
@@ -150,7 +159,18 @@ export async function getServiceProfile(
     slug: string,
     locale: string,
 ): Promise<ServiceProfile | null> {
-    const [service] = await db
+    const [[service], locations] = await Promise.all([
+        getServiceRow(slug, locale),
+        getServiceLocations(slug),
+    ]);
+
+    if (!service) return null;
+
+    return { ...service, slug, locations };
+}
+
+function getServiceRow(slug: string, locale: string) {
+    return db
         .select({
             id: servicesTable.id,
             name: localizedName,
@@ -166,32 +186,34 @@ export async function getServiceProfile(
         .leftJoin(servicesTranslationsAlias, translationJoin(locale))
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);
-
-    if (!service) return null;
-
-    const locations = await getServiceLocations(service.id);
-
-    return { ...service, slug, locations };
 }
 
 /**
- * „Podobne firmy” dla profilu: aktywne wpisy tej samej kategorii, najpierw z miasta
- * glownej lokalizacji. Dobor i kolejnosc: `pickSimilarServices`.
+ * `true`, gdy glowne miasto kandydata to miasto zrodla (bez wielkosci liter i spacji na
+ * brzegach). `COALESCE`, bo `NULL` (kandydat bez miasta) w `ORDER BY … DESC` trafilby
+ * na poczatek listy. Zrodlo bez miasta niczego nie promuje.
+ */
+function isSameCity(city: string | null): SQL<boolean> {
+    const sourceCity = city?.trim() ?? '';
+    if (sourceCity === '') return sql<boolean>`false`;
+
+    return sql<boolean>`COALESCE(lower(btrim(${mainCity})) = lower(${sourceCity}), false)`;
+}
+
+/**
+ * „Podobne firmy” dla profilu: aktywne wpisy tej samej kategorii, bez samego wpisu,
+ * najpierw z miasta glownej lokalizacji zrodla, potem alfabetycznie — sortowanie i limit
+ * w SQL. Celowo bez rankingu premium: kolejnosc ma byc prosta i przewidywalna.
+ *
+ * Miasto kandydata to skorelowane podzapytanie `mainCity` (indeks
+ * `idx_location_service_main`), a nie join na `is_main_location = true`: dane maja wpisy
+ * z dwiema glownymi lokalizacjami (join zdublowalby firme) i bez zadnej (zniknelaby z listy).
  */
 export async function getSimilarServices(
-    serviceId: string,
+    { serviceId, category, city }: SimilarServicesSource,
     locale: string,
-): Promise<SimilarService[]> {
-    const [source] = await db
-        .select({ serviceId: servicesTable.id, category: servicesTable.category, city: mainCity })
-        .from(servicesTable)
-        .where(eq(servicesTable.id, serviceId))
-        .limit(1);
-
-    if (!source) return [];
-
-    // Bez LIMIT: kategoria liczy dziesiatki wpisow, a „to samo miasto najpierw”
-    // wymaga calej kategorii. Wpis bez slugu (przed backfillem) nie ma adresu profilu.
+): Promise<SimilarServiceRow[]> {
+    // Wpis bez slugu (przed backfillem) nie ma adresu profilu.
     const rows = await db
         .select({
             serviceId: servicesTable.id,
@@ -206,14 +228,14 @@ export async function getSimilarServices(
         .where(
             and(
                 isPublicService,
-                eq(servicesTable.category, source.category),
+                eq(servicesTable.category, category),
                 ne(servicesTable.id, serviceId),
                 isNotNull(servicesTable.slug),
             ),
-        );
+        )
+        .orderBy(sql`${isSameCity(city)} DESC`, localizedName, servicesTable.id)
+        .limit(SIMILAR_SERVICES_LIMIT);
 
     // `where` odsiewa NULL w SQL, ale typ kolumny tego nie wie — zawezamy tutaj.
-    const candidates = rows.flatMap(({ slug, ...row }) => (slug === null ? [] : [{ ...row, slug }]));
-
-    return pickSimilarServices(source, candidates);
+    return rows.flatMap(({ slug, ...row }) => (slug === null ? [] : [{ ...row, slug }]));
 }
