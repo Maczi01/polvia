@@ -8,6 +8,7 @@ import {
     tagsTranslationsTable,
     servicesTagsTable
 } from '../db/schema';
+import { createServiceSlugAllocator } from './service-slugs';
 
 async function mainSeed() {
     console.log('🚀 Rozpoczynam wielki seed danych z Tagami (36 marek)...');
@@ -142,6 +143,13 @@ async function mainSeed() {
         tagMap[t.key] = tag.id;
     }
 
+    // Slug uslugi (`/firma/<slug>`) liczony ta sama regula co `db:backfill-slugs`
+    // (nazwa + sufiks przy kolizji), NIE z `data.slug` — ten zostaje baza slugow
+    // lokalizacji. Dzieki temu po `db:reset` adresy profili zgadzaja sie z produkcja.
+    // Wyjatek: duplikaty nazw wstawione tu w innej kolejnosci niz `createdAt` na
+    // produkcji dostana zamienione sufiksy (`nazwa` <-> `nazwa-2`).
+    const allocateServiceSlug = createServiceSlugAllocator();
+
     // --- HELPER: SEEDER FUNCTION ---
     // To keep this readable and handle tags easily
     async function seedService(data: {
@@ -158,6 +166,7 @@ async function mainSeed() {
     }) {
         const [service] = await db.insert(servicesTable).values({
             name: data.name,
+            slug: allocateServiceSlug(data.name),
             category: data.category,
             coverage: data.coverage ?? 'local',
             image: data.image,

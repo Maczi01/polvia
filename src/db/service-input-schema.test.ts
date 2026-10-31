@@ -186,6 +186,24 @@ describe('serviceInputSchema', () => {
 
         expect(result.error.issues[0].path.join('.')).toBe('category');
     });
+
+    it('przyjmuje jawny slug uslugi zamiast wyliczonego z nazwy', () => {
+        const result = serviceInputSchema.safeParse(validInput({ slug: 'roza-warszawa' }));
+
+        expect(result.success).toBe(true);
+        if (!result.success) return;
+
+        expect(result.data.slug).toBe('roza-warszawa');
+    });
+
+    it('odrzuca nazwe, z ktorej nie da sie wyliczyc slugu, gdy brak jawnego slugu', () => {
+        const result = serviceInputSchema.safeParse(validInput({ name: '!!!' }));
+
+        expect(result.success).toBe(false);
+        if (result.success) return;
+
+        expect(result.error.issues[0].path.join('.')).toBe('slug');
+    });
 });
 
 describe('buildServiceSlug', () => {

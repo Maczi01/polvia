@@ -34,6 +34,7 @@ import {
     tagsTable,
     tagsTranslationsTable,
 } from './schema';
+import { describeSlugConflicts } from './service-slugs';
 
 const LANGUAGES = ['pl', 'uk', 'en', 'ru'] as const;
 
@@ -140,6 +141,17 @@ async function ensureTag(client: Transaction, tag: TagInput): Promise<string> {
     return created.id;
 }
 
+/** Slug uslugi jest UNIQUE i niezmienny — zajety oznacza duplikat albo potrzebe innego slugu. */
+async function isServiceSlugTaken(slug: string): Promise<boolean> {
+    const [existing] = await db
+        .select({ id: servicesTable.id })
+        .from(servicesTable)
+        .where(eq(servicesTable.slug, slug))
+        .limit(1);
+
+    return existing !== undefined;
+}
+
 /** Slug lokalizacji jest UNIQUE — kolizja to albo duplikat wpisu, albo zla nazwa. */
 async function findTakenSlugs(slugs: string[]): Promise<string[]> {
     const rows = await db
@@ -161,6 +173,7 @@ async function findServicesWithSameName(name: string): Promise<number> {
 
 async function reportPlan(input: ServiceInput, slugs: string[], image: string | null) {
     console.log(`Wpis:      ${input.name}`);
+    console.log(`Slug:      ${input.slug} (adres /firma/${input.slug})`);
     console.log(`Kategoria: ${input.category} | zasieg: ${input.coverage} | status: ${input.status}`);
     console.log(`Jezyki:    ${input.languages.join(', ')} | verified: ${input.verified}`);
     console.log(`Obrazek:   ${image ?? 'NULL (karta uzyje /default.png)'}`);
@@ -192,6 +205,7 @@ async function insertService(input: ServiceInput, slugs: string[], image: string
             .insert(servicesTable)
             .values({
                 name: input.name,
+                slug: input.slug,
                 category: input.category,
                 coverage: input.coverage,
                 status: input.status,
@@ -254,10 +268,16 @@ async function main(): Promise<void> {
         input.locations.map(location => location.city),
     );
 
-    const taken = await findTakenSlugs(slugs);
-    if (taken.length > 0) {
-        fail(`slug juz istnieje w bazie: ${taken.join(', ')} — to duplikat wpisu`);
-    }
+    const [isServiceTaken, takenLocationSlugs] = await Promise.all([
+        isServiceSlugTaken(input.slug),
+        findTakenSlugs(slugs),
+    ]);
+    const conflicts = describeSlugConflicts({
+        serviceSlug: input.slug,
+        isServiceSlugTaken: isServiceTaken,
+        takenLocationSlugs,
+    });
+    if (conflicts) fail(conflicts);
 
     const sameName = await findServicesWithSameName(input.name);
     if (sameName > 0) {

@@ -34,6 +34,10 @@ export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
+    // Adres profilu `/firma/<slug>`: unikalny i niezmienny (zmiana nazwy nie zmienia adresu).
+    // Nullowalny tylko na czas wdrozenia: najpierw `push` z ta kolumna, potem
+    // `db:backfill-slugs`, a dopiero potem `.notNull()` w osobnym `push`.
+    slug: varchar('slug', { length: 255 }).unique(),
     category: categoryEnum('category').notNull(),
     coverage: coverageEnum('coverage').notNull().default('local'),
     status: statusEnum('status').notNull().default('active'),

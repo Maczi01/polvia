@@ -110,7 +110,10 @@ export type LocationInput = z.infer<typeof locationInputSchema>;
 export const serviceInputSchema = z
     .object({
         name: z.string().min(1).max(255),
-        /** Baza slugu lokalizacji. Domyslnie wyliczana z `name` przez `buildServiceSlug`. */
+        /**
+         * Slug uslugi (adres `/firma/<slug>`, niezmienny) i baza slugow lokalizacji.
+         * Domyslnie wyliczany z `name` przez `buildServiceSlug`.
+         */
         slug: z
             .string()
             .regex(/^[a-z0-9-]+$/, 'Slug: male litery, cyfry i mysniki')
@@ -160,6 +163,15 @@ export const serviceInputSchema = z
                 code: z.ZodIssueCode.custom,
                 path: ['locations'],
                 message: 'Zasieg "online" dopuszcza jedna lokalizacje — dla kilku uzyj "hybrid"',
+            });
+        }
+
+        // Nazwa bez znakow [a-z0-9] (np. same emoji) dalaby pusty slug, czyli brak adresu profilu.
+        if (input.slug === undefined && buildServiceSlug(input.name) === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['slug'],
+                message: 'Z nazwy nie da sie wyliczyc slugu — podaj "slug" w JSON',
             });
         }
 
