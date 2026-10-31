@@ -38,6 +38,7 @@ function profile(overrides: Partial<ServiceProfile> = {}): ServiceProfile {
         tags: ['Glazura'],
         locations: [location()],
         premiumContent: null,
+        subscription: null,
         ...overrides,
     };
 }

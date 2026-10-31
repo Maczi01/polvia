@@ -1,22 +1,20 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { eq, inArray, sql } from 'drizzle-orm';
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-
+import { formatZodIssue } from './format-zod-issue';
 import {
     type PremiumContentData,
     premiumContentSchema,
     premiumImageFiles,
 } from './premium-content-schema';
-import { serviceLocationsTable, serviceProfilesTable, servicesTable } from './schema';
 import { buildLocationSlugs, serviceInputSchema, type ServiceInput } from './service-input-schema';
 
 /**
  * Publikacja tresci premium (`db:premium`, seed): upsert wiersza `service_profiles`
- * po slugu uslugi. Modul nie importuje `./index` (polaczenie z baza przy ladowaniu),
- * tylko dostaje magazyn — dzieki temu da sie go testowac bez bazy.
+ * uslugi znalezionej po slugach lokalizacji wpisu. Modul nie importuje `./index` (polaczenie
+ * z baza przy ladowaniu), tylko dostaje magazyn — dzieki temu da sie go testowac bez bazy.
+ * Adapter Drizzle magazynu: `premium-content-store.ts`.
  */
 
 export type PremiumContentErrorCode =
@@ -38,11 +36,16 @@ export class PremiumContentError extends Error {
     }
 }
 
+/** Usluga z adresem profilu (slug ustalony). */
+export type ServiceRef = { id: string; slug: string };
+
+/** Usluga, ktorej dotyczy plik wpisu: id do zapisu, slug do katalogu zdjec i adresu profilu. */
+export type EntryService = { serviceId: string; serviceSlug: string };
+
 /** Dostep do bazy potrzebny publikacji — produkcyjnie `createPremiumContentStore(db)`. */
 export type PremiumContentStore = {
-    findServiceIdBySlug(serviceSlug: string): Promise<string | null>;
-    /** Slugi uslug, do ktorych naleza podane lokalizacje (bez powtorzen). */
-    findServiceSlugsByLocationSlugs(locationSlugs: readonly string[]): Promise<string[]>;
+    /** Uslugi, do ktorych naleza podane lokalizacje (bez powtorzen, tylko ze slugiem). */
+    findServicesByLocationSlugs(locationSlugs: readonly string[]): Promise<ServiceRef[]>;
     /** Surowy zapisany wiersz tresci albo `null`, gdy uslugi nie opublikowano. */
     findContent(serviceId: string): Promise<unknown>;
     saveContent(serviceId: string, content: PremiumContentData): Promise<void>;
@@ -57,64 +60,72 @@ export type PreviousPremiumContent =
 export type PremiumUpsertPlan = { serviceId: string; previous: PreviousPremiumContent };
 
 export type PremiumUpsertInput = {
-    serviceSlug: string;
+    service: EntryService;
     content: PremiumContentData;
-    /** Katalog `public/` (zdjecia leza w `<publicDir>/services/<serviceSlug>/`). */
+    /** Katalog `public/` (zdjecia leza w `<publicDir>/services/<service.serviceSlug>/`). */
     publicDir: string;
 };
 
-/** Pliki tresci, ktorych nie ma na dysku, jako `services/<slug>/<plik>` (wzgledem `public/`). */
+/**
+ * Pliki tresci, ktorych nie ma na dysku, jako `services/<slug>/<plik>` (wzgledem `public/`).
+ * Porownuje z dokladnymi nazwami z katalogu, nie przez `existsSync`: Windows nie rozroznia
+ * wielkosci liter, a Vercel tak — `Cover.JPG` przy `cover.jpg` dalby 404 dopiero na produkcji.
+ */
 export function findMissingPremiumImages(
     serviceSlug: string,
     content: PremiumContentData,
     publicDir: string,
 ): string[] {
+    const directory = path.join(publicDir, 'services', serviceSlug);
+    const present = new Set(existsSync(directory) ? readdirSync(directory) : []);
+
     return premiumImageFiles(content)
-        .map(file => path.posix.join('services', serviceSlug, file))
-        .filter(relative => !existsSync(path.join(publicDir, relative)));
+        .filter(file => !present.has(file))
+        .map(file => path.posix.join('services', serviceSlug, file));
 }
 
 /**
- * Slug uslugi, ktora utworzyl plik wpisu. Szukany po slugach lokalizacji (jednoznaczne,
+ * Usluga, ktora utworzyl plik wpisu. Szukana po slugach lokalizacji (jednoznaczne,
  * liczone z `slug` w JSON), a nie po `buildServiceSlug(name)`: przy duplikacie nazwy
  * wpis ma adres `nazwa-2`, a slug z nazwy wskazalby cudzy profil.
  */
-export async function resolveEntryServiceSlug(
+export async function resolveEntryService(
     store: PremiumContentStore,
     input: { slug: ServiceInput['slug']; locations: readonly { city: string }[] },
-): Promise<string> {
+): Promise<EntryService> {
     const locationSlugs = buildLocationSlugs(
         input.slug,
         input.locations.map(location => location.city),
     );
-    const serviceSlugs = await store.findServiceSlugsByLocationSlugs(locationSlugs);
+    const [service, ...others] = await store.findServicesByLocationSlugs(locationSlugs);
 
-    if (serviceSlugs.length === 0) {
+    if (service === undefined) {
         throw new PremiumContentError(
             'SERVICE_NOT_FOUND',
             `w bazie nie ma wpisu ze slugiem i lokalizacjami ${locationSlugs.join(', ')} ` +
                 '— najpierw npm run db:add (albo db:backfill-slugs)',
         );
     }
-    if (serviceSlugs.length > 1) {
+    if (others.length > 0) {
+        const slugs = [service, ...others].map(({ slug }) => slug).join(', ');
         throw new PremiumContentError(
             'ENTRY_AMBIGUOUS',
-            `lokalizacje ${locationSlugs.join(', ')} naleza do kilku wpisow: ${serviceSlugs.join(', ')}`,
+            `lokalizacje ${locationSlugs.join(', ')} naleza do kilku wpisow: ${slugs}`,
         );
     }
 
-    return serviceSlugs[0];
+    return { serviceId: service.id, serviceSlug: service.slug };
 }
 
 /**
- * Wszystko, co moze zawiesc, przed zapisem: pliki zdjec i istnienie uslugi.
+ * Wszystko, co moze zawiesc, przed zapisem: pliki zdjec (usluge ustala `resolveEntryService`).
  * Niczego nie zapisuje — z tego korzysta `--dry-run`.
  */
 export async function preparePremiumUpsert(
     store: PremiumContentStore,
-    { serviceSlug, content, publicDir }: PremiumUpsertInput,
+    { service, content, publicDir }: PremiumUpsertInput,
 ): Promise<PremiumUpsertPlan> {
-    const missing = findMissingPremiumImages(serviceSlug, content, publicDir);
+    const missing = findMissingPremiumImages(service.serviceSlug, content, publicDir);
     if (missing.length > 0) {
         throw new PremiumContentError(
             'IMAGES_MISSING',
@@ -123,14 +134,7 @@ export async function preparePremiumUpsert(
         );
     }
 
-    const serviceId = await store.findServiceIdBySlug(serviceSlug);
-    if (serviceId === null) {
-        throw new PremiumContentError(
-            'SERVICE_NOT_FOUND',
-            `w bazie nie ma uslugi o slugu "${serviceSlug}"`,
-        );
-    }
-
+    const { serviceId } = service;
     return { serviceId, previous: toPrevious(await store.findContent(serviceId)) };
 }
 
@@ -155,7 +159,10 @@ export async function upsertPremiumContent(
 export type PremiumEntriesReport = {
     /** Slugi uslug z opublikowana trescia. */
     published: string[];
-    /** Pliki z blokiem `premium`, ktorych wpisu nie ma w bazie (np. nieprzepisany do seeda). */
+    /**
+     * Pliki pominiete: z blokiem `premium`, ale bez wpisu w bazie (np. nieprzepisany do
+     * seeda), albo nieparsowalne (bez parsowania nie wiadomo, czy to wpis premium).
+     */
     skipped: { file: string; reason: string }[];
 };
 
@@ -163,10 +170,22 @@ function hasPremiumBlock(raw: unknown): boolean {
     return typeof raw === 'object' && raw !== null && 'premium' in raw;
 }
 
+type ParsedJson = { isValid: true; value: unknown } | { isValid: false };
+
+function parseJson(text: string): ParsedJson {
+    try {
+        return { isValid: true, value: JSON.parse(text) };
+    } catch (error) {
+        if (!(error instanceof SyntaxError)) throw error;
+        return { isValid: false };
+    }
+}
+
 /**
  * Seed: upsert tresci z kazdego pliku `<dataDir>/*.json` z blokiem `premium`, zeby
- * `db:reset` jej nie gubil. Pliki bez bloku nie sa walidowane (nie blokuja seeda).
- * Bledny blok albo brak zdjecia przerywa — tak samo jak `db:premium`.
+ * `db:reset` jej nie gubil. Pliki bez bloku nie sa walidowane, a nieparsowalne (plik roboczy)
+ * trafiaja do `skipped` — zadne nie blokuje seeda. Bledny blok, brak zdjecia albo wpis
+ * wskazujacy kilka uslug przerywa — tak samo jak `db:premium`.
  */
 export async function publishPremiumEntries(
     store: PremiumContentStore,
@@ -177,22 +196,24 @@ export async function publishPremiumEntries(
 
     // Kolejno, nie rownolegle: kilka wpisow premium, a czytelny log bledu jest wazniejszy.
     for (const file of files) {
-        const raw: unknown = JSON.parse(await readFile(path.join(dataDir, file), 'utf8'));
-        if (!hasPremiumBlock(raw)) continue;
+        const json = parseJson(await readFile(path.join(dataDir, file), 'utf8'));
+        if (!json.isValid) {
+            report.skipped.push({ file, reason: 'niepoprawny JSON' });
+            continue;
+        }
+        if (!hasPremiumBlock(json.value)) continue;
 
-        const parsed = serviceInputSchema.safeParse(raw);
+        const parsed = serviceInputSchema.safeParse(json.value);
         if (!parsed.success) {
-            const issues = parsed.error.issues.map(
-                issue => `${issue.path.join('.') || '(korzen)'}: ${issue.message}`,
-            );
+            const issues = parsed.error.issues.map(issue => formatZodIssue(issue));
             throw new PremiumContentError('INVALID_ENTRY', `${file}: ${issues.join('; ')}`);
         }
         const entry = parsed.data;
         if (!entry.premium) continue;
 
-        let serviceSlug: string;
+        let service: EntryService;
         try {
-            serviceSlug = await resolveEntryServiceSlug(store, entry);
+            service = await resolveEntryService(store, entry);
         } catch (error) {
             if (!(error instanceof PremiumContentError) || error.code !== 'SERVICE_NOT_FOUND')
                 throw error;
@@ -200,77 +221,9 @@ export async function publishPremiumEntries(
             continue;
         }
 
-        await upsertPremiumContent(store, { serviceSlug, content: entry.premium, publicDir });
-        report.published.push(serviceSlug);
+        await upsertPremiumContent(store, { service, content: entry.premium, publicDir });
+        report.published.push(service.serviceSlug);
     }
 
     return report;
-}
-
-/** `insert … on conflict (service_id) do update` — jeden wiersz na usluge. */
-export function buildSavePremiumContentQuery(
-    db: PostgresJsDatabase,
-    serviceId: string,
-    content: PremiumContentData,
-) {
-    const values = {
-        template: content.template,
-        coverImage: content.coverImage,
-        gallery: content.gallery,
-        priceList: content.priceList,
-        faq: content.faq,
-    };
-
-    return db
-        .insert(serviceProfilesTable)
-        .values({ serviceId, ...values })
-        .onConflictDoUpdate({
-            target: serviceProfilesTable.serviceId,
-            set: { ...values, updatedAt: sql`now()` },
-        });
-}
-
-export function createPremiumContentStore(db: PostgresJsDatabase): PremiumContentStore {
-    return {
-        async findServiceIdBySlug(serviceSlug) {
-            const [row] = await db
-                .select({ id: servicesTable.id })
-                .from(servicesTable)
-                .where(eq(servicesTable.slug, serviceSlug))
-                .limit(1);
-
-            return row?.id ?? null;
-        },
-
-        async findServiceSlugsByLocationSlugs(locationSlugs) {
-            const rows = await db
-                .selectDistinct({ slug: servicesTable.slug })
-                .from(serviceLocationsTable)
-                .innerJoin(servicesTable, eq(servicesTable.id, serviceLocationsTable.serviceId))
-                .where(inArray(serviceLocationsTable.slug, [...locationSlugs]));
-
-            // Usluga bez slugu (przed backfillem) nie ma adresu profilu ani katalogu zdjec.
-            return rows.flatMap(({ slug }) => (slug === null ? [] : [slug]));
-        },
-
-        async findContent(serviceId) {
-            const [row] = await db
-                .select({
-                    template: serviceProfilesTable.template,
-                    coverImage: serviceProfilesTable.coverImage,
-                    gallery: serviceProfilesTable.gallery,
-                    priceList: serviceProfilesTable.priceList,
-                    faq: serviceProfilesTable.faq,
-                })
-                .from(serviceProfilesTable)
-                .where(eq(serviceProfilesTable.serviceId, serviceId))
-                .limit(1);
-
-            return row ?? null;
-        },
-
-        async saveContent(serviceId, content) {
-            await buildSavePremiumContentQuery(db, serviceId, content);
-        },
-    };
 }

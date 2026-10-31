@@ -1,6 +1,5 @@
 import {
     isPremiumActive,
-    PREMIUM_GRACE_DAYS,
     premiumRankingExpiry,
     type PremiumSubscriptionState,
 } from '@/lib/premium';
@@ -41,7 +40,7 @@ describe('isPremiumActive', () => {
         expect(isPremiumActive(subscription({ status: 'canceled' }), now)).toBe(false);
     });
 
-    it('zwraca true dla anulowania z koncem okresu, dopoki okres trwa', () => {
+    it('anulowanie z koncem okresu nie skraca oplaconego okresu', () => {
         const now = new Date('2026-11-29T12:00:00.000Z');
 
         expect(isPremiumActive(subscription({ cancelAtPeriodEnd: true }), now)).toBe(true);
@@ -67,8 +66,7 @@ describe('isPremiumActive', () => {
 });
 
 describe('premiumRankingExpiry', () => {
-    it('zwraca koniec okresu plus PREMIUM_GRACE_DAYS dni', () => {
-        expect(PREMIUM_GRACE_DAYS).toBe(3);
+    it('zwraca koniec okresu plus 3 dni karencji', () => {
         expect(premiumRankingExpiry(subscription())).toEqual(new Date('2026-12-03T12:00:00.000Z'));
     });
 

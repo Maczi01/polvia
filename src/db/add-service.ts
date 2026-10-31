@@ -22,6 +22,7 @@ import path from 'node:path';
 
 import { and, eq, inArray, like, or } from 'drizzle-orm';
 
+import { formatZodIssue } from './format-zod-issue';
 import { db } from './index';
 import {
     buildLocationSlugs,
@@ -85,7 +86,7 @@ async function readInput(filePath: string): Promise<ServiceInput> {
     if (!result.success) {
         console.error(`BLAD: ${filePath} nie przeszedl walidacji:`);
         for (const issue of result.error.issues) {
-            console.error(`  ${issue.path.join('.') || '(korzen)'}: ${issue.message}`);
+            console.error(`  ${formatZodIssue(issue)}`);
         }
         // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);

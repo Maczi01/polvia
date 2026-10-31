@@ -1,4 +1,7 @@
+import path from 'node:path';
+
 import slugify from 'slugify';
+
 import { db } from '../db';
 import {
     servicesTable,
@@ -8,9 +11,9 @@ import {
     tagsTranslationsTable,
     servicesTagsTable
 } from '../db/schema';
+import { createPremiumContentStore } from './premium-content-store';
 import { createServiceSlugAllocator } from './service-slugs';
-import { createPremiumContentStore, publishPremiumEntries } from './upsert-premium-content';
-import path from 'node:path';
+import { publishPremiumEntries } from './upsert-premium-content';
 
 async function mainSeed() {
     console.log('🚀 Rozpoczynam wielki seed danych z Tagami (36 marek)...');

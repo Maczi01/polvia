@@ -148,8 +148,17 @@ describe('getServiceProfile', () => {
             slug: 'roza',
             locations: [location()],
             premiumContent: null,
+            subscription: null,
         });
         expect(render(query(0).joins[0]).params).toContain('uk');
+    });
+
+    it('profil niesie stan subskrypcji (do U8 zawsze null)', async () => {
+        mockDb.results = [[SERVICE_ROW], [location()]];
+
+        const profile = await getServiceProfile('roza', 'uk');
+
+        expect(profile?.subscription).toBeNull();
     });
 
     it('lokalizacje pobiera rownolegle, po slugu aktywnego wpisu (nie po id z pierwszego zapytania)', async () => {

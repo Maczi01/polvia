@@ -1,7 +1,8 @@
 import { premiumBlock } from '../../tests/fixtures/premium/premium-block';
 import {
-    localizePremiumContent,
+    PREMIUM_FAQ_MAX,
     PREMIUM_GALLERY_MAX,
+    PREMIUM_PRICE_LIST_MAX,
     premiumContentSchema,
     premiumImageFiles,
 } from './premium-content-schema';
@@ -72,6 +73,53 @@ describe('premiumContentSchema', () => {
         ]);
     });
 
+    it(`odrzuca cennik ponad ${PREMIUM_PRICE_LIST_MAX} i FAQ ponad ${PREMIUM_FAQ_MAX} pozycji`, () => {
+        const [price] = VALID.priceList;
+        const [faq] = VALID.faq;
+        const priceList = Array.from({ length: PREMIUM_PRICE_LIST_MAX + 1 }, (_, index) => ({
+            ...price,
+            name: { pl: `p${index}`, uk: `u${index}`, en: `e${index}`, ru: `r${index}` },
+        }));
+        const faqs = Array.from({ length: PREMIUM_FAQ_MAX + 1 }, (_, index) => ({
+            ...faq,
+            q: { pl: `p${index}`, uk: `u${index}`, en: `e${index}`, ru: `r${index}` },
+        }));
+
+        expect(issuePaths(premiumBlock({ priceList: priceList.slice(0, -1) }))).toEqual([]);
+        expect(issuePaths(premiumBlock({ priceList }))).toEqual(['priceList']);
+        expect(issuePaths(premiumBlock({ faq: faqs.slice(0, -1) }))).toEqual([]);
+        expect(issuePaths(premiumBlock({ faq: faqs }))).toEqual(['faq']);
+    });
+
+    it('odrzuca powtorzony plik galerii ze sciezka na duplikacie', () => {
+        const [item] = VALID.gallery;
+
+        expect(issuePaths(premiumBlock({ gallery: [item, { ...item }] }))).toEqual([
+            'gallery.1.file',
+        ]);
+    });
+
+    it('odrzuca powtorzona nazwe w cenniku tylko w locale, w ktorym sie powtarza', () => {
+        const [item] = VALID.priceList;
+        const other = { ...item, name: { ...item.name, pl: 'Farbowanie', en: 'Colouring' } };
+        const duplicateUk = { ...other, name: { ...other.name, ru: 'Окрашивание' } };
+
+        expect(issuePaths(premiumBlock({ priceList: [item, duplicateUk] }))).toEqual([
+            'priceList.1.name.uk',
+        ]);
+    });
+
+    it('odrzuca powtorzone pytanie FAQ w kazdym locale, w ktorym sie powtarza', () => {
+        const [item] = VALID.faq;
+
+        expect(issuePaths(premiumBlock({ faq: [item, { ...item }] }))).toEqual([
+            'faq.1.q.pl',
+            'faq.1.q.en',
+            'faq.1.q.ru',
+            'faq.1.q.uk',
+        ]);
+    });
+
     it.each(['../../env.ts', 'podkatalog/foto.jpg', 'foto.svg', '.jpg', 'foto..jpg'])(
         'odrzuca nazwe pliku %p (sciezka albo nie-obrazek)',
         file => {
@@ -111,46 +159,6 @@ describe('serviceInputSchema z blokiem premium', () => {
 
         expect(result.success).toBe(false);
         expect(result.success || result.error.issues[0]?.path).toEqual(['premium', 'template']);
-    });
-});
-
-describe('localizePremiumContent', () => {
-    const content = VALID;
-
-    it('rozwiazuje teksty dla locale i sklada sciezki /services/<slug>/<plik>', () => {
-        const localized = localizePremiumContent(content, {
-            serviceSlug: 'salon-roza',
-            locale: 'uk',
-            coverAlt: 'Салон Роза',
-        });
-
-        expect(localized).toEqual({
-            template: 'gallery',
-            coverImage: { src: '/services/salon-roza/cover.jpg', alt: 'Салон Роза' },
-            gallery: [{ src: '/services/salon-roza/salon-1.webp', alt: 'Інтерʼєр салону' }],
-            priceList: [{ name: 'Стрижка', price: 'від 80 зл' }],
-            faq: [{ question: 'Чи потрібно записуватися?', answer: 'Так, телефоном.' }],
-        });
-    });
-
-    it('przenosi notatke cennika tylko, gdy jest w danych', () => {
-        const [item] = content.priceList;
-        const withNote = {
-            ...content,
-            priceList: [
-                { ...item, note: { pl: 'Notatka', uk: 'Примітка', en: 'Note', ru: 'Заметка' } },
-            ],
-        };
-
-        const localized = localizePremiumContent(withNote, {
-            serviceSlug: 's',
-            locale: 'en',
-            coverAlt: '',
-        });
-
-        expect(localized.priceList).toEqual([
-            { name: 'Haircut', price: 'from 80 PLN', note: 'Note' },
-        ]);
     });
 });
 

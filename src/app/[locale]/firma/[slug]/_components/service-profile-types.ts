@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react';
 import type { Link } from '@/i18n/navigation';
 import type { Coverage } from '@/lib/coverage';
 import type { ServiceLanguage } from '@/lib/languages';
-import type { PremiumTemplate } from '@/lib/premium-templates';
+import type { LocalizedPremiumContent } from '@/lib/service-profile-premium';
 import type { ServiceProfileLocation } from '@/lib/service-profile-queries';
 
 /**
@@ -32,19 +32,13 @@ export type SimilarService = {
     href: ProfileHref;
 };
 
-export type ProfileImage = { src: string; alt: string };
+/**
+ * Tresc premium w jednym locale. Jedno zrodlo ksztaltu: projekcja w `@/lib/service-profile-premium`
+ * (tylko `import type` — zod z tamtego modulu nie trafia do bundla klienta).
+ */
+export type PremiumContent = LocalizedPremiumContent;
 
-export type PriceListItem = { name: string; price: string; note?: string };
-
-export type FaqItem = { question: string; answer: string };
-
-export type PremiumContent = {
-    template: PremiumTemplate;
-    coverImage: ProfileImage | null;
-    gallery: ProfileImage[];
-    priceList: PriceListItem[];
-    faq: FaqItem[];
-};
+export type { FaqItem, PriceListItem, ProfileImage } from '@/lib/service-profile-premium';
 
 export type ServiceProfileView = {
     slug: string;

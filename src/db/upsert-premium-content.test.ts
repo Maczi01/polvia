@@ -5,17 +5,13 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
-import { drizzle } from 'drizzle-orm/postgres-js';
-
 import { premiumBlock } from '../../tests/fixtures/premium/premium-block';
 import { type PremiumContentData, premiumContentSchema } from './premium-content-schema';
 import {
-    buildSavePremiumContentQuery,
-    PremiumContentError,
     type PremiumContentStore,
     preparePremiumUpsert,
     publishPremiumEntries,
-    resolveEntryServiceSlug,
+    resolveEntryService,
     upsertPremiumContent,
 } from './upsert-premium-content';
 
@@ -28,11 +24,10 @@ const CONTENT = premiumContentSchema.parse(premiumBlock());
 function createMemoryStore(services: Record<string, { id: string; locationSlugs: string[] }>) {
     const rows = new Map<string, unknown>();
     const store: PremiumContentStore = {
-        findServiceIdBySlug: async slug => services[slug]?.id ?? null,
-        findServiceSlugsByLocationSlugs: async locationSlugs =>
+        findServicesByLocationSlugs: async locationSlugs =>
             Object.entries(services)
                 .filter(([, service]) => service.locationSlugs.some(s => locationSlugs.includes(s)))
-                .map(([slug]) => slug),
+                .map(([slug, { id }]) => ({ id, slug })),
         findContent: async serviceId => rows.get(serviceId) ?? null,
         saveContent: async (serviceId, content) => {
             rows.set(serviceId, structuredClone(content));
@@ -42,6 +37,7 @@ function createMemoryStore(services: Record<string, { id: string; locationSlugs:
 }
 
 const SERVICES = { 'salon-roza': { id: 'svc-1', locationSlugs: ['salon-roza-warszawa'] } };
+const SALON = { serviceId: 'svc-1', serviceSlug: 'salon-roza' };
 
 let publicDir: string;
 
@@ -60,12 +56,12 @@ afterEach(() => {
 });
 
 describe('upsertPremiumContent', () => {
-    it('zapisuje tresc dla uslugi o podanym slugu', async () => {
+    it('zapisuje tresc dla podanej uslugi', async () => {
         addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
         const { store, rows } = createMemoryStore(SERVICES);
 
         const plan = await upsertPremiumContent(store, {
-            serviceSlug: 'salon-roza',
+            service: SALON,
             content: CONTENT,
             publicDir,
         });
@@ -74,10 +70,10 @@ describe('upsertPremiumContent', () => {
         expect(rows.get('svc-1')).toEqual(CONTENT);
     });
 
-    it('dwa razy z ta sama trescia daje jeden wiersz i identyczna tresc', async () => {
+    it('ponowne wywolanie zapisuje te sama tresc', async () => {
         addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
         const { store, rows } = createMemoryStore(SERVICES);
-        const input = { serviceSlug: 'salon-roza', content: CONTENT, publicDir };
+        const input = { service: SALON, content: CONTENT, publicDir };
 
         await upsertPremiumContent(store, input);
         const second = await upsertPremiumContent(store, input);
@@ -85,21 +81,6 @@ describe('upsertPremiumContent', () => {
         expect(rows.size).toBe(1);
         expect(rows.get('svc-1')).toEqual(CONTENT);
         expect(second.previous).toEqual({ kind: 'valid', content: CONTENT });
-    });
-
-    it('nieistniejacy slug uslugi konczy sie bledem typowanym, bez zapisu', async () => {
-        addImages('nie-ma', ['cover.jpg', 'salon-1.webp']);
-        const { store, rows } = createMemoryStore(SERVICES);
-
-        const upsert = upsertPremiumContent(store, {
-            serviceSlug: 'nie-ma',
-            content: CONTENT,
-            publicDir,
-        });
-
-        await expect(upsert).rejects.toBeInstanceOf(PremiumContentError);
-        await expect(upsert).rejects.toMatchObject({ code: 'SERVICE_NOT_FOUND' });
-        expect(rows.size).toBe(0);
     });
 
     it('brakujace pliki galerii przerywaja z lista brakujacych, bez zapisu', async () => {
@@ -111,7 +92,7 @@ describe('upsertPremiumContent', () => {
         const { store, rows } = createMemoryStore(SERVICES);
 
         const upsert = upsertPremiumContent(store, {
-            serviceSlug: 'salon-roza',
+            service: SALON,
             content,
             publicDir,
         });
@@ -123,6 +104,23 @@ describe('upsertPremiumContent', () => {
         expect(rows.size).toBe(0);
     });
 
+    it('nazwa pliku rozni sie od dysku wielkoscia liter: IMAGES_MISSING, bez zapisu', async () => {
+        addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
+        const { store, rows } = createMemoryStore(SERVICES);
+
+        const upsert = upsertPremiumContent(store, {
+            service: SALON,
+            content: { ...CONTENT, coverImage: 'Cover.JPG' },
+            publicDir,
+        });
+
+        await expect(upsert).rejects.toMatchObject({
+            code: 'IMAGES_MISSING',
+            missingFiles: ['services/salon-roza/Cover.JPG'],
+        });
+        expect(rows.size).toBe(0);
+    });
+
     it('zdjecia szuka w katalogu slugu uslugi, nie w samym public/services/', async () => {
         writeFileSync(path.join(publicDir, 'cover.jpg'), 'img');
         mkdirSync(path.join(publicDir, 'services'), { recursive: true });
@@ -130,7 +128,7 @@ describe('upsertPremiumContent', () => {
         const { store } = createMemoryStore(SERVICES);
 
         const upsert = upsertPremiumContent(store, {
-            serviceSlug: 'salon-roza',
+            service: SALON,
             content: { ...CONTENT, gallery: [] },
             publicDir,
         });
@@ -147,7 +145,7 @@ describe('preparePremiumUpsert', () => {
         rows.set('svc-1', { template: 'luxury', gallery: 'zepsute' });
 
         const plan = await preparePremiumUpsert(store, {
-            serviceSlug: 'salon-roza',
+            service: SALON,
             content: { ...CONTENT, coverImage: null, gallery: [] },
             publicDir,
         });
@@ -157,21 +155,24 @@ describe('preparePremiumUpsert', () => {
     });
 });
 
-describe('resolveEntryServiceSlug', () => {
+describe('resolveEntryService', () => {
     const entry = { slug: 'salon-roza', locations: [{ city: 'Warszawa' }] };
 
-    it('znajduje slug uslugi po slugach lokalizacji wpisu', async () => {
+    it('znajduje id i slug uslugi po slugach lokalizacji wpisu', async () => {
         const { store } = createMemoryStore({
             'salon-roza-2': { id: 'svc-2', locationSlugs: ['salon-roza-warszawa'] },
         });
 
-        expect(await resolveEntryServiceSlug(store, entry)).toBe('salon-roza-2');
+        expect(await resolveEntryService(store, entry)).toEqual({
+            serviceId: 'svc-2',
+            serviceSlug: 'salon-roza-2',
+        });
     });
 
     it('wpis nieobecny w bazie konczy sie bledem SERVICE_NOT_FOUND', async () => {
         const { store } = createMemoryStore({});
 
-        await expect(resolveEntryServiceSlug(store, entry)).rejects.toMatchObject({
+        await expect(resolveEntryService(store, entry)).rejects.toMatchObject({
             code: 'SERVICE_NOT_FOUND',
         });
     });
@@ -182,7 +183,7 @@ describe('resolveEntryServiceSlug', () => {
             b: { id: 'svc-b', locationSlugs: ['salon-roza-warszawa'] },
         });
 
-        await expect(resolveEntryServiceSlug(store, entry)).rejects.toMatchObject({
+        await expect(resolveEntryService(store, entry)).rejects.toMatchObject({
             code: 'ENTRY_AMBIGUOUS',
         });
     });
@@ -231,6 +232,45 @@ describe('publishPremiumEntries', () => {
         expect(rows.get('svc-1')).toEqual(CONTENT);
     });
 
+    it('nieparsowalny plik trafia do skipped, pozostale wpisy sa publikowane', async () => {
+        addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
+        writeFileSync(path.join(dataDir, 'roboczy.json'), '{');
+        writeEntry('salon-roza.json', { ...ENTRY, premium: premiumBlock() });
+        const { store, rows } = createMemoryStore(SERVICES);
+
+        const report = await publishPremiumEntries(store, { dataDir, publicDir });
+
+        expect(report.skipped).toEqual([{ file: 'roboczy.json', reason: 'niepoprawny JSON' }]);
+        expect(report.published).toEqual(['salon-roza']);
+        expect(rows.get('svc-1')).toEqual(CONTENT);
+    });
+
+    it('brak zdjecia przerywa seed (IMAGES_MISSING) zamiast pominac plik, nic nie zapisane', async () => {
+        addImages('salon-roza', ['cover.jpg']);
+        writeEntry('salon-roza.json', { ...ENTRY, premium: premiumBlock() });
+        const { store, rows } = createMemoryStore(SERVICES);
+
+        await expect(publishPremiumEntries(store, { dataDir, publicDir })).rejects.toMatchObject({
+            code: 'IMAGES_MISSING',
+            missingFiles: ['services/salon-roza/salon-1.webp'],
+        });
+        expect(rows.size).toBe(0);
+    });
+
+    it('wpis wskazujacy kilka uslug przerywa seed (ENTRY_AMBIGUOUS), nic nie zapisane', async () => {
+        addImages('a', ['cover.jpg', 'salon-1.webp']);
+        writeEntry('salon-roza.json', { ...ENTRY, premium: premiumBlock() });
+        const { store, rows } = createMemoryStore({
+            a: { id: 'svc-a', locationSlugs: ['salon-roza-warszawa'] },
+            b: { id: 'svc-b', locationSlugs: ['salon-roza-warszawa'] },
+        });
+
+        await expect(publishPremiumEntries(store, { dataDir, publicDir })).rejects.toMatchObject({
+            code: 'ENTRY_AMBIGUOUS',
+        });
+        expect(rows.size).toBe(0);
+    });
+
     it('bledny blok premium przerywa seed z nazwa pliku', async () => {
         writeEntry('salon-roza.json', { ...ENTRY, premium: premiumBlock({ template: 'x' }) });
         const { store } = createMemoryStore(SERVICES);
@@ -239,17 +279,5 @@ describe('publishPremiumEntries', () => {
             code: 'INVALID_ENTRY',
             message: expect.stringContaining('salon-roza.json: premium.template'),
         });
-    });
-});
-
-describe('buildSavePremiumContentQuery', () => {
-    it('robi upsert po service_id (on conflict do update), nie drugi insert', () => {
-        const query = buildSavePremiumContentQuery(drizzle.mock(), 'svc-1', CONTENT).toSQL();
-
-        expect(query.sql).toMatch(/^insert into "service_profiles"/);
-        expect(query.sql).toContain('on conflict ("service_id") do update set');
-        expect(query.sql).toContain('"updated_at" = now()');
-        expect(query.params).toContain('svc-1');
-        expect(query.params).toContain(JSON.stringify(CONTENT.gallery));
     });
 });

@@ -4,7 +4,6 @@ import { and, eq, type InferSelectModel, isNotNull, ne, type SQL, sql } from 'dr
 
 import { db } from '@/db';
 import { servicesTranslationsAlias } from '@/db/aliases';
-import type { LocalizedPremiumContent } from '@/db/premium-content-schema';
 import {
     serviceLocationsTable,
     serviceProfilesTable,
@@ -12,8 +11,9 @@ import {
     servicesTagsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
+import type { PremiumSubscriptionState } from '@/lib/premium';
 import { isPublicService } from '@/lib/public-service-filter';
-import { toPremiumContent } from '@/lib/service-profile-premium';
+import { type LocalizedPremiumContent, toPremiumContent } from '@/lib/service-profile-premium';
 import {
     SIMILAR_SERVICES_LIMIT,
     type SimilarServiceRow,
@@ -60,6 +60,11 @@ export type ServiceProfile = Pick<
      * `null`: brak tresci albo zapisany jsonb nie przechodzi walidacji (blad w logu).
      */
     premiumContent: LocalizedPremiumContent | null;
+    /**
+     * Stan subskrypcji tej uslugi — wejscie `isPremiumActive`. `null`: brak subskrypcji.
+     * Czytany w tym samym zapytaniu co profil, wiec zawsze dotyczy wpisu spod `slug`.
+     */
+    subscription: PremiumSubscriptionState | null;
 };
 
 export type ServiceSlugStatus = { exists: boolean };
@@ -159,6 +164,9 @@ function getServiceLocations(slug: string): Promise<ServiceProfileLocation[]> {
         .orderBy(sql`${serviceLocationsTable.isMainLocation} DESC`, serviceLocationsTable.slug);
 }
 
+/** U8: leftJoin(service_subscriptions) po service_id, tak jak service_profiles. */
+const NO_SUBSCRIPTION: PremiumSubscriptionState | null = null;
+
 /**
  * Komplet danych darmowego profilu `/firma/<slug>` albo `null`, gdy pod slugiem
  * nie ma aktywnego wpisu (`pending`/`inactive` sa niepubliczne).
@@ -182,7 +190,7 @@ export async function getServiceProfile(
         name: row.name,
     });
 
-    return { ...row, slug, locations, premiumContent };
+    return { ...row, slug, locations, premiumContent, subscription: NO_SUBSCRIPTION };
 }
 
 function getServiceRow(slug: string, locale: string) {

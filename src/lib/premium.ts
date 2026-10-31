@@ -18,11 +18,11 @@ export const SUBSCRIPTION_STATUSES = [
 
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 
-export interface PremiumSubscriptionState {
+export type PremiumSubscriptionState = {
     status: SubscriptionStatus;
     currentPeriodEnd: Date;
     cancelAtPeriodEnd: boolean;
-}
+};
 
 /** Karencja ponad koniec okresu — czas na Smart Retries Stripe przy `past_due`. */
 export const PREMIUM_GRACE_DAYS = 3;

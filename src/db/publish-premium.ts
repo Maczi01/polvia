@@ -14,14 +14,15 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { formatZodIssue } from './format-zod-issue';
 import { db } from './index';
 import { describePremiumChanges } from './premium-content-diff';
+import { createPremiumContentStore } from './premium-content-store';
 import { serviceInputSchema } from './service-input-schema';
 import {
-    createPremiumContentStore,
     PremiumContentError,
     preparePremiumUpsert,
-    resolveEntryServiceSlug,
+    resolveEntryService,
 } from './upsert-premium-content';
 
 /* eslint-disable no-console, unicorn/no-process-exit */
@@ -57,7 +58,7 @@ async function readEntry(filePath: string) {
     if (!result.success) {
         console.error(`BLAD: ${filePath} nie przeszedl walidacji:`);
         for (const issue of result.error.issues) {
-            console.error(`  ${issue.path.join('.') || '(korzen)'}: ${issue.message}`);
+            console.error(`  ${formatZodIssue(issue)}`);
         }
         process.exit(1);
     }
@@ -73,9 +74,10 @@ async function main(): Promise<void> {
     const { entry, premium } = await readEntry(filePath);
     const store = createPremiumContentStore(db);
 
-    const serviceSlug = await resolveEntryServiceSlug(store, entry);
+    const service = await resolveEntryService(store, entry);
+    const { serviceSlug } = service;
     const plan = await preparePremiumUpsert(store, {
-        serviceSlug,
+        service,
         content: premium,
         publicDir: path.join(process.cwd(), 'public'),
     });

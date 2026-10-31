@@ -196,11 +196,20 @@ Po kolei:
    z danymi wpisu: domena e-maila = domena `webpage`, NIP = `nip` wpisu, albo potwierdzenie
    z kontaktu podanego we wpisie (telefon, e-mail ze strony firmy). Brak zgodnosci = **stop**:
    nie publikuj, zglos userowi do zwrotu platnosci. Nie publikuj na podstawie domyslu.
+   **Blok `premium` dopisuj do JSON-a dopiero po tej weryfikacji** — seed (`db:reset`)
+   publikuje kazdy blok `premium` z `data/services/` bez pytania, takze szkic niezweryfikowanej
+   firmy.
 2. **Zdjecia do `public/services/<slug-uslugi>/`**, gdzie `<slug-uslugi>` to adres profilu
    `/firma/<slug-uslugi>` (wypisuje go dry run). W JSON-ie podawaj **sama nazwe pliku**
    (`cover.jpg`), bez sciezki — schemat odrzuca `/` i `..`. Formaty: jpg, png, webp, avif.
-   Galeria: najwyzej `PREMIUM_GALLERY_MAX` (15) zdjec. Brak pliku przerywa publikacje z lista
-   brakujacych — strona nigdy nie dostaje martwego obrazka.
+   Nazwa w JSON-ie musi zgadzac sie z plikiem **co do wielkosci liter** (`Cover.JPG` przy
+   `cover.jpg` to brak pliku — Vercel rozroznia wielkosc liter, Windows nie). Pliki galerii
+   nie moga sie powtarzac. Galeria: najwyzej `PREMIUM_GALLERY_MAX` (15) zdjec. Brak pliku
+   przerywa publikacje z lista brakujacych — strona nigdy nie dostaje martwego obrazka.
+   **Katalog zalezy od slugu uslugi w bazie, nie od nazwy pliku JSON.** Slug z sufiksem
+   (`salon-roza-2`, przy duplikacie nazwy) moze sie zmienic po `db:reset`, jesli zmieni sie
+   kolejnosc wpisow w seedzie — wtedy seed przerwie sie na `IMAGES_MISSING`. Przed
+   `db:reset` sprawdz, czy slugi uslug premium sie nie zmienia (albo przenies katalog).
 3. **Blok `premium` w JSON-ie**, kazdy tekst w czterech jezykach (`pl`, `uk`, `en`, `ru`):
 
    ```json
@@ -215,6 +224,9 @@ Po kolei:
 
    `template`: `gallery` | `professional` | `classic`. `coverImage`, `gallery`, `priceList`,
    `faq` i `note` sa opcjonalne. Ceny to tekst od firmy — nie wymyslaj ich ani nie przeliczaj.
+   Limity: cennik najwyzej `PREMIUM_PRICE_LIST_MAX` (30) pozycji, FAQ najwyzej
+   `PREMIUM_FAQ_MAX` (20) pytan. Nazwy w cenniku i pytania FAQ nie moga sie powtarzac w
+   zadnym jezyku.
 4. **Dry run i STOP:**
 
    ```bash

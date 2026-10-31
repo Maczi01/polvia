@@ -1,5 +1,9 @@
+import { premiumContentSchema } from '@/db/premium-content-schema';
+
 import { premiumBlock } from '../../tests/fixtures/premium/premium-block';
-import { toPremiumContent } from './service-profile-premium';
+import { localizePremiumContent, toPremiumContent } from './service-profile-premium';
+
+const VALID = premiumContentSchema.parse(premiumBlock());
 
 const SOURCE = { serviceId: 'svc-1', slug: 'salon-roza', locale: 'en', name: 'Salon Roza' };
 
@@ -23,5 +27,45 @@ describe('toPremiumContent', () => {
         expect(JSON.stringify(consoleError.mock.calls)).not.toContain('"x"');
 
         consoleError.mockRestore();
+    });
+});
+
+describe('localizePremiumContent', () => {
+    const content = VALID;
+
+    it('rozwiazuje teksty dla locale i sklada sciezki /services/<slug>/<plik>', () => {
+        const localized = localizePremiumContent(content, {
+            serviceSlug: 'salon-roza',
+            locale: 'uk',
+            coverAlt: 'Салон Роза',
+        });
+
+        expect(localized).toEqual({
+            template: 'gallery',
+            coverImage: { src: '/services/salon-roza/cover.jpg', alt: 'Салон Роза' },
+            gallery: [{ src: '/services/salon-roza/salon-1.webp', alt: 'Інтерʼєр салону' }],
+            priceList: [{ name: 'Стрижка', price: 'від 80 зл' }],
+            faq: [{ question: 'Чи потрібно записуватися?', answer: 'Так, телефоном.' }],
+        });
+    });
+
+    it('przenosi notatke cennika tylko, gdy jest w danych', () => {
+        const [item] = content.priceList;
+        const withNote = {
+            ...content,
+            priceList: [
+                { ...item, note: { pl: 'Notatka', uk: 'Примітка', en: 'Note', ru: 'Заметка' } },
+            ],
+        };
+
+        const localized = localizePremiumContent(withNote, {
+            serviceSlug: 's',
+            locale: 'en',
+            coverAlt: '',
+        });
+
+        expect(localized.priceList).toEqual([
+            { name: 'Haircut', price: 'from 80 PLN', note: 'Note' },
+        ]);
     });
 });

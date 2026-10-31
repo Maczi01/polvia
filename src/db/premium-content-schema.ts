@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-import { PREMIUM_GALLERY_MAX, PREMIUM_TEMPLATES } from '../lib/premium-templates';
+import { locales } from '../i18n/config';
+import {
+    PREMIUM_FAQ_MAX,
+    PREMIUM_GALLERY_MAX,
+    PREMIUM_PRICE_LIST_MAX,
+    PREMIUM_TEMPLATES,
+} from '../lib/premium-templates';
 
 /**
  * Tresc premium wpisu: blok `premium` w `data/services/<plik>.json` i ten sam ksztalt
@@ -13,7 +19,9 @@ import { PREMIUM_GALLERY_MAX, PREMIUM_TEMPLATES } from '../lib/premium-templates
 
 /** Reeksport z lekkiego modulu — klient importuje `@/lib/premium-templates` bez zoda. */
 export {
+    PREMIUM_FAQ_MAX,
     PREMIUM_GALLERY_MAX,
+    PREMIUM_PRICE_LIST_MAX,
     PREMIUM_TEMPLATES,
     type PremiumTemplate,
 } from '../lib/premium-templates';
@@ -77,6 +85,28 @@ const faqItemSchema = z
     })
     .strict();
 
+/**
+ * Druga i kolejne wystapienia tej samej wartosci jako blad na sciezce duplikatu. Duplikat
+ * diff zlewa w „Bez zmian”, a w widoku daje powtorzony klucz Reacta.
+ */
+function reportDuplicates(
+    context: z.RefinementCtx,
+    values: readonly string[],
+    pathAt: (index: number) => (string | number)[],
+): void {
+    const seen = new Set<string>();
+    for (const [index, value] of values.entries()) {
+        if (seen.has(value)) {
+            context.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Powtorzona pozycja — kazda musi byc unikalna',
+                path: pathAt(index),
+            });
+        }
+        seen.add(value);
+    }
+}
+
 export const premiumContentSchema = z
     .object({
         template: z.enum(PREMIUM_TEMPLATES),
@@ -85,10 +115,35 @@ export const premiumContentSchema = z
             .array(galleryItemSchema)
             .max(PREMIUM_GALLERY_MAX, `Galeria: najwyzej ${PREMIUM_GALLERY_MAX} zdjec`)
             .default([]),
-        priceList: z.array(priceListItemSchema).default([]),
-        faq: z.array(faqItemSchema).default([]),
+        priceList: z
+            .array(priceListItemSchema)
+            .max(PREMIUM_PRICE_LIST_MAX, `Cennik: najwyzej ${PREMIUM_PRICE_LIST_MAX} pozycji`)
+            .default([]),
+        faq: z
+            .array(faqItemSchema)
+            .max(PREMIUM_FAQ_MAX, `FAQ: najwyzej ${PREMIUM_FAQ_MAX} pytan`)
+            .default([]),
     })
-    .strict();
+    .strict()
+    .superRefine((content, context) => {
+        reportDuplicates(
+            context,
+            content.gallery.map(item => item.file),
+            index => ['gallery', index, 'file'],
+        );
+        for (const locale of locales) {
+            reportDuplicates(
+                context,
+                content.priceList.map(item => item.name[locale]),
+                index => ['priceList', index, 'name', locale],
+            );
+            reportDuplicates(
+                context,
+                content.faq.map(item => item.q[locale]),
+                index => ['faq', index, 'q', locale],
+            );
+        }
+    });
 
 export type PremiumContentData = z.infer<typeof premiumContentSchema>;
 export type PremiumGalleryItem = z.infer<typeof galleryItemSchema>;
@@ -101,51 +156,4 @@ export function premiumImageFiles(content: PremiumContentData): string[] {
     const gallery = content.gallery.map(item => item.file);
 
     return content.coverImage === null ? gallery : [content.coverImage, ...gallery];
-}
-
-/** Sciezka obrazka premium dla `next/image` (`public/services/<slug>/<plik>`). */
-export function premiumImagePath(serviceSlug: string, file: string): string {
-    return `/services/${serviceSlug}/${file}`;
-}
-
-/**
- * Tresc premium w jednym locale — ksztalt kontraktu widoku profilu (`PremiumContent`
- * w `service-profile-types.ts`). Zdefiniowany tutaj, bo warstwa danych nie importuje z `app/`.
- */
-export type LocalizedPremiumContent = {
-    template: PremiumContentData['template'];
-    coverImage: { src: string; alt: string } | null;
-    gallery: { src: string; alt: string }[];
-    priceList: { name: string; price: string; note?: string }[];
-    faq: { question: string; answer: string }[];
-};
-
-type LocalizeOptions = {
-    serviceSlug: string;
-    locale: PremiumContentLocale;
-    /** Alt coveru: nazwa firmy w locale (cover nie ma wlasnego opisu w JSON). */
-    coverAlt: string;
-};
-
-export function localizePremiumContent(
-    content: PremiumContentData,
-    { serviceSlug, locale, coverAlt }: LocalizeOptions,
-): LocalizedPremiumContent {
-    return {
-        template: content.template,
-        coverImage:
-            content.coverImage === null
-                ? null
-                : { src: premiumImagePath(serviceSlug, content.coverImage), alt: coverAlt },
-        gallery: content.gallery.map(item => ({
-            src: premiumImagePath(serviceSlug, item.file),
-            alt: item.alt[locale],
-        })),
-        priceList: content.priceList.map(item => ({
-            name: item.name[locale],
-            price: item.price[locale],
-            ...(item.note === undefined ? {} : { note: item.note[locale] }),
-        })),
-        faq: content.faq.map(item => ({ question: item.q[locale], answer: item.a[locale] })),
-    };
 }
