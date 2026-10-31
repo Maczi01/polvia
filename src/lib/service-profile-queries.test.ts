@@ -4,8 +4,11 @@
 import { is, SQL } from 'drizzle-orm';
 import { PgDialect } from 'drizzle-orm/pg-core';
 
+import { db } from '@/db';
+
 import {
     getServiceProfile,
+    getServiceProfileSitemapEntries,
     getServiceSlugStatus,
     getSimilarServices,
     type ServiceProfileLocation,
@@ -234,5 +237,35 @@ describe('getServiceSlugStatus', () => {
         mockDb.results = [[]];
 
         expect(await getServiceSlugStatus('nie-ma')).toEqual({ exists: false });
+    });
+});
+
+describe('getServiceProfileSitemapEntries', () => {
+    const UPDATED_AT = new Date('2026-10-30T12:00:00Z');
+
+    it('zwraca slugi z data aktualizacji, filtrujac w SQL aktywne wpisy ze slugiem', async () => {
+        mockDb.results = [[{ slug: 'roza', updatedAt: UPDATED_AT }]];
+
+        expect(await getServiceProfileSitemapEntries()).toEqual([
+            { slug: 'roza', updatedAt: UPDATED_AT },
+        ]);
+
+        const where = render(query(0).where);
+        expect(where.params).toEqual(['active']);
+        expect(where.sql).toContain('"services"."slug" is not null');
+    });
+
+    it('pomija wpis bez slugu, nawet gdy baza go zwrocila', async () => {
+        mockDb.results = [[{ slug: null, updatedAt: UPDATED_AT }]];
+
+        expect(await getServiceProfileSitemapEntries()).toEqual([]);
+    });
+
+    it('blad bazy przechodzi do wolajacego', async () => {
+        jest.spyOn(db, 'select').mockImplementationOnce(() => {
+            throw new Error('connection refused');
+        });
+
+        await expect(getServiceProfileSitemapEntries()).rejects.toThrow('connection refused');
     });
 });

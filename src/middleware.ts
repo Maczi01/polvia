@@ -4,13 +4,61 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseMapSlug } from '@/lib/map-slug-parser';
 import { parseMapPathname } from '@/lib/map-pathname';
 import { localizedMapBasePath } from '@/lib/map-url-builder';
+import {
+    isValidServiceSlug,
+    parseServiceProfilePathname,
+    SERVICE_PROFILE_NOT_FOUND_PATH,
+} from '@/lib/service-profile-path';
+import { lookupServiceSlug } from '@/lib/service-slug-lookup';
 
 const intlMiddleware = createMiddleware({
     ...routing,
     localeDetection: false
 });
 
-export default function middleware(request: NextRequest) {
+/**
+ * Profil firmy `/firma/<slug>` (i `/{locale}/firma/<slug>`): prawdziwe 404 dla slugu,
+ * pod ktorym nie ma aktywnego wpisu. `null` = sciezka nie jest profilem albo profil
+ * istnieje / lookup zawiodl — zadanie idzie dalej normalna droga.
+ *
+ * Powod jak przy mapie: `[locale]/loading.tsx` sprawia, ze strona streamuje, wiec
+ * `notFound()` w `page.tsx` daje soft-404 (status 200). Middleware na edge nie ma bazy,
+ * wiec pyta `GET /api/service-slug/<slug>` (Node). Matcher wyklucza `/api`, wiec ten
+ * `fetch` nie wraca do middleware.
+ *
+ * 404 to rewrite na sciezke, ktorej nie dopasuje zadna trasa: router Next ustawia 404
+ * i renderuje globalne not-found przed jakimkolwiek streamowaniem layoutu `[locale]`.
+ */
+async function handleServiceProfile(request: NextRequest): Promise<NextResponse | null> {
+    const profilePath = parseServiceProfilePathname(request.nextUrl.pathname);
+    if (!profilePath) return null;
+
+    const notFound = (): NextResponse =>
+        NextResponse.rewrite(new URL(SERVICE_PROFILE_NOT_FOUND_PATH, request.url));
+
+    if (!isValidServiceSlug(profilePath.slug)) return notFound();
+
+    const result = await lookupServiceSlug({
+        origin: request.nextUrl.origin,
+        slug: profilePath.slug,
+        // Na Vercelu platforma nadpisuje ten naglowek adresem klienta — klient go nie podmieni.
+        forwardedFor: request.headers.get('x-forwarded-for'),
+    });
+
+    // `unknown` (timeout, 5xx, 429) = fail-open: profil renderuje sie albo konczy
+    // `notFound()` strony — swiadomie akceptowany soft-404 w wyjatku.
+    return result === 'missing' ? notFound() : null;
+}
+
+/**
+ * Kolejnosc galezi:
+ * 1. walidacja slugu mapy (307 na baze mapy),
+ * 2. profil `/firma/<slug>` (404 dla nieistniejacego),
+ * 3. rewrite `/mapa/**` i redirect `/map/**`,
+ * 4. next-intl.
+ * Galezie walidacji ida przed rewrite'ami, bo musza widziec adres z przegladarki.
+ */
+export default async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
 
     // Walidacja slugu mapy MUSI byc tutaj, nie w page.tsx.
@@ -37,6 +85,9 @@ export default function middleware(request: NextRequest) {
             return NextResponse.redirect(url, 307);
         }
     }
+
+    const profileResponse = await handleServiceProfile(request);
+    if (profileResponse) return profileResponse;
 
     // Handle localized /mapa/{slug...} URLs for PL locale.
     // next-intl only maps the exact /mapa → /map pathname;

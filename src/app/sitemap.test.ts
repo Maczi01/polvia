@@ -1,4 +1,5 @@
 import sitemap from '@/app/sitemap';
+import { getServiceProfileSitemapEntries } from '@/lib/service-profile-queries';
 import { CATEGORY_SLUGS, COUNTY_SLUGS } from '@/lib/slug-mappings';
 
 // getPosts czyta pliki MDX z dysku — zewnetrzne zrodlo tresci, nieistotne dla
@@ -12,6 +13,12 @@ jest.mock('@/lib/posts', () => ({
 // wiec podajemy je jawnie — asercje sprawdzaja sciezki, nie domene.
 jest.mock('../../env', () => ({
     env: { NEXT_PUBLIC_SITE_URL: 'https://polvia.test' },
+}));
+
+// Baza to zewnetrzny serwis. Filtr aktywnych wpisow ze slugiem siedzi w SQL zapytania
+// (test w `service-profile-queries.test.ts`); tu liczy sie, ze sitemapa nie dokleja nic poza nim.
+jest.mock('@/lib/service-profile-queries', () => ({
+    getServiceProfileSitemapEntries: jest.fn().mockResolvedValue([]),
 }));
 
 const urls = async (): Promise<string[]> => (await sitemap()).map(entry => String(entry.url));
@@ -91,5 +98,55 @@ describe('sitemap — strona „Dodaj firme"', () => {
 
         expect(list).toContain('https://polvia.test/dodaj-firme');
         expect(list).toContain('https://polvia.test/en/add-business');
+    });
+});
+
+describe('sitemap — profile firm', () => {
+    const UPDATED_AT = new Date('2026-10-30T12:00:00Z');
+
+    beforeEach(() => {
+        jest.mocked(getServiceProfileSitemapEntries).mockResolvedValue([
+            { slug: 'kancelaria-nowak', updatedAt: UPDATED_AT },
+        ]);
+    });
+
+    afterEach(() => {
+        jest.mocked(getServiceProfileSitemapEntries).mockResolvedValue([]);
+        jest.restoreAllMocks();
+    });
+
+    it('zawiera profil w 4 wariantach locale, pl bez prefiksu', async () => {
+        const list = await urls();
+
+        expect(list).toContain('https://polvia.test/firma/kancelaria-nowak');
+        expect(list).toContain('https://polvia.test/en/firma/kancelaria-nowak');
+        expect(list).toContain('https://polvia.test/ru/firma/kancelaria-nowak');
+        expect(list).toContain('https://polvia.test/uk/firma/kancelaria-nowak');
+    });
+
+    it('lastModified profilu to data aktualizacji wpisu', async () => {
+        const entries = await sitemap();
+        const profile = entries.find(entry => entry.url === 'https://polvia.test/firma/kancelaria-nowak');
+
+        expect(profile?.lastModified).toBe(UPDATED_AT.toISOString());
+    });
+
+    it('zawiera tylko profile zwrocone przez zapytanie o aktywne wpisy', async () => {
+        const list = await urls();
+
+        const profiles = list.filter(url => url.includes('/firma/'));
+        expect(profiles).toHaveLength(4);
+        expect(profiles.every(url => url.endsWith('/firma/kancelaria-nowak'))).toBe(true);
+    });
+
+    it('awaria bazy nie zabiera stron statycznych i jest logowana', async () => {
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+        jest.mocked(getServiceProfileSitemapEntries).mockRejectedValue(new Error('connection refused'));
+
+        const list = await urls();
+
+        expect(list.some(url => url.endsWith('/mapa'))).toBe(true);
+        expect(list.some(url => url.includes('/firma/'))).toBe(false);
+        expect(console.error).toHaveBeenCalled();
     });
 });

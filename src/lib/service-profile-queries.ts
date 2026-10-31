@@ -105,6 +105,19 @@ export async function getServiceSlugStatus(slug: string): Promise<ServiceSlugSta
     return { exists: row !== undefined };
 }
 
+export type ServiceProfileSitemapEntry = { slug: string; updatedAt: Date };
+
+/** Slugi aktywnych wpisow z adresem profilu — dla sitemapy. Wpis bez slugu nie ma profilu. */
+export async function getServiceProfileSitemapEntries(): Promise<ServiceProfileSitemapEntry[]> {
+    const rows = await db
+        .select({ slug: servicesTable.slug, updatedAt: servicesTable.updatedAt })
+        .from(servicesTable)
+        .where(and(isPublicService, isNotNull(servicesTable.slug)));
+
+    // `where` odsiewa NULL w SQL, ale typ kolumny tego nie wie — zawezamy tutaj.
+    return rows.flatMap(({ slug, updatedAt }) => (slug === null ? [] : [{ slug, updatedAt }]));
+}
+
 function getServiceLocations(serviceId: string): Promise<ServiceProfileLocation[]> {
     return db
         .select({

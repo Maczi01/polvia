@@ -48,10 +48,17 @@ export const routing = defineRouting({
             ru: '/add-business',
             uk: '/add-business',
         },
+        // Profil firmy: ten sam segment `firma` we wszystkich locale (adres z outreachu).
+        '/firma/[slug]': '/firma/[slug]',
         '/dashboard': '/dashboard',
         '/dashboard/services': '/dashboard/services',
         '/dashboard/services/new': '/dashboard/services/new',
     },
 });
 
-export type AppPathnames = keyof typeof routing.pathnames;
+/**
+ * Trasy bez segmentow dynamicznych — te, ktore nawigacja przyjmuje jako sam `pathname`.
+ * Trasa z `[param]` (np. `/firma/[slug]`) wymaga `{ pathname, params }`, wiec nie moze
+ * byc celem rzutowan `as AppPathnames` w naglowku i przelaczniku jezyka.
+ */
+export type AppPathnames = Exclude<keyof typeof routing.pathnames, `${string}[${string}`>;
