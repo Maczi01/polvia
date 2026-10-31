@@ -2,9 +2,9 @@ import type { Socials } from '@/types';
 
 import type { ProfileLocation, ServiceProfileView } from './service-profile-types';
 
-/** Glowna lokalizacja wpisu: oznaczona `isMain`, a bez oznaczenia pierwsza. */
+/** Glowna lokalizacja wpisu: oznaczona `isMainLocation`, a bez oznaczenia pierwsza. */
 export function getMainLocation(locations: readonly ProfileLocation[]): ProfileLocation | null {
-    return locations.find(location => location.isMain) ?? locations[0] ?? null;
+    return locations.find(location => location.isMainLocation) ?? locations[0] ?? null;
 }
 
 function hasAddress(location: ProfileLocation): boolean {
@@ -27,8 +27,27 @@ export function getAddressedLocations(
 }
 
 /** Miasto pod nazwa firmy w naglowku; wpis bez punktu obslugi go nie ma. */
-export function getHeaderCity(profile: ServiceProfileView): string | null {
+export function getHeaderCity(
+    profile: Pick<ServiceProfileView, 'coverage' | 'locations'>,
+): string | null {
     return getAddressedLocations(profile)[0]?.city ?? null;
+}
+
+const SAFE_EXTERNAL_PROTOCOLS: ReadonlySet<string> = new Set(['http:', 'https:']);
+
+/**
+ * Link zewnetrzny z danych wpisu (socials, `sameAs`) albo `null`, gdy jest pusty, bialy,
+ * niepoprawny albo ma inny protokol niz `http(s):` (np. `javascript:`, `data:`).
+ * `new URL()` zamiast `URL.canParse` (brak w jsdom i Safari < 17), bez `instanceof`.
+ */
+export function toSafeExternalHref(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    if (!trimmed) return null;
+    try {
+        return SAFE_EXTERNAL_PROTOCOLS.has(new URL(trimmed).protocol) ? trimmed : null;
+    } catch {
+        return null;
+    }
 }
 
 export function toWebsiteHref(webpage: string): string {
@@ -52,7 +71,7 @@ export function toWhatsAppHref(location: ProfileLocation): string | null {
     if (location.whatsappNumber) {
         return `https://wa.me/${location.whatsappNumber.replace(/\D/g, '')}`;
     }
-    return location.socials?.whatsapp ?? null;
+    return toSafeExternalHref(location.socials?.whatsapp);
 }
 
 /** Nawigacja tylko do punktu ze wspolrzednymi — bez nich link mialby `null,null`. */
@@ -76,7 +95,7 @@ export function getActionHrefs(location: ProfileLocation, showNavigate: boolean)
     return {
         call: location.phoneNumber ? `tel:${location.phoneNumber}` : null,
         whatsapp: toWhatsAppHref(location),
-        telegram: location.socials?.telegram ?? null,
+        telegram: toSafeExternalHref(location.socials?.telegram),
         navigate: showNavigate ? toNavigateHref(location) : null,
     };
 }
@@ -95,7 +114,16 @@ export function getSocialLinks(
 ): { key: SocialIconKey; href: string }[] {
     if (!socials) return [];
     return SOCIAL_ICON_KEYS.flatMap(key => {
-        const href = socials[key];
+        const href = toSafeExternalHref(socials[key]);
         return href ? [{ key, href }] : [];
+    });
+}
+
+/** `sameAs` do JSON-LD: wszystkie bezpieczne linki z `socials`, puste i obce protokoly pominiete. */
+export function toSameAs(socials: Socials | null): string[] {
+    if (!socials) return [];
+    return Object.values(socials).flatMap(value => {
+        const href = toSafeExternalHref(value);
+        return href ? [href] : [];
     });
 }

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
-import { premiumEmptyFixture, premiumOf, premiumServiceFixture } from '../profile-fixtures';
+import { premiumEmptyFixture, premiumServiceFixture } from '../profile-fixtures';
 import { renderWithIntl } from '../profile-test-utils';
 import { TemplateGallery } from './template-gallery';
 
@@ -13,12 +13,7 @@ jest.mock('@/i18n/navigation', () => ({
 
 describe('TemplateGallery', () => {
     it('renderuje nazwe jako h1, cover, galerie, cennik i FAQ; przechodzi jest-axe', async () => {
-        const { container } = renderWithIntl(
-            <TemplateGallery
-                profile={premiumServiceFixture}
-                premium={premiumOf(premiumServiceFixture)}
-            />,
-        );
+        const { container } = renderWithIntl(<TemplateGallery profile={premiumServiceFixture} />);
 
         expect(screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' })).toBeInTheDocument();
         expect(screen.getByRole('img', { name: 'Narzędzia ekipy remontowej' })).toBeInTheDocument();
@@ -29,21 +24,14 @@ describe('TemplateGallery', () => {
     });
 
     it('nie ma "Podobnych firm" ani CTA ulepszenia (R10)', () => {
-        renderWithIntl(
-            <TemplateGallery
-                profile={premiumServiceFixture}
-                premium={premiumOf(premiumServiceFixture)}
-            />,
-        );
+        renderWithIntl(<TemplateGallery profile={premiumServiceFixture} />);
 
         expect(screen.queryByRole('region', { name: 'Podobne firmy' })).not.toBeInTheDocument();
         expect(screen.queryByRole('link', { name: /ulepsz stronę/ })).not.toBeInTheDocument();
     });
 
     it('bez cover, galerii, cennika, FAQ i lokalizacji nie renderuje pustych sekcji', async () => {
-        const { container } = renderWithIntl(
-            <TemplateGallery profile={premiumEmptyFixture} premium={premiumOf(premiumEmptyFixture)} />,
-        );
+        const { container } = renderWithIntl(<TemplateGallery profile={premiumEmptyFixture} />);
 
         expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(premiumEmptyFixture.name);
         expect(screen.queryByRole('region', { name: 'Galeria' })).not.toBeInTheDocument();

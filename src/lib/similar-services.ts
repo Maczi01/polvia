@@ -16,12 +16,6 @@ export type SimilarServiceRow = {
     category: string;
 };
 
-/**
- * Stara nazwa wiersza, kolidujaca z typem widoku `SimilarService` w `service-profile-types.ts`.
- * Zostaje tylko dla `to-profile-view.ts`; do usuniecia przy refaktorze typow widoku (#8).
- */
-export type SimilarService = SimilarServiceRow;
-
 /** Profil, dla ktorego szukamy podobnych firm — strona ma te dane z `getServiceProfile`. */
 export type SimilarServicesSource = {
     serviceId: string;

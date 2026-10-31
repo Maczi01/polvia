@@ -56,7 +56,7 @@ export type ServiceProfile = Pick<
 
 export type ServiceSlugStatus = { exists: boolean };
 
-export type { SimilarService, SimilarServiceRow } from '@/lib/similar-services';
+export type { SimilarServiceRow } from '@/lib/similar-services';
 
 /** Nazwa w locale z fallbackiem na nazwe bazowa — ten sam wzorzec co `getServices`. */
 const localizedName = sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`;

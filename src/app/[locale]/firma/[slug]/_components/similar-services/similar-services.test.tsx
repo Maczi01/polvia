@@ -27,6 +27,14 @@ describe('SimilarServices', () => {
         expect(await axe(container)).toHaveNoViolations();
     });
 
+    it('linki do profili nie maja prefetchu (lookup slugu w middleware)', () => {
+        renderWithIntl(<SimilarServices services={localServiceFixture.similarServices} />);
+
+        for (const link of screen.getAllByRole('link')) {
+            expect(link).toHaveAttribute('data-prefetch', 'false');
+        }
+    });
+
     it('bez podobnych firm nie renderuje sekcji', () => {
         renderWithIntl(<SimilarServices services={[]} />);
 

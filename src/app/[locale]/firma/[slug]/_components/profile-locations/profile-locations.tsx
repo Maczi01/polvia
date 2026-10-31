@@ -105,8 +105,8 @@ export function ProfileLocations({
                     <LocationAddress
                         key={location.id}
                         location={location}
-                        showMainLabel={hasMany && location.isMain}
-                        showPhone={hasMany && !location.isMain}
+                        showMainLabel={hasMany && location.isMainLocation}
+                        showPhone={hasMany && !location.isMainLocation}
                     />
                 ))}
             </ul>

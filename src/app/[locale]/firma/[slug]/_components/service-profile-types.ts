@@ -4,7 +4,7 @@ import type { Link } from '@/i18n/navigation';
 import type { Coverage } from '@/lib/coverage';
 import type { ServiceLanguage } from '@/lib/languages';
 import type { PremiumTemplate } from '@/lib/premium-templates';
-import type { Socials } from '@/types';
+import type { ServiceProfileLocation } from '@/lib/service-profile-queries';
 
 /**
  * Kontrakt widoku profilu firmy. Komponenty profilu nie znaja bazy ani czterech
@@ -15,28 +15,11 @@ import type { Socials } from '@/types';
 /** Href w formacie `Link` z `@/i18n/navigation` (typowane sciezki routingu). */
 export type ProfileHref = ComponentProps<typeof Link>['href'];
 
-export type OpeningPeriod = { open: string; close: string };
-
-/** Klucze jak w kolumnie `opening_hours`: `monday` … `sunday` (`@/lib/weekdays`). */
-export type OpeningHours = Readonly<Record<string, OpeningPeriod>>;
-
-export type ProfileLocation = {
-    id: string;
-    city: string | null;
-    street: string | null;
-    postcode: string | null;
-    /** Wartosc z bazy, np. `mazowieckie`; etykiete daje `VOIVODESHIP_TO_MESSAGE_KEY`. */
-    voivodeship: string | null;
-    latitude: number | null;
-    longitude: number | null;
-    phoneNumber: string | null;
-    email: string | null;
-    webpage: string | null;
-    socials: Socials | null;
-    whatsappNumber: string | null;
-    openingHours: OpeningHours;
-    isMain: boolean;
-};
+/**
+ * Lokalizacja profilu w ksztalcie z zapytania (nazwy jak w bazie, np. `isMainLocation`).
+ * Bez `slug`: widok nie linkuje lokalizacji, link do mapy sklada `toProfileView`.
+ */
+export type ProfileLocation = Omit<ServiceProfileLocation, 'slug'>;
 
 export type SimilarService = {
     slug: string;
@@ -75,7 +58,7 @@ export type ServiceProfileView = {
     languages: ServiceLanguage[];
     tags: string[];
     verified: boolean;
-    /** Glowna lokalizacja ma `isMain`; bez niej glowna jest pierwsza. */
+    /** Glowna lokalizacja ma `isMainLocation`; bez niej glowna jest pierwsza. */
     locations: ProfileLocation[];
     /** Link „Pokaz na mapie”; `null` dla wpisow bez punktu obslugi. */
     mapHref: ProfileHref | null;
@@ -83,3 +66,6 @@ export type ServiceProfileView = {
     upgradeHref: ProfileHref;
     premium: PremiumContent | null;
 };
+
+/** Profil z trescia premium — jedyne wejscie szablonow premium (strona zaweza `view.premium`). */
+export type PremiumProfileView = ServiceProfileView & { premium: PremiumContent };

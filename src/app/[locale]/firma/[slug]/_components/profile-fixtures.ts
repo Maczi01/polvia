@@ -1,6 +1,8 @@
+import type { OpeningHours } from '@/lib/weekdays';
+
 import type {
-    OpeningHours,
     PremiumContent,
+    PremiumProfileView,
     ProfileImage,
     ProfileLocation,
     ServiceProfileView,
@@ -41,7 +43,7 @@ export function makeLocation(overrides: Partial<ProfileLocation> = {}): ProfileL
         },
         whatsappNumber: '+48 600 100 200',
         openingHours: WEEKDAY_HOURS,
-        isMain: true,
+        isMainLocation: true,
         ...overrides,
     };
 }
@@ -103,7 +105,7 @@ export const localServiceFixture: ServiceProfileView = {
             longitude: 21.0239,
             phoneNumber: '+48 600 300 400',
             email: null,
-            isMain: false,
+            isMainLocation: false,
         }),
     ],
     mapHref: { pathname: '/map', query: { place: 'mistrz-remontu' } },
@@ -210,12 +212,12 @@ const PREMIUM_CONTENT: PremiumContent = {
     ],
 };
 
-export const premiumServiceFixture: ServiceProfileView = {
+export const premiumServiceFixture: PremiumProfileView = {
     ...localServiceFixture,
     premium: PREMIUM_CONTENT,
 };
 
-export const premiumProfessionalFixture: ServiceProfileView = {
+export const premiumProfessionalFixture: PremiumProfileView = {
     ...localServiceFixture,
     slug: 'kancelaria-nowak',
     name: 'Kancelaria Adwokacka Nowak i Wspólnicy',
@@ -269,7 +271,7 @@ export const premiumProfessionalFixture: ServiceProfileView = {
 };
 
 /** Premium oplacone przed publikacja tresci: bez cover, galerii, cennika, FAQ i adresu. */
-export const premiumEmptyFixture: ServiceProfileView = {
+export const premiumEmptyFixture: PremiumProfileView = {
     ...onlineServiceFixture,
     locations: [],
     premium: {
@@ -280,9 +282,3 @@ export const premiumEmptyFixture: ServiceProfileView = {
         faq: [],
     },
 };
-
-/** Tresc premium fixture'u — dla testow i stories szablonow, ktore wymagaja `PremiumContent`. */
-export function premiumOf(profile: ServiceProfileView): PremiumContent {
-    if (!profile.premium) throw new Error(`Fixture ${profile.slug} nie ma tresci premium`);
-    return profile.premium;
-}

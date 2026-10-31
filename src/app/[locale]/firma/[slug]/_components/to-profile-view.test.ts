@@ -1,5 +1,5 @@
 import type { ServiceProfile, ServiceProfileLocation } from '@/lib/service-profile-queries';
-import type { SimilarService } from '@/lib/similar-services';
+import type { SimilarServiceRow } from '@/lib/similar-services';
 
 import { toProfileView, toServiceImagePath } from './to-profile-view';
 
@@ -41,7 +41,7 @@ function profile(overrides: Partial<ServiceProfile> = {}): ServiceProfile {
     };
 }
 
-const similar: SimilarService[] = [
+const similar: SimilarServiceRow[] = [
     {
         serviceId: 'service-2',
         slug: 'liga-remontu',
@@ -64,12 +64,16 @@ describe('toServiceImagePath', () => {
 });
 
 describe('toProfileView', () => {
-    it('mapuje logo, jezyki obslugi i glowna lokalizacje', () => {
+    it('mapuje logo i jezyki obslugi, a lokalizacje przekazuje z nazwami z bazy', () => {
         const view = toProfileView(profile(), similar, 'pl');
 
         expect(view.logo).toBe('/services/remont.png');
         expect(view.languages).toEqual(['pl', 'uk']);
-        expect(view.locations[0]).toMatchObject({ id: 'loc-1', isMain: true, city: 'Warszawa' });
+        expect(view.locations[0]).toMatchObject({
+            id: 'loc-1',
+            isMainLocation: true,
+            city: 'Warszawa',
+        });
         expect(view.upgradeHref).toBe('/pricing');
         expect(view.premium).toBeNull();
     });

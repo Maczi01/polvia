@@ -20,6 +20,7 @@ import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
+import type { OpeningHours } from '../lib/weekdays';
 
 export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
 
@@ -72,7 +73,7 @@ export const serviceLocationsTable = pgTable('service_locations', {
     // (R9). Wiersz lokalizacji istnieje zawsze, bo niesie wymagany `slug` i `city`.
     latitude: doublePrecision('latitude'),
     longitude: doublePrecision('longitude'),
-    openingHours: jsonb('opening_hours').$type<Record<string, { open: string; close: string }>>().notNull(),
+    openingHours: jsonb('opening_hours').$type<OpeningHours>().notNull(),
     phoneNumber: varchar('phone_number', { length: 50 }),
     email: varchar('email', { length: 255 }),
     webpage: varchar('webpage', { length: 255 }),

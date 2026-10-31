@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 import {
     premiumEmptyFixture,
-    premiumOf,
     premiumProfessionalFixture,
     premiumServiceFixture,
 } from '../profile-fixtures';
@@ -15,10 +14,7 @@ const meta = {
     decorators: [withProfileIntl],
     parameters: profileStoryParameters,
     globals: { theme: 'light' },
-    args: {
-        profile: premiumProfessionalFixture,
-        premium: premiumOf(premiumProfessionalFixture),
-    },
+    args: { profile: premiumProfessionalFixture },
 } satisfies Meta<typeof TemplateProfessional>;
 
 export default meta;
@@ -30,20 +26,20 @@ export const LawFirmMobile: Story = { parameters: mobileViewport };
 
 /** Ta sama tresc co w szablonie Galeria (cover + 12 zdjec) — porownanie ukladow. */
 export const FullDesktop: Story = {
-    args: { profile: premiumServiceFixture, premium: premiumOf(premiumServiceFixture) },
+    args: { profile: premiumServiceFixture },
 };
 
 export const FullMobile: Story = {
-    args: { profile: premiumServiceFixture, premium: premiumOf(premiumServiceFixture) },
+    args: { profile: premiumServiceFixture },
     parameters: mobileViewport,
 };
 
 /** Premium oplacone przed publikacja tresci: bez cover, galerii i adresu. */
 export const EmptyDesktop: Story = {
-    args: { profile: premiumEmptyFixture, premium: premiumOf(premiumEmptyFixture) },
+    args: { profile: premiumEmptyFixture },
 };
 
 export const EmptyMobile: Story = {
-    args: { profile: premiumEmptyFixture, premium: premiumOf(premiumEmptyFixture) },
+    args: { profile: premiumEmptyFixture },
     parameters: mobileViewport,
 };

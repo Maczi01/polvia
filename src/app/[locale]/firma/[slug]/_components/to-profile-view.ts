@@ -1,15 +1,10 @@
 import type { Locale } from '@/i18n/config';
 import { toServiceLanguages } from '@/lib/languages';
 import { buildServiceUrl } from '@/lib/map-url-builder';
-import type { ServiceProfile, ServiceProfileLocation } from '@/lib/service-profile-queries';
-import type { SimilarService as SimilarServiceRow } from '@/lib/similar-services';
+import type { ServiceProfile } from '@/lib/service-profile-queries';
+import type { SimilarServiceRow } from '@/lib/similar-services';
 
-import type {
-    ProfileHref,
-    ProfileLocation,
-    ServiceProfileView,
-    SimilarService,
-} from './service-profile-types';
+import type { ProfileHref, ServiceProfileView, SimilarService } from './service-profile-types';
 
 /** CTA darmowego profilu w fazie 1 prowadzi do cennika (`/cennik` w pl). */
 const UPGRADE_HREF: ProfileHref = '/pricing';
@@ -17,25 +12,6 @@ const UPGRADE_HREF: ProfileHref = '/pricing';
 /** Sciezka obrazka z `public/services/` albo `null` (komponent pokaze `/default.png`). */
 export function toServiceImagePath(image: string | null): string | null {
     return image?.trim() ? `/services/${image.trimEnd()}` : null;
-}
-
-function toProfileLocation(location: ServiceProfileLocation): ProfileLocation {
-    return {
-        id: location.id,
-        city: location.city,
-        street: location.street,
-        postcode: location.postcode,
-        voivodeship: location.voivodeship,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        phoneNumber: location.phoneNumber,
-        email: location.email,
-        webpage: location.webpage,
-        socials: location.socials,
-        whatsappNumber: location.whatsappNumber,
-        openingHours: location.openingHours,
-        isMain: location.isMainLocation,
-    };
 }
 
 /**
@@ -78,7 +54,7 @@ export function toProfileView(
         languages: toServiceLanguages(profile.languages),
         tags: profile.tags,
         verified: profile.verified,
-        locations: profile.locations.map(toProfileLocation),
+        locations: profile.locations,
         mapHref: toMapHref(profile, locale),
         similarServices: similarServices.map(toSimilarService),
         upgradeHref: UPGRADE_HREF,

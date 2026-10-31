@@ -36,8 +36,10 @@ export function SimilarServices({
             <ul className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
                 {services.map(service => (
                     <li key={service.slug}>
+                        {/* Bez prefetchu: kazdy prefetch profilu to lookup slugu w middleware. */}
                         <Link
                             href={service.href}
+                            prefetch={false}
                             className={cn(
                                 'group flex h-full flex-col items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 text-center transition-all md:p-5',
                                 'hover:-translate-y-0.5 hover:border-green-300 hover:shadow-lg',

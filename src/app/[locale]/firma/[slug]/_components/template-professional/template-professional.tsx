@@ -13,7 +13,7 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
-import type { PremiumContent, ServiceProfileView } from '../service-profile-types';
+import type { PremiumProfileView } from '../service-profile-types';
 
 /** Cienkie ramki, mniej zaokraglen, szeryfowe naglowki — powaga kancelarii. */
 const SECTION =
@@ -24,8 +24,7 @@ const ASIDE_TITLE = 'font-serif text-lg font-semibold text-slate-900 dark:text-s
 const GALLERY_PREVIEW = 4;
 
 type TemplateProfessionalProps = {
-    profile: ServiceProfileView;
-    premium: PremiumContent;
+    profile: PremiumProfileView;
 };
 
 /**
@@ -33,10 +32,8 @@ type TemplateProfessionalProps = {
  * zdjecia, cennik i FAQ na pierwszym planie, kontakt w przyklejonej kolumnie.
  * Cover, jesli jest, ilustruje sekcje „O firmie” zamiast dominowac nad trescia.
  */
-export function TemplateProfessional({
-    profile,
-    premium,
-}: TemplateProfessionalProps): ReactElement {
+export function TemplateProfessional({ profile }: TemplateProfessionalProps): ReactElement {
+    const { premium } = profile;
     const mainLocation = getMainLocation(profile.locations);
     const city = getHeaderCity(profile);
     const showNavigate = profile.coverage !== 'online';

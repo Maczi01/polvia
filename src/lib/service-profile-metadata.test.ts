@@ -4,9 +4,11 @@ import {
     buildProfileCanonicalUrl,
     buildProfileJsonLd,
     buildProfileLanguageAlternates,
+    buildProfileMetadata,
     buildProfileTitle,
     type JsonLdLocation,
     META_DESCRIPTION_MAX_LENGTH,
+    type ProfileMetadataInput,
     serializeJsonLd,
     truncateMetaDescription,
 } from './service-profile-metadata';
@@ -195,5 +197,73 @@ describe('serializeJsonLd', () => {
         expect(serialized).not.toContain('</script>');
         expect(serialized).not.toContain('<');
         expect(JSON.parse(serialized)).toEqual(data);
+    });
+});
+
+describe('buildProfileMetadata', () => {
+    const FALLBACK = 'Mistrz Remontu — Remonty, Warszawa. Adres, telefon i kontakt.';
+
+    function input(overrides: Partial<ProfileMetadataInput> = {}): ProfileMetadataInput {
+        return {
+            baseUrl: BASE_URL,
+            locale: 'uk',
+            slug: 'mistrz-remontu',
+            name: 'Mistrz Remontu',
+            categoryLabel: 'Remonty',
+            city: 'Warszawa',
+            siteName: 'Polvia',
+            description: 'Remonty mieszkan pod klucz.',
+            fallbackDescription: FALLBACK,
+            imagePath: '/services/remont.png',
+            ...overrides,
+        };
+    }
+
+    it('profil null daje noindex i nofollow', () => {
+        expect(buildProfileMetadata(null)).toEqual({ robots: { index: false, follow: false } });
+    });
+
+    it('sklada tytul, opis, adres kanoniczny i obrazek Open Graph', () => {
+        const metadata = buildProfileMetadata(input());
+
+        expect(metadata.title).toBe('Mistrz Remontu — Remonty, Warszawa | Polvia');
+        expect(metadata.description).toBe('Remonty mieszkan pod klucz.');
+        expect(metadata.robots).toEqual({ index: true, follow: true });
+        expect(metadata.alternates?.canonical).toBe(`${BASE_URL}/uk/firma/mistrz-remontu`);
+        expect(metadata.openGraph).toMatchObject({
+            url: `${BASE_URL}/uk/firma/mistrz-remontu`,
+            locale: 'uk',
+            alternateLocale: locales.filter(locale => locale !== 'uk'),
+            images: [{ url: `${BASE_URL}/services/remont.png`, alt: 'Mistrz Remontu' }],
+        });
+    });
+
+    it.each([
+        ['null', null],
+        ['pusty', ''],
+        ['bialy', '   '],
+    ])('opis %s daje opis zastepczy, nie pusty <meta description>', (_label, description) => {
+        const metadata = buildProfileMetadata(input({ description }));
+
+        expect(metadata.description).toBe(FALLBACK);
+        expect(metadata.openGraph?.description).toBe(FALLBACK);
+    });
+
+    it('brak logo nie dodaje obrazka do Open Graph', () => {
+        const metadata = buildProfileMetadata(input({ imagePath: null }));
+
+        expect(metadata.openGraph?.images).toBeUndefined();
+    });
+
+    it('hreflang: wszystkie 4 locale i x-default na wersje bez prefiksu', () => {
+        const languages = buildProfileMetadata(input()).alternates?.languages;
+
+        expect(languages).toEqual({
+            pl: `${BASE_URL}/firma/mistrz-remontu`,
+            en: `${BASE_URL}/en/firma/mistrz-remontu`,
+            ru: `${BASE_URL}/ru/firma/mistrz-remontu`,
+            uk: `${BASE_URL}/uk/firma/mistrz-remontu`,
+            'x-default': `${BASE_URL}/firma/mistrz-remontu`,
+        });
     });
 });

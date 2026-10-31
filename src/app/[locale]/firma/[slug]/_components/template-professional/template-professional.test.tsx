@@ -3,7 +3,6 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 
 import {
     premiumEmptyFixture,
-    premiumOf,
     premiumProfessionalFixture,
     premiumServiceFixture,
 } from '../profile-fixtures';
@@ -18,12 +17,7 @@ jest.mock('@/i18n/navigation', () => ({
 
 describe('TemplateProfessional', () => {
     it('renderuje nazwe jako h1 i stawia cennik przed opisem firmy; przechodzi jest-axe', async () => {
-        const { container } = renderWithIntl(
-            <TemplateProfessional
-                profile={premiumProfessionalFixture}
-                premium={premiumOf(premiumProfessionalFixture)}
-            />,
-        );
+        const { container } = renderWithIntl(<TemplateProfessional profile={premiumProfessionalFixture} />);
 
         expect(
             screen.getByRole('heading', { level: 1, name: premiumProfessionalFixture.name }),
@@ -36,12 +30,7 @@ describe('TemplateProfessional', () => {
     });
 
     it('pokazuje 4 miniatury galerii z licznikiem pozostalych i cover w sekcji "O firmie"', () => {
-        renderWithIntl(
-            <TemplateProfessional
-                profile={premiumServiceFixture}
-                premium={premiumOf(premiumServiceFixture)}
-            />,
-        );
+        renderWithIntl(<TemplateProfessional profile={premiumServiceFixture} />);
 
         expect(screen.getAllByRole('button', { name: /^Powiększ zdjęcie/ })).toHaveLength(4);
         expect(screen.getByText('+8')).toBeInTheDocument();
@@ -51,12 +40,7 @@ describe('TemplateProfessional', () => {
     });
 
     it('bez tresci premium i lokalizacji nie renderuje pustych sekcji', async () => {
-        const { container } = renderWithIntl(
-            <TemplateProfessional
-                profile={premiumEmptyFixture}
-                premium={premiumOf(premiumEmptyFixture)}
-            />,
-        );
+        const { container } = renderWithIntl(<TemplateProfessional profile={premiumEmptyFixture} />);
 
         expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(premiumEmptyFixture.name);
         expect(screen.queryByRole('region', { name: 'Galeria' })).not.toBeInTheDocument();

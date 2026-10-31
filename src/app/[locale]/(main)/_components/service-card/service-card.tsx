@@ -6,7 +6,6 @@ import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { Link as LocaleLink } from '@/i18n/navigation';
 import { cn } from '@/lib/utilities';
 import { LANGUAGE_FLAG_PATHS, toServiceLanguages } from '@/lib/languages';
 import { Button } from '@/components/ui/button/button';
@@ -16,7 +15,8 @@ import { PartialService } from '@/types';
 import { PopupMarkerData } from '@/app/[locale]/(main)/_components/overview-map/overview-map';
 import { VerifiedBadge } from '@/components/ui/verified-badge/verified-badge';
 import { CopyEmailButton } from '@/app/[locale]/(main)/_components/copy-email-button/copy-email-button';
-import { WEEKDAY_KEYS } from '@/lib/weekdays';
+import { ServiceProfileLink } from '@/app/[locale]/(main)/_components/service-profile-link/service-profile-link';
+import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
 
 /**
  * Siatka przyciskow akcji wedlug ich liczby. Cztery przyciski wracaja do dwoch
@@ -105,7 +105,7 @@ const getDomainFromUrl = (url: string): string => {
 };
 
 const getTodayHours = (
-    openingHours: Record<string, { open: string; close: string }> | undefined | null,
+    openingHours: OpeningHours | undefined | null,
 ): { open: string; close: string } | null => {
     if (!openingHours) return null;
     // Klucze w danych to `monday`…`sunday` (`WEEKDAY_KEYS`), a `getDay()` liczy od niedzieli (0).
@@ -764,14 +764,14 @@ export const ServiceCard = forwardRef<HTMLDivElement, CardProps>(
 
                         {/* Profil firmy; wpis bez slugu (przed backfillem) nie ma adresu profilu */}
                         {serviceSlug && (
-                            <LocaleLink
-                                href={{ pathname: '/firma/[slug]', params: { slug: serviceSlug } }}
+                            <ServiceProfileLink
+                                slug={serviceSlug}
                                 onClick={e => e.stopPropagation()}
-                                className="flex items-center justify-center gap-1.5 rounded-full py-2 text-sm font-semibold text-[#C52289] transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C52289] dark:text-pink-400"
+                                className="flex items-center justify-center gap-1.5 rounded-full py-2 text-sm transition-colors dark:text-pink-400"
                             >
                                 {t('viewProfile')}
                                 <ArrowRight size={16} aria-hidden="true" />
-                            </LocaleLink>
+                            </ServiceProfileLink>
                         )}
                     </div>
                 </div>

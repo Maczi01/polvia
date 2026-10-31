@@ -13,22 +13,22 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
-import type { PremiumContent, ServiceProfileView } from '../service-profile-types';
+import type { PremiumProfileView } from '../service-profile-types';
 
 /** Sekcje na cieplym tle, bez ramek — zdjecia maja grac pierwsze skrzypce. */
 const SECTION = 'rounded-3xl border-0 bg-stone-100/70 dark:bg-stone-900/60 md:p-8';
 const TITLE = 'text-2xl font-bold tracking-tight md:text-3xl';
 
 type TemplateGalleryProps = {
-    profile: ServiceProfileView;
-    premium: PremiumContent;
+    profile: PremiumProfileView;
 };
 
 /**
  * Szablon „Galeria” (beauty, remonty, gastro): pelnoekranowy cover z nazwa na
  * zdjeciu i mozaika zdjec zaraz pod nim. Bez cover naglowek ma gradient marki.
  */
-export function TemplateGallery({ profile, premium }: TemplateGalleryProps): ReactElement {
+export function TemplateGallery({ profile }: TemplateGalleryProps): ReactElement {
+    const { premium } = profile;
     const mainLocation = getMainLocation(profile.locations);
     const city = getHeaderCity(profile);
     const showNavigate = profile.coverage !== 'online';

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
-import { premiumEmptyFixture, premiumOf, premiumServiceFixture } from '../profile-fixtures';
+import { premiumEmptyFixture, premiumServiceFixture } from '../profile-fixtures';
 import { renderWithIntl } from '../profile-test-utils';
 import { TemplateClassic } from './template-classic';
 
@@ -13,12 +13,7 @@ jest.mock('@/i18n/navigation', () => ({
 
 describe('TemplateClassic', () => {
     it('renderuje nazwe jako h1, cover i 6 miniatur galerii; przechodzi jest-axe', async () => {
-        const { container } = renderWithIntl(
-            <TemplateClassic
-                profile={premiumServiceFixture}
-                premium={premiumOf(premiumServiceFixture)}
-            />,
-        );
+        const { container } = renderWithIntl(<TemplateClassic profile={premiumServiceFixture} />);
 
         expect(screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' })).toBeInTheDocument();
         expect(screen.getByRole('img', { name: 'Narzędzia ekipy remontowej' })).toBeInTheDocument();
@@ -30,10 +25,18 @@ describe('TemplateClassic', () => {
         expect(await axe(container)).toHaveNoViolations();
     });
 
+    it('priorytet ladowania (LCP) ma tylko cover, logo laduje sie leniwie', () => {
+        renderWithIntl(<TemplateClassic profile={premiumServiceFixture} />);
+
+        const cover = screen.getByRole('img', { name: 'Narzędzia ekipy remontowej' });
+        const logo = screen.getByRole('img', { name: 'Logo firmy Mistrz Remontu' });
+        // next/image: `priority` wylacza `loading="lazy"`.
+        expect(cover).not.toHaveAttribute('loading', 'lazy');
+        expect(logo).toHaveAttribute('loading', 'lazy');
+    });
+
     it('bez cover, galerii i lokalizacji nie renderuje pustych sekcji', async () => {
-        const { container } = renderWithIntl(
-            <TemplateClassic profile={premiumEmptyFixture} premium={premiumOf(premiumEmptyFixture)} />,
-        );
+        const { container } = renderWithIntl(<TemplateClassic profile={premiumEmptyFixture} />);
 
         expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(premiumEmptyFixture.name);
         expect(screen.queryByRole('region', { name: 'Galeria' })).not.toBeInTheDocument();

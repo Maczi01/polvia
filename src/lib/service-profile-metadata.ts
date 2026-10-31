@@ -1,7 +1,9 @@
+import type { Metadata } from 'next';
+
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 import type { Coverage } from '@/lib/coverage';
 import { buildServiceProfilePath } from '@/lib/service-profile-path';
-import { WEEKDAY_KEYS } from '@/lib/weekdays';
+import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
 
 /**
  * Metadane SEO profilu firmy `/firma/<slug>`: adresy kanoniczne i hreflang, opis meta
@@ -65,7 +67,61 @@ export function truncateMetaDescription(
     return `${cut.replace(/[\s,.;:!?—–-]+$/, '')}${ELLIPSIS}`;
 }
 
-type OpeningHours = Readonly<Record<string, { open: string; close: string }>>;
+/** Absolutny adres sciezki z `public/` albo `null`, gdy sciezki nie ma. */
+export function toAbsoluteUrl(baseUrl: string, path: string | null): string | null {
+    return path ? `${baseUrl}${path}` : null;
+}
+
+/** Opis meta: opis firmy, a gdy jest pusty lub bialy — opis zastepczy z tlumaczen. */
+export function pickMetaDescription(description: string | null, fallback: string): string {
+    return truncateMetaDescription(description?.trim() ? description : fallback);
+}
+
+/** Metadane adresu bez aktywnego wpisu: strona nie trafia do indeksu. */
+export const MISSING_PROFILE_METADATA: Metadata = { robots: { index: false, follow: false } };
+
+export type ProfileMetadataInput = ProfileTitleInput & {
+    baseUrl: string;
+    locale: Locale;
+    slug: string;
+    /** Opis firmy w locale; pusty albo bialy oznacza „brak”. */
+    description: string | null;
+    /** Opis zastepczy (z tlumaczen), gdy firma nie ma wlasnego. */
+    fallbackDescription: string;
+    /** Sciezka logo (`/services/<plik>`) albo `null` — wtedy bez obrazka w Open Graph. */
+    imagePath: string | null;
+};
+
+/** `generateMetadata` profilu; `null` (brak aktywnego wpisu) daje `noindex`. */
+export function buildProfileMetadata(input: ProfileMetadataInput | null): Metadata {
+    if (!input) return MISSING_PROFILE_METADATA;
+
+    const { baseUrl, locale, slug, name, siteName } = input;
+    const title = buildProfileTitle(input);
+    const description = pickMetaDescription(input.description, input.fallbackDescription);
+    const url = buildProfileCanonicalUrl(baseUrl, locale, slug);
+    const imageUrl = toAbsoluteUrl(baseUrl, input.imagePath);
+
+    return {
+        title,
+        description,
+        alternates: {
+            canonical: url,
+            languages: buildProfileLanguageAlternates(baseUrl, slug),
+        },
+        openGraph: {
+            title,
+            description,
+            url,
+            type: 'website',
+            locale,
+            alternateLocale: locales.filter(l => l !== locale),
+            siteName,
+            images: imageUrl ? [{ url: imageUrl, alt: name }] : undefined,
+        },
+        robots: { index: true, follow: true },
+    };
+}
 
 /** Lokalizacja potrzebna do JSON-LD — podzbior `ProfileLocation`. */
 export type JsonLdLocation = {

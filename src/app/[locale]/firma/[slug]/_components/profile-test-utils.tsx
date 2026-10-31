@@ -23,17 +23,23 @@ function hrefToString(href: unknown): string {
 
 type MockLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
     href: unknown;
+    prefetch?: boolean | null;
     children: ReactNode;
 };
 
 /**
  * Zastepstwo `Link` z `@/i18n/navigation` (routing next-intl ciagnie App Router).
  * Renderuje wewnetrzna sciezke; lokalizacja adresu to zadanie next-intl.
+ * `prefetch` trafia do `data-prefetch`, zeby test mogl go sprawdzic.
  * Uzycie: `jest.mock('@/i18n/navigation', () => ({ Link: jest.requireActual('…/profile-test-utils').MockLink }))`.
  */
-export function MockLink({ href, children, ...rest }: MockLinkProps): ReactElement {
+export function MockLink({ href, prefetch, children, ...rest }: MockLinkProps): ReactElement {
     return (
-        <a href={hrefToString(href)} {...rest}>
+        <a
+            href={hrefToString(href)}
+            data-prefetch={prefetch === undefined || prefetch === null ? undefined : String(prefetch)}
+            {...rest}
+        >
             {children}
         </a>
     );

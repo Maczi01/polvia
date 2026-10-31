@@ -13,14 +13,13 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
-import type { PremiumContent, ServiceProfileView } from '../service-profile-types';
+import type { PremiumProfileView } from '../service-profile-types';
 
 const SECTION = 'rounded-2xl shadow-sm';
 const GALLERY_PREVIEW = 6;
 
 type TemplateClassicProps = {
-    profile: ServiceProfileView;
-    premium: PremiumContent;
+    profile: PremiumProfileView;
 };
 
 /**
@@ -28,7 +27,8 @@ type TemplateClassicProps = {
  * na srodku; ponizej tresc i kontakt w dwoch kolumnach. Bez cover baner ma
  * gradient w kolorach serwisu.
  */
-export function TemplateClassic({ profile, premium }: TemplateClassicProps): ReactElement {
+export function TemplateClassic({ profile }: TemplateClassicProps): ReactElement {
+    const { premium } = profile;
     const mainLocation = getMainLocation(profile.locations);
     const city = getHeaderCity(profile);
     const showNavigate = profile.coverage !== 'online';
@@ -59,7 +59,6 @@ export function TemplateClassic({ profile, premium }: TemplateClassicProps): Rea
                             name={profile.name}
                             logo={profile.logo}
                             size={128}
-                            priority
                             className="relative size-28 rounded-full border-0 shadow-lg ring-4 ring-white dark:ring-gray-800 md:size-32"
                         />
                         <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50 md:text-4xl">

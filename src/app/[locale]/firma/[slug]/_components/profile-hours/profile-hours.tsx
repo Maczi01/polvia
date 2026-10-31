@@ -2,10 +2,9 @@ import { useTranslations } from 'next-intl';
 import type { ReactElement } from 'react';
 
 import { cn } from '@/lib/utilities';
-import { WEEKDAY_KEYS } from '@/lib/weekdays';
+import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
 
 import { ProfileSection } from '../profile-section/profile-section';
-import type { OpeningHours } from '../service-profile-types';
 
 type ProfileHoursProps = {
     openingHours: OpeningHours;
