@@ -255,6 +255,24 @@ describe('buildProfileMetadata', () => {
         expect(metadata.openGraph?.images).toBeUndefined();
     });
 
+    it('widok premium z coverem: cover zamiast logo w Open Graph', () => {
+        const metadata = buildProfileMetadata(
+            input({ coverImagePath: '/services/mistrz-remontu/cover.jpg' }),
+        );
+
+        expect(metadata.openGraph?.images).toEqual([
+            { url: `${BASE_URL}/services/mistrz-remontu/cover.jpg`, alt: 'Mistrz Remontu' },
+        ]);
+    });
+
+    it('widok free (bez coveru): obrazkiem Open Graph zostaje logo', () => {
+        const metadata = buildProfileMetadata(input({ coverImagePath: null }));
+
+        expect(metadata.openGraph?.images).toEqual([
+            { url: `${BASE_URL}/services/remont.png`, alt: 'Mistrz Remontu' },
+        ]);
+    });
+
     it('hreflang: wszystkie 4 locale i x-default na wersje bez prefiksu', () => {
         const languages = buildProfileMetadata(input()).alternates?.languages;
 

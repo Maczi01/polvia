@@ -58,6 +58,6 @@ export function toProfileView(
         mapHref: toMapHref(profile, locale),
         similarServices: similarServices.map(toSimilarService),
         upgradeHref: UPGRADE_HREF,
-        premium: null,
+        premium: profile.premiumContent,
     };
 }

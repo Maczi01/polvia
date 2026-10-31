@@ -79,6 +79,20 @@ describe('toProfileView', () => {
         expect(view.premium).toBeNull();
     });
 
+    it('przekazuje tresc premium z zapytania bez zmian', () => {
+        const premiumContent: ServiceProfile['premiumContent'] = {
+            template: 'professional',
+            coverImage: { src: '/services/mistrz-remontu/cover.jpg', alt: 'Mistrz Remontu' },
+            gallery: [],
+            priceList: [],
+            faq: [{ question: 'Czy dojezdzacie?', answer: 'Tak.' }],
+        };
+
+        const view = toProfileView(profile({ premiumContent }), similar, 'pl');
+
+        expect(view.premium).toBe(premiumContent);
+    });
+
     it('wpis bez obrazka ma logo null', () => {
         expect(toProfileView(profile({ image: null }), [], 'pl').logo).toBeNull();
     });

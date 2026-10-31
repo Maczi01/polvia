@@ -90,6 +90,11 @@ export type ProfileMetadataInput = ProfileTitleInput & {
     fallbackDescription: string;
     /** Sciezka logo (`/services/<plik>`) albo `null` — wtedy bez obrazka w Open Graph. */
     imagePath: string | null;
+    /**
+     * Sciezka coveru premium; podawana tylko przy widoku premium i wtedy zastepuje logo
+     * w Open Graph. Pominieta albo `null` — obrazkiem zostaje logo.
+     */
+    coverImagePath?: string | null;
 };
 
 /** `generateMetadata` profilu; `null` (brak aktywnego wpisu) daje `noindex`. */
@@ -100,7 +105,7 @@ export function buildProfileMetadata(input: ProfileMetadataInput | null): Metada
     const title = buildProfileTitle(input);
     const description = pickMetaDescription(input.description, input.fallbackDescription);
     const url = buildProfileCanonicalUrl(baseUrl, locale, slug);
-    const imageUrl = toAbsoluteUrl(baseUrl, input.imagePath);
+    const imageUrl = toAbsoluteUrl(baseUrl, input.coverImagePath ?? input.imagePath);
 
     return {
         title,
