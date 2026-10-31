@@ -227,7 +227,7 @@ flowchart LR
 
 ### Faza 1 — Darmowy profil
 
-- [ ] **Unit 1: Slug usługi i zapytania profilu**
+- [x] **Unit 1: Slug usługi i zapytania profilu**
 
 **Cel:** Każda usługa ma unikalny, niezmienny slug, a warstwa danych potrafi zwrócić komplet danych profilu i „Podobne firmy”.
 
@@ -281,7 +281,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 2: Routing `/firma/[slug]`, lookup w middleware i sitemap**
+- [x] **Unit 2: Routing `/firma/[slug]`, lookup w middleware i sitemap**
 
 **Cel:** Adres profilu działa we wszystkich locale. Nieistniejący slug zwraca prawdziwy status 404 (bez soft-404), a profile są w sitemapie.
 
@@ -329,7 +329,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 3: Kierunek wizualny — komponenty prezentacyjne profilu i 3 szablonów**
+- [x] **Unit 3: Kierunek wizualny — komponenty prezentacyjne profilu i 3 szablonów**
 
 **Cel:** Przed podłączeniem danych powstają komponenty prezentacyjne: darmowy profil i trzy szablony premium. Pokazane są w Storybooku na fixture'ach (desktop i mobile), do akceptacji przez usera. To realizuje decyzję „IU na kierunek wizualny” zamiast `DESIGN.md`.
 
@@ -390,7 +390,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 4: Strona profilu (free), metadane i linki z karty/popupu**
+- [x] **Unit 4: Strona profilu (free), metadane i linki z karty/popupu**
 
 **Cel:** `/firma/<slug>` renderuje darmowy profil z prawdziwymi danymi, z metadanymi SEO, hreflang i JSON-LD. Karta i popup mapy linkują do profilu.
 

@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-10-31
+**Ostatnia aktualizacja:** 2026-10-31 (po fazie 1)
 
 ## Źródła
 
@@ -110,9 +110,67 @@
   - `DATABASE_URL` = produkcja;
   - jeden dev server, nigdy `npm run build` przy działającym serverze.
 
+## Decyzje podjęte w trakcie wykonania
+
+- **2026-10-31: ceny planu Profesjonalny to 9 zł/mies. i 49 zł/rok** (decyzja usera przy starcie fazy 1).
+  - Kwoty trafiają do Stripe Prices (PLN; operator, U8) i do `Pricing.plans.essentials` w 4 plikach `messages/` (U11).
+  - BLIK recurring mieści się w limicie 2000 PLN.
+
+- **2026-10-31: user zaakceptował wygląd profilu i 3 szablonów (bramka U3).** Zrzuty: `screeny-u3/`.
+- **Slug usługi liczony jedną regułą w seedzie, backfillu i `db:add`** (`createServiceSlugAllocator` w `src/db/service-slugs.ts`). Wcześniej seed zapisywał bazę slugów lokalizacji (`multi-cook-warszawa`), a backfill na produkcji liczył slug z nazwy (`multi-cook`), więc po `db:reset` adresy `/firma/…` by się zmieniły.
+- **404 dla nieistniejącego profilu:** middleware robi `rewrite` na `/pl/firma/_brak-profilu/_404`, ścieżkę niedopasowaną przez routing. Next zwraca wtedy 404 przed streamowaniem layoutu (sprawdzone w kodzie Next 15.1.11).
+  - Treść to globalne not-found Next, tak samo jak dla każdego nieistniejącego adresu w serwisie. Własna strona 404 dla całego serwisu jest poza zakresem.
+  - `firma/not-found.tsx` obsługuje tylko fail-open.
+- **Rate limit lookupu:** 120 zapytań na 60 s per IP klienta (`x-forwarded-for` przekazany z middleware). Przy 429 albo awarii store'u lookup przepuszcza żądanie (fail-open).
+  - Po wdrożeniu sprawdzić w logach Vercela, czy route widzi IP klienta, a nie IP middleware. Jeśli widzi IP middleware, rozważyć nagłówek z sekretem (nowa zmienna env).
+
+## Log wykonania
+
+### Faza 1 — Darmowy profil (2026-10-31)
+
+| Unit | Builder | Status | Commit |
+|---|---|---|---|
+| U1 Slug + zapytania | feature-builder-web-data | completed (+ poprawka seeda) | `668f261` |
+| U2 Routing, lookup, sitemap | feature-builder-web-data | completed | `0365af3` |
+| U3 Komponenty i 3 szablony | feature-builder-web-ui | completed, wygląd zaakceptowany | `c6bc11a` |
+| U4 Strona profilu, metadane, linki | feature-builder-web-ui | completed | `c3d43c8` |
+
+Gate po fazie: `npx tsc --noEmit` OK, `npx jest` 143 suite'y i 1505 testów OK, `npx next lint` bez błędów i warningów.
+
+**`npm run build` nie został uruchomiony.** W worktree celowo nie ma `.env`, a build bez prawdziwego środowiska nie przejdzie walidacji `env.ts`; sitemapa z `revalidate` pyta bazę przy buildzie. Weryfikacja buildu odbędzie się na deployu preview.
+
+**Odchylenia zgłoszone przez builderów (zaakceptowane):**
+- **U1:**
+  - Logika slugów i doboru podobnych wydzielona do czystych modułów `src/db/service-slugs.ts` i `src/lib/similar-services.ts` (z testami).
+  - Brak `src/db/add-service.test.ts`, bo `add-service.ts` odpala `main()` i łączy się z bazą przy imporcie. Komenda weryfikacji poprawiona w zadaniach.
+  - `superRefine` odrzuca pusty slug wyliczony z nazwy.
+- **U2:**
+  - Dodatkowy moduł `src/lib/service-slug-lookup.ts` (fetch z timeoutem, testowalny poza middleware).
+  - Typ `AppPathnames` zawężony do tras bez parametrów.
+  - `revalidate = 3600` w sitemapie: wpisy z `db:add` pojawiają się bez deployu.
+- **U3:**
+  - Dodatkowe sekcje i helpery, żeby zmieścić się w limicie 300 linii.
+  - Token `brand` (`#C52289`) w `tailwind.config.ts`.
+  - `SimilarService.href` w kontrakcie.
+- **U4:**
+  - `src/app/[locale]/firma/layout.tsx` z nagłówkiem i stopką, bo `firma/` leży poza route groups.
+  - Kolumna `serviceSlug` także w `semantic-search.ts`.
+  - Fixture'y 8 istniejących testów dostały `serviceSlug: null`; asercje bez zmian.
+  - Test popupu.
+  - Naprawiony przełącznik języka (zgłoszone przez U2).
+  - Naprawiony wiersz „Dziś” w karcie: klucze godzin w danych są pisane małymi literami, a karta szukała `Monday`.
+
+**Incydent:** builder U1 użył raz `git stash` + `stash pop` w współdzielonym worktree (kilka sekund). Pop przeszedł czysto, a końcowe diffy U3 i kontekstu są kompletne. Kolejni builderzy mają zakaz komend git zmieniających drzewo.
+
+## Środowisko worktree
+
+- `node_modules`: własna instalacja (`npm ci`, 2026-10-31). Junction do głównego katalogu łamał Storybooka: webpack nie przetwarzał `.storybook/preview.ts` spoza ścieżki projektu. U8 może więc instalować `stripe` normalnie.
+- **Brak `.env` w worktree, celowo.** `DATABASE_URL` = produkcja, więc buildery nie mogą zapisać nic do żywej bazy.
+- Baseline 2026-10-31: `npx tsc --noEmit` przechodzi; `npx jest`: 113 suite'ów i 1288 testów zielonych.
+
 ## Odroczone do implementacji
 
-- Ceny i waluta (kwoty w Stripe i w `Pricing.plans.essentials`).
+- ~~Ceny i waluta~~: rozstrzygnięte (patrz wyżej).
 - Ostateczne `PREMIUM_GRACE_DAYS`.
 - Timeout i cache lookupu w middleware.
 - Limit galerii (punkt odniesienia: 15) i wymiary cover.

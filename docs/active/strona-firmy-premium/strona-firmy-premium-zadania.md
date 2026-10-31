@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-10-31
+**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 1)
 
 ## Źródła
 
@@ -29,19 +29,19 @@
 **Delegate to:** `feature-builder-web-data` · **Nakład:** M · **Zależności:** brak
 **Wymagania:** R1, R2, R3
 
-- [ ] `src/db/schema.ts`: kolumna `services.slug` (unikalna; najpierw nullowalna)
-- [ ] `src/db/backfill-service-slugs.ts`: idempotentny backfill (`buildServiceSlug` + sufiks przy kolizji, kolejność po `createdAt`); skrypt w `package.json`
-- [ ] `src/db/seed.ts`: `seedService` zapisuje `slug` usługi
-- [ ] `src/db/add-service.ts` + `src/db/service-input-schema.ts`: zapis slugu usługi, odrzucenie zajętego slugu z czytelnym komunikatem
-- [ ] `src/lib/service-profile-queries.ts` (`server-only`): `getServiceProfile(slug, locale)`, `getSimilarServices(serviceId, locale)` (ta sama kategoria, bez siebie, najpierw to samo miasto, max 6), `getServiceSlugStatus(slug)`; typy z `InferSelectModel`
-- [ ] `Test:` `locale='uk'` daje nazwę i opis z tłumaczenia `uk`; brak tłumaczenia daje `services.name`
-- [ ] `Test:` wpis o `status != 'active'` daje `null`
-- [ ] `Test:` wpis online-only (lokalizacje bez współrzędnych) zwraca lokalizacje z `latitude = null` bez błędu
-- [ ] `Test:` `getSimilarServices`: bez samego wpisu, ta sama kategoria, max 6, to samo miasto na początku
-- [ ] `Test:` backfill: dwie usługi o tej samej nazwie dostają `nazwa` i `nazwa-2`; ponowny run bez zmian
-- [ ] `Test:` `add-service` odrzuca JSON z zajętym slugiem usługi
+- [x] `src/db/schema.ts`: kolumna `services.slug` (unikalna; najpierw nullowalna)
+- [x] `src/db/backfill-service-slugs.ts`: idempotentny backfill (`buildServiceSlug` + sufiks przy kolizji, kolejność po `createdAt`); skrypt w `package.json`
+- [x] `src/db/seed.ts`: `seedService` zapisuje `slug` usługi
+- [x] `src/db/add-service.ts` + `src/db/service-input-schema.ts`: zapis slugu usługi, odrzucenie zajętego slugu z czytelnym komunikatem
+- [x] `src/lib/service-profile-queries.ts` (`server-only`): `getServiceProfile(slug, locale)`, `getSimilarServices(serviceId, locale)` (ta sama kategoria, bez siebie, najpierw to samo miasto, max 6), `getServiceSlugStatus(slug)`; typy z `InferSelectModel`
+- [x] `Test:` `locale='uk'` daje nazwę i opis z tłumaczenia `uk`; brak tłumaczenia daje `services.name`
+- [x] `Test:` wpis o `status != 'active'` daje `null`
+- [x] `Test:` wpis online-only (lokalizacje bez współrzędnych) zwraca lokalizacje z `latitude = null` bez błędu
+- [x] `Test:` `getSimilarServices`: bez samego wpisu, ta sama kategoria, max 6, to samo miasto na początku
+- [x] `Test:` backfill: dwie usługi o tej samej nazwie dostają `nazwa` i `nazwa-2`; ponowny run bez zmian
+- [x] `Test:` `add-service` odrzuca JSON z zajętym slugiem usługi
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-queries src/db/add-service` przechodzi (liczba suite'ów zgodna z oczekiwaną)
+- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-queries src/lib/similar-services src/db/service-slugs src/db/service-input-schema` przechodzi (4 suite'y; `add-service.ts` odpala `main()` przy imporcie, więc logika kolizji jest testowana w `service-slugs.test.ts`)
 - [ ] `Weryfikacja:` grep: `src/lib/service-profile-queries.ts` zawiera `import 'server-only'`
 - [ ] `Operator:` `npx drizzle-kit push` (kolumna nullowalna) **na produkcji**; potwierdzić kolumnę w `information_schema`
 - [ ] `Operator:` uruchomić backfill, sprawdzić brak `NULL`, potem `push` z `notNull`
@@ -51,20 +51,20 @@
 **Delegate to:** `feature-builder-web-data` · **Nakład:** M · **Zależności:** U1
 **Wymagania:** R1, R6
 
-- [ ] `src/i18n/routing.ts`: `'/firma/[slug]'` w `pathnames`
-- [ ] `src/lib/service-profile-path.ts`: czyste funkcje
+- [x] `src/i18n/routing.ts`: `'/firma/[slug]'` w `pathnames`
+- [x] `src/lib/service-profile-path.ts`: czyste funkcje
   - `parseServiceProfilePathname`
   - `isReservedRootSegment` (locale, segmenty `pathnames` pl i en, `api`, `firma`, `dashboard`, `thanks`, przekierowania z `next.config.ts`, katalogi `public/`)
   - `buildServiceProfilePath(locale, slug)` przez `localePathPrefix()`
   - walidacja formatu slugu
-- [ ] `src/app/api/service-slug/[slug]/route.ts`: GET, runtime Node, Zod na parametrze, odpowiedź `{ data: { exists }, error }`, rate limit z poprawnym IP klienta przy wywołaniu z middleware
-- [ ] `src/middleware.ts`: gałąź `/firma/<slug>` przed next-intl. Lookup z jawnym timeoutem; brak wpisu daje status 404; awaria lookupu przepuszcza żądanie dalej. Kolejność gałęzi opisana komentarzem.
-- [ ] `src/app/sitemap.ts`: profile aktywnych wpisów × 4 locale
-- [ ] `Test:` `parseServiceProfilePathname`: `/firma/abc` → `{ locale: 'pl', slug: 'abc' }`; `/uk/firma/abc` → `uk`; `/firma/` i `/firma/a/b` → `null`
-- [ ] `Test:` `buildServiceProfilePath`: `pl` → `/firma/x`, `ru` → `/ru/firma/x`; **asercja negatywna:** żadne locale poza `en` nie dostaje `/en`
-- [ ] `Test:` `isReservedRootSegment` jest prawdą dla `mapa`, `cennik`, `pricing`, `blog`, `en`, `api`, `firma`, `services`, `privacy`
-- [ ] `Test:` route handler: istniejący slug → 200 `exists: true`; nieistniejący → `exists: false`; niepoprawny format → 400 z `error.code`
-- [ ] `Test:` sitemap zawiera profil w 4 wariantach locale i nie zawiera wpisów nieaktywnych
+- [x] `src/app/api/service-slug/[slug]/route.ts`: GET, runtime Node, Zod na parametrze, odpowiedź `{ data: { exists }, error }`, rate limit z poprawnym IP klienta przy wywołaniu z middleware
+- [x] `src/middleware.ts`: gałąź `/firma/<slug>` przed next-intl. Lookup z jawnym timeoutem; brak wpisu daje status 404; awaria lookupu przepuszcza żądanie dalej. Kolejność gałęzi opisana komentarzem.
+- [x] `src/app/sitemap.ts`: profile aktywnych wpisów × 4 locale
+- [x] `Test:` `parseServiceProfilePathname`: `/firma/abc` → `{ locale: 'pl', slug: 'abc' }`; `/uk/firma/abc` → `uk`; `/firma/` i `/firma/a/b` → `null`
+- [x] `Test:` `buildServiceProfilePath`: `pl` → `/firma/x`, `ru` → `/ru/firma/x`; **asercja negatywna:** żadne locale poza `en` nie dostaje `/en`
+- [x] `Test:` `isReservedRootSegment` jest prawdą dla `mapa`, `cennik`, `pricing`, `blog`, `en`, `api`, `firma`, `services`, `privacy`
+- [x] `Test:` route handler: istniejący slug → 200 `exists: true`; nieistniejący → `exists: false`; niepoprawny format → 400 z `error.code`
+- [x] `Test:` sitemap zawiera profil w 4 wariantach locale i nie zawiera wpisów nieaktywnych
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug" src/app/sitemap` przechodzi (liczba suite'ów zgodna z oczekiwaną)
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -79,25 +79,25 @@
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** L · **Zależności:** brak (równolegle z U1 i U2)
 **Wymagania:** R2, R3, R7, R8, R9
 
-- [ ] `src/lib/premium-templates.ts`: `PREMIUM_TEMPLATES = ['gallery','professional','classic']`, limity galerii (bez zod i `src/db`)
-- [ ] `_components/service-profile-types.ts`: kontrakt `ServiceProfileView` (dane free + opcjonalne `premium`)
-- [ ] `_components/profile-fixtures.ts` z fixture'ami:
+- [x] `src/lib/premium-templates.ts`: `PREMIUM_TEMPLATES = ['gallery','professional','classic']`, limity galerii (bez zod i `src/db`)
+- [x] `_components/service-profile-types.ts`: kontrakt `ServiceProfileView` (dane free + opcjonalne `premium`)
+- [x] `_components/profile-fixtures.ts` z fixture'ami:
   - wpis lokalny z kompletem danych,
   - wpis online-only,
   - wpis bez logo,
   - premium z 12 zdjęciami, cennikiem i FAQ
-- [ ] `_components/profile-free/` (`.tsx`, `.test.tsx`, `.stories.tsx`): „Podobne firmy” + CTA „To moja firma — ulepsz stronę” jako link
-- [ ] `_components/template-gallery/`, `template-professional/`, `template-classic/` (każdy z testem i stories)
-- [ ] Sekcje współdzielone w folderach z testem: `profile-contact`, `profile-hours`, `profile-price-list`, `profile-faq`, `profile-gallery`, `similar-services`
-- [ ] Mapa jako statyczny podgląd albo link „pokaż na mapie” (`buildServiceUrl`), bez osadzania Mapboxa
-- [ ] Bez nowej biblioteki karuzeli/lightboxa (preferować `<dialog>`). Każda nowa paczka tylko za zgodą usera.
-- [ ] `messages/{pl,en,ru,uk}.json`: namespace `ServiceProfile`
-- [ ] `Test:` każdy szablon i profil free renderuje nazwę jako `h1`; `jest-axe` bez naruszeń
-- [ ] `Test:` profil free online-only: brak sekcji mapy i adresu, jest badge „online”
-- [ ] `Test:` szablon bez `premium.gallery` nie renderuje pustej sekcji galerii
-- [ ] `Test:` `profile-free` renderuje „Podobne firmy” i CTA jako link
-- [ ] `Test:` cennik renderuje pozycje w kolejności z danych, z ceną jako tekstem
-- [ ] `Test:` FAQ rozwijane (`<details>` lub odpowiednik), dostępne z klawiatury
+- [x] `_components/profile-free/` (`.tsx`, `.test.tsx`, `.stories.tsx`): „Podobne firmy” + CTA „To moja firma — ulepsz stronę” jako link
+- [x] `_components/template-gallery/`, `template-professional/`, `template-classic/` (każdy z testem i stories)
+- [x] Sekcje współdzielone w folderach z testem: `profile-contact`, `profile-hours`, `profile-price-list`, `profile-faq`, `profile-gallery`, `similar-services`
+- [x] Mapa jako statyczny podgląd albo link „pokaż na mapie” (`buildServiceUrl`), bez osadzania Mapboxa
+- [x] Bez nowej biblioteki karuzeli/lightboxa (preferować `<dialog>`). Każda nowa paczka tylko za zgodą usera.
+- [x] `messages/{pl,en,ru,uk}.json`: namespace `ServiceProfile`
+- [x] `Test:` każdy szablon i profil free renderuje nazwę jako `h1`; `jest-axe` bez naruszeń
+- [x] `Test:` profil free online-only: brak sekcji mapy i adresu, jest badge „online”
+- [x] `Test:` szablon bez `premium.gallery` nie renderuje pustej sekcji galerii
+- [x] `Test:` `profile-free` renderuje „Podobne firmy” i CTA jako link
+- [x] `Test:` cennik renderuje pozycje w kolejności z danych, z ceną jako tekstem
+- [x] `Test:` FAQ rozwijane (`<details>` lub odpowiednik), dostępne z klawiatury
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -110,23 +110,23 @@
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** M · **Zależności:** U1, U2, U3
 **Wymagania:** R1, R2, R3, R4 (link), R5, R6
 
-- [ ] `src/app/[locale]/firma/[slug]/page.tsx`: Server Component (`getServiceProfile` + `getSimilarServices`), bez `<Suspense>` przed danymi; `notFound()` tylko jako siatka bezpieczeństwa
-- [ ] `src/app/[locale]/firma/not-found.tsx`: własny, nie kopia `map/not-found.tsx`
-- [ ] `src/lib/service-profile-metadata.ts`, czyste funkcje:
+- [x] `src/app/[locale]/firma/[slug]/page.tsx`: Server Component (`getServiceProfile` + `getSimilarServices`), bez `<Suspense>` przed danymi; `notFound()` tylko jako siatka bezpieczeństwa
+- [x] `src/app/[locale]/firma/not-found.tsx`: własny, nie kopia `map/not-found.tsx`
+- [x] `src/lib/service-profile-metadata.ts`, czyste funkcje:
   - canonical,
   - `alternates.languages` ×4 + `x-default`,
   - opis meta z obcięciem,
   - JSON-LD (`LocalBusiness` albo `Organization` dla online-only)
-- [ ] `generateMetadata`: tytuł `<nazwa> — <kategoria>, <miasto> | Polvia`; `openGraph.images` = logo
-- [ ] CTA w fazie 1 → `/pricing` (`Link` z `@/i18n/navigation`)
-- [ ] `src/lib/queries.ts`: `getServices` zwraca `services.slug`; `src/types/index.ts` dostaje to pole tylko gdy potrzebne
-- [ ] `service-card.tsx`: link „Zobacz profil” w sekcji rozwiniętej (`@/i18n/navigation`, `stopPropagation`)
-- [ ] `marker-popup.tsx`: link do profilu
-- [ ] `messages/{pl,en,ru,uk}.json`
-- [ ] `Test:` canonical `ru` = `/ru/firma/x`; `languages` ma 4 locale + `x-default`; asercja negatywna na `/en`
-- [ ] `Test:` JSON-LD dla online-only bez `address` i `geo`
-- [ ] `Test:` opis meta obcięty do limitu bez cięcia w środku słowa
-- [ ] `Test:` `service-card`: rozwinięta karta ma link „Zobacz profil” z `href` w bieżącym locale; klik nie zwija karty
+- [x] `generateMetadata`: tytuł `<nazwa> — <kategoria>, <miasto> | Polvia`; `openGraph.images` = logo
+- [x] CTA w fazie 1 → `/pricing` (`Link` z `@/i18n/navigation`)
+- [x] `src/lib/queries.ts`: `getServices` zwraca `services.slug`; `src/types/index.ts` dostaje to pole tylko gdy potrzebne
+- [x] `service-card.tsx`: link „Zobacz profil” w sekcji rozwiniętej (`@/i18n/navigation`, `stopPropagation`)
+- [x] `marker-popup.tsx`: link do profilu
+- [x] `messages/{pl,en,ru,uk}.json`
+- [x] `Test:` canonical `ru` = `/ru/firma/x`; `languages` ma 4 locale + `x-default`; asercja negatywna na `/en`
+- [x] `Test:` JSON-LD dla online-only bez `address` i `geo`
+- [x] `Test:` opis meta obcięty do limitu bez cięcia w środku słowa
+- [x] `Test:` `service-card`: rozwinięta karta ma link „Zobacz profil” z `href` w bieżącym locale; klik nie zwija karty
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest src/lib/service-profile-metadata "src/app/\[locale\]/\(main\)/_components/service-card"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
