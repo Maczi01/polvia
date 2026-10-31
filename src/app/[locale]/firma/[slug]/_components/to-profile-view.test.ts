@@ -37,6 +37,7 @@ function profile(overrides: Partial<ServiceProfile> = {}): ServiceProfile {
         image: 'remont.png  ',
         tags: ['Glazura'],
         locations: [location()],
+        premiumContent: null,
         ...overrides,
     };
 }

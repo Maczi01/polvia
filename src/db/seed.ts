@@ -9,6 +9,8 @@ import {
     servicesTagsTable
 } from '../db/schema';
 import { createServiceSlugAllocator } from './service-slugs';
+import { createPremiumContentStore, publishPremiumEntries } from './upsert-premium-content';
+import path from 'node:path';
 
 async function mainSeed() {
     console.log('🚀 Rozpoczynam wielki seed danych z Tagami (36 marek)...');
@@ -3573,6 +3575,18 @@ async function mainSeed() {
             },
         ],
     });
+
+    // --- TRESC PREMIUM ---
+    // Zrodlem jest blok `premium` w data/services/*.json (ten sam co `db:premium`),
+    // wiec `db:reset` odtwarza opublikowana tresc. Stan subskrypcji odtwarza osobny resync.
+    const premium = await publishPremiumEntries(createPremiumContentStore(db), {
+        dataDir: path.join(process.cwd(), 'data', 'services'),
+        publicDir: path.join(process.cwd(), 'public'),
+    });
+    for (const slug of premium.published) console.log(`Premium: /firma/${slug}`);
+    for (const { file, reason } of premium.skipped) {
+        console.warn(`UWAGA: tresc premium z ${file} pominieta — ${reason}`);
+    }
 
     console.log('✅ Seed zakończony z tagami!');
 }

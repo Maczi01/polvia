@@ -183,6 +183,58 @@ Zglos userowi: id wpisu, slugi, URL do sprawdzenia, tagi utworzone jako nowe.
 Plik `data/services/<slug>.json` zostaje w repo jako slad tego, co poszlo do bazy.
 **Nie commituj go, dopoki user o to nie poprosi.**
 
+## Wpis premium
+
+Tresc strony premium (szablon, cover, galeria, cennik, FAQ) to blok `premium` w **tym samym**
+pliku `data/services/<plik>.json`, co wpis. Model jest concierge (R17): firma nie ma panelu,
+founder publikuje tresc za nia. Wpis musi juz istniec w bazie (`db:add`). Tresc przetrwa
+`db:reset` (seed czyta bloki `premium`) i zostaje w bazie po wygasnieciu subskrypcji.
+
+Po kolei:
+
+1. **Weryfikacja, ze placi wlasciciel.** Porownaj dane z platnosci Stripe (e-mail, NIP z faktury)
+   z danymi wpisu: domena e-maila = domena `webpage`, NIP = `nip` wpisu, albo potwierdzenie
+   z kontaktu podanego we wpisie (telefon, e-mail ze strony firmy). Brak zgodnosci = **stop**:
+   nie publikuj, zglos userowi do zwrotu platnosci. Nie publikuj na podstawie domyslu.
+2. **Zdjecia do `public/services/<slug-uslugi>/`**, gdzie `<slug-uslugi>` to adres profilu
+   `/firma/<slug-uslugi>` (wypisuje go dry run). W JSON-ie podawaj **sama nazwe pliku**
+   (`cover.jpg`), bez sciezki — schemat odrzuca `/` i `..`. Formaty: jpg, png, webp, avif.
+   Galeria: najwyzej `PREMIUM_GALLERY_MAX` (15) zdjec. Brak pliku przerywa publikacje z lista
+   brakujacych — strona nigdy nie dostaje martwego obrazka.
+3. **Blok `premium` w JSON-ie**, kazdy tekst w czterech jezykach (`pl`, `uk`, `en`, `ru`):
+
+   ```json
+   "premium": {
+     "template": "gallery",
+     "coverImage": "cover.jpg",
+     "gallery": [{ "file": "wnetrze.jpg", "alt": { "pl": "…", "uk": "…", "en": "…", "ru": "…" } }],
+     "priceList": [{ "name": { "pl": "…", … }, "price": { "pl": "od 80 zl", … }, "note": { … } }],
+     "faq": [{ "q": { "pl": "…", … }, "a": { "pl": "…", … } }]
+   }
+   ```
+
+   `template`: `gallery` | `professional` | `classic`. `coverImage`, `gallery`, `priceList`,
+   `faq` i `note` sa opcjonalne. Ceny to tekst od firmy — nie wymyslaj ich ani nie przeliczaj.
+4. **Dry run i STOP:**
+
+   ```bash
+   npm run db:premium -- data/services/<plik>.json --dry-run
+   ```
+
+   Pokazuje profil, ktorego dotyczy tresc, i diff wzgledem bazy (`+` nowe, `-` usuniete, `~`
+   zmienione). Pokaz userowi wyjscie i caly blok `premium`. **Czekaj na wyrazne OK.**
+5. **Publikacja** po OK:
+
+   ```bash
+   npm run db:premium -- data/services/<plik>.json
+   ```
+
+   Upsert jest idempotentny — poprawki w JSON-ie publikujesz ta sama komenda. Zdjecia w
+   `public/` trafiaja na produkcje dopiero z deployem: zglos userowi, ze trzeba je zacommitowac.
+
+Strona pokazuje szablon premium tylko przy aktywnej subskrypcji; sama tresc w bazie niczego
+nie wlacza.
+
 ## Czego nie robic
 
 - Nie uzywaj `npm run db:reset` — kasuje cala baze. Runner dopisuje wpis do dzialajacej bazy.

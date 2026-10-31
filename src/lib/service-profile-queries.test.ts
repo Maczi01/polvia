@@ -13,6 +13,7 @@ import {
     getSimilarServices,
     type ServiceProfileLocation,
 } from './service-profile-queries';
+import { premiumBlock } from '../../tests/fixtures/premium/premium-block';
 import { SIMILAR_SERVICES_LIMIT, type SimilarServicesSource } from './similar-services';
 
 /** Jedno zapytanie zbudowane na mocku: co wybralo, z jakim WHERE/JOIN i LIMIT. */
@@ -142,7 +143,12 @@ describe('getServiceProfile', () => {
 
         const profile = await getServiceProfile('roza', 'uk');
 
-        expect(profile).toEqual({ ...SERVICE_ROW, slug: 'roza', locations: [location()] });
+        expect(profile).toEqual({
+            ...SERVICE_ROW,
+            slug: 'roza',
+            locations: [location()],
+            premiumContent: null,
+        });
         expect(render(query(0).joins[0]).params).toContain('uk');
     });
 
@@ -203,11 +209,82 @@ describe('getServiceProfile', () => {
     });
 });
 
+describe('getServiceProfile — tresc premium', () => {
+    let consoleError: jest.SpyInstance;
+
+    beforeEach(() => {
+        consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        consoleError.mockRestore();
+    });
+
+    it('dolacza service_profiles left joinem po id uslugi', async () => {
+        mockDb.results = [[SERVICE_ROW], []];
+
+        await getServiceProfile('roza', 'pl');
+
+        expect(render(query(0).joins[1]).sql).toBe(
+            '"service_profiles"."service_id" = "services"."id"',
+        );
+    });
+
+    it('brak wiersza service_profiles daje premiumContent: null bez logu', async () => {
+        mockDb.results = [[{ ...SERVICE_ROW, premium: null }], []];
+
+        const profile = await getServiceProfile('roza', 'uk');
+
+        expect(profile?.premiumContent).toBeNull();
+        expect(consoleError).not.toHaveBeenCalled();
+    });
+
+    it('zwraca tresc w locale profilu, ze sciezkami zdjec w katalogu slugu', async () => {
+        mockDb.results = [[{ ...SERVICE_ROW, premium: premiumBlock() }], []];
+
+        const profile = await getServiceProfile('roza', 'uk');
+
+        expect(profile?.premiumContent).toEqual({
+            template: 'gallery',
+            coverImage: { src: '/services/roza/cover.jpg', alt: SERVICE_ROW.name },
+            gallery: [{ src: '/services/roza/salon-1.webp', alt: 'Інтерʼєр салону' }],
+            priceList: [{ name: 'Стрижка', price: 'від 80 зл' }],
+            faq: [{ question: 'Чи потрібно записуватися?', answer: 'Так, телефоном.' }],
+        });
+    });
+
+    it('uszkodzony jsonb daje profil z premiumContent: null i zalogowany blad bez tresci', async () => {
+        const broken = { ...premiumBlock(), faq: 'to nie jest lista', template: 'luxury' };
+        mockDb.results = [[{ ...SERVICE_ROW, premium: broken }], [location()]];
+
+        const profile = await getServiceProfile('roza', 'pl');
+
+        expect(profile?.name).toBe(SERVICE_ROW.name);
+        expect(profile?.locations).toEqual([location()]);
+        expect(profile?.premiumContent).toBeNull();
+        expect(consoleError).toHaveBeenCalledWith('service profile premium content invalid', {
+            serviceId: 'svc-1',
+            issues: ['template', 'faq'],
+        });
+    });
+});
+
 describe('getSimilarServices', () => {
-    const SOURCE: SimilarServicesSource = { serviceId: 'svc-1', category: 'law', city: ' Warszawa ' };
+    const SOURCE: SimilarServicesSource = {
+        serviceId: 'svc-1',
+        category: 'law',
+        city: ' Warszawa ',
+    };
 
     function candidate(id: string, slug: string | null = id) {
-        return { serviceId: id, slug, name: `Firma ${id}`, image: null, city: 'Warszawa', category: 'law' };
+        return {
+            serviceId: id,
+            slug,
+            name: `Firma ${id}`,
+            image: null,
+            city: 'Warszawa',
+            category: 'law',
+        };
     }
 
     it('jedno zapytanie z limitem w SQL, bez ponownego pobierania kategorii i miasta zrodla', async () => {
@@ -237,7 +314,9 @@ describe('getSimilarServices', () => {
         const [sameCity, byName, tieBreaker] = query(0)
             .orderBy.map(render)
             .map(term => ({ ...term, sql: term.sql.replaceAll(/\s+/g, ' ') }));
-        expect(sameCity?.sql).toMatch(/lower\(btrim\(.*"service_locations"\."city".*\)\) = lower\(\$\d+\)/);
+        expect(sameCity?.sql).toMatch(
+            /lower\(btrim\(.*"service_locations"\."city".*\)\) = lower\(\$\d+\)/,
+        );
         expect(sameCity?.sql).toMatch(/^COALESCE\(.*, false\) DESC$/);
         expect(sameCity?.params).toEqual(['Warszawa']);
         expect(byName?.sql).toContain('COALESCE');

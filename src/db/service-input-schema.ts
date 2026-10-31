@@ -7,6 +7,7 @@ import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { isValidServiceSlug } from '../lib/service-slug-format';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 import { WEEKDAY_KEYS } from '../lib/weekdays';
+import { premiumContentSchema } from './premium-content-schema';
 
 /**
  * Czysta warstwa walidacji opisu wpisu katalogowego (plik JSON z `data/services/`).
@@ -143,6 +144,11 @@ export const serviceInputSchema = z
         locations: z
             .array(locationInputSchema)
             .min(1, 'Wpis potrzebuje co najmniej jednej lokalizacji'),
+        /**
+         * Tresc strony premium. `db:add` jej nie zapisuje — publikuje ja `db:premium`
+         * (i seed), dopiero gdy founder potwierdzi, ze placi wlasciciel wpisu (R17).
+         */
+        premium: premiumContentSchema.optional(),
     })
     .strict()
     .superRefine((input, ctx) => {

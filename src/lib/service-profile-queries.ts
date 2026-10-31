@@ -4,13 +4,16 @@ import { and, eq, type InferSelectModel, isNotNull, ne, type SQL, sql } from 'dr
 
 import { db } from '@/db';
 import { servicesTranslationsAlias } from '@/db/aliases';
+import type { LocalizedPremiumContent } from '@/db/premium-content-schema';
 import {
     serviceLocationsTable,
+    serviceProfilesTable,
     servicesTable,
     servicesTagsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
 import { isPublicService } from '@/lib/public-service-filter';
+import { toPremiumContent } from '@/lib/service-profile-premium';
 import {
     SIMILAR_SERVICES_LIMIT,
     type SimilarServiceRow,
@@ -52,6 +55,11 @@ export type ServiceProfile = Pick<
     tags: string[];
     /** Glowna lokalizacja pierwsza. Wpis `online` moze miec `latitude`/`longitude` = null. */
     locations: ServiceProfileLocation[];
+    /**
+     * Opublikowana tresc premium w danym locale, niezalezna od stanu subskrypcji (R18).
+     * `null`: brak tresci albo zapisany jsonb nie przechodzi walidacji (blad w logu).
+     */
+    premiumContent: LocalizedPremiumContent | null;
 };
 
 export type ServiceSlugStatus = { exists: boolean };
@@ -166,7 +174,15 @@ export async function getServiceProfile(
 
     if (!service) return null;
 
-    return { ...service, slug, locations };
+    const { premium, ...row } = service;
+    const premiumContent = toPremiumContent(premium, {
+        serviceId: row.id,
+        slug,
+        locale,
+        name: row.name,
+    });
+
+    return { ...row, slug, locations, premiumContent };
 }
 
 function getServiceRow(slug: string, locale: string) {
@@ -181,9 +197,18 @@ function getServiceRow(slug: string, locale: string) {
             verified: servicesTable.verified,
             image: servicesTable.image,
             tags: tagsInLocale(locale),
+            // Obiekt przy left joinie: brak wiersza `service_profiles` daje `premium: null`.
+            premium: {
+                template: serviceProfilesTable.template,
+                coverImage: serviceProfilesTable.coverImage,
+                gallery: serviceProfilesTable.gallery,
+                priceList: serviceProfilesTable.priceList,
+                faq: serviceProfilesTable.faq,
+            },
         })
         .from(servicesTable)
         .leftJoin(servicesTranslationsAlias, translationJoin(locale))
+        .leftJoin(serviceProfilesTable, eq(serviceProfilesTable.serviceId, servicesTable.id))
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);
 }

@@ -18,9 +18,15 @@ import { relations, sql } from 'drizzle-orm';
 
 import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
+import { PREMIUM_TEMPLATES } from '../lib/premium-templates';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 import type { OpeningHours } from '../lib/weekdays';
+import type {
+    PremiumFaqItem,
+    PremiumGalleryItem,
+    PremiumPriceListItem,
+} from './premium-content-schema';
 
 export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
 
@@ -30,6 +36,9 @@ export const statusEnum = pgEnum('status', SERVICE_STATUS_VALUES);
 
 /** Zasieg obslugi — druga, ortogonalna os obok kategorii (branzy). Opis wartosci: `coverage.ts`. */
 export const coverageEnum = pgEnum('coverage', COVERAGE_VALUES);
+
+/** Szablon strony premium. Wartosci i ich opis: `src/lib/premium-templates.ts`. */
+export const profileTemplateEnum = pgEnum('profile_template', PREMIUM_TEMPLATES);
 
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -128,6 +137,26 @@ export const promotedServicesRelations = relations(promotedServicesTable, ({ one
         references: [servicesTable.id],
     }),
 }));
+
+/**
+ * Tresc strony premium (1:1 z usluga), publikowana przez `db:premium` z bloku `premium`
+ * w `data/services/<plik>.json`. Niezalezna od subskrypcji: po wygasnieciu zostaje
+ * i wraca po wznowieniu (R18). Teksty w jsonb maja wszystkie cztery jezyki; ksztalt
+ * pilnuje `premiumContentSchema` na zapisie i na odczycie.
+ */
+export const serviceProfilesTable = pgTable('service_profiles', {
+    serviceId: uuid('service_id')
+        .primaryKey()
+        .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    template: profileTemplateEnum('template').notNull(),
+    /** Sama nazwa pliku z `public/services/<slug-uslugi>/`. */
+    coverImage: varchar('cover_image', { length: 255 }),
+    gallery: jsonb('gallery').$type<PremiumGalleryItem[]>().notNull().default([]),
+    priceList: jsonb('price_list').$type<PremiumPriceListItem[]>().notNull().default([]),
+    faq: jsonb('faq').$type<PremiumFaqItem[]>().notNull().default([]),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
 
 export const serviceEngagementsTable = pgTable('service_engagements', {
     id: uuid('id').defaultRandom().primaryKey(),
