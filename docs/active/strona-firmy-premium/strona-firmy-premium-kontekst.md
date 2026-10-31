@@ -162,6 +162,15 @@ Gate po fazie: `npx tsc --noEmit` OK, `npx jest` 143 suite'y i 1505 testów OK, 
 
 **Incydent:** builder U1 użył raz `git stash` + `stash pop` w współdzielonym worktree (kilka sekund). Pop przeszedł czysto, a końcowe diffy U3 i kontekstu są kompletne. Kolejni builderzy mają zakaz komend git zmieniających drzewo.
 
+### Review fazy 1 (2026-10-31)
+
+Raport: [review-faza-1.md](review-faza-1.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 9 × P2, 17 × P3). Wszystkie 15 checkboxów `Weryfikacja:` fazy 1 przeszło. E2E nie było uruchamiane: brak scenariuszy przeglądarkowych w `Weryfikacja:`, a baza bez backfillu.
+
+Kluczowe wnioski:
+- **Slug usługi musi mieć jedną regułę i jeden format na wszystkich ścieżkach zapisu** (seed, backfill, `db:add`, middleware). Decyzja: slug zawsze z nazwy, `slug` w JSON to tylko baza slugów lokalizacji. Naprawić przed backfillem na produkcji.
+- **Lookup w middleware ma trzy słabości:** prefetch linków mnoży wywołania, brak cache CDN, a założenie o `x-forwarded-for` jest wewnętrznie sprzeczne. Fail-open chroni dostępność profili, ale nie gwarancję 404.
+- **Kontrakt widoku do uproszczenia przed fazą 2:** `PremiumProfileView` zamiast podwójnego propsa, `ProfileLocation` inferowany z Drizzle.
+
 ## Środowisko worktree
 
 - `node_modules`: własna instalacja (`npm ci`, 2026-10-31). Junction do głównego katalogu łamał Storybooka: webpack nie przetwarzał `.storybook/preview.ts` spoza ścieżki projektu. U8 może więc instalować `stripe` normalnie.

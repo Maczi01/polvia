@@ -40,9 +40,9 @@
 - [x] `Test:` `getSimilarServices`: bez samego wpisu, ta sama kategoria, max 6, to samo miasto na początku
 - [x] `Test:` backfill: dwie usługi o tej samej nazwie dostają `nazwa` i `nazwa-2`; ponowny run bez zmian
 - [x] `Test:` `add-service` odrzuca JSON z zajętym slugiem usługi
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-queries src/lib/similar-services src/db/service-slugs src/db/service-input-schema` przechodzi (4 suite'y; `add-service.ts` odpala `main()` przy imporcie, więc logika kolizji jest testowana w `service-slugs.test.ts`)
-- [ ] `Weryfikacja:` grep: `src/lib/service-profile-queries.ts` zawiera `import 'server-only'`
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/service-profile-queries src/lib/similar-services src/db/service-slugs src/db/service-input-schema` przechodzi (4 suite'y; `add-service.ts` odpala `main()` przy imporcie, więc logika kolizji jest testowana w `service-slugs.test.ts`)
+- [x] `Weryfikacja:` grep: `src/lib/service-profile-queries.ts` zawiera `import 'server-only'`
 - [ ] `Operator:` `npx drizzle-kit push` (kolumna nullowalna) **na produkcji**; potwierdzić kolumnę w `information_schema`
 - [ ] `Operator:` uruchomić backfill, sprawdzić brak `NULL`, potem `push` z `notNull`
 
@@ -65,9 +65,9 @@
 - [x] `Test:` `isReservedRootSegment` jest prawdą dla `mapa`, `cennik`, `pricing`, `blog`, `en`, `api`, `firma`, `services`, `privacy`
 - [x] `Test:` route handler: istniejący slug → 200 `exists: true`; nieistniejący → `exists: false`; niepoprawny format → 400 z `error.code`
 - [x] `Test:` sitemap zawiera profil w 4 wariantach locale i nie zawiera wpisów nieaktywnych
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug" src/app/sitemap` przechodzi (liczba suite'ów zgodna z oczekiwaną)
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug" src/app/sitemap` przechodzi (liczba suite'ów zgodna z oczekiwaną)
+- [x] `Weryfikacja:` `npx next lint` bez błędów
 - [ ] `Operator:` sprawdzić status przez `curl -o /dev/null -w "%{http_code}"`:
   - `/firma/nie-istnieje` → `404`
   - `/firma/<istniejący>` → `200`
@@ -98,11 +98,11 @@
 - [x] `Test:` `profile-free` renderuje „Podobne firmy” i CTA jako link
 - [x] `Test:` cennik renderuje pozycje w kolejności z danych, z ceną jako tekstem
 - [x] `Test:` FAQ rozwijane (`<details>` lub odpowiednik), dostępne z klawiatury
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Weryfikacja:` grep: żaden plik w `src/app/[locale]/firma/**` nie importuje `next/link` ani `next/navigation`
-- [ ] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` grep: żaden plik w `src/app/[locale]/firma/**` nie importuje `next/link` ani `next/navigation` (PASS z adnotacją: jedyne trafienie to `notFound` z `next/navigation` w `page.tsx` — `@/i18n/navigation` go nie eksportuje)
+- [x] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
 - [ ] `Operator:` **bramka:** user przegląda w Storybooku profil free i 3 szablony (desktop 1440 i mobile 390) i akceptuje kierunek przed U4 i U7
 
 ### U4. Strona profilu (free), metadane, linki z karty i popupu
@@ -127,16 +127,51 @@
 - [x] `Test:` JSON-LD dla online-only bez `address` i `geo`
 - [x] `Test:` opis meta obcięty do limitu bez cięcia w środku słowa
 - [x] `Test:` `service-card`: rozwinięta karta ma link „Zobacz profil” z `href` w bieżącym locale; klik nie zwija karty
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-metadata "src/app/\[locale\]/\(main\)/_components/service-card"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Weryfikacja:` grep: `src/app/[locale]/firma/[slug]/page.tsx` nie zawiera `'use client'`
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/service-profile-metadata "src/app/\[locale\]/\(main\)/_components/service-card"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` grep: `src/app/[locale]/firma/[slug]/page.tsx` nie zawiera `'use client'`
 - [ ] `Operator:` sprawdzić `/firma/<slug>` i `/uk/firma/<slug>` w przeglądarce:
   - `h1` z nazwą, „Podobne firmy”,
   - CTA prowadzi do `/cennik` (pl) albo `/uk/pricing` (uk),
   - zero błędów konsoli,
   - `hreflang` ×4 w źródle strony
 - [ ] `Operator:` z `/mapa` rozwinąć kartę, kliknąć „Zobacz profil”: otwiera się profil tej firmy
+
+## Do poprawy po review fazy 1
+
+Raport: [review-faza-1.md](review-faza-1.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 9 × P2, 17 × P3).
+Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozostałe P2 przed wdrożeniem fazy 1 na produkcję.
+
+- [ ] 🟠 [important] **`service-card.tsx:767`, `marker-popup.tsx`, `similar-services.tsx`**: prefetch linków do profilu odpala lookup w middleware i wyczerpuje limit. Dodać `prefetch={false}`.
+- [ ] 🟠 [important] **`src/middleware.ts:47`, `service-slug-lookup.ts:43`, `api/service-slug/[slug]/route.ts:46`**: założenie o XFF przeczy samo sobie (globalny kubełek albo obejście limitu).
+  - Ruch z middleware uwierzytelniony sekretem z `env.ts`, z osobnym limitem.
+  - Ruch publiczny dostaje limit po IP platformy.
+  - Test: żądanie bez sekretu i z podrobionym XFF nie omija limitu.
+- [ ] 🟠 [important] **`service-slug-lookup.ts:43`, `route.ts:96`**: lookup bez cache.
+  - `Cache-Control: public, s-maxage=300, stale-while-revalidate=86400` dla `exists:true`, `s-maxage=30` dla `false`.
+  - Usunąć `cache: 'no-store'`.
+- [ ] 🟠 [important] **`service-profile-queries.ts:181-218`, `similar-services.ts`, `page.tsx:108`, `schema.ts`**: podobne firmy.
+  - `ORDER BY (miasto = źródło) DESC, name LIMIT 6` w SQL.
+  - Sygnatura `({ serviceId, category, city }, locale)` bez ponownego pobierania.
+  - `Promise.all` z lokalizacjami.
+  - Indeks `(service_id, is_main_location)` na `service_locations`.
+- [ ] 🟠 [important] **`service-input-schema.ts:119` vs `service-profile-path.ts:19`**: jeden format slugu w lekkim module dla zod i middleware. Test: `buildServiceSlug(x)` zawsze przechodzi `isValidServiceSlug`.
+- [ ] 🟠 [important] **`add-service.ts:208` vs `seed.ts:169`**: slug usługi zawsze z nazwy (`createServiceSlugAllocator` z zajętymi slugami z bazy), także w `db:add`.
+  - `slug` w JSON zostaje wyłącznie bazą slugów lokalizacji.
+  - Logika w czystym module z testem.
+  - Komentarz w `schema.ts`.
+- [ ] 🟠 [important] **`template-*.tsx`, `service-profile-types.ts:84`**: dane premium przekazywane dwa razy. `PremiumProfileView = ServiceProfileView & { premium: PremiumContent }`, szablony przyjmują tylko `{ profile }`.
+- [ ] 🟠 [important] **`service-profile-types.ts:22-37`, `to-profile-view.ts:22-39`**: `ProfileLocation` przez `Omit<ServiceProfileLocation, 'slug'>`, usunąć mapper-kopistę. Jeden typ `OpeningHours` w `@/lib/weekdays` (P3 #14).
+- [ ] 🟠 [important] **`firma/[slug]/page.tsx:49-96`**: `generateMetadata` i `toSameAs` bez testu.
+  - Pusty lub biały opis daje pusty `<meta description>`; dać fallback po `trim()`.
+  - Testy: `null` daje `noindex`; opis `null` / `''` / `'   '`; brak logo w `openGraph`.
+- [ ] 🟡 [nit] **`profile-helpers.ts`, `page.tsx:38`**: `toSafeExternalHref` (tylko `https?:`) dla socials i `sameAs`; puste i białe stringi pominięte.
+- [ ] 🟡 [nit] **`language-switcher.tsx:56`**: ogólna obsługa tras z parametrem (`pathname.includes('[')`).
+- [ ] 🟡 [nit] **`service-card.tsx:766`, `marker-popup.tsx:101`**: wspólny `ServiceProfileLink` z tokenem `brand`.
+- [ ] 🟡 [nit] **`template-*.tsx`, `profile-free.tsx`**: funkcje JSX > 50 linii; wydzielić hero/nagłówek.
+- [ ] 🟡 [nit] **`template-classic.tsx:46,62`**: `priority` tylko na cover.
+- [ ] 🟡 [nit] Pozostałe P3 (#11, #15, #17, #18, #20–#26) według raportu, do rozważenia.
 
 ---
 
