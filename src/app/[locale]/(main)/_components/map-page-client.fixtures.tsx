@@ -22,6 +22,7 @@ export function service(overrides: Partial<Service> = {}): Service {
         id: `id-${counter}`,
         serviceId: `service-${counter}`,
         slug: `slug-${counter}`,
+        serviceSlug: null,
         createdAt: '2026-01-01',
         updatedAt: '2026-01-01',
         name: `Usluga ${counter}`,

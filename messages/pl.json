@@ -156,7 +156,8 @@
     "emailCopied": "Mail skopiowany",
     "emailCopyFailed": "Nie udało się skopiować",
     "languages": "Mówimy:",
-    "coverage_online": "Online"
+    "coverage_online": "Online",
+    "viewProfile": "Zobacz profil"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
@@ -454,7 +455,8 @@
     "list": "Szczegóły",
     "close": "Zamknij",
     "viewInList": "Zobacz na liście",
-    "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem"
+    "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem",
+    "viewProfile": "Zobacz profil"
   },
   "contact": {
     "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej.",
@@ -603,7 +605,9 @@
     "mapHeading": "Nie znaleźliśmy tej strony",
     "mapDescription": "Adres, który otworzyłeś, nie odpowiada żadnej kategorii ani lokalizacji na mapie.",
     "backToMap": "Przejdź do mapy",
-    "backHome": "Strona główna"
+    "backHome": "Strona główna",
+    "profileHeading": "Nie znaleźliśmy tej firmy",
+    "profileDescription": "Profil, który otworzyłeś, nie istnieje albo został wyłączony. Poszukaj firmy na mapie."
   },
   "addBusiness": {
     "cta": {
@@ -877,6 +881,10 @@
       "friday": "Piątek",
       "saturday": "Sobota",
       "sunday": "Niedziela"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
+      "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia."
     }
   }
 }

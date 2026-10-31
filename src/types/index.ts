@@ -65,7 +65,10 @@ export type Socials = {
 export type Service = {
     id: string;
     serviceId: string;
+    /** Slug lokalizacji (`service_locations.slug`) — parametr `?place=` na mapie. */
     slug: string;
+    /** Slug wpisu (`services.slug`) — adres profilu `/firma/<slug>`; `null` przed backfillem. */
+    serviceSlug: string | null;
     createdAt: string;
     updatedAt: string;
     name: string;

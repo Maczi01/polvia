@@ -24,6 +24,7 @@ export async function getServices(locale: string = 'en') {
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
             slug: serviceLocationsTable.slug,
+            serviceSlug: servicesTable.slug,
 
             name: sql<string>`COALESCE(${servicesTranslationsAlias.name}, ${servicesTable.name})`.as(
                 'name',

@@ -156,7 +156,8 @@
     "emailCopied": "Пошту скопійовано",
     "emailCopyFailed": "Не вдалося скопіювати",
     "languages": "Говоримо:",
-    "coverage_online": "Онлайн"
+    "coverage_online": "Онлайн",
+    "viewProfile": "Переглянути профіль"
   },
   "Calculator": {
     "monthlyIncome": "Місячний дохід",
@@ -454,7 +455,8 @@
     "list": "Докладніше",
     "close": "Закрити",
     "viewInList": "Показати у списку",
-    "stackedHeader": "{count, plural, one {# компанія} few {# компанії} many {# компаній} other {# компанії}} за цією адресою"
+    "stackedHeader": "{count, plural, one {# компанія} few {# компанії} many {# компаній} other {# компанії}} за цією адресою",
+    "viewProfile": "Переглянути профіль"
   },
   "contact": {
     "rateLimitExceeded": "Перевищено ліміт повідомлень. Спробуйте пізніше.",
@@ -603,7 +605,9 @@
     "mapHeading": "Ми не знайшли цю сторінку",
     "mapDescription": "Адреса, яку ви відкрили, не відповідає жодній категорії чи локації на карті.",
     "backToMap": "Перейти до карти",
-    "backHome": "Головна сторінка"
+    "backHome": "Головна сторінка",
+    "profileHeading": "Ми не знайшли цю компанію",
+    "profileDescription": "Профіль, який ви відкрили, не існує або був вимкнений. Знайдіть компанію на карті."
   },
   "addBusiness": {
     "cta": {
@@ -877,6 +881,10 @@
       "friday": "Пʼятниця",
       "saturday": "Субота",
       "sunday": "Неділя"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Адреса, телефон, години роботи та контакти в каталозі Polvia.",
+      "descriptionOnline": "{name} — {category}, обслуговування онлайн. Контакти та інформація про компанію в каталозі Polvia."
     }
   }
 }

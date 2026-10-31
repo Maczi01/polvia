@@ -1,0 +1,87 @@
+import type { Locale } from '@/i18n/config';
+import { toServiceLanguages } from '@/lib/languages';
+import { buildServiceUrl } from '@/lib/map-url-builder';
+import type { ServiceProfile, ServiceProfileLocation } from '@/lib/service-profile-queries';
+import type { SimilarService as SimilarServiceRow } from '@/lib/similar-services';
+
+import type {
+    ProfileHref,
+    ProfileLocation,
+    ServiceProfileView,
+    SimilarService,
+} from './service-profile-types';
+
+/** CTA darmowego profilu w fazie 1 prowadzi do cennika (`/cennik` w pl). */
+const UPGRADE_HREF: ProfileHref = '/pricing';
+
+/** Sciezka obrazka z `public/services/` albo `null` (komponent pokaze `/default.png`). */
+export function toServiceImagePath(image: string | null): string | null {
+    return image?.trim() ? `/services/${image.trimEnd()}` : null;
+}
+
+function toProfileLocation(location: ServiceProfileLocation): ProfileLocation {
+    return {
+        id: location.id,
+        city: location.city,
+        street: location.street,
+        postcode: location.postcode,
+        voivodeship: location.voivodeship,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        phoneNumber: location.phoneNumber,
+        email: location.email,
+        webpage: location.webpage,
+        socials: location.socials,
+        whatsappNumber: location.whatsappNumber,
+        openingHours: location.openingHours,
+        isMain: location.isMainLocation,
+    };
+}
+
+/**
+ * Link „Pokaz na mapie” do pinu glownej lokalizacji. Wpis `online` i lokalizacja
+ * bez wspolrzednych nie maja pinu, wiec nie maja tez linku.
+ */
+function toMapHref(profile: ServiceProfile, locale: Locale): ProfileHref | null {
+    if (profile.coverage === 'online') return null;
+    const main = profile.locations.find(location => location.isMainLocation) ?? profile.locations[0];
+    if (!main || main.latitude === null || main.longitude === null) return null;
+
+    const { query } = buildServiceUrl(main.slug, locale);
+    return { pathname: '/map', query };
+}
+
+function toSimilarService(row: SimilarServiceRow): SimilarService {
+    return {
+        slug: row.slug,
+        name: row.name,
+        logo: toServiceImagePath(row.image),
+        city: row.city,
+        category: row.category,
+        href: { pathname: '/firma/[slug]', params: { slug: row.slug } },
+    };
+}
+
+/** Wynik zapytan profilu -> kontrakt widoku darmowego profilu. */
+export function toProfileView(
+    profile: ServiceProfile,
+    similarServices: readonly SimilarServiceRow[],
+    locale: Locale,
+): ServiceProfileView {
+    return {
+        slug: profile.slug,
+        name: profile.name,
+        description: profile.description,
+        logo: toServiceImagePath(profile.image),
+        category: profile.category,
+        coverage: profile.coverage,
+        languages: toServiceLanguages(profile.languages),
+        tags: profile.tags,
+        verified: profile.verified,
+        locations: profile.locations.map(toProfileLocation),
+        mapHref: toMapHref(profile, locale),
+        similarServices: similarServices.map(toSimilarService),
+        upgradeHref: UPGRADE_HREF,
+        premium: null,
+    };
+}

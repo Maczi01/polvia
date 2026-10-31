@@ -20,6 +20,7 @@ function service(overrides: Partial<PartialService> = {}): PartialService {
         id: `id-${counter}`,
         serviceId: `service-${counter}`,
         slug: `slug-${counter}`,
+        serviceSlug: null,
         name: `Usluga ${counter}`,
         description: null,
         category: 'financial',
@@ -388,5 +389,35 @@ describe('<ServiceCard /> — tagi zwinietej karty', () => {
         const htmlSzeroki = kontenerTagowZwinietejKarty().outerHTML;
 
         expect(htmlWaski).toBe(htmlSzeroki);
+    });
+});
+
+describe('<ServiceCard /> — godziny dzisiaj', () => {
+    afterEach(() => jest.useRealTimers());
+
+    // Regresja: karta szukala kluczy `Monday`…`Sunday`, a dane maja `monday`…`sunday`,
+    // wiec wiersz „Dzis” nie pojawial sie nigdy.
+    it('pokazuje dzisiejsze godziny z kluczy pisanych malymi literami', () => {
+        jest.useFakeTimers({ now: new Date('2026-11-02T10:00:00') }); // poniedzialek
+
+        renderCard({ openingHours: { monday: { open: '08:00', close: '18:00' } } });
+
+        expect(screen.getByText(/today/)).toHaveTextContent('today: 08:00 – 18:00');
+    });
+
+    it('niedziela bez godzin nie pokazuje wiersza dzisiaj', () => {
+        jest.useFakeTimers({ now: new Date('2026-11-01T10:00:00') }); // niedziela
+
+        renderCard({ openingHours: { monday: { open: '08:00', close: '18:00' } } });
+
+        expect(screen.queryByText(/today/)).not.toBeInTheDocument();
+    });
+});
+
+describe('<ServiceCard /> — link do profilu', () => {
+    it('wpis bez slugu uslugi nie ma linku do profilu', () => {
+        renderCard({ serviceSlug: null });
+
+        expect(screen.queryByRole('link', { name: 'viewProfile' })).not.toBeInTheDocument();
     });
 });

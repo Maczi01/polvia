@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { SelectScrollable } from '@/components/ui/select/select-scrollable';
 import { usePathname, useRouter } from '@/i18n/navigation';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { getCategoryFromSlug, getSlugFromCategory } from '@/lib/slug-mappings';
 import { type AppPathnames } from '@/i18n/routing';
 
@@ -39,9 +39,40 @@ function translateMapPathname(pathname: string, fromLocale: Locale, toLocale: Lo
     return `/map/${translated.join('/')}`;
 }
 
+type QueryObject = Record<string, string>;
+
+type LocaleSwitchHref =
+    | { pathname: '/firma/[slug]'; params: { slug: string }; query: QueryObject }
+    | { pathname: AppPathnames; query: QueryObject };
+
+/**
+ * Cel `router.replace` przy zmianie jezyka. `usePathname()` zwraca szablon trasy
+ * (`/firma/[slug]`), wiec trasa z parametrem musi dostac `params` z `useParams()` —
+ * bez nich next-intl rzuca „Insufficient params”.
+ */
+function buildLocaleSwitchHref(
+    pathname: string,
+    params: ReturnType<typeof useParams>,
+    query: QueryObject,
+    fromLocale: Locale,
+    toLocale: Locale,
+): LocaleSwitchHref {
+    if (pathname === '/firma/[slug]' && typeof params.slug === 'string') {
+        return { pathname, params: { slug: params.slug }, query };
+    }
+
+    // Sciezki mapy (`/map/<kategoria>`) nie sa kluczami `routing.pathnames` — next-intl
+    // przepuszcza je bez zmian, wiec typ trzeba tu zawezic recznie.
+    return {
+        pathname: translateMapPathname(pathname, fromLocale, toLocale) as AppPathnames,
+        query,
+    };
+}
+
 export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
     const router = useRouter();
     const pathname = usePathname();
+    const params = useParams();
     const searchParams = useSearchParams();
     const [selectedLocale, setSelectedLocale] = useState<Locale>(locale);
     const [isClient, setIsClient] = useState(false);
@@ -66,12 +97,9 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
             queryObject[key] = value;
         });
 
-        // Translate map category slugs to the target locale
-        const translatedPathname = translateMapPathname(pathname, selectedLocale, newLocale);
-
         // Navigate to new locale while preserving search parameters
         router.replace(
-            { pathname: translatedPathname as AppPathnames, query: queryObject },
+            buildLocaleSwitchHref(pathname, params, queryObject, selectedLocale, newLocale),
             { locale: newLocale }
         );
         setSelectedLocale(newLocale);
@@ -93,12 +121,9 @@ export const LanguageSwitcher = ({ locale }: { locale: Locale }) => {
                 queryObject[key] = value;
             });
 
-            // Translate map category slugs to the stored locale
-            const translatedPathname = translateMapPathname(pathname, locale, storedLocale);
-
             // Redirect to user's preferred language while preserving search parameters
             router.replace(
-                { pathname: translatedPathname as AppPathnames, query: queryObject },
+                buildLocaleSwitchHref(pathname, params, queryObject, locale, storedLocale),
                 { locale: storedLocale }
             );
         }

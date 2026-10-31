@@ -156,7 +156,8 @@
     "emailCopied": "Почта скопирована",
     "emailCopyFailed": "Не удалось скопировать",
     "languages": "Говорим:",
-    "coverage_online": "Онлайн"
+    "coverage_online": "Онлайн",
+    "viewProfile": "Открыть профиль"
   },
   "Calculator": {
     "monthlyIncome": "Месячный доход",
@@ -454,7 +455,8 @@
     "list": "Подробности",
     "close": "Закрыть",
     "viewInList": "Показать в списке",
-    "stackedHeader": "{count, plural, one {# компания} few {# компании} many {# компаний} other {# компании}} по этому адресу"
+    "stackedHeader": "{count, plural, one {# компания} few {# компании} many {# компаний} other {# компании}} по этому адресу",
+    "viewProfile": "Открыть профиль"
   },
   "contact": {
     "rateLimitExceeded": "Превышен лимит сообщений. Попробуйте позже.",
@@ -603,7 +605,9 @@
     "mapHeading": "Мы не нашли эту страницу",
     "mapDescription": "Адрес, который вы открыли, не соответствует ни одной категории или локации на карте.",
     "backToMap": "Перейти к карте",
-    "backHome": "Главная страница"
+    "backHome": "Главная страница",
+    "profileHeading": "Мы не нашли эту компанию",
+    "profileDescription": "Профиль, который вы открыли, не существует или был отключён. Найдите компанию на карте."
   },
   "addBusiness": {
     "cta": {
@@ -877,6 +881,10 @@
       "friday": "Пятница",
       "saturday": "Суббота",
       "sunday": "Воскресенье"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Адрес, телефон, часы работы и контакты в каталоге Polvia.",
+      "descriptionOnline": "{name} — {category}, обслуживание онлайн. Контакты и информация о компании в каталоге Polvia."
     }
   }
 }

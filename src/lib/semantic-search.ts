@@ -164,6 +164,7 @@ async function findClosestLocations(embeddingVector: string, whereConditions: SQ
             id: serviceLocationsTable.id,
             serviceId: servicesTable.id,
             slug: serviceLocationsTable.slug,
+            serviceSlug: servicesTable.slug,
             name: servicesTable.name,
             category: servicesTable.category,
             coverage: servicesTable.coverage,

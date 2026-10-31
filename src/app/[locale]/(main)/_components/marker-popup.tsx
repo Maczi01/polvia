@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utilities';
 import { PartialService } from '@/types';
 import { useTranslations } from 'next-intl';
+import { Link as LocaleLink } from '@/i18n/navigation';
 
 type MarkerPopupProps = {
     latitude: number;
@@ -97,6 +98,17 @@ export const MarkerPopup = ({
                                             )}
                                         />
                                     </Link>
+                                    {selectedService.serviceSlug && (
+                                        <LocaleLink
+                                            href={{
+                                                pathname: '/firma/[slug]',
+                                                params: { slug: selectedService.serviceSlug },
+                                            }}
+                                            className="mt-1 block text-sm font-semibold text-[#C52289] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C52289]"
+                                        >
+                                            {t('viewProfile')}
+                                        </LocaleLink>
+                                    )}
                                 </div>
                             </div>
                         </div>

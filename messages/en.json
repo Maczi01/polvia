@@ -156,7 +156,8 @@
     "emailCopied": "Email copied",
     "emailCopyFailed": "Could not copy",
     "languages": "We speak:",
-    "coverage_online": "Online"
+    "coverage_online": "Online",
+    "viewProfile": "View profile"
   },
   "Calculator": {
     "monthlyIncome": "Monthly income",
@@ -454,7 +455,8 @@
     "list": "Details",
     "close": "Close",
     "viewInList": "View in list",
-    "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address"
+    "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address",
+    "viewProfile": "View profile"
   },
   "contact": {
     "rateLimitExceeded": "Message limit exceeded. Please try again later.",
@@ -603,7 +605,9 @@
     "mapHeading": "We could not find this page",
     "mapDescription": "The address you opened does not match any category or location on the map.",
     "backToMap": "Go to the map",
-    "backHome": "Home page"
+    "backHome": "Home page",
+    "profileHeading": "We could not find this business",
+    "profileDescription": "The profile you opened does not exist or has been disabled. Look for the business on the map."
   },
   "addBusiness": {
     "cta": {
@@ -877,6 +881,10 @@
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
+      "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory."
     }
   }
 }
