@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-10-31 (po wykonaniu fazy 1)
+**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 1)
 
 ## Źródła
 
@@ -143,35 +143,35 @@
 Raport: [review-faza-1.md](review-faza-1.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 9 × P2, 17 × P3).
 Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozostałe P2 przed wdrożeniem fazy 1 na produkcję.
 
-- [ ] 🟠 [important] **`service-card.tsx:767`, `marker-popup.tsx`, `similar-services.tsx`**: prefetch linków do profilu odpala lookup w middleware i wyczerpuje limit. Dodać `prefetch={false}`.
-- [ ] 🟠 [important] **`src/middleware.ts:47`, `service-slug-lookup.ts:43`, `api/service-slug/[slug]/route.ts:46`**: założenie o XFF przeczy samo sobie (globalny kubełek albo obejście limitu).
+- [x] 🟠 [important] **`service-card.tsx:767`, `marker-popup.tsx`, `similar-services.tsx`**: prefetch linków do profilu odpala lookup w middleware i wyczerpuje limit. Dodać `prefetch={false}`.
+- [x] 🟠 [important] **`src/middleware.ts:47`, `service-slug-lookup.ts:43`, `api/service-slug/[slug]/route.ts:46`**: założenie o XFF przeczy samo sobie (globalny kubełek albo obejście limitu).
   - Ruch z middleware uwierzytelniony sekretem z `env.ts`, z osobnym limitem.
   - Ruch publiczny dostaje limit po IP platformy.
   - Test: żądanie bez sekretu i z podrobionym XFF nie omija limitu.
-- [ ] 🟠 [important] **`service-slug-lookup.ts:43`, `route.ts:96`**: lookup bez cache.
+- [x] 🟠 [important] **`service-slug-lookup.ts:43`, `route.ts:96`**: lookup bez cache.
   - `Cache-Control: public, s-maxage=300, stale-while-revalidate=86400` dla `exists:true`, `s-maxage=30` dla `false`.
   - Usunąć `cache: 'no-store'`.
-- [ ] 🟠 [important] **`service-profile-queries.ts:181-218`, `similar-services.ts`, `page.tsx:108`, `schema.ts`**: podobne firmy.
+- [x] 🟠 [important] **`service-profile-queries.ts:181-218`, `similar-services.ts`, `page.tsx:108`, `schema.ts`**: podobne firmy.
   - `ORDER BY (miasto = źródło) DESC, name LIMIT 6` w SQL.
   - Sygnatura `({ serviceId, category, city }, locale)` bez ponownego pobierania.
   - `Promise.all` z lokalizacjami.
   - Indeks `(service_id, is_main_location)` na `service_locations`.
-- [ ] 🟠 [important] **`service-input-schema.ts:119` vs `service-profile-path.ts:19`**: jeden format slugu w lekkim module dla zod i middleware. Test: `buildServiceSlug(x)` zawsze przechodzi `isValidServiceSlug`.
-- [ ] 🟠 [important] **`add-service.ts:208` vs `seed.ts:169`**: slug usługi zawsze z nazwy (`createServiceSlugAllocator` z zajętymi slugami z bazy), także w `db:add`.
+- [x] 🟠 [important] **`service-input-schema.ts:119` vs `service-profile-path.ts:19`**: jeden format slugu w lekkim module dla zod i middleware. Test: `buildServiceSlug(x)` zawsze przechodzi `isValidServiceSlug`.
+- [x] 🟠 [important] **`add-service.ts:208` vs `seed.ts:169`**: slug usługi zawsze z nazwy (`createServiceSlugAllocator` z zajętymi slugami z bazy), także w `db:add`.
   - `slug` w JSON zostaje wyłącznie bazą slugów lokalizacji.
   - Logika w czystym module z testem.
   - Komentarz w `schema.ts`.
-- [ ] 🟠 [important] **`template-*.tsx`, `service-profile-types.ts:84`**: dane premium przekazywane dwa razy. `PremiumProfileView = ServiceProfileView & { premium: PremiumContent }`, szablony przyjmują tylko `{ profile }`.
-- [ ] 🟠 [important] **`service-profile-types.ts:22-37`, `to-profile-view.ts:22-39`**: `ProfileLocation` przez `Omit<ServiceProfileLocation, 'slug'>`, usunąć mapper-kopistę. Jeden typ `OpeningHours` w `@/lib/weekdays` (P3 #14).
-- [ ] 🟠 [important] **`firma/[slug]/page.tsx:49-96`**: `generateMetadata` i `toSameAs` bez testu.
+- [x] 🟠 [important] **`template-*.tsx`, `service-profile-types.ts:84`**: dane premium przekazywane dwa razy. `PremiumProfileView = ServiceProfileView & { premium: PremiumContent }`, szablony przyjmują tylko `{ profile }`.
+- [x] 🟠 [important] **`service-profile-types.ts:22-37`, `to-profile-view.ts:22-39`**: `ProfileLocation` przez `Omit<ServiceProfileLocation, 'slug'>`, usunąć mapper-kopistę. Jeden typ `OpeningHours` w `@/lib/weekdays` (P3 #14).
+- [x] 🟠 [important] **`firma/[slug]/page.tsx:49-96`**: `generateMetadata` i `toSameAs` bez testu.
   - Pusty lub biały opis daje pusty `<meta description>`; dać fallback po `trim()`.
   - Testy: `null` daje `noindex`; opis `null` / `''` / `'   '`; brak logo w `openGraph`.
-- [ ] 🟡 [nit] **`profile-helpers.ts`, `page.tsx:38`**: `toSafeExternalHref` (tylko `https?:`) dla socials i `sameAs`; puste i białe stringi pominięte.
+- [x] 🟡 [nit] **`profile-helpers.ts`, `page.tsx:38`**: `toSafeExternalHref` (tylko `https?:`) dla socials i `sameAs`; puste i białe stringi pominięte.
 - [ ] 🟡 [nit] **`language-switcher.tsx:56`**: ogólna obsługa tras z parametrem (`pathname.includes('[')`).
-- [ ] 🟡 [nit] **`service-card.tsx:766`, `marker-popup.tsx:101`**: wspólny `ServiceProfileLink` z tokenem `brand`.
+- [x] 🟡 [nit] **`service-card.tsx:766`, `marker-popup.tsx:101`**: wspólny `ServiceProfileLink` z tokenem `brand`.
 - [ ] 🟡 [nit] **`template-*.tsx`, `profile-free.tsx`**: funkcje JSX > 50 linii; wydzielić hero/nagłówek.
-- [ ] 🟡 [nit] **`template-classic.tsx:46,62`**: `priority` tylko na cover.
-- [ ] 🟡 [nit] Pozostałe P3 (#11, #15, #17, #18, #20–#26) według raportu, do rozważenia.
+- [x] 🟡 [nit] **`template-classic.tsx:46,62`**: `priority` tylko na cover.
+- [ ] 🟡 [nit] Pozostałe P3 (#18, #20–#23, #25) według raportu, do rozważenia. Zrobione przy poprawkach: #11 (świadomie bez zmiany, komentarz), #15, #17, #24, #26.
 
 ---
 

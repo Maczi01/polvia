@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-10-31 (po fazie 1)
+**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 1)
 
 ## Źródła
 
@@ -170,6 +170,42 @@ Kluczowe wnioski:
 - **Slug usługi musi mieć jedną regułę i jeden format na wszystkich ścieżkach zapisu** (seed, backfill, `db:add`, middleware). Decyzja: slug zawsze z nazwy, `slug` w JSON to tylko baza slugów lokalizacji. Naprawić przed backfillem na produkcji.
 - **Lookup w middleware ma trzy słabości:** prefetch linków mnoży wywołania, brak cache CDN, a założenie o `x-forwarded-for` jest wewnętrznie sprzeczne. Fail-open chroni dostępność profili, ale nie gwarancję 404.
 - **Kontrakt widoku do uproszczenia przed fazą 2:** `PremiumProfileView` zamiast podwójnego propsa, `ProfileLocation` inferowany z Drizzle.
+
+### Poprawki po review fazy 1 (2026-10-31)
+
+Wszystkie 9 × P2 naprawione, do tego P3 #10, #11 (świadomie bez zmiany), #13–#15, #17, #19, #24, #26. Bramka: `tsc` OK, `jest` 143 suite'y / 1566 testów, `next lint` 0 błędów (4660 starych ostrzeżeń, 4425 to `no-undef` w plikach testowych w całym repo, nie z tej gałęzi).
+
+| Commit | Builder | Zakres |
+|---|---|---|
+| `16f505b` | feature-builder-web-data | #2–#6, P3 #11, #15, #24, #26 |
+| `0e63b47` | feature-builder-web-ui | #1, #7–#9, P3 #10, #13, #14, #17, #19 |
+
+Decyzje:
+- **Format slugu:** jedno źródło w `src/lib/service-slug-format.ts`. Z niego korzystają zod i middleware. Nazwa bez liter i cyfr daje slug `firma`.
+- **`db:add`:** slug usługi liczony z nazwy (`planNewServiceSlug`). Zajęty slug dostaje sufiks `-2`, a błędem jest tylko kolizja slugu lokalizacji. `describeSlugConflicts` i `isServiceSlugTaken` usunięte.
+- **Lookup:** middleware wysyła `SERVICE_SLUG_LOOKUP_SECRET` w nagłówku `x-service-slug-lookup-secret`, porównywany przez `timingSafeEqual` na SHA-256.
+  - Ruch z sekretem nie ma limitu po IP. Wszystkie fetche z middleware wychodzą z jednego adresu, więc limit byłby jednym globalnym kubełkiem.
+  - Ruch publiczny ma limit 120/min po `x-vercel-forwarded-for`, a bez niego po `x-real-ip`. Nigdy po XFF.
+- **Zmienna obowiązkowa:** `SERVICE_SLUG_LOOKUP_SECRET` (`min(32)`) jest wymagana w `env.ts`. Bez niej padną build na Vercelu, `npm run dev` i skrypty `db:*` na tej gałęzi.
+- **Origin lookupu:** zostaje z `Host` (P3 #11, z komentarzem). `NEXT_PUBLIC_SITE_URL` skierowałby dev i preview na produkcję.
+- **Cache:** `exists:true` dostaje `s-maxage=300, swr=86400`, `false` dostaje `s-maxage=30`, a 400/429/500 dostają `private, no-store`.
+- **Podobne firmy:**
+  - Sortowanie i `LIMIT 6` są w SQL, nowy indeks `idx_location_service_main`.
+  - Zostaje skorelowane podzapytanie `mainCity` zamiast joina, bo dane mają wpisy z dwiema głównymi lokalizacjami.
+  - `pickSimilarServices` usunięty.
+  - `getServiceProfile` pobiera wpis i lokalizacje równolegle.
+- **Metadane:** `buildProfileMetadata` i `pickMetaDescription` w `service-profile-metadata.ts`, `toSameAs` i `toSafeExternalHref` w `profile-helpers.ts`. `page.tsx` jest cienki.
+- **Link do profilu:** `ServiceProfileLink` w `(main)/_components/` ma zawsze `prefetch={false}`.
+
+Odłożone (P3): #12, #16, #18, #20–#23, #25. Do tego `border-[#C52289]` w `service-card.tsx:425` i ujednolicenie `OpeningHours` z `add-business/jsonld-facts.ts`.
+
+**Nowe kroki operatora** (dochodzą do kroków U1/U2):
+1. Wygenerować sekret: `openssl rand -hex 32`, zapisać jako `SERVICE_SLUG_LOOKUP_SECRET` w Vercel (Production + Preview) i w lokalnym `.env`.
+2. `npx drizzle-kit push`: kolumna `services.slug` z U1 oraz indeks `idx_location_service_main`. Oba addytywne.
+3. Na preview sprawdzić:
+   - `curl -sI /api/service-slug/<slug>`: jest `Cache-Control`, drugie żądanie daje `x-vercel-cache: HIT`,
+   - `/firma/xyz` zwraca 404.
+4. Po backfillu: `SELECT slug FROM services WHERE slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$'` ma zwrócić 0 wierszy.
 
 ## Środowisko worktree
 
