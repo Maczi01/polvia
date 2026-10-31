@@ -204,9 +204,9 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 - [x] `Test:` dwa upserty tych samych danych dają jeden wiersz i identyczną treść
 - [x] `Test:` brakujący plik w galerii przerywa z listą brakujących plików
 - [x] `Test:` `getServiceProfile` z uszkodzonym jsonb zwraca `premiumContent: null`
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/db/premium-content-schema src/db/upsert-premium-content src/lib/service-profile-queries` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/db/premium-content-schema src/db/upsert-premium-content src/lib/service-profile-queries` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
 - [ ] `Operator:` `npx drizzle-kit push` (enum + `service_profiles`) na produkcji; potwierdzić w `information_schema` i `pg_type`
 
 ### U7. Profil renderuje szablon premium
@@ -220,12 +220,33 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
 - [x] `Test:` premium aktywne z `template='gallery'` → `{ kind: 'premium', template: 'gallery' }`
 - [x] `Test:` premium aktywne bez `premiumContent` → `classic`
 - [x] `Test:` premium wygasłe z zachowaną treścią → `{ kind: 'free' }`
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Operator:` wpis z aktywną subskrypcją testową:
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [ ] `Operator:` **(wykonalne dopiero po U8 — stub subskrypcji zwraca `null`)** wpis z aktywną subskrypcją testową:
   - pokazuje wybrany szablon, bez „Podobnych firm” i bez CTA;
   - po ustawieniu `currentPeriodEnd` w przeszłości (baza testowa, **nie prod**) wraca do free
+
+---
+
+## Do poprawy po review fazy 2
+
+Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 4 × P2, 20 × P3). P2-1 i P2-2 naprawić **przed U8**, bo U8 przejmuje ten kontrakt.
+
+- [ ] 🟠 [important] **`firma/[slug]/page.tsx:56-65`**: źródło subskrypcji jako stub bez `serviceId`, synchroniczny, w `page.tsx`.
+  - `getServiceProfile` zwraca `subscription: PremiumSubscriptionState | null` (do U8 stałe `null` w zapytaniu, w U8 `leftJoin(service_subscriptions)`).
+  - `resolveProfileView(profile)` zostaje synchroniczne; jedno `now` dla metadanych i strony.
+  - W U8: test negatywny (subskrypcja usługi A nie włącza premium usłudze B).
+- [ ] 🟠 [important] **`firma/[slug]/page.tsx:120-121`, `:138-151`**: cover w OG tylko przy premium i pomijanie podobnych firm bez testu. Czyste funkcje (`selectOgCoverPath`, `shouldLoadSimilarServices`) w `select-profile-view.ts` z testami: free z treścią → `null`; premium z coverem → src; premium bez treści → `null`.
+- [ ] 🟠 [important] **`src/db/premium-content-schema.ts:115-151` vs `service-profile-types.ts:35-47`**: dwa ręcznie zsynchronizowane kształty treści premium, projekcja widoku w `src/db`.
+  - `LocalizedPremiumContent`, `localizePremiumContent` i `premiumImagePath` przenieść do `src/lib/service-profile-premium.ts`.
+  - `PremiumContent = LocalizedPremiumContent` (import type).
+- [ ] 🟠 [important] **`src/db/upsert-premium-content.ts:180`**: `JSON.parse` przed `hasPremiumBlock`, więc dowolny niepoprawny JSON w `data/services/` przerywa `db:reset` bez nazwy pliku. Owinąć parse (ostrzeżenie z nazwą pliku i pominięcie albo `INVALID_ENTRY` z nazwą) + test z plikiem `'{'`.
+- [ ] 🟡 [nit] **`premium-content-schema.ts:84-89`**: limit liczby pozycji `priceList`/`faq` (stałe w `premium-templates.ts`) i unikalność `file`/`name`/`q` przez `superRefine` (P3 #12, #13).
+- [ ] 🟡 [nit] **`upsert-premium-content.ts:74`**: sprawdzanie zdjęć wrażliwe na wielkość liter (Windows vs Vercel) (P3 #14).
+- [ ] 🟡 [nit] **`.claude/skills/dodaj/SKILL.md`**: blok `premium` w JSON dopiero po weryfikacji płacącego; katalog zdjęć zależy od slugu usługi (P3 #15, #16).
+- [ ] 🟡 [nit] **przed U8**: sprawdzić w `npm run build`, czy `/[locale]/firma/[slug]` jest dynamiczna; jeśli nie — `revalidatePath` w webhooku (P3 #17).
+- [ ] 🟡 [nit] Pozostałe P3 (#1–#11, #18–#20) według raportu, do rozważenia.
 
 ---
 

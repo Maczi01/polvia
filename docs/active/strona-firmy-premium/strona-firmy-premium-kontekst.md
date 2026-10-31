@@ -241,6 +241,19 @@ Ryzyko: `page.tsx` nie ma testu renderu. Przejście premium → szablon da się 
    - `/firma/xyz` zwraca 404.
 4. Po backfillu: `SELECT slug FROM services WHERE slug !~ '^[a-z0-9]+(-[a-z0-9]+)*$'` ma zwrócić 0 wierszy.
 
+### Review fazy 2 (2026-10-31)
+
+Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 4 × P2, 20 × P3). Wszystkie 6 checkboxów `Weryfikacja:` fazy 2 przeszło (CLI). E2E nie było uruchamiane: brak scenariuszy przeglądarkowych w `Weryfikacja:`, a jedyny scenariusz premium wymaga U8.
+
+Kluczowe wnioski:
+- **Kontrakt subskrypcji trzeba ustalić przed U8, a nie w U8.**
+  - Stub `getPremiumSubscription()` bez `serviceId` wymusza na U8 zmianę sygnatury i zaprasza do źródła niefiltrującego po usłudze.
+  - Kierunek: `subscription` jako pole `getServiceProfile` (left join, jak `premiumContent`).
+- **Decyzje „co pokazać przy premium” (cover w OG, podobne firmy) muszą być czystymi funkcjami z testami.** `page.tsx` nie ma testu, a R18 zostawia treść w bazie po wygaśnięciu. Odwrócony warunek przeszedłby przez gate.
+- **Jeden kształt treści premium.** Projekcja na locale przechodzi do `src/lib`, a typ widoku jest aliasem.
+- **Seed czyta teraz `data/services/`**, więc niepoprawny plik roboczy przerywa `db:reset`. Parse musi być odporny i wskazywać plik.
+- Bezpieczeństwo bez uwag: path traversal zamknięty, brak XSS, premium nie do włączenia bez subskrypcji.
+
 ## Środowisko worktree
 
 - `node_modules`: własna instalacja (`npm ci`, 2026-10-31). Junction do głównego katalogu łamał Storybooka: webpack nie przetwarzał `.storybook/preview.ts` spoza ścieżki projektu. U8 może więc instalować `stripe` normalnie.
