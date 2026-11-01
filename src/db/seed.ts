@@ -1642,7 +1642,7 @@ async function mainSeed() {
 
     // 1. EASY Warsztat Samochodowy (Warszawa)
     await seedService({
-        name: 'EASY Warsztat Samochodowy | Автосервис',
+        name: 'EASY Warsztat Samochodowy – Автосервис',
         slug: 'easy-warsztat-samochodowy-warszawa',
         category: 'mechanics',
         ukName: 'EASY Автомайстерня | Автосервіс', enName: 'EASY Car Workshop', ruName: 'EASY Автомастерская | Автосервис',
@@ -1774,9 +1774,9 @@ async function mainSeed() {
     });
 
 
-    // 5. Kraków warsztat samochodowy | СТО Краков
+    // 5. Kraków warsztat samochodowy – СТО Краков
     await seedService({
-        name: 'Kraków warsztat samochodowy | СТО Краков',
+        name: 'Kraków warsztat samochodowy – СТО Краков',
         slug: 'krakow-warsztat-samochodowy-sto',
         category: 'mechanics',
         ukName: 'Краків автомайстерня | СТО Краків', enName: 'Kraków Car Workshop | STO', ruName: 'Краков автомастерская | СТО Краков',
