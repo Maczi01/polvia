@@ -11,7 +11,13 @@ import { routing } from '@/i18n/routing';
 import { getOperatorInbox } from '@/lib/mailer';
 import { verifyPaidCheckoutSession } from '@/lib/premium-checkout';
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
-import { checkRateLimit, getClientIp, rateLimitSubject } from '@/lib/rate-limit';
+import {
+    checkRateLimit,
+    getClientIp,
+    type RateLimitOptions,
+    type RateLimitResult,
+    rateLimitSubject,
+} from '@/lib/rate-limit';
 import { isValidServiceSlug } from '@/lib/service-slug-format';
 
 import { env } from '../../../../../../../env';
@@ -31,14 +37,56 @@ const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
  */
 const THANKS_PAGE_PER_IP = 20;
 
+/**
+ * Gorny limit czasu na sprawdzenie limitu. Klient Redisa nie ma `commandTimeout` (globalny
+ * zmienilby zachowanie innych przeplywow), wiec zawieszony Redis ogranicza sie tutaj.
+ */
+const RATE_LIMIT_CHECK_TIMEOUT_MS = 1500;
+
+class RateLimitCheckTimeoutError extends Error {
+    constructor() {
+        super(`Rate limit check exceeded ${RATE_LIMIT_CHECK_TIMEOUT_MS} ms`);
+        this.name = 'RateLimitCheckTimeoutError';
+    }
+}
+
+async function checkRateLimitWithTimeout(options: RateLimitOptions): Promise<RateLimitResult> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+        timer = setTimeout(
+            () => reject(new RateLimitCheckTimeoutError()),
+            RATE_LIMIT_CHECK_TIMEOUT_MS,
+        );
+    });
+    try {
+        return await Promise.race([checkRateLimit(options), timeout]);
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+/**
+ * Awaria Redisa (`RateLimitStoreError`, przekroczony czas, zerwane polaczenie ioredis — bez
+ * wspolnej klasy bledu) przepuszcza do Stripe: platnik tuz po zaplacie ma zobaczyc
+ * potwierdzenie, a Stripe ma wlasny limit API. Fail-closed dawaloby „odswiez” na caly
+ * czas awarii, a strona nie ma tu nic do ochrony poza kwota zapytan do Stripe.
+ */
 async function isWithinVerifyLimit(): Promise<boolean> {
     const ip = getClientIp({ headers: await headers() });
-    const result = await checkRateLimit({
-        key: `premium:thanks:${rateLimitSubject(ip)}`,
-        max: THANKS_PAGE_PER_IP,
-        windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
-    });
-    return result.allowed;
+    try {
+        const result = await checkRateLimitWithTimeout({
+            key: `premium:thanks:${rateLimitSubject(ip)}`,
+            max: THANKS_PAGE_PER_IP,
+            windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+        });
+        return result.allowed;
+    } catch (error) {
+        // Bez IP w logu — to dane osobowe, a do diagnozy awarii Redisa niepotrzebne.
+        console.error('premium-thanks: rate limit store unavailable, failing open', {
+            error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+        });
+        return true;
+    }
 }
 
 function toLocale(value: string): Locale {
@@ -229,15 +277,21 @@ export default async function PremiumThanksPage({
     }
 
     const verification = await verifyPaidCheckoutSession(sessionId.data, slug);
-    if (verification.status === 'unavailable') {
-        return <CheckoutUnavailable sessionId={sessionId.data} slug={slug} />;
+    // Bez `default`: nowy wariant wyniku to blad kompilacji (brak `return`), nie cichy „paid”.
+    switch (verification.status) {
+        case 'unavailable': {
+            return <CheckoutUnavailable sessionId={sessionId.data} slug={slug} />;
+        }
+        case 'invalid': {
+            return <CheckoutNotConfirmed slug={slug} />;
+        }
+        case 'paid': {
+            return (
+                <PageShell>
+                    <PaymentConfirmedCard />
+                    <MaterialsCard sessionId={sessionId.data} slug={slug} />
+                </PageShell>
+            );
+        }
     }
-    if (verification.status === 'invalid') return <CheckoutNotConfirmed slug={slug} />;
-
-    return (
-        <PageShell>
-            <PaymentConfirmedCard />
-            <MaterialsCard sessionId={sessionId.data} slug={slug} />
-        </PageShell>
-    );
 }

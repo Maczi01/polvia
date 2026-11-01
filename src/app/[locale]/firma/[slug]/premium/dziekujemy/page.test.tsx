@@ -122,6 +122,67 @@ describe('PremiumThanksPage', () => {
         expect(verifyMock).not.toHaveBeenCalled();
     });
 
+    it('awaria Redisa nie blokuje platnika: pyta Stripe i pokazuje potwierdzenie', async () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        rateLimitMock.mockRejectedValue(new Error('Command timed out'));
+        verifyMock.mockResolvedValue({
+            status: 'paid',
+            target: {
+                serviceId: 'id',
+                slug: SLUG,
+                name: 'Kancelaria Nowak',
+                hasActivePremium: false,
+            },
+            payer: { name: null, email: null, taxIds: [], address: null },
+        });
+
+        await renderPage();
+
+        expect(verifyMock).toHaveBeenCalledWith(SESSION_ID, SLUG);
+        expect(
+            screen.getByRole('heading', { level: 1, name: thanks('title') }),
+        ).toBeInTheDocument();
+        expect(screen.getByRole('form', { name: 'materials-form' })).toBeInTheDocument();
+        expect(consoleError).toHaveBeenCalledTimes(1);
+        expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('failing open'), {
+            error: 'Error: Command timed out',
+        });
+        // Adres klienta nie trafia do logu.
+        expect(JSON.stringify(consoleError.mock.calls)).not.toContain('203.0.113.7');
+        consoleError.mockRestore();
+    });
+
+    it('zawieszony Redis po 1500 ms przepuszcza do Stripe, nie trzymajac renderu', async () => {
+        jest.useFakeTimers();
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            // Licznik nigdy nie odpowiada — jak Redis, ktory przyjal polaczenie i milczy.
+            rateLimitMock.mockReturnValue(new Promise(() => {}));
+            verifyMock.mockResolvedValue({ status: 'invalid' });
+
+            const page = PremiumThanksPage({
+                params: Promise.resolve({ locale: 'pl', slug: SLUG }),
+                searchParams: Promise.resolve({ session_id: SESSION_ID }),
+            });
+            await jest.advanceTimersByTimeAsync(1499);
+            expect(verifyMock).not.toHaveBeenCalled();
+
+            await jest.advanceTimersByTimeAsync(1);
+            render(await resolveServerTree(await page));
+
+            expect(verifyMock).toHaveBeenCalledWith(SESSION_ID, SLUG);
+            expect(
+                screen.getByRole('heading', { level: 1, name: thanks('invalidTitle') }),
+            ).toBeInTheDocument();
+            expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('failing open'), {
+                error: 'RateLimitCheckTimeoutError: Rate limit check exceeded 1500 ms',
+            });
+        } finally {
+            consoleError.mockRestore();
+            jest.useRealTimers();
+        }
+    });
+
     it('niepoprawna sesja pokazuje "nie potwierdzono"', async () => {
         verifyMock.mockResolvedValue({ status: 'invalid' });
 
