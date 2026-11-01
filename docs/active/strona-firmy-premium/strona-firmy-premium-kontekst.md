@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 2)
+**Ostatnia aktualizacja:** 2026-11-01 (faza 3 wykonana)
 
 ## Źródła
 
@@ -276,6 +276,46 @@ Decyzje:
 - `formatZodIssue` w `src/db/format-zod-issue.ts` (3 użycia).
 
 Otwarte: P3 #4, #5, #6, #18 (do rozważenia). Przed U8 zostaje #17: sprawdzić, czy trasa profilu jest dynamiczna. Wymaga `npm run build` z `.env`, więc dopiero na preview.
+
+### Faza 3 — Subskrypcja (2026-11-01)
+
+Decyzje usera przy starcie: zależność `stripe@23.0.1` (23.1.0 miała 3 dni — za świeża), `PREMIUM_GRACE_DAYS = 3`, cała faza w jednym uruchomieniu.
+
+| Unit | Builder | Status | Commit |
+|---|---|---|---|
+| U8 Stripe: webhook, stan, ranking, resync | feature-builder-web-data | completed | `683ccc5` |
+| U10 Krótki adres `/<slug>` | feature-builder-web-data | completed (równolegle z U9) | `9c1e845` |
+| U9 Checkout + formularz materiałów | feature-builder-web-fullstack | completed | `187806b` |
+| U11 Przepisanie `/cennik` | feature-builder-web-ui | completed | `568bce1` |
+
+Bramka: `tsc` OK, `jest` 160 suite'ów / 1755 testów, `next lint` 0 błędów. `npm run build` pominięty (brak `.env` w worktree).
+
+Decyzje i odchylenia builderów (zaakceptowane):
+- **U8:**
+  - `apiVersion = '2026-09-30.endive'`; `current_period_end` leży na `items.data[]` (bierzemy maksimum). Klient: timeout 8 s, `maxNetworkRetries: 1`; webhook `maxDuration = 30`.
+  - Dedupe zapisywany **po** udanej synchronizacji (`insert … on conflict do nothing returning`); mail tylko gdy ten insert oznaczył zdarzenie.
+  - Powiązanie subskrypcji z wpisem: `client_reference_id` → istniejący wiersz → `metadata.serviceSlug` → `metadata.serviceId`. Slug potrzebny, bo `db:reset` nadaje nowe UUID.
+  - Konflikt drugiej subskrypcji rozstrzyga `isPremiumActive` zapisanej; wygasła zostaje zastąpiona. Upsert `promoted_services` zmienia tylko `expiresAt`, `priority` operatora zostaje.
+  - Dodatkowe moduły (limit 300 linii): `subscription-store.ts`, `subscription-notifications.ts`, `stripe-events.ts`, `stripe-webhook-events.ts`. Adaptery Drizzle bez własnych testów (zastąpione bazą w pamięci w testach sync i route).
+  - **5 zmiennych `STRIPE_*` jest wymaganych w `env.ts`** — bez nich nie wstanie build ani dev server.
+  - `service-profile-queries.test.ts` ma 456 linii (ponad limit 300, było 400) — zgłoszone, nie dzielone.
+- **U10:**
+  - `ServiceSlugLookupResult = 'premium' | 'found' | 'missing' | 'unknown'`; gałąź `/firma/*` sprawdza tylko `missing`.
+  - `rootAliasRedirectPath` jako czysta funkcja (middleware nie importuje się w Jeście). 307, query string przechodzi.
+  - Cache CDN `s-maxage=300` obejmuje `hasActivePremium` — alias zaczyna/przestaje działać z opóźnieniem do 5 min (decyzja orkiestratora).
+  - Ograniczenie: slugi zaczynające się od `api` nie dostaną aliasu (matcher). Nowy katalog w `public/` lub przekierowanie w `next.config.ts` trzeba dopisać do `STATIC_RESERVED_SEGMENTS`.
+  - Ryzyko do review bezpieczeństwa: losowe jednosegmentowe ścieżki (np. `/wp-admin`) robią lookup do bazy (indeksowany SELECT; ten sam profil ryzyka co `/firma/<losowy>` od U2).
+- **U9:**
+  - Akcje z sygnaturą `(previous, formData)` (`useActionState`). Kody: checkout `BAD_INPUT`, `RATE_LIMITED`, `NOT_FOUND`, `ALREADY_PREMIUM`, `CHECKOUT_FAILED`; materiały `BAD_INPUT`, `RATE_LIMITED`, `FORBIDDEN`, `VERIFY_FAILED`, `SEND_FAILED`.
+  - Logika Stripe i zapytanie po id w `src/lib/premium-checkout.ts` i `premium-checkout-queries.ts` (`getPremiumCheckoutTarget`); stałe dla klienta w `premium-checkout-fields.ts`.
+  - `success_url` z `env.NEXT_PUBLIC_SITE_URL` — lokalny test checkoutu wymaga ustawienia tej zmiennej na localhost.
+  - Strona `dziekujemy` nie wymaga zmian w routingu ani middleware (4 segmenty nie pasują do `/firma/[slug]`); do potwierdzenia w teście ręcznym.
+  - Formularze bez react-hook-form (zakaz importu zod w kliencie); `onSubmit` + `startTransition`, żeby błąd nie czyścił pól.
+  - `ServiceProfileView.upgradeHref` zastąpione przez `serviceId`; testy profilu zaktualizowane do nowego zachowania (asercje nie osłabione).
+  - Checkout dla `uk` z `locale: 'auto'` (Stripe nie ma ukraińskiego).
+- **U11:**
+  - `/cennik` jako Server Component; `pricing-plans` kliencki tylko dla przełącznika. Oszczędność roczna 54% (1 − 49/108).
+  - Poprawione także obietnice spoza `features`: „14-day free trial” w en/ru/uk (triala nie ma), gwiazdki markdown w `team.features.0`, plan Przedsiębiorstwo „Wycena indywidualna”, link stopki `href="#"` → `/contact`. Usunięty zdublowany landmark `<main>`.
 
 ## Środowisko worktree
 

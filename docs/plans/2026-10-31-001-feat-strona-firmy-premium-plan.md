@@ -537,7 +537,7 @@ flowchart LR
 
 ### Faza 3 — Subskrypcja
 
-- [ ] **Unit 8: Stripe — stan premium, webhook, ranking, resync**
+- [x] **Unit 8: Stripe — stan premium, webhook, ranking, resync**
 
 **Cel:** Zdarzenia Stripe utrzymują w bazie stan subskrypcji per wpis. Premium aktywuje się i wygasa automatycznie, wpis premium dostaje wyższą pozycję, a stan da się odtworzyć ze Stripe po `db:reset`.
 
@@ -623,7 +623,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 9: Checkout z profilu i formularz materiałów**
+- [x] **Unit 9: Checkout z profilu i formularz materiałów**
 
 **Cel:** Firma kupuje premium dla swojego wpisu jednym przyciskiem na profilu. Po płatności przesyła materiały, a founder dostaje maila.
 
@@ -691,7 +691,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 10: Krótki adres `polvia.pl/<slug>` dla premium**
+- [x] **Unit 10: Krótki adres `polvia.pl/<slug>` dla premium**
 
 **Cel:** Firma z aktywnym premium ma krótki adres przekierowujący na profil. Bez premium ta sama ścieżka zwraca 404.
 
@@ -730,7 +730,7 @@ flowchart LR
 
 ---
 
-- [ ] **Unit 11: Przepisanie `/cennik`**
+- [x] **Unit 11: Przepisanie `/cennik`**
 
 **Cel:** Cennik obiecuje dokładnie to, co dostarcza premium, a jego CTA prowadzą tam, gdzie da się kupić albo zarządzać subskrypcją.
 

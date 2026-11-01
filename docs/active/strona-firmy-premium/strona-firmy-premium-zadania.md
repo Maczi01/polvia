@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-10-31 (po poprawkach review fazy 2)
+**Ostatnia aktualizacja:** 2026-11-01 (faza 3 wykonana)
 
 ## Źródła
 
@@ -258,39 +258,39 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 **Wymagania:** R12, R15, R18
 **Notatka wykonawcza:** test-first. Najpierw `isPremiumActive` i kontrakt webhooka (podpis, dedupe, kolejność), potem implementacja.
 
-- [ ] `Operator:` **przed startem U8** user akceptuje zależność `stripe`
-- [ ] `package.json`: `stripe` (przypięta wersja), skrypt `db:sync-subscriptions`
-- [ ] `env.ts` (server + `runtimeEnv`): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`
-- [ ] `src/lib/stripe.ts` (`server-only`, jawny timeout i `apiVersion`)
-- [ ] `src/db/schema.ts`: tabele `service_subscriptions` (1:1 z usługą) i `stripe_events` (`id` pk)
+- [x] `Operator:` **przed startem U8** user akceptuje zależność `stripe` (2026-11-01: `stripe@23.0.1`)
+- [x] `package.json`: `stripe` (przypięta wersja), skrypt `db:sync-subscriptions`
+- [x] `env.ts` (server + `runtimeEnv`): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`
+- [x] `src/lib/stripe.ts` (`server-only`, jawny timeout i `apiVersion`)
+- [x] `src/db/schema.ts`: tabele `service_subscriptions` (1:1 z usługą) i `stripe_events` (`id` pk)
 - [x] `src/lib/premium.ts`: `isPremiumActive`, `PREMIUM_GRACE_DAYS` (domyślnie 3), `premiumRankingExpiry` — **zrobione w fazie 2** (`e4c7f7e`); enum `subscription_status` buduj z `SUBSCRIPTION_STATUSES`
-- [ ] `src/lib/service-profile-queries.ts`: zamienić stałą `NO_SUBSCRIPTION` w `getServiceProfile` na `leftJoin(service_subscriptions)` po `service_id` (kontrakt `profile.subscription` gotowy po review fazy 2; `page.tsx` bez zmian)
-- [ ] `Test:` aktywna subskrypcja usługi A nie włącza premium usłudze B (test negatywny z review fazy 2)
-- [ ] `src/lib/subscription-sync.ts`: `syncSubscriptionFromStripe(subscriptionId)`
+- [x] `src/lib/service-profile-queries.ts`: zamienić stałą `NO_SUBSCRIPTION` w `getServiceProfile` na `leftJoin(service_subscriptions)` po `service_id` (kontrakt `profile.subscription` gotowy po review fazy 2; `page.tsx` bez zmian)
+- [x] `Test:` aktywna subskrypcja usługi A nie włącza premium usłudze B (test negatywny z review fazy 2)
+- [x] `src/lib/subscription-sync.ts`: `syncSubscriptionFromStripe(subscriptionId)`
   - pobiera subskrypcję,
   - w jednej transakcji: upsert `service_subscriptions` + upsert lub usunięcie `promoted_services`,
   - konflikt drugiej aktywnej subskrypcji: bez nadpisania, z powiadomieniem foundera
-- [ ] `src/app/api/stripe/webhook/route.ts`:
+- [x] `src/app/api/stripe/webhook/route.ts`:
   - `runtime = 'nodejs'`, `request.text()` + `constructEvent`,
   - dedupe wycofywany przy błędzie,
   - zdarzenia: `checkout.session.completed`, `customer.subscription.created`, `.updated`, `.deleted`, `invoice.paid`, `invoice.payment_failed`,
   - mail do foundera z timeoutem po zapisie,
   - bez rate limitu (uzasadnienie w komentarzu),
   - odpowiedź `{ data, error }` bez surowych błędów
-- [ ] `src/db/sync-subscriptions.ts`: CLI odtwarzający stan ze Stripe
-- [ ] `src/lib/service-profile-queries.ts`: stan premium w `getServiceProfile` i `getServiceSlugStatus`
+- [x] `src/db/sync-subscriptions.ts`: CLI odtwarzający stan ze Stripe
+- [x] `src/lib/service-profile-queries.ts`: stan premium w `getServiceProfile` i `getServiceSlugStatus`
 - [x] `Test:` `isPremiumActive` (faza 2, `src/lib/premium.test.ts`):
   - `active` w okresie → true
   - `past_due` w karencji → true
   - `past_due` po karencji → false
   - `canceled` → false
   - `cancelAtPeriodEnd` przed końcem → true
-- [ ] `Test:` brak lub zły podpis → 400; synchronizacja nie wołana
-- [ ] `Test:` to samo `event.id` dwa razy → 200 i synchronizacja raz
-- [ ] `Test:` błąd synchronizacji → 500, `event.id` nieoznaczone (ponowienie przejdzie)
-- [ ] `Test:` zawieszony `sendMail` nie blokuje odpowiedzi ponad timeout; handler zwraca 200
-- [ ] `Test:` `canceled` usuwa wpis z `promoted_services`; `active` ustawia `expiresAt = currentPeriodEnd + grace`
-- [ ] `Test:` druga aktywna subskrypcja nie nadpisuje stanu i wysyła powiadomienie
+- [x] `Test:` brak lub zły podpis → 400; synchronizacja nie wołana
+- [x] `Test:` to samo `event.id` dwa razy → 200 i synchronizacja raz
+- [x] `Test:` błąd synchronizacji → 500, `event.id` nieoznaczone (ponowienie przejdzie)
+- [x] `Test:` zawieszony `sendMail` nie blokuje odpowiedzi ponad timeout; handler zwraca 200
+- [x] `Test:` `canceled` usuwa wpis z `promoted_services`; `active` ustawia `expiresAt = currentPeriodEnd + grace`
+- [x] `Test:` druga aktywna subskrypcja nie nadpisuje stanu i wysyła powiadomienie
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest src/lib/premium src/lib/subscription-sync "src/app/api/stripe"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -315,36 +315,36 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 **Delegate to:** `feature-builder-web-fullstack` · **Nakład:** M · **Zależności:** U4, U8
 **Wymagania:** R4, R14, R16, R17
 
-- [ ] `src/app/[locale]/firma/[slug]/_checkout-schema.ts`: Zod (`serviceId` uuid, `interval ∈ {monthly, yearly}`, materiały z limitami długości)
-- [ ] `_actions.ts` → `startPremiumCheckout`:
+- [x] `src/app/[locale]/firma/[slug]/_checkout-schema.ts`: Zod (`serviceId` uuid, `interval ∈ {monthly, yearly}`, materiały z limitami długości)
+- [x] `_actions.ts` → `startPremiumCheckout`:
   1. Zod,
   2. rate limit,
   3. wpis aktywny, inaczej `ALREADY_PREMIUM`,
   4. cena z allowlisty env,
   5. sesja z `mode: 'subscription'`, `client_reference_id`, `subscription_data.metadata.serviceId`, `tax_id_collection`, `billing_address_collection: 'required'`, `success_url` z `{CHECKOUT_SESSION_ID}` w locale, `cancel_url` na profil,
   6. `redirect(session.url)`
-- [ ] `_actions.ts` → `submitPremiumMaterials`:
+- [x] `_actions.ts` → `submitPremiumMaterials`:
   1. Zod,
   2. rate limit,
   3. ponowna weryfikacja `session_id` w Stripe,
   4. mail do foundera z timeoutem,
   5. typowane błędy
-- [ ] `_components/upgrade-cta/` (wybór miesięcznie/rocznie + submit; test, stories), który zastępuje link do `/cennik` w `profile-free`
-- [ ] `premium/dziekujemy/page.tsx`:
+- [x] `_components/upgrade-cta/` (wybór miesięcznie/rocznie + submit; test, stories), który zastępuje link do `/cennik` w `profile-free`
+- [x] `premium/dziekujemy/page.tsx`:
   - weryfikuje sesję przed renderem (nieopłacona lub z innego wpisu → komunikat zamiast formularza),
   - informuje „aktywacja w ciągu kilku minut”,
   - link do portalu,
   - adres mailowy dla zdjęć
-- [ ] `_components/premium-materials-form/` (+ test): `aria-live` na wyniku, `aria-describedby` dla błędów
-- [ ] `src/i18n/routing.ts`: ścieżka strony sukcesu w `pathnames`, jeśli wymagana
-- [ ] `messages/{pl,en,ru,uk}.json`
-- [ ] `Test:` `startPremiumCheckout` z niepoprawnym `interval` → `BAD_INPUT`; Stripe nie wołany
-- [ ] `Test:` wpis z aktywnym premium → `ALREADY_PREMIUM`
-- [ ] `Test:` po przekroczeniu limitu → `RATE_LIMITED`
-- [ ] `Test:` poprawne dane → sesja z ceną z env dla interwału i `client_reference_id = serviceId`
-- [ ] `Test:` `submitPremiumMaterials` z sesją nieopłaconą lub z innego wpisu → `FORBIDDEN`; mail nie wysłany
-- [ ] `Test:` błąd `sendMail` → typowany błąd dla użytkownika bez surowego komunikatu
-- [ ] `Test:` `upgrade-cta` i `premium-materials-form`: `jest-axe` bez naruszeń; błędy przez `aria-describedby`; mocki akcji rozwiązane przed końcem testu
+- [x] `_components/premium-materials-form/` (+ test): `aria-live` na wyniku, `aria-describedby` dla błędów
+- [x] `src/i18n/routing.ts`: ścieżka strony sukcesu w `pathnames`, jeśli wymagana
+- [x] `messages/{pl,en,ru,uk}.json`
+- [x] `Test:` `startPremiumCheckout` z niepoprawnym `interval` → `BAD_INPUT`; Stripe nie wołany
+- [x] `Test:` wpis z aktywnym premium → `ALREADY_PREMIUM`
+- [x] `Test:` po przekroczeniu limitu → `RATE_LIMITED`
+- [x] `Test:` poprawne dane → sesja z ceną z env dla interwału i `client_reference_id = serviceId`
+- [x] `Test:` `submitPremiumMaterials` z sesją nieopłaconą lub z innego wpisu → `FORBIDDEN`; mail nie wysłany
+- [x] `Test:` błąd `sendMail` → typowany błąd dla użytkownika bez surowego komunikatu
+- [x] `Test:` `upgrade-cta` i `premium-materials-form`: `jest-axe` bez naruszeń; błędy przez `aria-describedby`; mocki akcji rozwiązane przed końcem testu
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -360,14 +360,14 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 **Delegate to:** `feature-builder-web-data` · **Nakład:** S · **Zależności:** U2, U8
 **Wymagania:** R11
 
-- [ ] `src/lib/service-profile-path.ts`: `parseRootAliasPathname`
-- [ ] `src/app/api/service-slug/[slug]/route.ts`: pole `hasActivePremium`
-- [ ] `src/middleware.ts`: gałąź aliasu
+- [x] `src/lib/service-profile-path.ts`: `parseRootAliasPathname`
+- [x] `src/app/api/service-slug/[slug]/route.ts`: pole `hasActivePremium`
+- [x] `src/middleware.ts`: gałąź aliasu
   - tylko jednosegmentowe ścieżki bez prefiksu locale, spoza listy zarezerwowanych,
   - `hasActivePremium` → **307** na `buildServiceProfilePath('pl', slug)`,
   - kolejność: walidacja mapy, `/firma/*`, alias, rewrite i redirect mapy, next-intl
-- [ ] `Test:` `parseRootAliasPathname`: `/firma-x` → `firma-x`; `/mapa`, `/en`, `/cennik`, `/api`, `/a/b`, `/` → `null`
-- [ ] `Test:` route: aktywne premium → `hasActivePremium: true`; wygasłe → `false`
+- [x] `Test:` `parseRootAliasPathname`: `/firma-x` → `firma-x`; `/mapa`, `/en`, `/cennik`, `/api`, `/a/b`, `/` → `null`
+- [x] `Test:` route: aktywne premium → `hasActivePremium: true`; wygasłe → `false`
 - [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
 - [ ] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug"` przechodzi
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
@@ -381,16 +381,16 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 **Delegate to:** `feature-builder-web-ui` · **Nakład:** S · **Zależności:** U9
 **Wymagania:** R19, R14
 
-- [ ] `pricing/page.tsx` jako Server Component (env portalu, tłumaczenia); przełącznik okresu w małym komponencie klienckim `pricing/_components/pricing-plans/` (+ test)
-- [ ] CTA przez `Link` z `@/i18n/navigation`:
+- [x] `pricing/page.tsx` jako Server Component (env portalu, tłumaczenia); przełącznik okresu w małym komponencie klienckim `pricing/_components/pricing-plans/` (+ test)
+- [x] CTA przez `Link` z `@/i18n/navigation`:
   - free → `/add-business`
   - Profesjonalny → `/map` z instrukcją „znajdź swoją firmę i kliknij Ulepsz”
   - Przedsiębiorstwo → `/contact`
   - link „Zarządzaj subskrypcją” → `STRIPE_PORTAL_LOGIN_URL`
-- [ ] `messages/{pl,en,ru,uk}.json` → `Pricing.plans.essentials.features`:
+- [x] `messages/{pl,en,ru,uk}.json` → `Pricing.plans.essentials.features`:
   - dodać: szablony, cover i galerię, cennik usług i FAQ, brak „podobnych firm”, krótki adres, wyższą pozycję
   - usunąć: wyszukiwarkę semantyczną, powitanie w social mediach, promocje, WWW i social media jako atut płatny
-- [ ] `Test:` `pricing-plans`:
+- [x] `Test:` `pricing-plans`:
   - cechy planu Profesjonalny bez usuniętych obietnic,
   - CTA free ma `href` `/dodaj-firme` w `pl` i `/en/add-business` w `en`,
   - `jest-axe` bez naruszeń
@@ -399,7 +399,7 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [ ] `Weryfikacja:` `npx next lint` bez błędów
 - [ ] `Weryfikacja:` grep: brak `href="#"` w `src/app/[locale]/(header)/pricing/**`
 - [ ] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
-- [ ] `Operator:` uzupełnić kwoty planu Profesjonalny w 4 plikach `messages/` (decyzja cenowa)
+- [x] `Operator:` uzupełnić kwoty planu Profesjonalny w 4 plikach `messages/` (decyzja cenowa; 9 zł / 49 zł wpisane w U11)
 - [ ] `Operator:` sprawdzić `/cennik` i `/ru/pricing`:
   - wszystkie CTA prowadzą do istniejących stron,
   - link portalu otwiera logowanie Stripe,
@@ -409,6 +409,11 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 
 ## Po wdrożeniu
 
+- [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną
+- [ ] `Operator:` lokalny test checkoutu wymaga `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (`success_url` budowany z tej zmiennej, inaczej powrót na produkcję)
+- [ ] `Operator:` po każdym `db:reset`: `npm run db:sync-subscriptions`
+- [ ] Do rozważenia: slugi zaczynające się od `api` (np. `apiary-x`) nie dostaną aliasu `/<slug>` — matcher middleware je pomija; profil `/firma/<slug>` działa
+- [ ] Do rozważenia: lista cech planu darmowego w `/cennik` nie wspomina WWW i social mediów, które darmowy profil ma (R2)
 - [ ] `Operator:` zmienić 307 aliasu na 308 po obserwacji na produkcji
 - [ ] `Operator:` sekcja o profilu i premium w `CLAUDE.md`:
   - `isPremiumActive` jako jedyne źródło prawdy,
