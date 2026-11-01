@@ -402,6 +402,24 @@ Odchylenia: #10 tylko częściowo (bez zmiany schematu `null` dalej usuwa ręczn
 
 Bramka: `npx tsc --noEmit` OK; `npx jest` 183 suite'y / 1979 testów; `npx next lint` 0 błędów. Build niewykonalny w worktree (brak `.env`) — krok operatora.
 
+## Stripe odłożony, premium ręczne (2026-11-01)
+
+**Decyzja usera:** płatności online odkładamy, premium sprzedawane ręcznie (przelew), popyt mały. Wybory: (1) kod Stripe uśpić, nie usuwać; (2) ręczne premium jako data w JSON; (3) CTA → formularz kontaktowy.
+
+Wykonanie (feature-builder-web-fullstack, status completed):
+- `src/lib/stripe-config.ts`: `resolveStripeConfig()` — wszystkie 5 `STRIPE_*` albo żadna (`StripePartialConfigError`, wołane na końcu `env.ts`, bo `@t3-oss/env` 0.12 nie waliduje pól łącznie). `stripe.ts`: `isStripeConfigured`, `STRIPE_KEY_MODE`, leniwy `getStripe()`.
+- Bez konfiguracji: webhook 404 (przed podpisem), `dziekujemy` `notFound()`, akcje `CHECKOUT_DISABLED`, `db:sync-subscriptions` odmawia.
+- `premium.activeUntil` → `service_profiles.manual_premium_until` (wyłączna północ `Europe/Warsaw` po tej dacie, `src/lib/manual-premium.ts` przez `Intl`, testy obu zmian czasu) + `promoted_services` z `GREATEST`; zapis w jednej transakcji (seed i `db:premium`, diff pokazuje datę). Brak `activeUntil` zeruje kolumnę (plik = źródło prawdy), promocji nie usuwa.
+- `hasActivePremium({ subscription, manualPremiumUntil }, now)` w `premium.ts`: widok, alias, `ALREADY_PREMIUM`.
+- CTA: serwer przekazuje `PremiumPurchase` (`checkout | contact`); formularz kontaktowy czyta `?topic=premium&firma=<slug>` przez `useSearchParams` w `<Suspense>` (strona zostaje statyczna); parser `src/lib/premium-contact.ts`.
+- `SKILL.md` (`/dodaj`) i `CLAUDE.md` zaktualizowane.
+
+Orkiestrator: `subscription-store.setPromotion(null)` nie usuwa rankingu, gdy wpis ma trwające premium ręczne (`NOT EXISTS … manual_premium_until > NOW()`) — ryzyko zgłoszone przez agenta na wypadek powrotu Stripe. `schema.ts` skrócony do 300 linii.
+
+Odchylenia/dług: `contact-form.tsx` 350 linii (było 342 przed zmianą — do refaktoru osobno); reguła `GREATEST` w dwóch adapterach (`subscription-store.ts`, `premium-content-store.ts`).
+
+Bramka: tsc OK; jest 189 suite'ów / 2056 testów; lint 0 błędów.
+
 ## Środowisko worktree
 
 - `node_modules`: własna instalacja (`npm ci`, 2026-10-31). Junction do głównego katalogu łamał Storybooka: webpack nie przetwarzał `.storybook/preview.ts` spoza ścieżki projektu. U8 może więc instalować `stripe` normalnie.

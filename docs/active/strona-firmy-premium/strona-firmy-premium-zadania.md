@@ -470,9 +470,36 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 ---
 
+## Decyzja 2026-11-01: Stripe odłożony, premium ręczne
+
+Płatności online odłożone (mały popyt). Kod Stripe uśpiony: `STRIPE_*` opcjonalne (wszystkie albo żadna). Premium włączane ręcznie po przelewie przez `premium.activeUntil` w JSON. „Przejdź na Premium” prowadzi do formularza kontaktowego. Szczegóły: plik kontekstu, sekcja „Stripe odłożony”.
+
+**Kroki operatora potrzebne TERAZ (wdrożenie bez Stripe):**
+
+- [ ] `Operator:` w Vercelu (Production + Preview) **brak wszystkich** pięciu `STRIPE_*` — częściowa konfiguracja zatrzymuje start aplikacji
+- [ ] `Operator:` `npx drizzle-kit push` (enum, `service_profiles` z `manual_premium_until`, `service_subscriptions`, `stripe_events`, indeks `service_locations`) na produkcji po przejrzeniu planu zmian; potwierdzić w `information_schema`
+- [ ] `Operator:` backfill slugów usług (U1) i `push` z `notNull`
+- [ ] `Operator:` `npm run build` z produkcyjnym `.env` przy zatrzymanym dev serverze
+- [ ] `Operator:` na Preview: profil `/firma/<slug>`, alias `curl` (niżej), przycisk „Przejdź na Premium” → `/kontakt?topic=premium&firma=<slug>` z wypełnionym tematem i wiadomością, `/cennik` → „Napisz do nas”; `/firma/<slug>/premium/dziekujemy` i `POST /api/stripe/webhook` → 404
+- [ ] `Operator:` bramka U3 — akceptacja wyglądu profilu free i 3 szablonów (Storybook)
+
+**Włączenie premium firmie (po przelewie):**
+1. weryfikacja właściciela (krok 1 w `.claude/skills/dodaj/SKILL.md`),
+2. w `data/services/<plik>.json`, w bloku `premium`: `"activeUntil": "RRRR-MM-DD"` (aktywne do końca tego dnia czasu polskiego),
+3. `npm run db:premium -- data/services/<plik>.json --dry-run` → sprawdzić diff z datą,
+4. `npm run db:premium -- data/services/<plik>.json`,
+5. zacommitować JSON (seed odtwarza datę po `db:reset`).
+Przedłużenie = nowa data i te same kroki. Wyłączenie przed czasem: usunąć `activeUntil` — widok i alias znikają od razu, ranking trwa do starej daty (skrócenie: ręcznie `promoted_services`).
+
+**Powrót do Stripe:** pięć `STRIPE_*` w Vercelu + redeploy + webhook w Stripe Dashboard, potem kroki oznaczone niżej jako Stripe. Kod bez zmian.
+
+---
+
 ## Po wdrożeniu
 
-- [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną
+> Kroki dotyczące Stripe (zmienne `STRIPE_*`, webhook, `stripe listen`, `CONFIG_MISMATCH`, Customer Portal, `rk_live_`, `db:sync-subscriptions`, Fakturownia, test checkoutu U9) są **odłożone do powrotu Stripe**.
+
+- [ ] `Operator:` **(Stripe, odłożone)** 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) — wszystkie albo żadna
 - [ ] `Operator:` lokalny test checkoutu wymaga `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (`success_url` budowany z tej zmiennej, inaczej powrót na produkcję)
 - [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 503 `CONFIG_MISMATCH` i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu. `stripe listen` **nie ponawia** zdarzeń: po poprawieniu bazy wyślij je ponownie przez `stripe events resend <evt_id>`
 - [ ] `Operator:` **nie rejestrować** testowego endpointu webhooka dla Preview — Preview ma nielokalną bazę, więc każde zdarzenie dostanie 503, Stripe wyśle maile o awarii i w końcu wyłączy endpoint. Testy checkoutu tylko lokalnie z `stripe listen`
