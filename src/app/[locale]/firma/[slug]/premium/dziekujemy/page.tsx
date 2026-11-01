@@ -25,6 +25,9 @@ import { submitPremiumMaterials } from '../../_actions';
 import { checkoutSessionIdSchema } from '../../_checkout-schema';
 import { PremiumMaterialsForm } from '../../_components/premium-materials-form/premium-materials-form';
 
+// Najgorszy render: Stripe 8 s × 2 (ponowienie) + limit 1,5 s — wzorem webhooka.
+export const maxDuration = 30;
+
 type PageProps = {
     params: Promise<{ locale: string; slug: string }>;
     searchParams: Promise<{ session_id?: string | string[] }>;

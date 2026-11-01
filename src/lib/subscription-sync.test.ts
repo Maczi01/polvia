@@ -476,6 +476,58 @@ describe('syncSubscriptionFromStripe', () => {
                 expect(sendMail).not.toHaveBeenCalled();
             });
 
+            it('stara odzyskuje platnosc po wyparciu: konflikt oplacony, wiersz nowej bez zmian, log', async () => {
+                mockDb.subscriptions.set(SERVICE_A, oldPastDue);
+                stripeReturns(stripeSubscription({ id: 'sub_new', status: 'active' }));
+                await syncSubscriptionFromStripe('sub_new', { serviceId: SERVICE_A });
+                const newRow = mockDb.subscriptions.get(SERVICE_A);
+                const newPromotion = mockDb.promotions.get(SERVICE_A);
+
+                // invoice.paid starej (past_due → active): zdarzenie inne niz checkout.
+                stripeReturns(
+                    stripeSubscription({
+                        id: 'sub_old',
+                        status: 'active',
+                        metadata: { serviceSlug: 'kancelaria-a' },
+                    }),
+                );
+                const result = await syncSubscriptionFromStripe('sub_old');
+
+                expect(result).toEqual({
+                    outcome: 'conflict',
+                    serviceId: SERVICE_A,
+                    activeSubscriptionId: 'sub_new',
+                    conflictingSubscriptionId: 'sub_old',
+                    isIncomingActive: true,
+                });
+                expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(newRow);
+                expect(mockDb.promotions.get(SERVICE_A)).toEqual(newPromotion);
+                expect(console.warn).toHaveBeenCalledWith(
+                    expect.stringContaining('second paid subscription'),
+                    {
+                        serviceId: SERVICE_A,
+                        activeSubscriptionId: 'sub_new',
+                        conflictingSubscriptionId: 'sub_old',
+                    },
+                );
+                expect(sendMail).not.toHaveBeenCalled();
+            });
+
+            it('konflikt z nieoplacona subskrypcja nie loguje podwojnej oplaty', async () => {
+                mockDb.subscriptions.set(SERVICE_A, storedActive(SERVICE_A, 'sub_new'));
+                stripeReturns(stripeSubscription({ id: 'sub_old', status: 'canceled' }));
+
+                const result = await syncSubscriptionFromStripe('sub_old', {
+                    serviceId: SERVICE_A,
+                });
+
+                expect(result).toMatchObject({ outcome: 'conflict', isIncomingActive: false });
+                expect(console.warn).not.toHaveBeenCalledWith(
+                    expect.stringContaining('second paid subscription'),
+                    expect.anything(),
+                );
+            });
+
             it('nieoplacona nowa (incomplete) nie wypiera past_due w karencji', async () => {
                 mockDb.subscriptions.set(SERVICE_A, oldPastDue);
                 stripeReturns(stripeSubscription({ id: 'sub_new', status: 'incomplete' }));

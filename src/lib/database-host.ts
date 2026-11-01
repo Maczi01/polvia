@@ -4,6 +4,10 @@
  * Wspolne dla bramek chroniacych zdalna (produkcyjna) baze: `db:drop` (kasowanie) oraz zapisu
  * stanu premium przy testowym kluczu Stripe (webhook, `db:sync-subscriptions`).
  * Bez `server-only` i bez zaleznosci — importuja go tez skrypty CLI z `src/db`.
+ *
+ * Ograniczenie: bramka chroni przed blednym `DATABASE_URL` (adres zdalnej bazy w zmiennej),
+ * NIE przed tunelem na localhost (`ssh -L`, `cloud-sql-proxy`) — zdalna baza wystawiona pod
+ * `localhost` jest stad nieodroznialna od lokalnego docker-compose.
  */
 
 const LOCAL_HOSTS: ReadonlySet<string> = new Set(['localhost', '127.0.0.1', '::1', '0.0.0.0']);

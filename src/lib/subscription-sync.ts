@@ -193,6 +193,24 @@ function isStaleAfterTerminal(
     return TERMINAL_STATUSES.has(stored.status) && !TERMINAL_STATUSES.has(record.status);
 }
 
+type SubscriptionConflict = Extract<SubscriptionSyncResult, { outcome: 'conflict' }>;
+
+/**
+ * Oplacona druga subskrypcja wpisu = podwojna oplata. Log tutaj, nie w webhooku: mail wychodzi
+ * tylko po checkoucie, a ten sam stan przychodzi tez z `subscription.*`, `invoice.*` i resyncu
+ * CLI. Same identyfikatory, bez danych klienta.
+ */
+function reportConflict(conflict: SubscriptionConflict): SubscriptionConflict {
+    if (conflict.isIncomingActive) {
+        console.warn('subscription sync: second paid subscription for a service', {
+            serviceId: conflict.serviceId,
+            activeSubscriptionId: conflict.activeSubscriptionId,
+            conflictingSubscriptionId: conflict.conflictingSubscriptionId,
+        });
+    }
+    return conflict;
+}
+
 /** Decyzja i zapis pod blokada wiersza uslugi. */
 async function applySubscriptionState(
     store: SubscriptionTransaction,
@@ -207,13 +225,13 @@ async function applySubscriptionState(
 
     const activeSubscriptionId = conflictingSubscriptionId(stored, record, now);
     if (activeSubscriptionId) {
-        return {
+        return reportConflict({
             outcome: 'conflict',
             serviceId,
             activeSubscriptionId,
             conflictingSubscriptionId: stripeSubscriptionId,
             isIncomingActive,
-        };
+        });
     }
 
     if (isStaleAfterTerminal(stored, record)) {

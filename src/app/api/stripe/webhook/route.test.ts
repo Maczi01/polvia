@@ -315,23 +315,44 @@ describe('POST /api/stripe/webhook — tryb konta (livemode)', () => {
 });
 
 describe('POST /api/stripe/webhook — klucz testowy a baza nielokalna', () => {
-    it('klucz testowy + baza produkcyjna: 200 bez synchronizacji, bez oznaczenia i bez adresu bazy w logu', async () => {
-        jest.spyOn(console, 'warn').mockImplementation(() => {});
+    it('klucz testowy + baza produkcyjna: 503 bez synchronizacji, bez oznaczenia i bez adresu bazy w logu', async () => {
         mockEnv.DATABASE_URL = REMOTE_DATABASE_URL;
 
         const response = await signed(CHECKOUT_COMPLETED);
 
-        expect(response.status).toBe(200);
-        expect(await response.json()).toEqual({ data: { received: true }, error: null });
+        expect(response.status).toBe(503);
+        expect(await response.json()).toEqual({
+            data: null,
+            error: { code: 'CONFIG_MISMATCH', message: expect.any(String) },
+        });
         expect(syncSubscriptionFromStripe).not.toHaveBeenCalled();
         expect(mockProcessedEvents.has('evt_checkout')).toBe(false);
         expect(sendMail).not.toHaveBeenCalled();
-        expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('non-local database'), {
+        expect(console.error).toHaveBeenCalledWith(expect.stringContaining('non-local database'), {
             eventId: 'evt_checkout',
         });
-        const logged = JSON.stringify(jest.mocked(console.warn).mock.calls);
+        const logged = JSON.stringify(jest.mocked(console.error).mock.calls);
         expect(logged).not.toContain('db.prod.example.com');
         expect(logged).not.toContain('secret');
+    });
+
+    it('zdarzenie live + klucz testowy + baza produkcyjna: 503 z bramki bazy, nie 200 z bramki livemode', async () => {
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
+        mockEnv.DATABASE_URL = REMOTE_DATABASE_URL;
+        const payload = event(
+            'evt_live_remote',
+            'customer.subscription.updated',
+            { id: 'sub_1', object: 'subscription' },
+            true,
+        );
+
+        const response = await signed(payload);
+
+        expect(response.status).toBe(503);
+        expect((await response.json()).error.code).toBe('CONFIG_MISMATCH');
+        expect(syncSubscriptionFromStripe).not.toHaveBeenCalled();
+        expect(mockProcessedEvents.has('evt_live_remote')).toBe(false);
+        expect(console.warn).not.toHaveBeenCalled();
     });
 
     it('klucz testowy + baza lokalna: synchronizuje', async () => {

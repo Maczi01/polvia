@@ -25,6 +25,7 @@ import {
 } from '@/lib/premium-checkout-queries';
 import { checkRateLimit, getClientIp, rateLimitSubject } from '@/lib/rate-limit';
 import { buildServiceProfilePath } from '@/lib/service-profile-path';
+import { STRIPE_LIVE_MODE } from '@/lib/stripe';
 
 import {
     invalidMaterialsFields,
@@ -46,6 +47,12 @@ const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 const CHECKOUT_PER_IP = 10;
 /** Formularz wysyla sie raz; zapas na poprawki po bledzie. */
 const MATERIALS_PER_IP = 5;
+
+/** Platnosc testowa (klucz `sk_test_`) — founder nie moze wziac maila za prawdziwy zakup. */
+function materialsMailSubject(serviceName: string): string {
+    const subject = `Premium: materialy od ${serviceName}`;
+    return STRIPE_LIVE_MODE ? subject : `[TEST] ${subject}`;
+}
 
 async function requestLocale(): Promise<Locale> {
     const locale = await getLocale();
@@ -163,7 +170,7 @@ export async function submitPremiumMaterials(
     const sent = await sendMail({
         to: getOperatorInbox(),
         replyTo: checkout.payer.email ?? undefined,
-        subject: `Premium: materialy od ${checkout.target.name}`,
+        subject: materialsMailSubject(checkout.target.name),
         text: buildMaterialsMailText(input.data, checkout.target, checkout.payer),
     });
     if (!sent.ok) return fail('SEND_FAILED');

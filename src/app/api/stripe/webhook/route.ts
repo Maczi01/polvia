@@ -9,10 +9,7 @@ import {
     notifyPremiumPurchased,
     notifySubscriptionConflict,
 } from '@/lib/subscription-notifications';
-import {
-    type SubscriptionSyncResult,
-    syncSubscriptionFromStripe,
-} from '@/lib/subscription-sync';
+import { type SubscriptionSyncResult, syncSubscriptionFromStripe } from '@/lib/subscription-sync';
 
 import { env } from '../../../../../env';
 
@@ -20,9 +17,9 @@ import { env } from '../../../../../env';
  * Webhook Stripe: utrzymuje w bazie stan subskrypcji premium (`service_subscriptions`)
  * i pozycje w rankingu (`promoted_services`).
  *
- * Kolejnosc: 1) podpis (400), 2) bramka trybu (klucz testowy + baza nielokalna albo
- * `livemode` zdarzenia niezgodny z kluczem → 200 bez synchronizacji i bez oznaczenia),
- * 3) dedupe `stripe_events` (duplikat → 200),
+ * Kolejnosc: 1) podpis (400), 2) bramki trybu bez synchronizacji i bez oznaczenia: klucz
+ * testowy + baza nielokalna → 503 (blad konfiguracji, Stripe ponowi), `livemode` zdarzenia
+ * niezgodny z kluczem → 200, 3) dedupe `stripe_events` (duplikat → 200),
  * 4) synchronizacja (blad → 500, Stripe ponowi), 5) oznaczenie zdarzenia, 6) skutki uboczne
  * (maile do foundera) tylko przy pierwszym dostarczeniu, z limitem czasu i bledem tylko w logu.
  *
@@ -108,12 +105,14 @@ export async function POST(request: Request): Promise<NextResponse> {
         if (!event) return jsonError('INVALID_SIGNATURE', 'Invalid Stripe signature', 400);
 
         // Klucz testowy przy bazie nielokalnej (np. lokalny `.env` z produkcyjnym `DATABASE_URL`
-        // + `stripe listen`): karta 4242 dalaby prawdziwemu wpisowi premium. Bez adresu bazy w logu.
+        // + `stripe listen`): karta 4242 dalaby prawdziwemu wpisowi premium. 503, nie 200: przy
+        // pomylce w zmiennych produkcji (klucz testowy + live `whsec`) Stripe ponawia zdarzenie
+        // do 3 dni, wiec po poprawce klucza stan sam sie odtworzy. Bez adresu bazy w logu.
         if (!STRIPE_LIVE_MODE && !isLocalDatabaseUrl(env.DATABASE_URL)) {
-            console.warn('Stripe webhook: test key with non-local database, event ignored', {
+            console.error('Stripe webhook: test key with non-local database, event rejected', {
                 eventId: event.id,
             });
-            return received();
+            return jsonError('CONFIG_MISMATCH', 'Webhook misconfigured', 503);
         }
 
         // Zdarzenie z drugiego trybu konta nie dotyka bazy. W praktyce lapie je juz podpis

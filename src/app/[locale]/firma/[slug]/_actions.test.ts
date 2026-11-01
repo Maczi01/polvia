@@ -15,6 +15,8 @@ import { startPremiumCheckout, submitPremiumMaterials } from './_actions';
 const mockCreate = jest.fn();
 const mockRetrieve = jest.fn();
 const mockTargets = new Map<string, PremiumCheckoutTarget>();
+/** Domyslnie klucz testowy (`sk_test_`), jak lokalnie i na Preview. */
+const mockKeyMode = { isLive: false };
 
 class MockRedirectSignal extends Error {
     constructor(readonly url: string) {
@@ -65,6 +67,9 @@ jest.mock('@/lib/stripe', () => ({
             },
         },
     },
+    get STRIPE_LIVE_MODE() {
+        return mockKeyMode.isLive;
+    },
 }));
 jest.mock('@/lib/premium-checkout-queries', () => ({
     getPremiumCheckoutTarget: async (serviceId: string) => mockTargets.get(serviceId) ?? null,
@@ -101,6 +106,7 @@ beforeEach(() => {
     mockCreate.mockReset();
     mockRetrieve.mockReset();
     mockTargets.clear();
+    mockKeyMode.isLive = false;
     mockTargets.set(SERVICE_ID, TARGET);
     mockTargets.set(OTHER_SERVICE_ID, { ...TARGET, serviceId: OTHER_SERVICE_ID, slug: 'inna' });
     jest.mocked(checkRateLimit).mockReset().mockResolvedValue({ allowed: true, remaining: 1 });
@@ -219,6 +225,25 @@ describe('submitPremiumMaterials', () => {
         expect(mail.text).toContain('Wymiana zamka — od 150 zł');
         expect(mail.text).toContain('Jan Kowalski');
         expect(mail.text).toContain(`ID wpisu: ${SERVICE_ID}`);
+    });
+
+    it('klucz testowy: temat maila z materialami oznaczony [TEST]', async () => {
+        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
+
+        await submitPremiumMaterials(null, form(valid));
+
+        const mail = jest.mocked(sendMail).mock.calls[0][0];
+        expect(mail.subject).toBe('[TEST] Premium: materialy od Mistrz Remontu');
+    });
+
+    it('klucz produkcyjny: temat maila z materialami bez oznaczenia [TEST]', async () => {
+        mockKeyMode.isLive = true;
+        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
+
+        await submitPremiumMaterials(null, form(valid));
+
+        const mail = jest.mocked(sendMail).mock.calls[0][0];
+        expect(mail.subject).toBe('Premium: materialy od Mistrz Remontu');
     });
 
     it('sesja nieoplacona: FORBIDDEN i brak maila', async () => {
