@@ -16,6 +16,7 @@ function service(name: string): PartialService {
         id: `id-${counter}`,
         serviceId: `service-${counter}`,
         slug: `slug-${counter}`,
+        serviceSlug: null,
         name,
         description: null,
         category: 'financial',

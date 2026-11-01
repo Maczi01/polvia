@@ -18,8 +18,16 @@ import { relations, sql } from 'drizzle-orm';
 
 import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
+import { SUBSCRIPTION_STATUSES } from '../lib/premium';
+import { PREMIUM_TEMPLATES } from '../lib/premium-templates';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
+import type { OpeningHours } from '../lib/weekdays';
+import type {
+    PremiumFaqItem,
+    PremiumGalleryItem,
+    PremiumPriceListItem,
+} from './premium-content-schema';
 
 export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
 
@@ -30,10 +38,24 @@ export const statusEnum = pgEnum('status', SERVICE_STATUS_VALUES);
 /** Zasieg obslugi — druga, ortogonalna os obok kategorii (branzy). Opis wartosci: `coverage.ts`. */
 export const coverageEnum = pgEnum('coverage', COVERAGE_VALUES);
 
+/** Szablon strony premium. Wartosci i ich opis: `src/lib/premium-templates.ts`. */
+export const profileTemplateEnum = pgEnum('profile_template', PREMIUM_TEMPLATES);
+
+/** Status subskrypcji Stripe. Wartosci: `SUBSCRIPTION_STATUSES` w `src/lib/premium.ts`. */
+export const subscriptionStatusEnum = pgEnum('subscription_status', SUBSCRIPTION_STATUSES);
+
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     name: varchar('name', { length: 255 }).notNull(),
+    // Adres profilu `/firma/<slug>`: unikalny i niezmienny (zmiana nazwy nie zmienia adresu).
+    // Regula: zawsze z `name` przez `createServiceSlugAllocator` (`service-slugs.ts`) —
+    // `buildServiceSlug(name)`, przy kolizji sufiks `-2`, `-3`… — w seedzie, backfillu
+    // i `db:add`. `slug` z `data/services/*.json` to tylko baza slugow lokalizacji.
+    // Format: `isValidServiceSlug` (`src/lib/service-slug-format.ts`), sprawdzany w middleware.
+    // Nullowalny tylko na czas wdrozenia: najpierw `push` z ta kolumna, potem
+    // `db:backfill-slugs`, a dopiero potem `.notNull()` w osobnym `push`.
+    slug: varchar('slug', { length: 255 }).unique(),
     category: categoryEnum('category').notNull(),
     coverage: coverageEnum('coverage').notNull().default('local'),
     status: statusEnum('status').notNull().default('active'),
@@ -64,7 +86,7 @@ export const serviceLocationsTable = pgTable('service_locations', {
     // (R9). Wiersz lokalizacji istnieje zawsze, bo niesie wymagany `slug` i `city`.
     latitude: doublePrecision('latitude'),
     longitude: doublePrecision('longitude'),
-    openingHours: jsonb('opening_hours').$type<Record<string, { open: string; close: string }>>().notNull(),
+    openingHours: jsonb('opening_hours').$type<OpeningHours>().notNull(),
     phoneNumber: varchar('phone_number', { length: 50 }),
     email: varchar('email', { length: 255 }),
     webpage: varchar('webpage', { length: 255 }),
@@ -93,6 +115,9 @@ export const serviceLocationsTable = pgTable('service_locations', {
     index('idx_location_longitude').on(table.longitude),
     index('idx_location_city').on(table.city),
     index('idx_location_voivodeship').on(table.voivodeship),
+    // Lokalizacje uslugi i jej glowne miasto (profil, „Podobne firmy”) — bez tego kazde
+    // zapytanie po `service_id` to skan calej tabeli.
+    index('idx_location_service_main').on(table.serviceId, table.isMainLocation),
 ]);
 
 export const serviceLocationsRelations = relations(serviceLocationsTable, ({ one }) => ({
@@ -116,6 +141,55 @@ export const promotedServicesRelations = relations(promotedServicesTable, ({ one
         references: [servicesTable.id],
     }),
 }));
+
+/**
+ * Tresc strony premium (1:1 z usluga), publikowana przez `db:premium` z bloku `premium`
+ * w `data/services/<plik>.json`. Niezalezna od stanu premium: po wygasnieciu zostaje
+ * i wraca po wznowieniu (R18). Teksty w jsonb maja wszystkie cztery jezyki; ksztalt
+ * pilnuje `premiumContentSchema` na zapisie i na odczycie. Premium reczne: `manual-premium.ts`.
+ */
+export const serviceProfilesTable = pgTable('service_profiles', {
+    serviceId: uuid('service_id')
+        .primaryKey()
+        .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    template: profileTemplateEnum('template').notNull(),
+    /** Sama nazwa pliku z `public/services/<slug-uslugi>/`. */
+    coverImage: varchar('cover_image', { length: 255 }),
+    gallery: jsonb('gallery').$type<PremiumGalleryItem[]>().notNull().default([]),
+    priceList: jsonb('price_list').$type<PremiumPriceListItem[]>().notNull().default([]),
+    faq: jsonb('faq').$type<PremiumFaqItem[]>().notNull().default([]),
+    manualPremiumUntil: timestamp('manual_premium_until', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+/**
+ * Stan subskrypcji premium (1:1 z usluga), odwzorowany ze Stripe przez webhook
+ * (`syncSubscriptionFromStripe`). Kolumny `status`/`currentPeriod*`/`cancelAtPeriodEnd`
+ * to wejscie `isPremiumActive` — premium liczone na odczycie, bez crona. Po `db:reset`
+ * stan odtwarza `npm run db:sync-subscriptions`.
+ */
+export const serviceSubscriptionsTable = pgTable('service_subscriptions', {
+    serviceId: uuid('service_id')
+        .primaryKey()
+        .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    stripeCustomerId: varchar('stripe_customer_id', { length: 255 }).notNull(),
+    stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }).notNull().unique(),
+    status: subscriptionStatusEnum('status').notNull(),
+    /** Od niego liczona karencja `past_due` (Stripe przesuwa okres przed nieudanym odnowieniem). */
+    currentPeriodStart: timestamp('current_period_start', { withTimezone: true }).notNull(),
+    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }).notNull(),
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+/** Przetworzone zdarzenia webhooka Stripe — deduplikacja ponowien (`id` = `event.id`). */
+export const stripeEventsTable = pgTable('stripe_events', {
+    id: varchar('id', { length: 255 }).primaryKey(),
+    type: varchar('type', { length: 255 }).notNull(),
+    processedAt: timestamp('processed_at', { withTimezone: true }).defaultNow().notNull(),
+});
 
 export const serviceEngagementsTable = pgTable('service_engagements', {
     id: uuid('id').defaultRandom().primaryKey(),

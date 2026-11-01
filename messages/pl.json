@@ -129,7 +129,10 @@
     "thanks": "Dziękujemy za wiadomość!",
     "success": "Otrzymaliśmy Twoją wiadomość. Postaramy się odpowiedzieć jak najszybciej.",
     "goBack": "Strona główna",
-    "sendAnother": "Wyślij kolejną wiadomość"
+    "sendAnother": "Wyślij kolejną wiadomość",
+    "premiumTopic": "Premium",
+    "premiumMessage": "Dzień dobry, chcę włączyć stronę premium dla firmy polvia.pl/firma/{slug}. Proszę o dane do przelewu.",
+    "premiumMessageNoService": "Dzień dobry, chcę włączyć stronę premium dla mojej firmy: (nazwa firmy). Proszę o dane do przelewu."
   },
   "MapCard": {
     "nowOpen": "Teraz otwarte",
@@ -156,7 +159,8 @@
     "emailCopied": "Mail skopiowany",
     "emailCopyFailed": "Nie udało się skopiować",
     "languages": "Mówimy:",
-    "coverage_online": "Online"
+    "coverage_online": "Online",
+    "viewProfile": "Zobacz profil"
   },
   "Calculator": {
     "monthlyIncome": "Miesięczny dochód",
@@ -454,11 +458,13 @@
     "list": "Szczegóły",
     "close": "Zamknij",
     "viewInList": "Zobacz na liście",
-    "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem"
+    "stackedHeader": "{count, plural, one {# firma} few {# firmy} many {# firm} other {# firmy}} pod tym adresem",
+    "viewProfile": "Zobacz profil"
   },
   "contact": {
     "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej.",
-    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później."
+    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później.",
+    "invalidInput": "Sprawdź adres e-mail, temat i treść wiadomości."
   },
   "images": {
     "logo": "Logo Polvia - katalog ukraińskich firm w Polsce",
@@ -538,23 +544,31 @@
     "simple": "Prosty cennik, bez ukrytych opłat. Możliwość anulowania w każdej chwili",
     "whatsIncluded": "Co zawiera",
     "recommended": "Polecany",
+    "billingLegend": "Okres rozliczenia",
     "monthly": "Miesięcznie",
-    "annual": "Rocznie (oszczędź 20%)",
+    "yearly": "Rocznie (oszczędź 54%)",
     "questions": "Pytania?",
     "contactSales": "Skontaktuj się z nami",
+    "manageSubscriptionPrompt": "Masz już stronę premium?",
+    "manageSubscription": "Zarządzaj subskrypcją",
+    "opensInNewTab": "(otwiera się w nowej karcie)",
     "plans": {
       "free": {
         "title": "Podstawowy",
         "subtitle": "Idealne dla nowych firm",
-        "price": "0 €",
-        "priceMonthly": "0 €",
-        "per": "/rok",
-        "perMonthly": "/miesiąc",
+        "price": {
+          "monthly": "0 zł",
+          "yearly": "0 zł"
+        },
+        "per": {
+          "monthly": "/miesiąc",
+          "yearly": "/rok"
+        },
         "cta": "Rozpocznij za darmo",
         "features": {
           "0": "Wizytówka na stronie - za darmo na zawsze",
           "1": "Lokalizacja na mapie i na liście",
-          "2": "Dane kontaktowe",
+          "2": "Dane kontaktowe, strona WWW i media społecznościowe",
           "3": "Opis działalności",
           "4": "Tagi",
           "5": "Pełna widoczność dla tysięcy użytkowników",
@@ -564,31 +578,33 @@
       "essentials": {
         "title": "Profesjonalny",
         "subtitle": "Dla rosnących firm",
-        "price": "69 €",
-        "priceMonthly": "19 €",
-        "per": "/rok",
-        "perMonthly": "/miesiąc",
-        "cta": "Wybierz Profesjonalny",
+        "price": {
+          "monthly": "9 zł",
+          "yearly": "49 zł"
+        },
+        "per": {
+          "monthly": "/miesiąc",
+          "yearly": "/rok"
+        },
+        "cta": "Znajdź swoją firmę",
+        "contactCta": "Napisz do nas",
+        "instruction": "Znajdź swoją firmę na mapie, otwórz jej profil i kliknij „To moja firma — ulepsz stronę”. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
+        "contactInstruction": "Napisz do nas z nazwą swojej firmy — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
         "features": {
-          "0": "Wszystko z planu Podstawowego",
-          "1": "Wyższa pozycja w wynikach wyszukiwania",
-          "2": "Szczegółowy opis usług",
-          "3": "Obecność na wyszukiwarce semantycznej",
-          "4": "Link do strony internetowej",
-          "5": "Profile w mediach społecznościowych",
-          "6": "Powitanie w mediach społecznościowych",
-          "7": "Możliwość dodania promocji",
-          "8": "Zwiększona widoczność w kategorii"
+          "basics": "Wszystko z planu Podstawowego",
+          "templates": "Wybór szablonu strony firmy",
+          "coverGallery": "Zdjęcie w nagłówku i galeria zdjęć",
+          "priceListFaq": "Cennik usług i odpowiedzi na częste pytania",
+          "noSimilar": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
+          "shortUrl": "Krótki adres polvia.pl/twoja-firma",
+          "higherPosition": "Wyższa pozycja na liście wyników i w kategorii"
         }
       },
       "team": {
         "title": "Przedsiębiorstwo",
         "subtitle": "Dla dużych firm i sieci",
-        "price": "Do ustalenia €",
-        "priceMonthly": "49 €",
-        "per": "/rok",
-        "perMonthly": "/miesiąc",
-        "cta": "Wybierz Przedsiębiorstwo",
+        "price": "Wycena indywidualna",
+        "cta": "Skontaktuj się z nami",
         "features": {
           "0": "Wszystko z planu Profesjonalnego",
           "1": "Priorytetowe pozycjonowanie",
@@ -603,7 +619,9 @@
     "mapHeading": "Nie znaleźliśmy tej strony",
     "mapDescription": "Adres, który otworzyłeś, nie odpowiada żadnej kategorii ani lokalizacji na mapie.",
     "backToMap": "Przejdź do mapy",
-    "backHome": "Strona główna"
+    "backHome": "Strona główna",
+    "profileHeading": "Nie znaleźliśmy tej firmy",
+    "profileDescription": "Profil, który otworzyłeś, nie istnieje albo został wyłączony. Poszukaj firmy na mapie."
   },
   "addBusiness": {
     "cta": {
@@ -823,6 +841,126 @@
       "review": "Wpis pojawi się w katalogu po weryfikacji przez nasz zespół. Jeśli będziemy mieć pytania, napiszemy na ten adres.",
       "correction": "Jeśli coś się nie zgadza, po prostu odpowiedz na tę wiadomość.",
       "signature": "Zespół Polvia"
+    }
+  },
+  "ServiceProfile": {
+    "logoAlt": "Logo firmy {name}",
+    "about": "O firmie",
+    "tags": "Specjalizacje",
+    "contact": "Kontakt",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "website": "Strona www",
+    "socials": "Media społecznościowe",
+    "call": "Zadzwoń",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "navigate": "Nawiguj",
+    "hours": "Godziny otwarcia",
+    "closed": "Zamknięte",
+    "address": "Adres",
+    "locations": "Lokalizacje",
+    "mainLocation": "Siedziba główna",
+    "showOnMap": "Pokaż na mapie",
+    "onlineOnly": "Firma obsługuje klientów wyłącznie zdalnie, bez punktu stacjonarnego.",
+    "languages": "Obsługa w językach",
+    "coverage": {
+      "online": "Online",
+      "hybrid": "Na miejscu i online"
+    },
+    "priceList": "Cennik usług",
+    "faq": "Najczęstsze pytania",
+    "gallery": "Galeria",
+    "galleryOpen": "Powiększ zdjęcie {index} z {total}: {alt}",
+    "galleryDialog": "Podgląd zdjęcia",
+    "galleryClose": "Zamknij podgląd",
+    "galleryPrevious": "Poprzednie zdjęcie",
+    "galleryNext": "Następne zdjęcie",
+    "galleryCounter": "{index} z {total}",
+    "similar": "Podobne firmy",
+    "upgrade": {
+      "eyebrow": "Dla właściciela",
+      "title": "To Twoja firma?",
+      "description": "Zamień ten profil w stronę firmową, którą chętnie podlinkujesz w bio i na wizytówce.",
+      "benefitPhotos": "Zdjęcie w nagłówku i galeria do {max} zdjęć",
+      "benefitPrices": "Cennik usług i odpowiedzi na częste pytania",
+      "benefitNoCompetitors": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
+      "cta": "To moja firma — ulepsz stronę",
+      "contactNote": "Napisz do nas — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy."
+    },
+    "checkout": {
+      "legend": "Okres rozliczenia",
+      "monthly": "Miesięcznie",
+      "yearly": "Rocznie",
+      "yearlySaving": "Najtaniej",
+      "pending": "Przekierowuję do płatności…",
+      "note": "Płatność obsługuje Stripe. Subskrypcję anulujesz w każdej chwili.",
+      "errors": {
+        "CHECKOUT_DISABLED": "Płatność online jest chwilowo niedostępna. Napisz do nas przez formularz kontaktowy.",
+        "BAD_INPUT": "Wybierz okres rozliczenia i spróbuj ponownie.",
+        "RATE_LIMITED": "Zbyt wiele prób. Spróbuj ponownie za godzinę.",
+        "NOT_FOUND": "Tej firmy nie ma już w katalogu.",
+        "ALREADY_PREMIUM": "Ta firma ma już aktywną stronę premium.",
+        "CHECKOUT_FAILED": "Nie udało się otworzyć płatności. Spróbuj ponownie za chwilę."
+      }
+    },
+    "premiumThanks": {
+      "metaTitle": "Dziękujemy za zakup premium",
+      "title": "Dziękujemy! Płatność przyjęta",
+      "activation": "Strona premium włączy się w ciągu kilku minut — gdy tylko potwierdzimy subskrypcję.",
+      "photos": "Zdjęcia (logo, okładkę i do {max} zdjęć do galerii) wyślij mailem na <mail>{email}</mail>, w temacie podając nazwę firmy.",
+      "portal": "Faktury i subskrypcję znajdziesz w portalu klienta.",
+      "portalLink": "Otwórz portal klienta",
+      "backToProfile": "Wróć do profilu firmy",
+      "invalidTitle": "Nie możemy potwierdzić płatności",
+      "invalidDescription": "Ten link nie dotyczy opłaconej subskrypcji tej firmy albo płatność jeszcze trwa. Jeśli płacisz przed chwilą, odśwież stronę za minutę.",
+      "unavailableTitle": "Nie możemy teraz potwierdzić płatności",
+      "unavailableDescription": "Chwilowo nie udało się sprawdzić płatności. Jeśli właśnie zapłaciłeś, nic nie musisz powtarzać — odśwież stronę za chwilę.",
+      "refresh": "Odśwież stronę"
+    },
+    "materials": {
+      "title": "Materiały do strony premium",
+      "description": "Napisz, co ma się znaleźć na stronie. Przygotujemy ją i damy znać mailem, gdy będzie gotowa.",
+      "templateLegend": "Szablon strony",
+      "templates": {
+        "gallery": "Galeria — na pierwszym planie zdjęcia",
+        "professional": "Profesjonalny — na pierwszym planie cennik i FAQ",
+        "classic": "Klasyczny — opis firmy i dane kontaktowe"
+      },
+      "optional": "(opcjonalnie)",
+      "priceList": "Cennik usług",
+      "priceListHint": "Jedna usługa w linii, np. „Wymiana zamka — od 150 zł”.",
+      "faq": "Najczęstsze pytania",
+      "faqHint": "Pytanie i odpowiedź, np. „Czy dojeżdżacie? — Tak, w całej Warszawie.”",
+      "notes": "Uwagi",
+      "notesHint": "Wszystko, co jeszcze chcesz nam przekazać.",
+      "submit": "Wyślij materiały",
+      "pending": "Wysyłam…",
+      "success": "Dziękujemy! Materiały dotarły — odezwiemy się mailem.",
+      "errors": {
+        "CHECKOUT_DISABLED": "Płatność online jest wyłączona — materiały wyślij przez formularz kontaktowy.",
+        "BAD_INPUT": "Popraw zaznaczone pola.",
+        "RATE_LIMITED": "Zbyt wiele prób. Spróbuj ponownie za godzinę.",
+        "FORBIDDEN": "Nie możemy potwierdzić płatności dla tej firmy.",
+        "VERIFY_FAILED": "Nie udało się sprawdzić płatności. Spróbuj ponownie za chwilę.",
+        "SEND_FAILED": "Nie udało się wysłać materiałów. Spróbuj ponownie za chwilę.",
+        "templateRequired": "Wybierz szablon strony.",
+        "tooLong": "Maksymalnie {max} znaków."
+      }
+    },
+    "days": {
+      "monday": "Poniedziałek",
+      "tuesday": "Wtorek",
+      "wednesday": "Środa",
+      "thursday": "Czwartek",
+      "friday": "Piątek",
+      "saturday": "Sobota",
+      "sunday": "Niedziela"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
+      "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
+      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia."
     }
   }
 }

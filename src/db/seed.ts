@@ -1,4 +1,7 @@
+import path from 'node:path';
+
 import slugify from 'slugify';
+
 import { db } from '../db';
 import {
     servicesTable,
@@ -8,6 +11,9 @@ import {
     tagsTranslationsTable,
     servicesTagsTable
 } from '../db/schema';
+import { createPremiumContentStore } from './premium-content-store';
+import { createServiceSlugAllocator } from './service-slugs';
+import { publishPremiumEntries } from './upsert-premium-content';
 
 async function mainSeed() {
     console.log('🚀 Rozpoczynam wielki seed danych z Tagami (36 marek)...');
@@ -142,6 +148,13 @@ async function mainSeed() {
         tagMap[t.key] = tag.id;
     }
 
+    // Slug uslugi (`/firma/<slug>`) liczony ta sama regula co `db:backfill-slugs`
+    // (nazwa + sufiks przy kolizji), NIE z `data.slug` — ten zostaje baza slugow
+    // lokalizacji. Dzieki temu po `db:reset` adresy profili zgadzaja sie z produkcja.
+    // Wyjatek: duplikaty nazw wstawione tu w innej kolejnosci niz `createdAt` na
+    // produkcji dostana zamienione sufiksy (`nazwa` <-> `nazwa-2`).
+    const allocateServiceSlug = createServiceSlugAllocator();
+
     // --- HELPER: SEEDER FUNCTION ---
     // To keep this readable and handle tags easily
     async function seedService(data: {
@@ -158,6 +171,7 @@ async function mainSeed() {
     }) {
         const [service] = await db.insert(servicesTable).values({
             name: data.name,
+            slug: allocateServiceSlug(data.name),
             category: data.category,
             coverage: data.coverage ?? 'local',
             image: data.image,
@@ -3564,6 +3578,21 @@ async function mainSeed() {
             },
         ],
     });
+
+    // --- TRESC PREMIUM ---
+    // Zrodlem jest blok `premium` w data/services/*.json (ten sam co `db:premium`),
+    // wiec `db:reset` odtwarza opublikowana tresc. Stan subskrypcji odtwarza osobny resync.
+    const premium = await publishPremiumEntries(createPremiumContentStore(db), {
+        dataDir: path.join(process.cwd(), 'data', 'services'),
+        publicDir: path.join(process.cwd(), 'public'),
+    });
+    for (const slug of premium.published) console.log(`Premium: /firma/${slug}`);
+    for (const { file, reason } of premium.skipped) {
+        console.warn(`UWAGA: tresc premium z ${file} pominieta — ${reason}`);
+    }
+    for (const { file, message } of premium.warnings) {
+        console.warn(`UWAGA: ${file}: ${message}`);
+    }
 
     console.log('✅ Seed zakończony z tagami!');
 }

@@ -22,6 +22,7 @@ function service(overrides: Partial<PartialService> = {}): PartialService {
         id: `id-${counter}`,
         serviceId: `service-${counter}`,
         slug: `slug-${counter}`,
+        serviceSlug: null,
         name: `Usluga ${counter}`,
         description: null,
         category: 'financial',

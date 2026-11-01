@@ -129,7 +129,10 @@
     "thanks": "Thank you for your message!",
     "success": "We have received your inquiry and will respond shortly.",
     "goBack": "Back to main page",
-    "sendAnother": "Send another message"
+    "sendAnother": "Send another message",
+    "premiumTopic": "Premium",
+    "premiumMessage": "Hello, I would like to activate the premium page for polvia.pl/firma/{slug}. Please send me the bank transfer details.",
+    "premiumMessageNoService": "Hello, I would like to activate the premium page for my business: (business name). Please send me the bank transfer details."
   },
   "MapCard": {
     "nowOpen": "Now open",
@@ -156,7 +159,8 @@
     "emailCopied": "Email copied",
     "emailCopyFailed": "Could not copy",
     "languages": "We speak:",
-    "coverage_online": "Online"
+    "coverage_online": "Online",
+    "viewProfile": "View profile"
   },
   "Calculator": {
     "monthlyIncome": "Monthly income",
@@ -454,11 +458,13 @@
     "list": "Details",
     "close": "Close",
     "viewInList": "View in list",
-    "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address"
+    "stackedHeader": "{count, plural, one {# business} other {# businesses}} at this address",
+    "viewProfile": "View profile"
   },
   "contact": {
     "rateLimitExceeded": "Message limit exceeded. Please try again later.",
-    "sendFailed": "We could not send your message. Please try again later."
+    "sendFailed": "We could not send your message. Please try again later.",
+    "invalidInput": "Please check your email address, topic and message."
   },
   "images": {
     "logo": "Polvia - Ukrainian Business Directory Poland",
@@ -538,23 +544,31 @@
     "simple": "Simple pricing, no hidden fees",
     "whatsIncluded": "What's included",
     "recommended": "Recommended",
+    "billingLegend": "Billing period",
     "monthly": "Monthly",
-    "annual": "Annual (save 20%)",
+    "yearly": "Annual (save 54%)",
     "questions": "Questions?",
     "contactSales": "Contact sales",
+    "manageSubscriptionPrompt": "Already have a premium page?",
+    "manageSubscription": "Manage subscription",
+    "opensInNewTab": "(opens in a new tab)",
     "plans": {
       "free": {
         "title": "Free",
         "subtitle": "Simple plan",
-        "price": "Free",
-        "priceMonthly": "Free",
-        "per": "forever",
-        "perMonthly": "forever",
+        "price": {
+          "monthly": "Free",
+          "yearly": "Free"
+        },
+        "per": {
+          "monthly": "forever",
+          "yearly": "forever"
+        },
         "cta": "Get started",
         "features": {
           "0": "Free business listing - free forever",
           "1": "Position on map and in list",
-          "2": "Contact details",
+          "2": "Contact details, website and social media",
           "3": "Bussiness description",
           "4": "Tags",
           "5": "Full visibility for thousands of users",
@@ -563,34 +577,36 @@
       },
       "essentials": {
         "title": "Essentials",
-        "subtitle": "Monthly billing",
-        "price": "$60",
-        "priceMonthly": "$6",
-        "per": "/year",
-        "perMonthly": "/month",
-        "cta": "Start 14-day free trial",
+        "subtitle": "For growing businesses",
+        "price": {
+          "monthly": "PLN 9",
+          "yearly": "PLN 49"
+        },
+        "per": {
+          "monthly": "/month",
+          "yearly": "/year"
+        },
+        "cta": "Find your business",
+        "contactCta": "Write to us",
+        "instruction": "Find your business on the map, open its profile and click “This is my business — upgrade the page”. Not listed yet? Add your business for free first.",
+        "contactInstruction": "Write to us with your business name — once the bank transfer is paid, we activate your premium page within 1 business day. Not in the directory yet? Add your business for free first.",
         "features": {
-          "0": "Everything from the **Basic Plan**",
-          "1": "Higher position in search results",
-          "2": "Detailed description of services",
-          "3": "Presence on the semantic search engine",
-          "4": "Link to the website",
-          "5": "Social media profiles",
-          "6": "Social media welcome/greeting",
-          "7": "Ability to add promotions",
-          "8": "Increased visibility in the category"
+          "basics": "Everything from the Free plan",
+          "templates": "Choice of a page template",
+          "coverGallery": "Header photo and photo gallery",
+          "priceListFaq": "Service price list and answers to frequent questions",
+          "noSimilar": "No “Similar businesses” section — we do not promote competitors",
+          "shortUrl": "Short address polvia.pl/your-business",
+          "higherPosition": "Higher position in the results and in your category"
         }
       },
       "team": {
         "title": "Team",
         "subtitle": "Monthly billing",
-        "price": "$120",
-        "priceMonthly": "$12",
-        "per": "/year",
-        "perMonthly": "/month",
-        "cta": "Start 14-day free trial",
+        "price": "Custom pricing",
+        "cta": "Contact us",
         "features": {
-          "0": "Everything from the **Professional Plan**",
+          "0": "Everything from the Professional plan",
           "1": "Priority positioning",
           "2": "Newsletter presence",
           "3": "Priority technical support",
@@ -603,7 +619,9 @@
     "mapHeading": "We could not find this page",
     "mapDescription": "The address you opened does not match any category or location on the map.",
     "backToMap": "Go to the map",
-    "backHome": "Home page"
+    "backHome": "Home page",
+    "profileHeading": "We could not find this business",
+    "profileDescription": "The profile you opened does not exist or has been disabled. Look for the business on the map."
   },
   "addBusiness": {
     "cta": {
@@ -823,6 +841,126 @@
       "review": "The listing will appear in the directory after our team has reviewed it. If we have any questions, we will write to this address.",
       "correction": "If anything is incorrect, simply reply to this message.",
       "signature": "The Polvia team"
+    }
+  },
+  "ServiceProfile": {
+    "logoAlt": "{name} logo",
+    "about": "About",
+    "tags": "Specialties",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "website": "Website",
+    "socials": "Social media",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "navigate": "Directions",
+    "hours": "Opening hours",
+    "closed": "Closed",
+    "address": "Address",
+    "locations": "Locations",
+    "mainLocation": "Main office",
+    "showOnMap": "Show on map",
+    "onlineOnly": "This business serves clients remotely only, with no physical location.",
+    "languages": "Languages spoken",
+    "coverage": {
+      "online": "Online",
+      "hybrid": "On-site and online"
+    },
+    "priceList": "Price list",
+    "faq": "Frequently asked questions",
+    "gallery": "Gallery",
+    "galleryOpen": "Enlarge photo {index} of {total}: {alt}",
+    "galleryDialog": "Photo preview",
+    "galleryClose": "Close preview",
+    "galleryPrevious": "Previous photo",
+    "galleryNext": "Next photo",
+    "galleryCounter": "{index} of {total}",
+    "similar": "Similar businesses",
+    "upgrade": {
+      "eyebrow": "For the owner",
+      "title": "Is this your business?",
+      "description": "Turn this profile into a business page you will be proud to link in your bio and on your business card.",
+      "benefitPhotos": "Header photo and a gallery of up to {max} photos",
+      "benefitPrices": "Price list and answers to common questions",
+      "benefitNoCompetitors": "No “Similar businesses” section — we do not promote competitors",
+      "cta": "This is my business — upgrade the page",
+      "contactNote": "Write to us — once the bank transfer is paid, we activate your premium page within 1 business day."
+    },
+    "checkout": {
+      "legend": "Billing period",
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "yearlySaving": "Best value",
+      "pending": "Redirecting to payment…",
+      "note": "Payments are handled by Stripe. Cancel your subscription at any time.",
+      "errors": {
+        "CHECKOUT_DISABLED": "Online payment is currently unavailable. Please write to us via the contact form.",
+        "BAD_INPUT": "Choose a billing period and try again.",
+        "RATE_LIMITED": "Too many attempts. Try again in an hour.",
+        "NOT_FOUND": "This business is no longer listed in the directory.",
+        "ALREADY_PREMIUM": "This business already has an active premium page.",
+        "CHECKOUT_FAILED": "We could not open the payment page. Try again in a moment."
+      }
+    },
+    "premiumThanks": {
+      "metaTitle": "Thank you for buying premium",
+      "title": "Thank you! Payment received",
+      "activation": "Your premium page will switch on within a few minutes — as soon as we confirm the subscription.",
+      "photos": "Send photos (logo, cover and up to {max} gallery photos) by email to <mail>{email}</mail>, with your business name in the subject.",
+      "portal": "Invoices and your subscription are in the customer portal.",
+      "portalLink": "Open the customer portal",
+      "backToProfile": "Back to the business profile",
+      "invalidTitle": "We cannot confirm the payment",
+      "invalidDescription": "This link does not belong to a paid subscription for this business, or the payment is still being processed. If you have just paid, refresh the page in a minute.",
+      "unavailableTitle": "We can't confirm the payment right now",
+      "unavailableDescription": "We couldn't check the payment at the moment. If you have just paid, there is nothing to repeat — refresh the page in a moment.",
+      "refresh": "Refresh the page"
+    },
+    "materials": {
+      "title": "Materials for your premium page",
+      "description": "Tell us what should be on the page. We will prepare it and email you when it is ready.",
+      "templateLegend": "Page template",
+      "templates": {
+        "gallery": "Gallery — photos first",
+        "professional": "Professional — price list and FAQ first",
+        "classic": "Classic — business description and contact details"
+      },
+      "optional": "(optional)",
+      "priceList": "Price list",
+      "priceListHint": "One service per line, e.g. “Lock replacement — from PLN 150”.",
+      "faq": "Frequently asked questions",
+      "faqHint": "Question and answer, e.g. “Do you travel to clients? — Yes, across Warsaw.”",
+      "notes": "Notes",
+      "notesHint": "Anything else you would like to tell us.",
+      "submit": "Send materials",
+      "pending": "Sending…",
+      "success": "Thank you! We have received your materials and will get back to you by email.",
+      "errors": {
+        "CHECKOUT_DISABLED": "Online payment is turned off — please send your materials via the contact form.",
+        "BAD_INPUT": "Please correct the highlighted fields.",
+        "RATE_LIMITED": "Too many attempts. Try again in an hour.",
+        "FORBIDDEN": "We cannot confirm a payment for this business.",
+        "VERIFY_FAILED": "We could not check the payment. Try again in a moment.",
+        "SEND_FAILED": "We could not send your materials. Try again in a moment.",
+        "templateRequired": "Choose a page template.",
+        "tooLong": "At most {max} characters."
+      }
+    },
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "meta": {
+      "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
+      "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory.",
+      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory."
     }
   }
 }

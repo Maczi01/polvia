@@ -183,6 +183,91 @@ Zglos userowi: id wpisu, slugi, URL do sprawdzenia, tagi utworzone jako nowe.
 Plik `data/services/<slug>.json` zostaje w repo jako slad tego, co poszlo do bazy.
 **Nie commituj go, dopoki user o to nie poprosi.**
 
+## Wpis premium
+
+Tresc strony premium (szablon, cover, galeria, cennik, FAQ) to blok `premium` w **tym samym**
+pliku `data/services/<plik>.json`, co wpis. Model jest concierge (R17): firma nie ma panelu,
+founder publikuje tresc za nia. Wpis musi juz istniec w bazie (`db:add`). Tresc przetrwa
+`db:reset` (seed czyta bloki `premium`) i zostaje w bazie po wygasnieciu subskrypcji.
+
+Po kolei:
+
+1. **Weryfikacja, ze placi wlasciciel.** Porownaj dane z platnosci (Stripe albo przelew: e-mail, NIP z faktury)
+   z danymi wpisu: domena e-maila = domena `webpage`, NIP = `nip` wpisu, albo potwierdzenie
+   z kontaktu podanego we wpisie (telefon, e-mail ze strony firmy). Brak zgodnosci = **stop**:
+   nie publikuj, zglos userowi do zwrotu platnosci. Nie publikuj na podstawie domyslu.
+   **Blok `premium` dopisuj do JSON-a dopiero po tej weryfikacji** — seed (`db:reset`)
+   publikuje kazdy blok `premium` z `data/services/` bez pytania, takze szkic niezweryfikowanej
+   firmy.
+2. **Zdjecia do `public/services/<slug-uslugi>/`**, gdzie `<slug-uslugi>` to adres profilu
+   `/firma/<slug-uslugi>` (wypisuje go dry run). W JSON-ie podawaj **sama nazwe pliku**
+   (`cover.jpg`), bez sciezki — schemat odrzuca `/` i `..`. Formaty: jpg, png, webp, avif.
+   Nazwa w JSON-ie musi zgadzac sie z plikiem **co do wielkosci liter** (`Cover.JPG` przy
+   `cover.jpg` to brak pliku — Vercel rozroznia wielkosc liter, Windows nie). Pliki galerii
+   nie moga sie powtarzac. Galeria: najwyzej `PREMIUM_GALLERY_MAX` (15) zdjec. Brak pliku
+   przerywa publikacje z lista brakujacych — strona nigdy nie dostaje martwego obrazka.
+   **Katalog zalezy od slugu uslugi w bazie, nie od nazwy pliku JSON.** Slug z sufiksem
+   (`salon-roza-2`, przy duplikacie nazwy) moze sie zmienic po `db:reset`, jesli zmieni sie
+   kolejnosc wpisow w seedzie — wtedy seed przerwie sie na `IMAGES_MISSING`. Przed
+   `db:reset` sprawdz, czy slugi uslug premium sie nie zmienia (albo przenies katalog).
+3. **Blok `premium` w JSON-ie**, kazdy tekst w czterech jezykach (`pl`, `uk`, `en`, `ru`):
+
+   ```json
+   "premium": {
+     "template": "gallery",
+     "coverImage": "cover.jpg",
+     "gallery": [{ "file": "wnetrze.jpg", "alt": { "pl": "…", "uk": "…", "en": "…", "ru": "…" } }],
+     "priceList": [{ "name": { "pl": "…", … }, "price": { "pl": "od 80 zl", … }, "note": { … } }],
+     "faq": [{ "q": { "pl": "…", … }, "a": { "pl": "…", … } }]
+   }
+   ```
+
+   `template`: `gallery` | `professional` | `classic`. `coverImage`, `gallery`, `priceList`,
+   `faq` i `note` sa opcjonalne. Ceny to tekst od firmy — nie wymyslaj ich ani nie przeliczaj.
+   Limity: cennik najwyzej `PREMIUM_PRICE_LIST_MAX` (30) pozycji, FAQ najwyzej
+   `PREMIUM_FAQ_MAX` (20) pytan. Nazwy w cenniku i pytania FAQ nie moga sie powtarzac w
+   zadnym jezyku.
+4. **Dry run i STOP:**
+
+   ```bash
+   npm run db:premium -- data/services/<plik>.json --dry-run
+   ```
+
+   Pokazuje profil, ktorego dotyczy tresc, i diff wzgledem bazy (`+` nowe, `-` usuniete, `~`
+   zmienione). Pokaz userowi wyjscie i caly blok `premium`. **Czekaj na wyrazne OK.**
+5. **Publikacja** po OK:
+
+   ```bash
+   npm run db:premium -- data/services/<plik>.json
+   ```
+
+   Upsert jest idempotentny — poprawki w JSON-ie publikujesz ta sama komenda. Zdjecia w
+   `public/` trafiaja na produkcje dopiero z deployem: zglos userowi, ze trzeba je zacommitowac.
+
+Strona pokazuje szablon premium tylko przy aktywnym premium: subskrypcji Stripe **albo**
+premium recznym (`activeUntil`). Sama tresc w bazie niczego nie wlacza.
+
+### Premium reczne (przelew) — `premium.activeUntil`
+
+Platnosci online sa wylaczone, dopoki w Vercelu nie ma zmiennych `STRIPE_*`; wtedy „Przejdz na
+Premium” prowadzi do formularza kontaktowego (temat „Premium”, slug firmy w wiadomosci).
+
+- **Kiedy ustawiac:** dopiero po otrzymaniu przelewu (i weryfikacji wlasciciela z kroku 1 —
+  dane z przelewu zamiast danych ze Stripe). Nie ustawiaj „na zapas” przed wplata.
+- **Format:** `"activeUntil": "2026-11-30"` w bloku `premium` — ostatni dzien premium,
+  **wlacznie**, w strefie Europe/Warsaw (wygasa o polnocy czasu polskiego po tym dniu, samo,
+  bez crona). Data musi istniec w kalendarzu (`2026-02-30` odrzuci walidacja).
+- **Publikacja:** ten sam dry run i `npm run db:premium -- data/services/<plik>.json`. Diff
+  pokazuje zmiane daty (`~ premium reczne: … -> …`). Zapis ustawia
+  `service_profiles.manual_premium_until` i podbija ranking (`promoted_services`) do konca tej
+  daty — dluzszej istniejacej daty rankingu nie skraca.
+- **Przedluzenie:** nowa data w JSON-ie + ponownie `db:premium` (dry run, OK, zapis).
+- **Wylaczenie przed czasem:** usun `activeUntil` i opublikuj — widok premium i alias znikna od
+  razu, ale pozycja w rankingu zostaje do starej daty (zapis nigdy nie usuwa promocji). Skrocenie
+  rankingu to reczna zmiana `promoted_services` przez operatora.
+- Seed (`db:reset`) odtwarza date z JSON-a, wiec **plik jest zrodlem prawdy** — data wpisana
+  tylko w bazie zniknie.
+
 ## Czego nie robic
 
 - Nie uzywaj `npm run db:reset` — kasuje cala baze. Runner dopisuje wpis do dzialajacej bazy.

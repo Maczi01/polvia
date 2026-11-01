@@ -4,8 +4,10 @@ import { z } from 'zod';
 import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
+import { isValidServiceSlug } from '../lib/service-slug-format';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 import { WEEKDAY_KEYS } from '../lib/weekdays';
+import { premiumContentSchema } from './premium-content-schema';
 
 /**
  * Czysta warstwa walidacji opisu wpisu katalogowego (plik JSON z `data/services/`).
@@ -110,10 +112,18 @@ export type LocationInput = z.infer<typeof locationInputSchema>;
 export const serviceInputSchema = z
     .object({
         name: z.string().min(1).max(255),
-        /** Baza slugu lokalizacji. Domyslnie wyliczana z `name` przez `buildServiceSlug`. */
+        /**
+         * Baza slugow lokalizacji (`<slug>-<miasto>`). NIE jest slugiem uslugi: adres
+         * `/firma/<slug>` liczy sie zawsze z `name` (`createServiceSlugAllocator`), tak samo
+         * w `db:add`, seedzie i backfillu. Domyslnie `buildServiceSlug(name)`.
+         * Format ten sam co slug uslugi, bo slug lokalizacji to ta sama gramatyka.
+         */
         slug: z
             .string()
-            .regex(/^[a-z0-9-]+$/, 'Slug: male litery, cyfry i mysniki')
+            .refine(
+                isValidServiceSlug,
+                'Slug: male litery i cyfry, grupy laczone pojedynczym myslnikiem, max 255 znakow',
+            )
             .optional(),
         category: z.enum(CATEGORY_VALUES),
         coverage: z.enum(COVERAGE_VALUES).default('local'),
@@ -134,6 +144,11 @@ export const serviceInputSchema = z
         locations: z
             .array(locationInputSchema)
             .min(1, 'Wpis potrzebuje co najmniej jednej lokalizacji'),
+        /**
+         * Tresc strony premium. `db:add` jej nie zapisuje — publikuje ja `db:premium`
+         * (i seed), dopiero gdy founder potwierdzi, ze placi wlasciciel wpisu (R17).
+         */
+        premium: premiumContentSchema.optional(),
     })
     .strict()
     .superRefine((input, ctx) => {
@@ -160,6 +175,17 @@ export const serviceInputSchema = z
                 code: z.ZodIssueCode.custom,
                 path: ['locations'],
                 message: 'Zasieg "online" dopuszcza jedna lokalizacje — dla kilku uzyj "hybrid"',
+            });
+        }
+
+        // Nazwa bez znakow [a-z0-9] (np. same emoji) dalaby pusta baze slugow lokalizacji
+        // (`-warszawa`). Slug uslugi i tak dostanie wtedy zastepczy `firma`, ale baze trzeba podac.
+        if (input.slug === undefined && buildServiceSlug(input.name) === '') {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['slug'],
+                message:
+                    'Z nazwy nie da sie wyliczyc bazy slugow lokalizacji — podaj "slug" w JSON',
             });
         }
 

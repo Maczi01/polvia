@@ -2,12 +2,12 @@
 
 import { Clock, Globe, type LucideIcon, Mail, MapPin, Phone } from 'lucide-react';
 import Image from 'next/image';
-import { hasLocale, useLocale, useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { JSX, ReactNode } from 'react';
 
 import { Badge } from '@/components/ui/badge/badge';
 import { Card } from '@/components/ui/card';
-import { type Locale, locales } from '@/i18n/config';
+import { type Locale, toLocale } from '@/i18n/config';
 import type { FactField } from '@/lib/add-business/draft-schema';
 import type { BusinessPreview, DraftPin } from '@/lib/add-business/types';
 import { CATEGORY_DEFINITIONS } from '@/lib/categories';
@@ -98,7 +98,7 @@ export function BusinessCardPreview(props: BusinessCardPreviewProps): JSX.Elemen
     const tCard = useTranslations('MapCard');
     const locale = useLocale();
     // Locale TRESCI (opisy, tagi), nie jezyk obslugi — `be` nie ma wersji katalogu.
-    const contentLocale: Locale = hasLocale(locales, locale) ? locale : 'pl';
+    const contentLocale: Locale = toLocale(locale);
 
     const isPending = (...fields: FactField[]): boolean =>
         fields.some(field => unconfirmed.includes(field));

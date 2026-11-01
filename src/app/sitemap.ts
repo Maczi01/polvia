@@ -1,9 +1,18 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
 import { addBusinessUrl } from '@/app/[locale]/(header)/add-business/add-business-urls';
+import { locales } from '@/i18n/config';
 import { getPosts } from '@/lib/posts';
+import { buildServiceProfilePath } from '@/lib/service-profile-path';
+import { getServiceProfileSitemapEntries } from '@/lib/service-profile-queries';
 import { CATEGORY_SLUGS, COUNTY_SLUGS, COVERAGE_ONLINE_SLUG } from '@/lib/slug-mappings';
 import { env } from '../../env';
+
+/**
+ * Profile firm przybywaja przez `db:add` bez deployu, wiec sitemapa odswieza sie co
+ * godzine (ISR) zamiast zostawac zamrozona na stanie z buildu.
+ */
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;
@@ -214,7 +223,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     // -------------------------------------------------------
-    // 7. Łączymy wszystko
+    // 7. Profile firm — /firma/{slug} w 4 locale (opisy istnieja w 4 jezykach)
+    // Tylko aktywne wpisy ze slugiem — filtr siedzi w zapytaniu.
+    //
+    // Blad bazy leci wyzej, NIE jest polykany: pusty wynik zostalby zapisany w ISR
+    // i przez `revalidate` (1 h) sitemapa nie mialaby ani jednego profilu. Rzucony blad
+    // przy rewalidacji zostawia poprzednia, pelna wersje i ponawia przy kolejnym zadaniu.
+    // Koszt: przy awarii bazy w trakcie builda build sie nie uda.
+    //
+    // `generateSitemaps` niepotrzebne przy obecnej skali: limit to 50 tys. URL na plik,
+    // a kazdy profil to 4 adresy — przejscie dopiero przy ~12 tys. aktywnych wpisow.
+    // -------------------------------------------------------
+    const profiles = await getServiceProfileSitemapEntries();
+    const profilePages: MetadataRoute.Sitemap = profiles.flatMap(({ slug, updatedAt }) =>
+        locales.map(locale => ({
+            url: `${baseUrl}${buildServiceProfilePath(locale, slug)}`,
+            lastModified: updatedAt.toISOString(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.6,
+        })),
+    );
+
+    // -------------------------------------------------------
+    // 8. Łączymy wszystko
     // (Kombinacje category+county pominięte — zbyt wiele stron z thin content)
     // -------------------------------------------------------
     return [
@@ -224,5 +255,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...onlinePages,
         ...categoryPages,
         ...countyPages,
+        ...profilePages,
     ];
 }

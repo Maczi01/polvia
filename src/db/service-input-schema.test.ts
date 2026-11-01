@@ -1,3 +1,4 @@
+import { isValidServiceSlug } from '../lib/service-slug-format';
 import {
     buildLocationSlugs,
     buildServiceSlug,
@@ -186,9 +187,61 @@ describe('serviceInputSchema', () => {
 
         expect(result.error.issues[0].path.join('.')).toBe('category');
     });
+
+    it('przyjmuje jawna baze slugow lokalizacji zamiast wyliczonej z nazwy', () => {
+        const result = serviceInputSchema.safeParse(validInput({ slug: 'roza-warszawa' }));
+
+        expect(result.success).toBe(true);
+        if (!result.success) return;
+
+        expect(result.data.slug).toBe('roza-warszawa');
+    });
+
+    it.each(['abc-', '-abc', 'a--b', 'Roza', 'a_b'])(
+        'odrzuca slug %s, ktorego middleware nie przepusci',
+        slug => {
+            const result = serviceInputSchema.safeParse(validInput({ slug }));
+
+            expect(result.success).toBe(false);
+            if (result.success) return;
+
+            expect(result.error.issues[0].path.join('.')).toBe('slug');
+        },
+    );
+
+    it('odrzuca nazwe, z ktorej nie da sie wyliczyc slugu, gdy brak jawnego slugu', () => {
+        const result = serviceInputSchema.safeParse(validInput({ name: '!!!' }));
+
+        expect(result.success).toBe(false);
+        if (result.success) return;
+
+        expect(result.error.issues[0].path.join('.')).toBe('slug');
+    });
 });
 
 describe('buildServiceSlug', () => {
+    it.each([
+        'Kancelaria Nowak & Wspolnicy',
+        'Żłobek Słoneczko',
+        'Привет мир',
+        'Привіт Їжак',
+        '- Myslniki na brzegach -',
+        'a -- b',
+        'Café—Bar',
+        'Studio 2',
+        '😀 Cafe',
+        'ß straße',
+    ])('wynik dla %s ma format slugu uslugi', name => {
+        expect(isValidServiceSlug(buildServiceSlug(name))).toBe(true);
+    });
+
+    it.each(['!!!', '--', '中文', 'Ⅻ'])(
+        'nazwa %s bez znakow [a-z0-9] daje pusty slug (zastepczy przydziela allocator)',
+        name => {
+            expect(buildServiceSlug(name)).toBe('');
+        },
+    );
+
     it('sprowadza polskie znaki i spacje do postaci URL-owej', () => {
         expect(buildServiceSlug('Żłobek Słoneczko')).toBe('zlobek-sloneczko');
     });

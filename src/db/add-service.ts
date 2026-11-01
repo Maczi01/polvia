@@ -10,6 +10,9 @@
  *   npm run db:add -- data/services/ifiora.json --dry-run   # sama walidacja
  *   npm run db:add -- data/services/ifiora.json             # zapis
  *
+ * Slug uslugi (`/firma/<slug>`) liczy sie zawsze z `name`, ta sama regula co seed
+ * i backfill (`planNewServiceSlug`). `slug` z JSON to wylacznie baza slugow lokalizacji.
+ *
  * Po zapisie: `npm run db:embeddings` — dorobi embeddingi nowym lokalizacjom.
  */
 
@@ -17,8 +20,9 @@ import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray, like, or } from 'drizzle-orm';
 
+import { formatZodIssue } from './format-zod-issue';
 import { db } from './index';
 import {
     buildLocationSlugs,
@@ -34,6 +38,7 @@ import {
     tagsTable,
     tagsTranslationsTable,
 } from './schema';
+import { planNewServiceSlug, serviceSlugBase } from './service-slugs';
 
 const LANGUAGES = ['pl', 'uk', 'en', 'ru'] as const;
 
@@ -81,7 +86,7 @@ async function readInput(filePath: string): Promise<ServiceInput> {
     if (!result.success) {
         console.error(`BLAD: ${filePath} nie przeszedl walidacji:`);
         for (const issue of result.error.issues) {
-            console.error(`  ${issue.path.join('.') || '(korzen)'}: ${issue.message}`);
+            console.error(`  ${formatZodIssue(issue)}`);
         }
         // eslint-disable-next-line unicorn/no-process-exit
         process.exit(1);
@@ -140,6 +145,20 @@ async function ensureTag(client: Transaction, tag: TagInput): Promise<string> {
     return created.id;
 }
 
+/**
+ * Zajete slugi uslug, z ktorymi moze skolidowac slug z nazwy: `<baza>` i `<baza>-*`.
+ * Baza ma format `[a-z0-9-]` (`buildServiceSlug`), wiec nie zawiera znakow
+ * specjalnych `LIKE` (`%`, `_`); wartosc i tak idzie jako parametr.
+ */
+async function findTakenServiceSlugs(base: string): Promise<string[]> {
+    const rows = await db
+        .select({ slug: servicesTable.slug })
+        .from(servicesTable)
+        .where(or(eq(servicesTable.slug, base), like(servicesTable.slug, `${base}-%`)));
+
+    return rows.flatMap(({ slug }) => (slug === null ? [] : [slug]));
+}
+
 /** Slug lokalizacji jest UNIQUE — kolizja to albo duplikat wpisu, albo zla nazwa. */
 async function findTakenSlugs(slugs: string[]): Promise<string[]> {
     const rows = await db
@@ -159,8 +178,17 @@ async function findServicesWithSameName(name: string): Promise<number> {
     return rows.length;
 }
 
-async function reportPlan(input: ServiceInput, slugs: string[], image: string | null) {
+type SlugPlan = {
+    /** Adres `/firma/<serviceSlug>` — zawsze z nazwy. */
+    serviceSlug: string;
+    /** Slugi lokalizacji z bazy `input.slug`, w kolejnosci `input.locations`. */
+    locationSlugs: string[];
+};
+
+async function reportPlan(input: ServiceInput, slugs: SlugPlan, image: string | null) {
     console.log(`Wpis:      ${input.name}`);
+    console.log(`Slug:      ${slugs.serviceSlug} (adres /firma/${slugs.serviceSlug})`);
+    console.log(`Baza slugow lokalizacji: ${input.slug}`);
     console.log(`Kategoria: ${input.category} | zasieg: ${input.coverage} | status: ${input.status}`);
     console.log(`Jezyki:    ${input.languages.join(', ')} | verified: ${input.verified}`);
     console.log(`Obrazek:   ${image ?? 'NULL (karta uzyje /default.png)'}`);
@@ -171,7 +199,7 @@ async function reportPlan(input: ServiceInput, slugs: string[], image: string | 
                 ? 'bez pinu'
                 : `${location.latitude}, ${location.longitude}`;
         const main = location.isMainLocation ? ' [glowna]' : '';
-        console.log(`  - ${slugs[index]} — ${location.city} (${pin})${main}`);
+        console.log(`  - ${slugs.locationSlugs[index]} — ${location.city} (${pin})${main}`);
     }
 
     if (input.tags.length === 0) {
@@ -186,12 +214,13 @@ async function reportPlan(input: ServiceInput, slugs: string[], image: string | 
     }
 }
 
-async function insertService(input: ServiceInput, slugs: string[], image: string | null) {
+async function insertService(input: ServiceInput, slugs: SlugPlan, image: string | null) {
     return db.transaction(async tx => {
         const [service] = await tx
             .insert(servicesTable)
             .values({
                 name: input.name,
+                slug: slugs.serviceSlug,
                 category: input.category,
                 coverage: input.coverage,
                 status: input.status,
@@ -213,7 +242,7 @@ async function insertService(input: ServiceInput, slugs: string[], image: string
         await tx.insert(serviceLocationsTable).values(
             input.locations.map((location, index) => ({
                 serviceId: service.id,
-                slug: slugs[index],
+                slug: slugs.locationSlugs[index],
                 city: location.city,
                 street: location.street ?? null,
                 voivodeship: location.voivodeship ?? null,
@@ -249,20 +278,24 @@ async function insertService(input: ServiceInput, slugs: string[], image: string
 async function main(): Promise<void> {
     const { filePath, isDryRun } = parseOptions(process.argv.slice(2));
     const input = await readInput(filePath);
-    const slugs = buildLocationSlugs(
+    const locationSlugs = buildLocationSlugs(
         input.slug,
         input.locations.map(location => location.city),
     );
 
-    const taken = await findTakenSlugs(slugs);
-    if (taken.length > 0) {
-        fail(`slug juz istnieje w bazie: ${taken.join(', ')} — to duplikat wpisu`);
-    }
+    const [takenServiceSlugs, takenLocationSlugs] = await Promise.all([
+        findTakenServiceSlugs(serviceSlugBase(input.name)),
+        findTakenSlugs(locationSlugs),
+    ]);
+    const plan = planNewServiceSlug({ name: input.name, takenServiceSlugs, takenLocationSlugs });
+    if (!plan.ok) fail(plan.message);
+    const slugs: SlugPlan = { serviceSlug: plan.serviceSlug, locationSlugs };
 
     const sameName = await findServicesWithSameName(input.name);
     if (sameName > 0) {
         console.warn(
-            `UWAGA: w bazie jest juz ${sameName} wpis(ow) o nazwie "${input.name}" pod innym slugiem.`,
+            `UWAGA: w bazie jest juz ${sameName} wpis(ow) o nazwie "${input.name}" — ` +
+                `nowy dostanie adres /firma/${slugs.serviceSlug}. Upewnij sie, ze to nie duplikat.`,
         );
     }
 

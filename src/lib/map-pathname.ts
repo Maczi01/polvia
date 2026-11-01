@@ -1,6 +1,7 @@
-import { type Locale, locales } from '@/i18n/config';
+import type { Locale } from '@/i18n/config';
 import { type MapFilters, parseMapSlug } from '@/lib/map-slug-parser';
 import { localizedMapBasePath } from '@/lib/map-url-builder';
+import { splitLocalePrefix } from '@/lib/split-locale-prefix';
 
 /**
  * Rozbior sciezki URL mapy na locale i segmenty slugu.
@@ -23,17 +24,14 @@ export type MapPathname = {
  * nie ma tam slugu do walidacji.
  */
 export function parseMapPathname(pathname: string): MapPathname | null {
-    const plMatch = /^\/mapa\/(.+)$/.exec(pathname);
-    if (plMatch) {
-        return { locale: 'pl', slug: plMatch[1].split('/') };
-    }
+    const { locale, isPrefixed, segments } = splitLocalePrefix(pathname);
+    const [mapSegment, ...slug] = segments;
 
-    const prefixedMatch = /^\/([a-z]{2})\/map\/(.+)$/.exec(pathname);
-    if (prefixedMatch && locales.includes(prefixedMatch[1] as Locale)) {
-        return { locale: prefixedMatch[1] as Locale, slug: prefixedMatch[2].split('/') };
-    }
+    // Bez prefiksu tylko polskie `/mapa`, z prefiksem (takze `/pl`) — wewnetrzne `/map`.
+    if (mapSegment !== (isPrefixed ? 'map' : 'mapa')) return null;
+    if (slug.join('/') === '') return null;
 
-    return null;
+    return { locale, slug };
 }
 
 const NO_FILTERS: MapFilters = { category: null, county: null, city: null, onlineOnly: false };

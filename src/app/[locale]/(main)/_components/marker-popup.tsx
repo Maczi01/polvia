@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { cn } from '@/lib/utilities';
 import { PartialService } from '@/types';
 import { useTranslations } from 'next-intl';
+import { ServiceProfileLink } from './service-profile-link/service-profile-link';
 
 type MarkerPopupProps = {
     latitude: number;
@@ -97,6 +98,14 @@ export const MarkerPopup = ({
                                             )}
                                         />
                                     </Link>
+                                    {selectedService.serviceSlug && (
+                                        <ServiceProfileLink
+                                            slug={selectedService.serviceSlug}
+                                            className="mt-1 block text-sm"
+                                        >
+                                            {t('viewProfile')}
+                                        </ServiceProfileLink>
+                                    )}
                                 </div>
                             </div>
                         </div>

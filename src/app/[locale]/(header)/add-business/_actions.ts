@@ -1,11 +1,10 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { hasLocale } from 'next-intl';
 import { getLocale } from 'next-intl/server';
 import OpenAI from 'openai';
 
-import { defaultLocale, type Locale, locales } from '@/i18n/config';
+import { type Locale, toLocale } from '@/i18n/config';
 import { generateDraft } from '@/lib/add-business/generate-draft';
 import { geocodeAddress } from '@/lib/add-business/geocode';
 import { processLogoCandidate } from '@/lib/add-business/logo';
@@ -42,8 +41,7 @@ async function clientIp(): Promise<string> {
 }
 
 async function requestLocale(): Promise<Locale> {
-    const locale = await getLocale();
-    return hasLocale(locales, locale) ? locale : defaultLocale;
+    return toLocale(await getLocale());
 }
 
 export async function generateDraftAction(
