@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (faza 3 wykonana)
+**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3)
 
 ## Źródła
 
@@ -316,6 +316,20 @@ Decyzje i odchylenia builderów (zaakceptowane):
 - **U11:**
   - `/cennik` jako Server Component; `pricing-plans` kliencki tylko dla przełącznika. Oszczędność roczna 54% (1 − 49/108).
   - Poprawione także obietnice spoza `features`: „14-day free trial” w en/ru/uk (triala nie ma), gwiazdki markdown w `team.features.0`, plan Przedsiębiorstwo „Wycena indywidualna”, link stopki `href="#"` → `/contact`. Usunięty zdublowany landmark `<main>`.
+
+### Review fazy 3 (2026-11-01)
+
+Raport: [review-faza-3.md](review-faza-3.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 7 × P2, 26 × P3). Wszystkie 16 checkboxów `Weryfikacja:` fazy 3 przeszło (CLI). E2E nie było uruchamiane: faza nie ma scenariuszy przeglądarkowych w `Weryfikacja:`, a test ścieżki płatności wymaga kluczy Stripe (krok `Operator:`).
+
+Kluczowe wnioski:
+- **Stan premium nie jest jeszcze wierny Stripe.** Trzy niezależne drogi do premium bez płacenia:
+  - karencja `past_due` liczona od przesuniętego już końca okresu,
+  - odczyt subskrypcji przed blokadą (wyścig zdarzeń),
+  - brak sprawdzenia `livemode` przy produkcyjnej bazie.
+  Do tego brak sprawdzenia ceny/produktu: każda subskrypcja na koncie z `client_reference_id` daje premium. Wszystko to przed startem sprzedaży.
+- **Skutki uboczne tylko w webhooku, po oznaczeniu zdarzenia.** Mail o konflikcie w `syncSubscriptionFromStripe` złamał ten kontrakt (powtarzane maile, także z CLI).
+- **Strona sukcesu to publiczny proxy do API Stripe** — potrzebuje limitu i rozróżnienia „Stripe niedostępny” od „nieopłacone”.
+- Bez uwag: podpis i dedupe webhooka, granice `server-only`, `isPremiumActive` jako jedyne źródło prawdy, czysty bundle klienta, kompletne pokrycie scenariuszy testowych z planu.
 
 ## Środowisko worktree
 

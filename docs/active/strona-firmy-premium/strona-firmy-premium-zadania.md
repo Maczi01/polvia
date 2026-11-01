@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-11-01 (faza 3 wykonana)
+**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3)
 
 ## Źródła
 
@@ -291,10 +291,10 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [x] `Test:` zawieszony `sendMail` nie blokuje odpowiedzi ponad timeout; handler zwraca 200
 - [x] `Test:` `canceled` usuwa wpis z `promoted_services`; `active` ustawia `expiresAt = currentPeriodEnd + grace`
 - [x] `Test:` druga aktywna subskrypcja nie nadpisuje stanu i wysyła powiadomienie
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/premium src/lib/subscription-sync "src/app/api/stripe"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Weryfikacja:` grep: brak `process.env` w nowych plikach; `STRIPE_SECRET_KEY` tylko w sekcji `server` w `env.ts`
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/premium src/lib/subscription-sync "src/app/api/stripe"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` grep: brak `process.env` w nowych plikach; `STRIPE_SECRET_KEY` tylko w sekcji `server` w `env.ts`
 - [ ] `Operator:` Stripe Dashboard (test, potem produkcja):
   - produkt „Profesjonalny” z cenami PLN miesięczną i roczną,
   - BLIK recurring (o ile przejdzie akceptację) i karty,
@@ -345,10 +345,10 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [x] `Test:` `submitPremiumMaterials` z sesją nieopłaconą lub z innego wpisu → `FORBIDDEN`; mail nie wysłany
 - [x] `Test:` błąd `sendMail` → typowany błąd dla użytkownika bez surowego komunikatu
 - [x] `Test:` `upgrade-cta` i `premium-materials-form`: `jest-axe` bez naruszeń; błędy przez `aria-describedby`; mocki akcji rozwiązane przed końcem testu
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest "src/app/\[locale\]/firma"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
 - [ ] `Operator:` w trybie testowym Stripe, w `pl` i `uk`:
   1. na `/firma/<slug>` wybrać „rocznie” i kliknąć CTA → Checkout,
   2. zapłacić kartą testową → `/firma/<slug>/premium/dziekujemy`,
@@ -368,9 +368,9 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
   - kolejność: walidacja mapy, `/firma/*`, alias, rewrite i redirect mapy, next-intl
 - [x] `Test:` `parseRootAliasPathname`: `/firma-x` → `firma-x`; `/mapa`, `/en`, `/cennik`, `/api`, `/a/b`, `/` → `null`
 - [x] `Test:` route: aktywne premium → `hasActivePremium: true`; wygasłe → `false`
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest src/lib/service-profile-path "src/app/api/service-slug"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
 - [ ] `Operator:` sprawdzić przez `curl`:
   - `/<slug-premium>` → `307 …/firma/<slug-premium>`
   - `/<slug-free>` → `404`
@@ -394,16 +394,35 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
   - cechy planu Profesjonalny bez usuniętych obietnic,
   - CTA free ma `href` `/dodaj-firme` w `pl` i `/en/add-business` w `en`,
   - `jest-axe` bez naruszeń
-- [ ] `Weryfikacja:` `npx tsc --noEmit` bez błędów
-- [ ] `Weryfikacja:` `npx jest "src/app/\[locale\]/\(header\)/pricing"` przechodzi
-- [ ] `Weryfikacja:` `npx next lint` bez błędów
-- [ ] `Weryfikacja:` grep: brak `href="#"` w `src/app/[locale]/(header)/pricing/**`
-- [ ] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
+- [x] `Weryfikacja:` `npx tsc --noEmit` bez błędów
+- [x] `Weryfikacja:` `npx jest "src/app/\[locale\]/\(header\)/pricing"` przechodzi
+- [x] `Weryfikacja:` `npx next lint` bez błędów
+- [x] `Weryfikacja:` grep: brak `href="#"` w `src/app/[locale]/(header)/pricing/**`
+- [x] `Weryfikacja:` `npx jest src/i18n/messages-parity` przechodzi
 - [x] `Operator:` uzupełnić kwoty planu Profesjonalny w 4 plikach `messages/` (decyzja cenowa; 9 zł / 49 zł wpisane w U11)
 - [ ] `Operator:` sprawdzić `/cennik` i `/ru/pricing`:
   - wszystkie CTA prowadzą do istniejących stron,
   - link portalu otwiera logowanie Stripe,
   - zero błędów konsoli
+
+---
+
+## Do poprawy po review fazy 3
+
+Raport: [review-faza-3.md](review-faza-3.md). Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 7 × P2, 26 × P3). Wszystkie P2 naprawić **przed startem sprzedaży**; #1–#3 razem (łącznie dają premium bez płatności).
+
+- [ ] 🟠 [important] **`src/lib/premium.ts:39-49`, `subscription-sync.ts:181`**: karencja `past_due` liczona od nowego końca okresu (Stripe przesuwa okres przed nieudaną płatnością) — premium i ranking bez płacenia przez cały cykl Smart Retries. Zapisać `current_period_start`, dla `past_due` granica `periodStart + grace`. Test: `past_due`, `periodEnd` za 28 dni, `periodStart` 4 dni temu → `false`.
+- [ ] 🟠 [important] **`src/lib/subscription-sync.ts:153` vs `:166`**: `subscriptions.retrieve` przed blokadą — równoległe `payment_failed` + `subscription.deleted` mogą zapisać nieświeży `past_due` po `canceled`. `retrieve` po `lockService` albo `canceled` jako stan końcowy. Test wyścigu z odwróconą kolejnością `retrieve`.
+- [ ] 🟠 [important] **`api/stripe/webhook/route.ts:52-60`, `src/db/sync-subscriptions.ts`**: brak sprawdzenia `livemode` — testowe klucze + produkcyjna baza wiążą testowe subskrypcje z prawdziwymi wpisami. Webhook: niezgodny tryb → 200 bez sync; CLI: pomijać niezgodne i wypisać tryb klucza + host bazy.
+- [ ] 🟠 [important] **`subscription-sync.ts:110`, `stripe-webhook-events.ts:33`, `premium-checkout.ts:104-109`**: brak sprawdzenia ceny/produktu — dowolny Payment Link z `client_reference_id=<uuid>` albo zmiana planu w portalu daje premium. Wymagać `price.id ∈ {STRIPE_PRICE_MONTHLY, STRIPE_PRICE_YEARLY}` w sync i w `verifyPaidCheckoutSession`; operator: portal tylko z tymi cenami.
+- [ ] 🟠 [important] **`subscription-sync.ts:188-200`**: mail o konflikcie przy każdym zdarzeniu, odnowieniu i resyncu. Sync zwraca konflikt bez maila; mail w `processEvent` przy `isFirstDelivery` i jednym typie zdarzenia. CLI wiąże od najstarszej subskrypcji.
+- [ ] 🟠 [important] **`premium/dziekujemy/page.tsx:157-162`**: publiczny GET bez limitu woła `checkout.sessions.retrieve` (zużycie limitu API Stripe wspólnego z checkoutem i webhookiem). `checkRateLimit` po IP przed weryfikacją.
+- [ ] 🟠 [important] **`premium/dziekujemy/page.tsx:162-163`**: `unavailable` (awaria Stripe) pokazuje „nie potwierdzono” płacącemu. Osobny wariant „odśwież za chwilę” (4 × `messages/`) + test gałęzi strony.
+- [ ] 🟡 [nit] Webhook/sync: #8 mail „opłacono” tylko przy `isPremiumActive`; #9 log dla `service_missing`/nie-UUID; #10 `setPromotion(null)` a ręczna promocja; #11 wspólny deadline webhooka i timeout bazy; #12 CLI bez drugiego `retrieve`; #13 slug + `db:reset` w dokumentacji operatora.
+- [ ] 🟡 [nit] Alias: #14 SWR 86400 vs obiecane „do 5 min”; #15 negatywny cache / segmenty skanerów; #16 slug kolidujący z zarezerwowanym lub `api*` bez aliasu.
+- [ ] 🟡 [nit] Checkout/materiały: #17 druga płatność przed webhookiem; #18 wielokrotne wysłanie materiałów + timeout `sendMail`; #19 `referrer: 'no-referrer'`; #20 komentarz o `no_payment_required`; #21 pełny URL profilu w mailu.
+- [ ] 🟡 [nit] Kod: #22 `SUBSCRIPTION_METADATA_KEYS` do lekkiego modułu; #23 `subscription-query-parts.ts`; #24 `syncSubscriptionFromStripe` 52 linie; #25 nazwy `stripe-events`/`stripe-webhook-events`; #26 `VISIBLE_FIELDS`; #27 helper `toLocale()`; #28 jedno źródło kwot i `PremiumInterval`, spójny domyślny interwał; #29 typ `WebhookErrorCode`, drobne w `/cennik`.
+- [ ] 🟡 [nit] Testy: #30 typy zdarzeń webhooka i równoległy duplikat; #31 `sync-subscriptions.ts`; #32 `uk` w `pricing-plans.test.tsx`, 456 linii w `service-profile-queries.test.ts`; #33 `dziekujemy` poza `pathnames` — potwierdzić w teście ręcznym U9.
 
 ---
 
