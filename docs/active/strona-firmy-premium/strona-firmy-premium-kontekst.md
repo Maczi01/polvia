@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (domknięcie wszystkich P3 faz 1–3)
+**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3, runda 5)
 
 ## Źródła
 
@@ -419,6 +419,15 @@ Orkiestrator: `subscription-store.setPromotion(null)` nie usuwa rankingu, gdy wp
 Odchylenia/dług: `contact-form.tsx` 350 linii (było 342 przed zmianą — do refaktoru osobno); reguła `GREATEST` w dwóch adapterach (`subscription-store.ts`, `premium-content-store.ts`).
 
 Bramka: tsc OK; jest 189 suite'ów / 2056 testów; lint 0 błędów.
+
+## Review fazy 3 — runda 5 (2026-11-01)
+
+Zakres `d5fa59c..HEAD` (P3 + uśpienie Stripe). 4 agentów (security, performance, kieran+architektura, spec-flow), E2E pominięte (brak `.env`). Werdykt ⚠️ 0 × P1, 6 × P2, 30 × P3; wszystkie P2 zweryfikowane w kodzie. Wnioski:
+- **`notFound()` pod `[locale]` zawsze trafia w streaming** (`[locale]/loading.tsx`) — każde „ma dać 404” na stronie poza 2-segmentowym profilem wymaga rewrite w middleware, nie `notFound()` w page (V2; ten sam wzorzec co soft-404 z learned-patterns).
+- **Kod modułowy w `env.ts` wykonuje się też w przeglądarce** — wszystko poza `createEnv` musi być bramkowane `typeof window` (V1).
+- **Skrócenie cache lookupu ma koszt dla aliasu, nie tylko świeżość** — timeout 1,5 s w middleware + zimny start bez SWR = 404 na rzadkim `/<slug>` (V4). Profil i alias potrzebują różnych kluczy cache.
+- **Reguły zapisane tylko w SQL adaptera muszą mieć test buildera** — atrapa magazynu w testach sync modelowała usuwanie bezwarunkowo, więc reguła z `NOT EXISTS` była niesprawdzana (V5, V6).
+- Uśpienie Stripe szczelne (bramki przed I/O na wszystkich ścieżkach), `hasActivePremium` jedynym odczytem premium firmy, testy nie osłabione.
 
 ## Środowisko worktree
 

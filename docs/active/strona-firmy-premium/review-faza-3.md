@@ -290,3 +290,92 @@ Scenariusze wdrożeń przy T1 (spec-flow): produkcja poprawna — bez zmian; `sk
 
 - Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
 - E2E: 0; Manual: 0; Niejasne: 0; Failujące: 0
+
+---
+
+# Review fazy 3 — runda 5 (po domknięciu P3 i uśpieniu Stripe, 2026-11-01)
+
+**Zakres:** `git diff d5fa59c..HEAD -- . ':!docs'` (commity `2881345`, `ce9cccd`; 137 plików, +7063/−2709).
+**Agenci:** security-sentinel, performance-oracle, kieran-typescript-reviewer (+ architecture-strategist), spec-flow-analyzer. E2E pominięte (brak `.env` w worktree, `DATABASE_URL` = produkcja; brak otwartych checkboxów `Weryfikacja:`).
+**Gate (przed review):** tsc OK, jest 189 suite'ów / 2056 testów, lint 0 błędów.
+
+## Werdykt: ⚠️ KONTYNUUJ Z ZASTRZEŻENIAMI — 0 × P1, 6 × P2, 30 × P3
+
+Poprawki P3 rund 1–4 zrobione poprawnie; asercje nie osłabione (podziały plików zachowują wszystkie `it`, zmiany to świadome zmiany kontraktu: #23 sitemapa, `CHECKOUT_DISABLED`, nowe joiny). Uśpienie Stripe szczelne: każda ścieżka Stripe za bramką `isStripeConfigured` przed I/O, `hasActivePremium` jedynym odczytem premium firmy, joiny tylko po `service_id`. Wszystkie P2 zweryfikowane przez orkiestratora w kodzie. P2-1 i P2-3 są uśpione przy wyłączonym Stripe; P2-2 i P2-4 dotyczą wdrożenia bez Stripe; P2-5 i P2-6 to luki testów na regułach z ostatniej decyzji.
+
+## 🟠 P2
+
+**P2-1. `env.ts:70` — `resolveStripeConfig(env)` na końcu modułu rzuca w przeglądarce.** (kieran; zweryfikowane)
+`@t3-oss/env-core` 0.12 rzuca przy odczycie zmiennej z sekcji `server` na kliencie, a funkcja destrukturyzuje pięć `STRIPE_*`. Każdy przyszły import `env` w komponencie `'use client'` (po to istnieje sekcja `client: NEXT_PUBLIC_SITE_URL`) wywali hydratację na produkcji; SSR i testy (mock `env`) tego nie pokażą. Dziś żaden klient nie importuje `env` — pułapka uśpiona. Poprawka: `if (typeof window === 'undefined') resolveStripeConfig(env);` + komentarz; przy okazji `emptyStringAsUndefined: true` (P3-16).
+
+**P2-2. `premium/dziekujemy/page.tsx:242` — bez Stripe `notFound()` daje soft-404 (200).** (security P3 + spec-flow P2; zweryfikowane: `src/app/[locale]/loading.tsx` istnieje, middleware łapie tylko 2-segmentowe `/firma/<slug>`)
+Wzorzec z `learned-patterns.md` („Catch-all + `<Suspense>`”). Krok operatora „`dziekujemy` → 404” nie przejdzie `curl`; `page.disabled.test.tsx` sprawdza tylko sygnał `notFound`. Poprawka: gałąź w `middleware.ts` — Stripe nieskonfigurowany + ścieżka `/{locale?}/firma/<slug>/premium/dziekujemy` → `rewrite(SERVICE_PROFILE_NOT_FOUND_PATH)`; dopasowanie jako czysta funkcja w `service-profile-path.ts` z testem.
+
+**P2-3. `firma/[slug]/_actions.ts:216` vs `:224` — fail-open znacznika materiałów nieosiągalny.** (kieran; zweryfikowane)
+`isWithinPremiumLimit('materials')` rzuca przy awarii Redisa przed `claimSend` (który celowo przepuszcza). Płacący po zakupie dostaje wyjątek z Server Action (brak `error.tsx` pod `[locale]`) zamiast typowanego błędu — łamie wniosek z kontekstu („każdy limit na ścieżce płacącego potrzebuje fail-open”) i format `{ error }`. Test `_actions.materials.test.ts:263` pokrywa tylko awarię znacznika. Uśpione (bez Stripe `CHECKOUT_DISABLED`). Poprawka: limit w `try/catch` z logiem i fail-open (jak `isWithinVerifyLimit` na `dziekujemy`); w `startPremiumCheckout` (`:83`) wyjątek → `fail('CHECKOUT_FAILED')`; testy „limit rzuca”.
+
+**P2-4. `api/service-slug/[slug]/route.ts:60` — krótki cache `exists` (240/60) + timeout lookupu 1,5 s → krótki adres premium z małym ruchem daje 404.** (performance; zweryfikowane: `SERVICE_SLUG_LOOKUP_TIMEOUT_MS = 1500`, `unknown` → brak przekierowania)
+Wcześniej `swr=86400` maskował zimne starty. Teraz prawie każde wejście na rzadko odwiedzany `/<slug>` (ulotki) to miss CDN → zimna funkcja + `connect_timeout` → >1,5 s → `unknown` → 404 zamiast 307. Profil `/firma/<slug>` traci 0,3–1,5 s TTFB z tego samego powodu, choć potrzebuje tylko `exists`. Poprawka: osobny klucz cache dla aliasu (`?premium=1` → 240/60), profil bez query z `s-maxage=300, stale-while-revalidate=86400`; parametr `purpose: 'profile' | 'alias'` w `lookupServiceSlug`; testy nagłówków dla obu.
+
+**P2-5. `src/lib/subscription-store.ts:107-124` — `setPromotion(null)` z `NOT EXISTS` bez testu; atrapa przeczy kontraktowi.** (spec-flow P2, kieran P3; zweryfikowane)
+`tests/fixtures/premium/fake-subscription-store.ts:53` usuwa promocję bezwarunkowo, więc reguła „premium ręczne trzyma ranking po końcu subskrypcji” nie jest sprawdzana nigdzie; regresja w `notExists` (odwrócony `gt`, brak filtra) przejdzie. `createTransactionStore` ma 70 linii. Poprawka: `buildRemovePromotionQuery(tx, serviceId)` obok `buildExtendPromotionQuery` z testem SQL (`drizzle.mock().toSQL()`); atrapa z `manualPremiumUntil` i scenariusz „anulowana subskrypcja + trwające premium ręczne → promocja zostaje”. Razem z P3-3 (jeden builder `GREATEST`) i P3-4.
+
+**P2-6. `src/db/premium-content-store.ts:102-134` — mapowanie daty w `findContent` i transakcja `saveContent` bez testu.** (spec-flow; zweryfikowane)
+Diff przedłużenia w `db:premium --dry-run` działa tylko dzięki `manualPremiumLastDay` w `findContent`; regresja daje `{ kind: 'invalid' }` i komunikat „treść zostanie nadpisana”. Gałąź zapisu rankingu i atomowość też bez testu. Poprawka: czysta `toEntryShape(row)` z testem round-trip (data → `manualPremiumEnd` → wiersz → `toEntryShape` → `premiumContentSchema.parse` → ta sama data); test `saveContent` na atrapie `db.transaction` (z datą 2 zapisy, bez daty 1, jedna transakcja).
+
+## 🟡 P3
+
+### Stripe (uśpiony) i bezpieczeństwo
+1. `_actions.ts:80-97` — checkout bez bramki „klucz testowy + baza nielokalna” (webhook i CLI ją mają): po powrocie Stripe z `sk_test_` na produkcji płacący widzi „płatność potwierdzona”, premium nie wchodzi. Wspólne `isStripeModeAllowed` w akcjach i `dziekujemy` → `CHECKOUT_DISABLED`. (security)
+2. `firma/[slug]/page.tsx` — `startPremiumCheckout` bez jawnego `maxDuration` (najgorszy przypadek ~21 s); `export const maxDuration = 30` + budżet w komentarzu. (performance)
+3. Reguła `GREATEST` dwa razy (`subscription-store.ts:130-139`, `premium-content-store.ts:69-81`) — `setPromotion` przez `buildExtendPromotionQuery(tx, …)`. (kieran)
+4. `subscription-store.ts:107-124` — `NOT EXISTS` zostawia też datę wydłużoną przez Stripe (roczna subskrypcja + krótsze premium ręczne + zwrot → ranking do końca roku). Zamiast pominięcia `UPDATE … SET expires_at = LEAST(expires_at, manual_premium_until)`. (spec-flow)
+5. `premium-subscription-search.ts:35` — nazwa `hasActivePremiumSubscription` myli się z `hasActivePremium` (`_actions.ts:87,89` obok siebie) → np. `hasUnsyncedPaidStripeSubscription`; rozważyć `isPremiumActive` → `isSubscriptionPremiumActive`. (kieran)
+6. `api/stripe/webhook/route.ts:37-42` — budżet w komentarzu zaniżony (`statement_timeout` per zapytanie × 5 + zapytania poza transakcją); bezpieczeństwo zachowane, poprawić opis. (performance)
+7. `_actions.ts:227` — dwie karty: druga dostaje `MATERIALS_SENT`, gdy pierwsza jeszcze wysyła i może dostać timeout; znacznik `pending`/`sent`. Opcjonalne. (spec-flow)
+8. Premium ręczne blokuje przedpłatę online po powrocie Stripe (`ALREADY_PREMIUM`, brak CTA) — potwierdzić, że akceptowane. (spec-flow)
+
+### Premium ręczne i dokumentacja
+9. `publish-premium.ts:108` — `activeUntil` z przeszłości lub z odległej przyszłości (literówka roku) bez ostrzeżenia; CLI pisze „aktywne do 2025-12-31”. Ostrzeżenie w dry-run i przy zapisie + test. (spec-flow)
+10. Dokumentacja (zadania, `SKILL.md:265`) — „widok i alias znikają od razu”: alias do 5 min (cache CDN). (spec-flow)
+11. CLAUDE.md „plik jest źródłem prawdy” — dopisać zastrzeżenie: ranking (`GREATEST`) trwa do starej daty po skróceniu/usunięciu `activeUntil`. (kieran)
+12. Zadania „po każdym `db:reset`: `db:sync-subscriptions`” — oznaczyć „(Stripe, odłożone)”; bez Stripe kod 1. (spec-flow)
+13. `manual-premium.test.ts` — dodać same dni zmiany czasu (`2026-03-29` → `22:00Z`, `2026-10-25` → `23:00Z`). Kod poprawny. (spec-flow)
+
+### Wydajność
+14. `pricing/page.tsx:6`, `firma/[slug]/page.tsx:25` — import `@/lib/stripe` ładuje SDK Stripe na zimnym starcie także w trybie uśpionym; lekki `stripe-enabled.ts` dla `/cennik`, `await import` w akcji. Opcjonalne. (performance)
+15. `src/i18n/request.ts:8-13` — import wszystkich 4 plików tłumaczeń; dynamiczny import per locale. (performance)
+16. `env.ts` — `emptyStringAsUndefined: true` (pusty `STRIPE_WEBHOOK_SECRET=` daje ogólne „Invalid environment variables” zamiast Stripe wyłączonego). (spec-flow, kieran)
+17. Profil `force-dynamic` bez cache + `getSimilarServices` ze skorelowanym podzapytaniem (sprzed zakresu); opcja na później `revalidate = 300` + `revalidatePath` jednego profilu. (performance)
+18. `service-profile-queries.ts:222` — kolumny jsonb treści premium pobierane też dla widoku free (transfer, nie parsowanie). Do zrobienia przy realnym ruchu. (performance)
+
+### Architektura i jakość kodu
+19. `isLocale` w trzech miejscach (`i18n/config.ts:8` prywatne, `split-locale-prefix.ts:18-20`, `blog-urls.ts:7`) — eksport z `config.ts`. (kieran)
+20. Para kolumn premium powtarzana 3× (`premium-checkout-queries.ts:40-44`, `service-profile-queries.ts:135-139, 229-235`) — `premiumStateColumns` w `subscription-query-parts.ts`, `ServiceProfile = {…} & PremiumState`. (kieran)
+21. `ServiceSlugStatus` dopuszcza `{ exists: false, hasActivePremium: true }` — unia dyskryminowana. (kieran)
+22. Wrapper „`sendMail` z limitem” dwa razy (`_actions.ts:183-196`, `subscription-notifications.ts:30-44`) — jedna funkcja w `mailer.ts`. (kieran)
+23. `premium-plan.ts` z jedną stałą — przenieść `DEFAULT_PREMIUM_INTERVAL` do `premium-checkout-fields.ts`. (kieran)
+24. `contact-form.tsx` 350 linii (było 342), komponent 216 linii — `contactDefaults(prefill, t)` do `premium-contact.ts` z testem. (kieran)
+25. Funkcje > 50 linii: `PriceCard` (76), `middleware` (56), `createTransactionStore` (70, z P2-5), `GalleryHero` (51). (kieran)
+26. Linie > 100 znaków w komentarzach: `middleware.ts:68`, JSDoc `selectProfileView`. (kieran)
+
+### Testy
+27. `profile-upgrade-cta.test.tsx:15` mockuje `Link` — dodać `it.each` na 4 locale z prawdziwym `Link` (`/kontakt` vs `/en/contact`). (spec-flow)
+28. Matcher middleware `api/` (#16) bez testu — wyeksportować wzorzec, test: `/apiary` pasuje, `/api/x` nie. (spec-flow)
+29. Formularz kontaktowy: test wysłania z prefill (body POST), slug > 255 w `premium-contact.test.ts`; uwaga produktowa — slug tylko w edytowalnej wiadomości. (spec-flow)
+30. Wybór `PremiumPurchase` / `PricingPurchase` z `isStripeConfigured` bez testu — czysta `premiumPurchaseFor(config)` z testem. (spec-flow)
+
+### Poza zakresem diffu (zgłoszone, nie liczone)
+- `src/app/api/submit-contact-query/route.ts:64-65` — `req.json()` + `parse` bez `safeParse`: zły input → 500 zamiast 400 `{ error }`. Lejek premium idzie teraz przez ten endpoint — osobne zadanie. (security)
+
+## Sprawdzone bez uwag (skrót)
+
+- **Bezpieczeństwo:** akcje — bramka Stripe przed Zod/Redis/Stripe, potem Zod → limit po IP → weryfikacja; cena z allowlisty env; materiały wiązane z sesją i slugiem przed `SET NX`. Webhook 404 przed odczytem body. `?topic=&firma=` — slug przez `isValidServiceSlug`, tylko do `defaultValue` (escape Reacta) i maila `text`. SQL parametryzowany (`NOT EXISTS`, `GREATEST`, `set_config` lokalny w transakcji). `hasActivePremium` nie do włączenia dla cudzego wpisu (joiny po `service_id`, kolumnę pisze tylko CLI/seed). Lookup aliasu: sekret porównywany w stałym czasie, odpowiedź niezależna od sekretu. Matcher i segmenty zarezerwowane pokrywają wszystkie trasy najwyższego poziomu. Brak nowych `process.env`/`NEXT_PUBLIC_*`.
+- **Wydajność:** nowe joiny po PK z `LIMIT 1`, bez N+1; `cache()` dla `resolveProfileView` — jedno parsowanie na żądanie, zero przy free; `withTimeout` sprząta timer; budżet `dziekujemy` (60 s) się zgadza; galeria RSC, klient bez zod/drizzle/env/stripe; `/kontakt` zostaje SSG (`<Suspense>`); `Intl.DateTimeFormat` modułowy.
+- **Architektura/TS:** `hasActivePremium` jedynym odczytem premium firmy (pozostałe `isPremiumActive(` tylko dla rekordu Stripe); `PremiumPurchase`/`ProfileViewKind` jako unie; `stripe-config.ts` czysty; leniwy `getStripe()`; granice DST poprawne; brak `as`/`!`/`any` w nowym kodzie, brak cykli, testy mockują tylko granice.
+- **Scenariusze:** tabela scenariusz → test (spec-flow) — 27 z 35 wierszy ✅, braki ujęte w P2-2, P2-5, P2-6 i P3. Nazwy z `seed.ts` (142 wpisy) nie kolidują z segmentami zarezerwowanymi.
+
+## Bookkeeping checkboxów Weryfikacja: (runda 5)
+
+- Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
+- E2E: 0; Manual: 0; Niejasne: 0; Failujące: 0

@@ -470,6 +470,25 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 ---
 
+## Do poprawy po review fazy 3 — runda 5
+
+Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 5”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 6 × P2, 30 × P3). Przed wdrożeniem bez Stripe: V2, V4. Przed powrotem Stripe: V1, V3. V5, V6: luki testów na regułach premium ręcznego.
+
+- [ ] 🟠 [important] V1 **`env.ts:70`** — `resolveStripeConfig(env)` na końcu modułu rzuca w przeglądarce (proxy `@t3-oss/env` przy odczycie zmiennej `server`); pierwszy klient importujący `env` wywali hydratację. `if (typeof window === 'undefined')` + komentarz; `emptyStringAsUndefined: true`.
+- [ ] 🟠 [important] V2 **`premium/dziekujemy/page.tsx:242`** — bez Stripe `notFound()` w streamowanej stronie (`[locale]/loading.tsx`) daje soft-404 (200). Rewrite na `SERVICE_PROFILE_NOT_FOUND_PATH` w middleware przy braku konfiguracji; czysta funkcja dopasowania ścieżki z testem.
+- [ ] 🟠 [important] V3 **`firma/[slug]/_actions.ts:216`** — awaria Redisa w `isWithinPremiumLimit('materials')` rzuca przed fail-open `claimSend`; płacący dostaje stronę błędu. Limit w `try/catch` + fail-open; w checkoutcie (`:83`) wyjątek → `fail('CHECKOUT_FAILED')`; testy „limit rzuca”.
+- [ ] 🟠 [important] V4 **`api/service-slug/[slug]/route.ts:60`** — cache `exists` 240/60 + timeout lookupu 1,5 s → zimny start na rzadkim `/<slug>` daje 404 zamiast 307. Osobny klucz cache dla aliasu (`?premium=1`, 240/60), profil `s-maxage=300, stale-while-revalidate=86400`; testy nagłówków.
+- [ ] 🟠 [important] V5 **`src/lib/subscription-store.ts:107-124`** — `setPromotion(null)` z `NOT EXISTS` bez testu, atrapa (`fake-subscription-store.ts:53`) usuwa bezwarunkowo. `buildRemovePromotionQuery` z testem SQL; atrapa z `manualPremiumUntil` + scenariusz; razem z P3 #3 (jeden builder `GREATEST`) i #4 (`LEAST`).
+- [ ] 🟠 [important] V6 **`src/db/premium-content-store.ts:102-134`** — mapowanie daty w `findContent` i transakcja `saveContent` bez testu. Czysta `toEntryShape(row)` z testem round-trip; test `saveContent` (z datą 2 zapisy, bez daty 1, jedna transakcja).
+- [ ] 🟡 [nit] Stripe/bezpieczeństwo: #1 bramka trybu klucza w checkoutcie, #2 `maxDuration` profilu, #3 jeden builder `GREATEST`, #4 `LEAST` przy premium ręcznym, #5 nazwa `hasActivePremiumSubscription`, #6 budżet webhooka w komentarzu, #7 znacznik `pending`, #8 decyzja: premium ręczne blokuje przedpłatę online.
+- [ ] 🟡 [nit] Premium ręczne/dokumentacja: #9 ostrzeżenie dla daty z przeszłości/odległej, #10 „alias do 5 min”, #11 zastrzeżenie o rankingu w CLAUDE.md, #12 `db:sync-subscriptions` jako krok Stripe, #13 testy dni zmiany czasu.
+- [ ] 🟡 [nit] Wydajność: #14 SDK Stripe na zimnym starcie, #15 tłumaczenia per locale, #16 `emptyStringAsUndefined`, #17 cache profilu (na później), #18 jsonb dla free (na później).
+- [ ] 🟡 [nit] Kod: #19 `isLocale` ×3, #20 `premiumStateColumns`, #21 unia `ServiceSlugStatus`, #22 wrapper `sendMail` ×2, #23 `premium-plan.ts`, #24 `contact-form.tsx` 350 linii, #25 funkcje > 50 linii, #26 linie > 100 znaków.
+- [ ] 🟡 [nit] Testy: #27 CTA profilu w 4 locale bez mocka `Link`, #28 matcher `api/`, #29 wysłanie formularza z prefill + slug > 255, #30 wybór `PremiumPurchase`.
+- [ ] 🟡 [nit] Poza zakresem: `api/submit-contact-query/route.ts:64-65` bez `safeParse` (500 zamiast 400) — osobne zadanie.
+
+---
+
 ## Decyzja 2026-11-01: Stripe odłożony, premium ręczne
 
 Płatności online odłożone (mały popyt). Kod Stripe uśpiony: `STRIPE_*` opcjonalne (wszystkie albo żadna). Premium włączane ręcznie po przelewie przez `premium.activeUntil` w JSON. „Przejdź na Premium” prowadzi do formularza kontaktowego. Szczegóły: plik kontekstu, sekcja „Stripe odłożony”.
