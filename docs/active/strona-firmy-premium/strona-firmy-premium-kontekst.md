@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3)
+**Ostatnia aktualizacja:** 2026-11-01 (poprawki P2 po review fazy 3)
 
 ## Źródła
 
@@ -330,6 +330,18 @@ Kluczowe wnioski:
 - **Skutki uboczne tylko w webhooku, po oznaczeniu zdarzenia.** Mail o konflikcie w `syncSubscriptionFromStripe` złamał ten kontrakt (powtarzane maile, także z CLI).
 - **Strona sukcesu to publiczny proxy do API Stripe** — potrzebuje limitu i rozróżnienia „Stripe niedostępny” od „nieopłacone”.
 - Bez uwag: podpis i dedupe webhooka, granice `server-only`, `isPremiumActive` jako jedyne źródło prawdy, czysty bundle klienta, kompletne pokrycie scenariuszy testowych z planu.
+
+## Poprawki P2 po review fazy 3 (2026-11-01)
+
+Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-builder-web-fullstack, #6–#7). Gate: tsc OK, jest 163 suite'y / 1790 testów, lint 0 błędów.
+
+- **#1:** nowa kolumna `current_period_start`; dla `past_due` `premiumRankingExpiry = periodStart + PREMIUM_GRACE_DAYS` (to samo dla `isPremiumActive` i `promoted_services`). Okres z `items.data[]` (max startów / max końców).
+- **#2:** decyzja — `canceled`/`incomplete_expired` jako stan końcowy pod `FOR UPDATE` zamiast `retrieve` pod blokadą (blokada przez wywołanie sieciowe do ~16 s przy `maxDuration` 30 s). Wyciągnięte `applySubscriptionState` (zamyka P3 #24).
+- **#3:** `isLiveStripeKey` w `stripe.ts`; webhook przy niezgodnym `livemode` → 200 bez sync i bez `stripe_events`; CLI wypisuje tryb klucza + host bazy i pomija niezgodne (`wrong_mode`).
+- **#4:** allowlista cen w nowym `src/lib/premium-prices.ts` (osobny moduł, by uniknąć cyklu `premium-checkout` ↔ `subscription-sync`). Obca cena w sync → `unlinked` (zapisany wiersz bez zmian, premium wygasa z końcem okresu); `verifyPaidCheckoutSession` z `expand: ['line_items']`, obca cena → istniejący wariant `invalid`.
+- **#5:** sync zwraca `conflict` bez maila; mail wysyła webhook przy `isFirstDelivery`, tylko dla `checkout.session.completed` i aktywnej przychodzącej subskrypcji (odchylenie od sugestii `subscription.created` — tam status bywa `incomplete`). CLI wiąże od najstarszej, bez maili.
+- **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
+- **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
 
 ## Środowisko worktree
 
