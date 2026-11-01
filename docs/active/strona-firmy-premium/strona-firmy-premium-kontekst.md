@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3 — runda 3)
+**Ostatnia aktualizacja:** 2026-11-01 (poprawki po rundzie 3 review fazy 3)
 
 ## Źródła
 
@@ -342,6 +342,16 @@ Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-build
 - **#5:** sync zwraca `conflict` bez maila; mail wysyła webhook przy `isFirstDelivery`, tylko dla `checkout.session.completed` i aktywnej przychodzącej subskrypcji (odchylenie od sugestii `subscription.created` — tam status bywa `incomplete`). CLI wiąże od najstarszej, bez maili.
 - **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
 - **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
+
+## Poprawki po rundzie 3 review fazy 3 (2026-11-01)
+
+Commit `4b11e94` (feature-builder-web-fullstack). Gate: tsc OK, jest 164 suite'y / 1817 testów, lint 0 błędów.
+
+- **T1:** bramka hosta w webhooku → 503 `CONFIG_MISMATCH` + `console.error({ eventId })`. Zmieniony istniejący test 200 → 503 (wprost sprzeczny z poprawką). Nowy test kolejności: live event + test key + zdalna baza → bramka hosta, nie `livemode`.
+- **T2:** `maxDuration = 30` na stronie `dziekujemy`. Plik ma teraz **300/300 linii** — każda kolejna zmiana wymaga najpierw T4.
+- **T3:** log `second paid subscription for a service` w `subscription-sync.ts` (helper `reportConflict`), bo sync widzi każdy konflikt, także z CLI. Test „stara `past_due` → `active` po wyparciu” + test negatywny.
+- **T9:** `materialsMailSubject()` z `[TEST] ` przy `!STRIPE_LIVE_MODE` (funkcja, nie stała — tryb czytany przy wywołaniu).
+- **T10:** JSDoc o tunelu na localhost w `database-host.ts`.
 
 ## Review fazy 3 — runda 3 (2026-11-01)
 

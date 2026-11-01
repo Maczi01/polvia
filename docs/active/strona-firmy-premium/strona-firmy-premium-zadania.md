@@ -445,12 +445,14 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po popr
 
 Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 3”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1 × P2, 11 × P3). R1–R4, R9 zamknięte.
 
-- [ ] 🟠 [important] **T1 `src/app/api/stripe/webhook/route.ts:112-117`**: bramka „klucz testowy + baza nielokalna” odpowiada 200 → przy pomyłce w zmiennych produkcji (test key + live `whsec`) Stripe nie ponawia i zdarzenia (z mailami) przepadają. Zwracać 503 + `console.error`; test: 503, sync niewołany, zdarzenie nieoznaczone.
-- [ ] 🟡 [nit] T2 `export const maxDuration = 30` na stronie `dziekujemy`.
-- [ ] 🟡 [nit] T3 log przy każdym `conflict && isIncomingActive` + test „stara `past_due` → `active` po wyparciu”; krok operatora przy podwójnej płatności.
+✅ T1 (oraz T2, T3, T9, T10) naprawione 2026-11-01 (commit `4b11e94`). Otwarte: T4–T8, T11.
+
+- [x] 🟠 [important] **T1 `src/app/api/stripe/webhook/route.ts:112-117`**: bramka „klucz testowy + baza nielokalna” odpowiada 200 → przy pomyłce w zmiennych produkcji (test key + live `whsec`) Stripe nie ponawia i zdarzenia (z mailami) przepadają. Zwracać 503 + `console.error`; test: 503, sync niewołany, zdarzenie nieoznaczone.
+- [x] 🟡 [nit] T2 `export const maxDuration = 30` na stronie `dziekujemy`.
+- [x] 🟡 [nit] T3 log przy każdym `conflict && isIncomingActive` + test „stara `past_due` → `active` po wyparciu”; krok operatora przy podwójnej płatności.
 - [ ] 🟡 [nit] T4 `checkRateLimitWithTimeout` do `src/lib/rate-limit.ts`, scalić z `isWithinLimit` (R17); `page.tsx` ma 297/300 linii.
 - [ ] 🟡 [nit] T5 decyzja: checkout przy `past_due` dozwolony czy R3 tylko jako obrona na wyścig (JSDoc).
-- [ ] 🟡 [nit] T6–T11: unia decyzji w `applySubscriptionState`, brakujące testy (kolejność bramek, sekwencje R3, timer), `payment_method_types`, `[TEST]` w mailu materiałów, JSDoc o tunelu, drobne — szczegóły w raporcie.
+- [ ] 🟡 [nit] T6–T11 (T9, T10 zrobione): unia decyzji w `applySubscriptionState`, brakujące testy (kolejność bramek, sekwencje R3, timer), `payment_method_types`, `[TEST]` w mailu materiałów, JSDoc o tunelu, drobne — szczegóły w raporcie.
 
 ---
 
@@ -458,8 +460,9 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną
 - [ ] `Operator:` lokalny test checkoutu wymaga `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (`success_url` budowany z tej zmiennej, inaczej powrót na produkcję)
-- [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 200 i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu
+- [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 503 `CONFIG_MISMATCH` (Stripe ponawia do 3 dni) i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu
 - [ ] Do rozważenia: staging z kluczami testowymi i zdalną bazą testową wymagałby flagi override w `env.ts` (dziś zablokowany przez R1)
+- [ ] `Operator:` przeglądać logi Vercela: `second paid subscription for a service` (podwójna opłata → anulować starszą subskrypcję w Stripe i `db:sync-subscriptions`), `failing open` (awaria Redisa na stronie `dziekujemy`), `CONFIG_MISMATCH` (zły klucz/baza w webhooku)
 - [ ] `Operator:` przeglądać logi `conflict` webhooka (np. stara subskrypcja odzyskała płatność po zakupie „ratunkowym” → podwójna opłata, bez maila)
 - [ ] Do rozważenia: globalny timeout klienta Redis — ryzyko dla `GETDEL` w `add-business/draft-store.ts`
 - [ ] `Operator:` po każdym `db:reset`: `npm run db:sync-subscriptions`
