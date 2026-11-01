@@ -206,3 +206,52 @@ Stara subskrypcja `past_due` w 3-dniowej karencji → `isPremiumActive` = true �
 - Pozostawione dla operatora: 0
 - Niejasne: 0
 - Failujące: 0
+
+---
+
+# Review fazy 3 — runda 3 (po poprawkach re-review, 2026-11-01)
+
+**Zakres:** `git diff 61c1367..HEAD -- . ':!docs'` (commity `e6aab21`, `ed2ffcc`; 10 plików, +457/−60).
+**Agenci:** security-sentinel, performance-oracle, kieran-typescript-reviewer, spec-flow-analyzer. E2E pominięte (brak `.env`, brak otwartych checkboxów `Weryfikacja:`).
+**Gate:** tsc OK, jest 164 suite'y / 1812 testów, lint 0 błędów.
+
+## Werdykt: ⚠️ KONTYNUUJ Z ZASTRZEŻENIAMI — 0 × P1, 1 × P2, 11 × P3
+
+### Status R1–R4 (+R9)
+
+| # | Status |
+|---|---|
+| R1 bramka klucz testowy + baza nielokalna | ✅ zamyka ryzyko zapisu (security sprawdził obejścia URL vs parser `postgres.js`: rozbieżności tylko w bezpieczną stronę; jedyne ścieżki zapisu subskrypcji to webhook i CLI). Nowy problem → T1 |
+| R2 fail-open na `dziekujemy` | ✅ (timer sprzątany, brak unhandled rejection; wymuszenie fail-open przez atakującego nieopłacalne) |
+| R3 wyparcie `past_due` | ✅ bez wektora ataku; ⚠️ przesłanka nietrafna → T5 |
+| R4 mail „opłacono” tylko przy premium | ✅ |
+| R9 `switch` z jawną gałęzią `paid` | ✅ (TS2366 wymusza exhaustiveness przy jawnym typie zwracanym) |
+
+Testy nie osłabione (zmienione tylko fabryki mocków na gettery).
+
+### Zweryfikowane przez orkiestratora — korekta klasyfikacji
+
+Architektura i spec-flow zgłosiły jako 🟠 „podwójna opłata bez śladu” oraz „anulowanie nowszej z dwóch opłaconych zdejmuje premium”. Security wykazał, a orkiestrator potwierdził w kodzie (`_actions.ts:80` `ALREADY_PREMIUM` przy `hasActivePremium`; `premium-checkout-queries.ts:48` = `isPremiumActive`, który obejmuje `past_due` w karencji), że **w 3-dniowej karencji nie da się rozpocząć nowego checkoutu**. Oba scenariusze wymagają sesji Checkout otwartej przed przejściem w `past_due` (ważnej do 24 h) — stąd obniżenie do 🟡 (T3, T5).
+
+## 🟠 P2
+
+**T1. Bramka R1 odpowiada 200 — przy błędnej konfiguracji wdrożenia zdarzenia przepadają na stałe** — `src/app/api/stripe/webhook/route.ts:112-117`. (spec-flow; zweryfikowane)
+Scenariusz: na produkcji `sk_test_` razem z live `whsec` (pomyłka w zmiennych Vercela). Podpis przechodzi, bramka zwraca 200, Stripe uznaje zdarzenie za dostarczone i nie ponawia. Przed R1 to samo zdarzenie kończyło się 500 (`retrieve` subskrypcji live kluczem testowym rzuca) i Stripe ponawiał przez 3 dni, więc stan sam się naprawiał po poprawce klucza. `db:sync-subscriptions` odtworzy tabele, ale nie maile (zakup, konflikt). Poprawka: bramka zwraca 503 + `console.error` (błąd konfiguracji „leci wyżej”, jak opisuje komentarz przy `verifyEvent`); przy lokalnym `stripe listen` i Preview 503 nic nie psuje. Test: kombinacja → 503, sync niewołany, zdarzenie nieoznaczone.
+
+## 🟡 P3
+
+- **T2** `dziekujemy/page.tsx`: brak `export const maxDuration = 30` — najgorszy render ~18 s (Redis 1,5 s + Stripe 8 s × 2); bez Fluid compute stare limity 10–15 s → 504 zamiast `CheckoutUnavailable`.
+- **T3** `subscription-sync.ts:180-183`: konflikt przy zdarzeniu innym niż `checkout.session.completed` nie jest logowany, a anulowanie nowszej z dwóch opłaconych zdejmuje premium do następnego zdarzenia starszej. Osiągalne tylko przez wcześniej otwartą sesję (patrz korekta). Minimum: `console.warn` przy każdym `conflict && isIncomingActive` + test „stara `past_due` → `active` po wyparciu”; krok operatora po podwójnej płatności: anulować starszą i `db:sync-subscriptions`.
+- **T4** `dziekujemy/page.tsx` (297/300 linii): `checkRateLimitWithTimeout` + `RateLimitCheckTimeoutError` to infrastruktura limitu — przenieść do `src/lib/rate-limit.ts` (unit test zamiast testu strony na fake timerach), scalić z `isWithinLimit` z `_actions.ts` (R17; trzeci wzorzec `Promise.race`+timer obok `subscription-notifications.ts`). Polityka fail-open zostaje w stronie.
+- **T5** Przesłanka R3 („wygasła karta → kupuję jeszcze raz”) nie zgadza się z `ALREADY_PREMIUM`. Decyzja: (i) dopuścić checkout przy `past_due` (wtedy T3 staje się realne) albo (ii) uznać R3 za obronę na wyścig i poprawić JSDoc w `subscription-sync.ts:156`.
+- **T6** `applySubscriptionState`: `supersedesPastDue` liczony dwa razy (raz ukryty w `conflictingSubscriptionId`) — czysta funkcja decyzji zwracająca unię `conflict | stale | write(replacedId)`.
+- **T7** Testy: kolejność bramek webhooka (live event + test key + zdalna baza; zdarzenie już w `stripe_events`), sekwencje R3 (`payment_failed` A po B, `incomplete`→`active` B, dwie nowe po sobie, A `past_due`→`active`), czyszczenie timera po rozwiązanym limicie.
+- **T8** `premium-checkout.ts:67`: brak `payment_method_types` — metoda z opóźnionym rozliczeniem (SEPA) włączona w Dashboardzie → `checkout.session.completed` przed `active` → mail o zakupie nie wychodzi wcale. Przypiąć `['card']` (+ BLIK, jeśli zaakceptowany) albo potwierdzić konfigurację Dashboardu.
+- **T9** `_actions.ts:159-167`: mail „materiały” na środowisku z kluczem testowym bez oznaczenia — `[TEST]` w temacie przy `!STRIPE_LIVE_MODE`.
+- **T10** `database-host.ts`: JSDoc — bramka chroni przed złym `DATABASE_URL`, nie przed tunelem na localhost (ssh -L, cloud-sql-proxy).
+- **T11** Drobne: klucz limitu wyliczony przed `try` (błąd programistyczny w `rateLimitSubject` dawałby cichy fail-open); `assertKeyModeMatchesDatabase(host)` miesza źródła; podwójne parsowanie URL w `drop.ts`; dwie konwencje sprzątania `console` spy; fail-open widoczny tylko w logu (krok operatora: przeglądać logi `failing open`); rozjazd CLI (najstarsza) vs webhook (najnowsza) przy podwójnej płatności.
+
+## Bookkeeping checkboxów Weryfikacja: (runda 3)
+
+- Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
+- E2E: 0; Manual: 0; Niejasne: 0; Failujące: 0

@@ -441,6 +441,19 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po popr
 
 ---
 
+## Do poprawy po review fazy 3 — runda 3
+
+Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 3”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 1 × P2, 11 × P3). R1–R4, R9 zamknięte.
+
+- [ ] 🟠 [important] **T1 `src/app/api/stripe/webhook/route.ts:112-117`**: bramka „klucz testowy + baza nielokalna” odpowiada 200 → przy pomyłce w zmiennych produkcji (test key + live `whsec`) Stripe nie ponawia i zdarzenia (z mailami) przepadają. Zwracać 503 + `console.error`; test: 503, sync niewołany, zdarzenie nieoznaczone.
+- [ ] 🟡 [nit] T2 `export const maxDuration = 30` na stronie `dziekujemy`.
+- [ ] 🟡 [nit] T3 log przy każdym `conflict && isIncomingActive` + test „stara `past_due` → `active` po wyparciu”; krok operatora przy podwójnej płatności.
+- [ ] 🟡 [nit] T4 `checkRateLimitWithTimeout` do `src/lib/rate-limit.ts`, scalić z `isWithinLimit` (R17); `page.tsx` ma 297/300 linii.
+- [ ] 🟡 [nit] T5 decyzja: checkout przy `past_due` dozwolony czy R3 tylko jako obrona na wyścig (JSDoc).
+- [ ] 🟡 [nit] T6–T11: unia decyzji w `applySubscriptionState`, brakujące testy (kolejność bramek, sekwencje R3, timer), `payment_method_types`, `[TEST]` w mailu materiałów, JSDoc o tunelu, drobne — szczegóły w raporcie.
+
+---
+
 ## Po wdrożeniu
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną

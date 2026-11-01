@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (poprawki po re-review fazy 3)
+**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3 — runda 3)
 
 ## Źródła
 
@@ -342,6 +342,14 @@ Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-build
 - **#5:** sync zwraca `conflict` bez maila; mail wysyła webhook przy `isFirstDelivery`, tylko dla `checkout.session.completed` i aktywnej przychodzącej subskrypcji (odchylenie od sugestii `subscription.created` — tam status bywa `incomplete`). CLI wiąże od najstarszej, bez maili.
 - **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
 - **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
+
+## Review fazy 3 — runda 3 (2026-11-01)
+
+4 agentów na `61c1367..HEAD`. Werdykt ⚠️ 0 × P1, 1 × P2, 11 × P3. R1–R4, R9 zamknięte.
+
+- **Wniosek o bramkach konfiguracji w webhooku:** odpowiedź 200 na błąd konfiguracji wyłącza mechanizm ponowień Stripe — zdarzenie przepada. Błąd konfiguracji → 5xx, a 200 tylko dla zdarzeń świadomie ignorowanych (T1).
+- **Korekta klasyfikacji:** „podwójna opłata” i „anulowanie nowszej zdejmuje premium” obniżone do P3 — `startPremiumCheckout` zwraca `ALREADY_PREMIUM` w karencji `past_due`, więc scenariusz wymaga sesji Checkout otwartej wcześniej. Przesłanka R3 była nietrafna (T5 — decyzja do podjęcia).
+- **Security:** bramka R1 sprawdzona względem parsera `postgres.js` (multihost, `?host=`, socket, IPv6-mapped, zapisy liczbowe 127.x) — rozbieżności tylko w bezpieczną stronę. Tunel na localhost przechodzi z założenia.
 
 ## Poprawki po re-review fazy 3 (2026-11-01)
 
