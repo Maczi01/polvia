@@ -146,3 +146,63 @@ Trzy ustalenia (#1, #2, #3) zweryfikowane przez orkiestratora w kodzie (`premium
 - [x] U11 `npx jest src/i18n/messages-parity` → PASS
 
 (Komendy `tsc`, `lint` i `messages-parity` liczone osobno dla każdego IU.)
+
+---
+
+# Re-review fazy 3 po poprawkach P2 (2026-11-01)
+
+**Zakres:** `git diff 5748887..HEAD -- . ':!docs'` (commity `3b8df5a`, `0661ce2`; 24 pliki, +955/−118).
+**Agenci:** security-sentinel, performance-oracle, kieran-typescript-reviewer (architektura + TS), spec-flow-analyzer (scenariusze + testy). E2E pominięte: brak `.env` (DATABASE_URL = produkcja) i brak otwartych checkboxów `Weryfikacja:` w fazie 3.
+**Gate:** tsc OK, jest 163 suite'y / 1790 testów, lint 0 błędów.
+
+## Werdykt: ⚠️ KONTYNUUJ Z ZASTRZEŻENIAMI — 0 × P1, 3 × P2, 14 × P3
+
+### Status pierwotnych P2
+
+| # | Problem | Status |
+|---|---|---|
+| 1 | Karencja `past_due` od nowego końca okresu | ✅ zamknięty |
+| 2 | Wyścig `retrieve` przed blokadą | ✅ zamknięty (scenariusz `canceled`); wyścigi niekońcowe → P3 R6 |
+| 3 | Brak sprawdzenia `livemode` | ⚠️ **częściowo** → R1 |
+| 4 | Brak sprawdzenia ceny | ✅ zamknięty |
+| 5 | Wielokrotny mail o konflikcie | ✅ zamknięty |
+| 6 | Strona `dziekujemy` bez limitu | ✅ zamknięty, ale nowa zależność od Redisa → R2 |
+| 7 | `unavailable` jako „nie potwierdzono” | ✅ zamknięty |
+
+Cykl `premium-checkout` ↔ `subscription-sync` usunięty. Zmienione istniejące testy nie zostały osłabione (asercje maila przeniesione do `route.test.ts`, ściślejsze `toHaveBeenCalledWith`), z dwoma drobnymi wyjątkami (P3 R10, R11).
+
+## 🟠 P2
+
+**R1. `livemode` nie chroni przed kluczem testowym + produkcyjną bazą** — `src/app/api/stripe/webhook/route.ts:108`, `src/db/sync-subscriptions.ts:53,67`. (security + spec-flow; zweryfikowane)
+Kod łapie tylko niezgodność trybu klucza i zdarzenia, która w praktyce nie występuje: endpoint testowy ma inny `whsec` (400 na podpisie), a `subscriptions.list` zwraca obiekty jednego trybu (gałąź `wrong_mode` w CLI jest martwa). Pierwotny scenariusz zostaje: lokalny `.env` z produkcyjnym `DATABASE_URL` + `sk_test_` + `stripe listen` / „lokalny test checkoutu” z kroków operatora → karta 4242 daje prawdziwemu wpisowi premium i ranking na ~miesiąc. Poprawka: bramka wzorem `assertDropAllowed` (`src/db/drop.ts:19`, `LOCAL_HOSTS`): `!STRIPE_LIVE_MODE` i host bazy spoza `LOCAL_HOSTS` → webhook 200 bez sync, CLI odmawia startu; ewentualny jawny override w `env.ts`. Usunąć martwy filtr `wrong_mode`.
+
+**R2. Awaria Redisa → strona błędu płacącemu tuż po zapłacie** — `src/app/[locale]/firma/[slug]/premium/dziekujemy/page.tsx:34-42, 227`, `src/lib/redis.ts:5-8`. (performance + architektura + spec-flow; security jako P3; zweryfikowane)
+`isWithinVerifyLimit` nie łapie `RateLimitStoreError` ani błędu ioredis, a pod `src/app/[locale]` nie ma `error.tsx`. Przed poprawką #6 strona nie zależała od Redisa. Do tego ioredis nie ma `commandTimeout` (tylko `maxRetriesPerRequest: 3`), więc przy zawieszonym Redisie render czeka kilkadziesiąt sekund. Poprawka: `try/catch` z logiem → fail-open (wołamy Stripe, który ma własny limit) albo `CheckoutUnavailable`; `commandTimeout` ~1–2 s w `redis.ts` (zabezpiecza też akcje premium). Test „`checkRateLimit` rzuca”.
+
+**R3. Nowy zakup w trakcie karencji `past_due` starej subskrypcji: zapłacono, premium brak do odnowienia** — `src/lib/subscription-sync.ts:156-164` + `route.ts:64-80`. (spec-flow; zweryfikowane w kodzie)
+Stara subskrypcja `past_due` w 3-dniowej karencji → `isPremiumActive` = true → wszystkie zdarzenia nowej, opłaconej subskrypcji kończą się `conflict` bez zapisu, a founder dostaje mail sugerujący zwrot nowej. Po `canceled` starej nic nie synchronizuje nowej aż do jej odnowienia (miesiąc/rok) albo ręcznego `db:sync-subscriptions`. To naturalna ścieżka „wygasła karta → kupuję jeszcze raz”. Poprawka: przychodząca `active`/`trialing` wygrywa z zapisaną `past_due` (zapis + log zamiast konfliktu). Test: stored `past_due` w karencji + przychodząca `active` o innym `id` → zapis, premium, brak maila o konflikcie.
+
+## 🟡 P3
+
+- **R4** `webhook/route.ts:68-69`: gałąź stanu końcowego zwraca `synced` z `isPremiumActive: false`, a `notifyAfterCheckout` wysyła „opłacono” przy każdym `synced`. Pogłębia P3 #8; warunek `result.isPremiumActive` zamyka oba.
+- **R5** `premium-checkout.ts:111`: `line_items.has_more` ignorowane (>10 pozycji). Odrzucić sesję przy `has_more`.
+- **R6** `subscription-sync.ts`: wyścigi niekońcowe (nieświeży `active` po `past_due`). Wąskie okno, samonaprawialne.
+- **R7** `premium.ts:50-53`: `past_due` po zmianie planu w środku okresu liczy karencję od chwili zmiany. Potwierdzić `payment_behavior` Customer Portalu.
+- **R8** `subscription-sync.ts:229-230` vs `premium-prices.ts:14`: dwie wersje reguły cen (pusta lista). Opisać różnicę w JSDoc.
+- **R9** `dziekujemy/page.tsx:232-237`: `paid` jako gałąź domyślna bez exhaustiveness. `switch` z `never`.
+- **R10** `route.test.ts` „konflikt nie wysyła maila o zakupie”: asercja po tytule maila wpisanym na sztywno. Zamienić na `toHaveBeenCalledTimes(1)` + asercję na mail o konflikcie.
+- **R11** `subscription-sync.test.ts` „nieaktywna druga subskrypcja”: `toEqual` → `toMatchObject` zgubiło ID. Przywrócić pełny `toEqual`.
+- **R12** Brakujące testy: `past_due` → `active` z odtworzeniem promocji, `trialing`, wiele pozycji (max startów/końców), `incomplete` po `incomplete_expired`. Test wyścigu #2 (`:238`) jest sekwencyjny i dubluje `:220`.
+- **R13** `sync-subscriptions.ts:74-76`: konflikt w CLI bez `activeSubscriptionId` w logu.
+- **R14** `stale_ignored` jako osobny wariant wyniku zamiast `synced` (czytelność, widoczny w CLI przez `Record<Outcome>`).
+- **R15** Postgres bez `connect_timeout` / `lock_timeout` (`src/db/index.ts:8`): czekanie na `FOR UPDATE` bez limitu wobec `maxDuration` 30 s.
+- **R16** `schema.ts:179`: `current_period_start NOT NULL` bez default. `push` padnie, jeśli `service_subscriptions` ma już wiersze.
+- **R17** `isWithinVerifyLimit` duplikuje `isWithinLimit` z `_actions.ts`; `resolveServerTree` w teście przy drugim użyciu do wspólnego modułu. Mail o konflikcie przepada przy awarii SMTP po `markStripeEventProcessed`: krok operatora — przeglądać logi `conflict`.
+
+## Bookkeeping checkboxów Weryfikacja: (re-review)
+
+- Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
+- Odznaczone na podstawie Agent 5 E2E: 0
+- Pozostawione dla operatora: 0
+- Niejasne: 0
+- Failujące: 0

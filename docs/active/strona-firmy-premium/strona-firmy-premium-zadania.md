@@ -428,6 +428,17 @@ Raport: [review-faza-3.md](review-faza-3.md). Werdykt: ⚠️ kontynuuj z zastrz
 
 ---
 
+## Do poprawy po re-review fazy 3
+
+Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po poprawkach P2”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 3 × P2, 14 × P3). P2 #1, #2, #4–#7 z pierwszego review zamknięte; #3 częściowo (→ R1).
+
+- [ ] 🟠 [important] **R1 `api/stripe/webhook/route.ts:108`, `src/db/sync-subscriptions.ts:53,67`**: klucz testowy + produkcyjna baza nadal zapisuje testowe subskrypcje (lokalny test checkoutu z `.env` na produkcję). Bramka wzorem `assertDropAllowed`/`LOCAL_HOSTS` z `src/db/drop.ts`: `!STRIPE_LIVE_MODE` i host bazy nielokalny → webhook 200 bez sync, CLI odmawia startu. Usunąć martwy filtr `wrong_mode`.
+- [ ] 🟠 [important] **R2 `premium/dziekujemy/page.tsx:34-42`, `src/lib/redis.ts:5-8`**: awaria Redisa → strona błędu płacącemu. `try/catch` z logiem (fail-open albo `CheckoutUnavailable`) + `commandTimeout` ~1–2 s w ioredis. Test „`checkRateLimit` rzuca”.
+- [ ] 🟠 [important] **R3 `src/lib/subscription-sync.ts:156-164`**: nowy zakup w karencji `past_due` starej subskrypcji → `conflict`, opłacona subskrypcja nie zapisana do odnowienia, mail „zwróć”. Przychodząca `active`/`trialing` wygrywa z zapisaną `past_due`. Test.
+- [ ] 🟡 [nit] R4–R17: mail „opłacono” tylko przy `isPremiumActive`, `line_items.has_more`, exhaustiveness w `dziekujemy`, 2 testy z osłabioną/kruchą asercją, brakujące testy (`past_due`→`active`, `trialing`, wiele pozycji, `incomplete_expired`), log konfliktu w CLI, timeouty Postgresa, `NOT NULL` bez default. Szczegóły w raporcie.
+
+---
+
 ## Po wdrożeniu
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną

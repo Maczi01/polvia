@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (poprawki P2 po review fazy 3)
+**Ostatnia aktualizacja:** 2026-11-01 (re-review fazy 3 po poprawkach)
 
 ## Źródła
 
@@ -342,6 +342,14 @@ Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-build
 - **#5:** sync zwraca `conflict` bez maila; mail wysyła webhook przy `isFirstDelivery`, tylko dla `checkout.session.completed` i aktywnej przychodzącej subskrypcji (odchylenie od sugestii `subscription.created` — tam status bywa `incomplete`). CLI wiąże od najstarszej, bez maili.
 - **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
 - **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
+
+## Re-review fazy 3 po poprawkach (2026-11-01)
+
+4 agentów (security, performance, kieran-typescript, spec-flow) na `5748887..HEAD`. Werdykt ⚠️ 0 × P1, 3 × P2, 14 × P3. Zamknięte: P2 #1, #2, #4, #5, #6, #7.
+
+- **Wniosek o `livemode`:** porównanie trybu klucza z trybem zdarzenia nie chroni przed niczym realnym (inny `whsec` per tryb, `list` zwraca jeden tryb). Prawdziwe ryzyko to *klucz testowy + baza produkcyjna*. Potrzebna bramka na host bazy (R1).
+- **Wniosek o rate limicie:** limit na stronie po płatności wprowadził twardą zależność od Redisa (R2). Każdy nowy `checkRateLimit` na ścieżce płacącego potrzebuje fail-open albo łagodnego wariantu.
+- **R3:** blokada konfliktu przez `past_due` w karencji uniemożliwia „ratunkowy” zakup po wygaśnięciu karty.
 
 ## Środowisko worktree
 
