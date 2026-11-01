@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { ContactFormData } from '@/app/api/submit-contact-query/route';
+import type { ContactFormData } from '@/app/api/submit-contact-query/route';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input/input';
+import type { ContactPrefill } from '@/lib/premium-contact';
 
 const formSchema = z.object({
     email: z.string().email({ message: 'Invalid email' }).max(100),
@@ -50,8 +51,15 @@ const submitContactForm = async (formData: ContactFormData) => {
     return await res.json();
 };
 
-export const ContactForm = () => {
+type ContactFormProps = {
+    /** Wstepne wypelnienie z query (`?topic=premium&firma=<slug>`) — zapytanie o premium. */
+    prefill?: ContactPrefill | null;
+};
+
+export const ContactForm = ({ prefill = null }: ContactFormProps) => {
     const t = useTranslations('ContactForm');
+    const premiumMessage =
+        prefill?.slug ? t('premiumMessage', { slug: prefill.slug }) : t('premiumMessageNoService');
     const router = useRouter();
     const [submitStatus, setSubmitStatus] = useState<{
         success?: boolean;
@@ -63,8 +71,8 @@ export const ContactForm = () => {
         resolver: zodResolver(formSchema),
         defaultValues: {
             email: '',
-            topic: '',
-            message: '',
+            topic: prefill ? t('premiumTopic') : '',
+            message: prefill ? premiumMessage : '',
         },
     });
 

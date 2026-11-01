@@ -144,9 +144,9 @@ export const promotedServicesRelations = relations(promotedServicesTable, ({ one
 
 /**
  * Tresc strony premium (1:1 z usluga), publikowana przez `db:premium` z bloku `premium`
- * w `data/services/<plik>.json`. Niezalezna od subskrypcji: po wygasnieciu zostaje
+ * w `data/services/<plik>.json`. Niezalezna od stanu premium: po wygasnieciu zostaje
  * i wraca po wznowieniu (R18). Teksty w jsonb maja wszystkie cztery jezyki; ksztalt
- * pilnuje `premiumContentSchema` na zapisie i na odczycie.
+ * pilnuje `premiumContentSchema` na zapisie i na odczycie. Premium reczne: `manual-premium.ts`.
  */
 export const serviceProfilesTable = pgTable('service_profiles', {
     serviceId: uuid('service_id')
@@ -158,6 +158,7 @@ export const serviceProfilesTable = pgTable('service_profiles', {
     gallery: jsonb('gallery').$type<PremiumGalleryItem[]>().notNull().default([]),
     priceList: jsonb('price_list').$type<PremiumPriceListItem[]>().notNull().default([]),
     faq: jsonb('faq').$type<PremiumFaqItem[]>().notNull().default([]),
+    manualPremiumUntil: timestamp('manual_premium_until', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });

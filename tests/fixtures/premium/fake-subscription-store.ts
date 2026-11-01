@@ -1,7 +1,7 @@
 /**
  * Atrapy granic synchronizacji subskrypcji (`subscription-sync.ts`) dla testow: baza za
- * adapterem `@/lib/subscription-store` (slownik w pamieci per `serviceId`) i `stripe` z samym
- * `subscriptions.retrieve`. Obie to zewnetrzne serwisy — logika decyzji zostaje prawdziwa.
+ * adapterem `@/lib/subscription-store` (slownik w pamieci per `serviceId`) i `@/lib/stripe`
+ * z klientem o samym `subscriptions.retrieve` i cenami premium. Obie to zewnetrzne serwisy — logika decyzji zostaje prawdziwa.
  *
  * Uzycie w tescie (fabryka `jest.mock` nie widzi importow, wiec bierze modul przez
  * `jest.requireActual`; rejestr modulow jest wspolny, wiec test i atrapa dziela stan):
@@ -73,8 +73,12 @@ export const fakeSubscriptionStoreModule = {
 
 export const fakeStripeRetrieve = jest.fn<Promise<StripeSubscriptionSnapshot>, [string]>();
 
+const fakeStripeClient = { subscriptions: { retrieve: fakeStripeRetrieve } };
+
+/** Klucz testowy; ceny premium z konfiguracji to allowlista synchronizacji. */
 export const fakeStripeModule = {
-    stripe: { subscriptions: { retrieve: fakeStripeRetrieve } },
+    getStripe: (): typeof fakeStripeClient => fakeStripeClient,
+    stripeConfig: { priceMonthly: PRICE_MONTHLY, priceYearly: PRICE_YEARLY },
     STRIPE_LIVE_MODE: false,
 };
 

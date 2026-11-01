@@ -1,13 +1,15 @@
 import 'server-only';
 
-import { env } from '../../env';
+import { stripeConfig } from '@/lib/stripe';
 
 /**
  * Allowlista cen premium. Konto Stripe moze miec inne produkty i Payment Linki, a UUID-y
  * wpisow sa publiczne — premium daje wylacznie subskrypcja/sesja z jedna z tych cen.
+ * Bez konfiguracji Stripe zadna cena nie jest cena premium.
  */
 export function isPremiumPriceId(priceId: string): boolean {
-    return priceId === env.STRIPE_PRICE_MONTHLY || priceId === env.STRIPE_PRICE_YEARLY;
+    if (stripeConfig === null) return false;
+    return priceId === stripeConfig.priceMonthly || priceId === stripeConfig.priceYearly;
 }
 
 /** Wszystkie pozycje (co najmniej jedna) maja cene premium. */

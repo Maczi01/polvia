@@ -1,4 +1,5 @@
 import {
+    hasActivePremium,
     isPremiumActive,
     premiumRankingExpiry,
     type PremiumSubscriptionState,
@@ -119,5 +120,42 @@ describe('premiumRankingExpiry', () => {
         premiumRankingExpiry(sub);
 
         expect(sub.currentPeriodEnd).toEqual(new Date('2026-11-30T12:00:00.000Z'));
+    });
+});
+
+describe('hasActivePremium — subskrypcja albo premium reczne', () => {
+    const now = new Date('2026-11-15T12:00:00.000Z');
+    const manualUntil = new Date('2026-11-30T23:00:00.000Z');
+
+    it('samo premium reczne (bez subskrypcji) wlacza premium do konca daty', () => {
+        expect(hasActivePremium({ subscription: null, manualPremiumUntil: manualUntil }, now)).toBe(
+            true,
+        );
+    });
+
+    it('wygasle premium reczne i brak subskrypcji: brak premium', () => {
+        const after = new Date('2026-12-01T00:00:00.000Z');
+
+        expect(
+            hasActivePremium({ subscription: null, manualPremiumUntil: manualUntil }, after),
+        ).toBe(false);
+    });
+
+    it('aktywna subskrypcja bez premium recznego: premium', () => {
+        expect(hasActivePremium({ subscription: subscription(), manualPremiumUntil: null }, now)).toBe(
+            true,
+        );
+    });
+
+    it('anulowana subskrypcja nie kasuje trwajacego premium recznego', () => {
+        const canceled = subscription({ status: 'canceled' });
+
+        expect(
+            hasActivePremium({ subscription: canceled, manualPremiumUntil: manualUntil }, now),
+        ).toBe(true);
+    });
+
+    it('bez subskrypcji i bez daty: brak premium', () => {
+        expect(hasActivePremium({ subscription: null, manualPremiumUntil: null }, now)).toBe(false);
     });
 });

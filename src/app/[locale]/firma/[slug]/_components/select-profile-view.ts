@@ -1,4 +1,4 @@
-import { isPremiumActive, type PremiumSubscriptionState } from '@/lib/premium';
+import { hasActivePremium, type PremiumState } from '@/lib/premium';
 import type { PremiumTemplate } from '@/lib/premium-templates';
 
 import type {
@@ -18,27 +18,27 @@ export type ProfileViewKind =
     | { kind: 'free' }
     | { kind: 'premium'; template: PremiumTemplate; content: PremiumContent | null };
 
-export type SelectProfileViewInput = {
+export type SelectProfileViewInput = PremiumState & {
     /**
      * Tresc premium z `service_profiles` (walidacja Zod + lokalizacja). Wolana dopiero przy
      * aktywnym premium: profil free nie parsuje jsonb, a uszkodzony wiersz nie loguje bledu
      * przy kazdym wejsciu na profil darmowy. Tresc zostaje w bazie po wygasnieciu premium.
      */
     loadPremiumContent: () => PremiumContent | null;
-    subscription: PremiumSubscriptionState | null;
     now: Date;
 };
 
 /**
- * Jedyna decyzja, ktory widok profilu renderujemy. Strona i `generateMetadata` wolaja
+ * Jedyna decyzja, ktory widok profilu renderujemy (premium = subskrypcja albo premium reczne). Strona i `generateMetadata` wolaja
  * ja z tymi samymi danymi, wiec cover w Open Graph pojawia sie tylko przy szablonie premium.
  */
 export function selectProfileView({
     loadPremiumContent,
     subscription,
+    manualPremiumUntil,
     now,
 }: SelectProfileViewInput): ProfileViewKind {
-    if (!isPremiumActive(subscription, now)) return { kind: 'free' };
+    if (!hasActivePremium({ subscription, manualPremiumUntil }, now)) return { kind: 'free' };
 
     const content = loadPremiumContent();
     return { kind: 'premium', template: content?.template ?? DEFAULT_PREMIUM_TEMPLATE, content };

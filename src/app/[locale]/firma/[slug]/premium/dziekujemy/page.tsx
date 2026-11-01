@@ -1,5 +1,6 @@
 import { CheckCircle2, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -11,8 +12,8 @@ import { isMaterialsSent } from '@/lib/premium-materials-sent';
 import { isWithinPremiumLimit } from '@/lib/premium-rate-limit';
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
 import { isValidServiceSlug } from '@/lib/service-slug-format';
+import { stripeConfig } from '@/lib/stripe';
 
-import { env } from '../../../../../../../env';
 import { submitPremiumMaterials } from '../../_actions';
 import { checkoutSessionIdSchema } from '../../_checkout-schema';
 import { PremiumMaterialsForm } from '../../_components/premium-materials-form/premium-materials-form';
@@ -157,7 +158,7 @@ async function CheckoutUnavailable({
     );
 }
 
-async function PaymentConfirmedCard(): Promise<ReactElement> {
+async function PaymentConfirmedCard({ portalUrl }: { portalUrl: string }): Promise<ReactElement> {
     const t = await getTranslations('ServiceProfile.premiumThanks');
     const inbox = getOperatorInbox();
 
@@ -185,7 +186,7 @@ async function PaymentConfirmedCard(): Promise<ReactElement> {
             <p className="mt-3 text-gray-700 dark:text-gray-300">
                 {t('portal')}{' '}
                 <a
-                    href={env.STRIPE_PORTAL_LOGIN_URL}
+                    href={portalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`inline-flex items-center gap-1 ${LINK_CLASSES}`}
@@ -230,12 +231,16 @@ async function MaterialsCard({
 /**
  * Powrot ze Stripe Checkout (`success_url`). Sesja jest sprawdzana w Stripe przed renderem:
  * formularz materialow dostaje tylko oplacona sesja tego wpisu. Strona nie czeka na webhook —
- * premium wlacza sie osobno, „w ciagu kilku minut”.
+ * premium wlacza sie osobno, „w ciagu kilku minut”. Bez konfiguracji Stripe strony nie ma (404):
+ * nie ma platnosci, ktora moglaby tu wrocic.
  */
 export default async function PremiumThanksPage({
     params,
     searchParams,
 }: PageProps): Promise<ReactElement> {
+    const config = stripeConfig;
+    if (!config) notFound();
+
     const { locale, slug } = await params;
     setRequestLocale(toLocale(locale));
     const { session_id: rawSessionId } = await searchParams;
@@ -263,7 +268,7 @@ export default async function PremiumThanksPage({
         case 'paid': {
             return (
                 <PageShell>
-                    <PaymentConfirmedCard />
+                    <PaymentConfirmedCard portalUrl={config.portalLoginUrl} />
                     <MaterialsCard sessionId={sessionId.data} slug={slug} />
                 </PageShell>
             );

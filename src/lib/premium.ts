@@ -1,8 +1,12 @@
+import { isManualPremiumActive } from './manual-premium';
+
 /**
  * Stan premium wpisu — jedyne miejsce, ktore decyduje, czy premium jest aktywne.
+ * Status premium FIRMY (widok profilu, alias, blokada checkoutu): `hasActivePremium`.
+ * `isPremiumActive` ocenia sam rekord subskrypcji Stripe (synchronizacja, ranking).
  *
  * Modul czysty (bez `server-only`, `src/db` i Stripe): stan liczymy na odczycie z danych
- * subskrypcji, bez crona. Statusy to statusy subskrypcji Stripe; schemat bazy zrobi z
+ * subskrypcji i daty premium recznego, bez crona. Statusy to statusy subskrypcji Stripe; schemat bazy zrobi z
  * `SUBSCRIPTION_STATUSES` enum, wiec ta stala jest zrodlem prawdy.
  */
 export const SUBSCRIPTION_STATUSES = [
@@ -57,4 +61,23 @@ export function isPremiumActive(sub: PremiumSubscriptionState | null, now: Date)
     if (!PREMIUM_ENTITLED_STATUSES.has(sub.status)) return false;
 
     return now.getTime() < premiumRankingExpiry(sub).getTime();
+}
+
+/** Wszystko, co decyduje o premium wpisu — czytane w jednym zapytaniu z wierszem wpisu. */
+export type PremiumState = {
+    /** Rekord `service_subscriptions` tego wpisu; `null`: brak subskrypcji. */
+    subscription: PremiumSubscriptionState | null;
+    /** `service_profiles.manual_premium_until` (premium oplacone przelewem); `null`: brak. */
+    manualPremiumUntil: Date | null;
+};
+
+/**
+ * Jedyne zrodlo prawdy o premium firmy: subskrypcja Stripe ALBO premium reczne
+ * (`manual-premium.ts`, aktywne do konca dnia `activeUntil` w strefie Europe/Warsaw).
+ */
+export function hasActivePremium(
+    { subscription, manualPremiumUntil }: PremiumState,
+    now: Date,
+): boolean {
+    return isPremiumActive(subscription, now) || isManualPremiumActive(manualPremiumUntil, now);
 }

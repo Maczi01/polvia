@@ -1,10 +1,12 @@
 // app/[locale]/contact/page.tsx
 
 import { ContactForm } from '@/app/[locale]/(main)/_components/contact-form';
+import { ContactFormFromQuery } from '@/app/[locale]/(main)/_components/contact-form-from-query';
 import { AddBusinessCta } from './_components/add-business-cta/add-business-cta';
 import { Header } from '@/components/header/header';
 import { getTranslations, setRequestLocale } from 'next-intl/server'; // Add setRequestLocale
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import { env } from '../../../../../env';
 
 export async function generateStaticParams() {
@@ -60,7 +62,10 @@ export default async function ContactPage({ // Add async and params
 
     return (
         <div className="overflow-y-auto px-4 py-10 sm:px-6">
-            <ContactForm />
+            {/* Wstepne wypelnienie z query bez czytania `searchParams` (strona statyczna). */}
+            <Suspense fallback={<ContactForm />}>
+                <ContactFormFromQuery />
+            </Suspense>
             <AddBusinessCta />
         </div>
     );

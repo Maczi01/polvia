@@ -24,7 +24,9 @@ export const PREMIUM_MATERIALS_MAX_LENGTH: Record<PremiumMaterialsTextField, num
 
 export type PremiumMaterialsField = 'template' | PremiumMaterialsTextField;
 
+/** Platnosci online wylaczone (brak `STRIPE_*`) — UI wtedy akcji nie wola, ale to publiczny POST. */
 export type CheckoutErrorCode =
+    | 'CHECKOUT_DISABLED'
     | 'BAD_INPUT'
     | 'RATE_LIMITED'
     | 'NOT_FOUND'
@@ -39,7 +41,14 @@ export type CheckoutAction = (
     formData: FormData,
 ) => Promise<CheckoutState>;
 
+/**
+ * Jak profil sprzedaje premium. Decyduje serwer (`isStripeConfigured`): Stripe Checkout albo
+ * — przy wylaczonych platnosciach online — link do formularza kontaktowego (premium reczne).
+ */
+export type PremiumPurchase = { kind: 'checkout'; action: CheckoutAction } | { kind: 'contact' };
+
 export type MaterialsErrorCode =
+    | 'CHECKOUT_DISABLED'
     | 'BAD_INPUT'
     | 'RATE_LIMITED'
     | 'FORBIDDEN'

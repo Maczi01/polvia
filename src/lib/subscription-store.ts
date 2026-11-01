@@ -1,9 +1,14 @@
 import 'server-only';
 
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, gt, notExists, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { promotedServicesTable, servicesTable, serviceSubscriptionsTable } from '@/db/schema';
+import {
+    promotedServicesTable,
+    serviceProfilesTable,
+    servicesTable,
+    serviceSubscriptionsTable,
+} from '@/db/schema';
 import type { PremiumSubscriptionState } from '@/lib/premium';
 import { subscriptionColumns } from '@/lib/subscription-query-parts';
 
@@ -33,8 +38,9 @@ export interface SubscriptionTransaction {
      *   odnowienie); koszt: skrocenie okresu subskrypcji przy aktywnym statusie (np. zmiana
      *   planu rocznego na miesieczny) nie skraca rankingu — premium liczy `isPremiumActive`
      *   z subskrypcji, nie z tej tabeli, a utrata uprawnien i tak konczy sie `null`,
-     * - `null` usuwa wiersz bez wzgledu na pochodzenie — po wygasnieciu subskrypcji reczna
-     *   promocje tego wpisu operator zaklada ponownie (krok w checkliscie operatora).
+     * - `null` usuwa wiersz, CHYBA ZE wpis ma trwajace premium reczne
+     *   (`service_profiles.manual_premium_until > NOW()`). Inna reczna promocja (sam wiersz
+     *   `promoted_services` bez daty w pliku) znika — operator zaklada ja ponownie.
      */
     setPromotion(serviceId: string, expiresAt: Date | null): Promise<void>;
 }
@@ -99,9 +105,24 @@ function createTransactionStore(tx: Transaction): SubscriptionTransaction {
 
         async setPromotion(serviceId, expiresAt) {
             if (expiresAt === null) {
-                await tx
-                    .delete(promotedServicesTable)
-                    .where(eq(promotedServicesTable.serviceId, serviceId));
+                // Trwajace premium reczne (przelew) trzyma ranking — ustawil go seed /
+                // `db:premium` z `GREATEST`, wiec wiersz siega co najmniej konca tej daty.
+                await tx.delete(promotedServicesTable).where(
+                    and(
+                        eq(promotedServicesTable.serviceId, serviceId),
+                        notExists(
+                            tx
+                                .select({ serviceId: serviceProfilesTable.serviceId })
+                                .from(serviceProfilesTable)
+                                .where(
+                                    and(
+                                        eq(serviceProfilesTable.serviceId, serviceId),
+                                        gt(serviceProfilesTable.manualPremiumUntil, sql`NOW()`),
+                                    ),
+                                ),
+                        ),
+                    ),
+                );
                 return;
             }
 

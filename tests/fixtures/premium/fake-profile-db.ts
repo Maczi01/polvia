@@ -109,6 +109,7 @@ export const SERVICE_ROW = {
     image: 'roza.png',
     tags: ['Податки'],
     subscription: null,
+    manualPremiumUntil: null,
 };
 
 export function location(overrides: Partial<ServiceProfileLocation> = {}): ServiceProfileLocation {

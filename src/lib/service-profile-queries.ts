@@ -12,14 +12,19 @@ import {
     servicesTagsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
-import { isPremiumActive, type PremiumSubscriptionState } from '@/lib/premium';
+import { hasActivePremium, type PremiumSubscriptionState } from '@/lib/premium';
 import { isPublicService } from '@/lib/public-service-filter';
 import {
     SIMILAR_SERVICES_LIMIT,
     type SimilarServiceRow,
     type SimilarServicesSource,
 } from '@/lib/similar-services';
-import { subscriptionColumns, subscriptionJoin } from '@/lib/subscription-query-parts';
+import {
+    manualPremiumUntilColumn,
+    serviceProfileJoin,
+    subscriptionColumns,
+    subscriptionJoin,
+} from '@/lib/subscription-query-parts';
 
 type ServiceRow = InferSelectModel<typeof servicesTable>;
 type LocationRow = InferSelectModel<typeof serviceLocationsTable>;
@@ -63,15 +68,17 @@ export type ServiceProfile = Pick<
      */
     premium: object | null;
     /**
-     * Stan subskrypcji tej uslugi — wejscie `isPremiumActive`. `null`: brak subskrypcji.
+     * Stan subskrypcji tej uslugi — wejscie `hasActivePremium`. `null`: brak subskrypcji.
      * Czytany w tym samym zapytaniu co profil, wiec zawsze dotyczy wpisu spod `slug`.
      */
     subscription: PremiumSubscriptionState | null;
+    /** Koniec premium recznego tej uslugi (`service_profiles`) — wejscie `hasActivePremium`. */
+    manualPremiumUntil: Date | null;
 };
 
 export type ServiceSlugStatus = {
     exists: boolean;
-    /** `isPremiumActive` w chwili zapytania; `false` dla nieistniejacego wpisu. */
+    /** `hasActivePremium` w chwili zapytania; `false` dla nieistniejacego wpisu. */
     hasActivePremium: boolean;
 };
 
@@ -123,15 +130,20 @@ export async function getServiceSlugStatus(
     now: Date = new Date(),
 ): Promise<ServiceSlugStatus> {
     const [row] = await db
-        .select({ id: servicesTable.id, subscription: subscriptionColumns })
+        .select({
+            id: servicesTable.id,
+            subscription: subscriptionColumns,
+            manualPremiumUntil: manualPremiumUntilColumn,
+        })
         .from(servicesTable)
         .leftJoin(serviceSubscriptionsTable, subscriptionJoin)
+        .leftJoin(serviceProfilesTable, serviceProfileJoin)
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);
 
     if (!row) return { exists: false, hasActivePremium: false };
 
-    return { exists: true, hasActivePremium: isPremiumActive(row.subscription, now) };
+    return { exists: true, hasActivePremium: hasActivePremium(row, now) };
 }
 
 export type ServiceProfileSitemapEntry = { slug: string; updatedAt: Date };
@@ -215,10 +227,11 @@ function getServiceRow(slug: string, locale: string) {
                 faq: serviceProfilesTable.faq,
             },
             subscription: subscriptionColumns,
+            manualPremiumUntil: manualPremiumUntilColumn,
         })
         .from(servicesTable)
         .leftJoin(servicesTranslationsAlias, translationJoin(locale))
-        .leftJoin(serviceProfilesTable, eq(serviceProfilesTable.serviceId, servicesTable.id))
+        .leftJoin(serviceProfilesTable, serviceProfileJoin)
         .leftJoin(serviceSubscriptionsTable, subscriptionJoin)
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);

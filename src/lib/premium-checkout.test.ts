@@ -15,29 +15,17 @@ const mockCreate = jest.fn();
 const mockRetrieve = jest.fn();
 const mockTargets = new Map<string, PremiumCheckoutTarget>();
 
-jest.mock('../../env', () => ({
-    env: {
-        NEXT_PUBLIC_SITE_URL: 'https://polvia.pl',
-        STRIPE_PRICE_MONTHLY: 'price_monthly_test',
-        STRIPE_PRICE_YEARLY: 'price_yearly_test',
-    },
-}));
+jest.mock('../../env', () => ({ env: { NEXT_PUBLIC_SITE_URL: 'https://polvia.pl' } }));
 jest.mock('@/db', () => ({ db: {} }));
-// Gettery, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje mockow.
-jest.mock('@/lib/stripe', () => ({
-    stripe: {
-        checkout: {
-            sessions: {
-                get create() {
-                    return mockCreate;
-                },
-                get retrieve() {
-                    return mockRetrieve;
-                },
-            },
-        },
-    },
-}));
+// Klient leniwy, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje mockow.
+jest.mock('@/lib/stripe', () => {
+    const config = { priceMonthly: 'price_monthly_test', priceYearly: 'price_yearly_test' };
+    return {
+        getStripe: () => ({ checkout: { sessions: { create: mockCreate, retrieve: mockRetrieve } } }),
+        stripeConfig: config,
+        requireStripeConfig: () => config,
+    };
+});
 jest.mock('@/lib/premium-checkout-queries', () => ({
     getPremiumCheckoutTarget: async (serviceId: string) => mockTargets.get(serviceId) ?? null,
 }));

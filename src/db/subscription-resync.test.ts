@@ -3,22 +3,31 @@
  */
 import { type SubscriptionSyncResult, syncSubscriptionSnapshot } from '@/lib/subscription-sync';
 
-import { keyModeRefusal, runSubscriptionResync } from './subscription-resync';
+import {
+    keyModeRefusal,
+    runSubscriptionResync,
+    STRIPE_DISABLED_REFUSAL,
+} from './subscription-resync';
 
 /** Stripe (lista subskrypcji) i synchronizacja (baza) to granice zewnetrzne skryptu. */
 const mockListed: Array<{ id: string; created: number }> = [];
 
+const mockListCalls: unknown[] = [];
+
 jest.mock('@/lib/stripe', () => ({
-    stripe: {
+    getStripe: () => ({
         subscriptions: {
             // Lista Stripe jest asynchronicznie iterowalna (auto-paginacja).
-            list: () => ({
-                async *[Symbol.asyncIterator]() {
-                    yield* mockListed;
-                },
-            }),
+            list: (params: unknown) => {
+                mockListCalls.push(params);
+                return {
+                    async *[Symbol.asyncIterator]() {
+                        yield* mockListed;
+                    },
+                };
+            },
         },
-    },
+    }),
 }));
 jest.mock('@/lib/subscription-sync', () => ({ syncSubscriptionSnapshot: jest.fn() }));
 
@@ -41,6 +50,7 @@ function logged(): string {
 
 beforeEach(() => {
     mockListed.length = 0;
+    mockListCalls.length = 0;
     jest.mocked(syncSubscriptionSnapshot)
         .mockReset()
         .mockResolvedValue({ outcome: 'synced', serviceId: SERVICE_ID, isPremiumActive: true });
@@ -69,10 +79,20 @@ describe('keyModeRefusal', () => {
 });
 
 describe('runSubscriptionResync', () => {
+    it('Stripe nieskonfigurowany: odmowa z komunikatem, kod 1, bez zapytania do Stripe', async () => {
+        mockListed.push({ id: 'sub_1', created: 1 });
+
+        expect(await runSubscriptionResync(LOCAL, null)).toBe(1);
+        expect(console.error).toHaveBeenCalledWith(STRIPE_DISABLED_REFUSAL);
+        expect(STRIPE_DISABLED_REFUSAL).toContain('STRIPE_*');
+        expect(mockListCalls).toEqual([]);
+        expect(syncSubscriptionSnapshot).not.toHaveBeenCalled();
+    });
+
     it('odmowa trybu: kod 1, zadnej synchronizacji', async () => {
         mockListed.push({ id: 'sub_1', created: 1 });
 
-        expect(await runSubscriptionResync(REMOTE, false)).toBe(1);
+        expect(await runSubscriptionResync(REMOTE, 'test')).toBe(1);
         expect(syncSubscriptionSnapshot).not.toHaveBeenCalled();
         expect(console.error).toHaveBeenCalledWith(expect.stringContaining('ODMOWA'));
     });
@@ -80,7 +100,7 @@ describe('runSubscriptionResync', () => {
     it('synchronizuje obiekty z listy od najstarszego, bez wskazowki wpisu; kod 0', async () => {
         mockListed.push({ id: 'sub_new', created: 300 }, { id: 'sub_old', created: 100 });
 
-        expect(await runSubscriptionResync(LOCAL, false)).toBe(0);
+        expect(await runSubscriptionResync(LOCAL, 'test')).toBe(0);
         expect(syncedIds()).toEqual(['sub_old', 'sub_new']);
         expect(syncSubscriptionSnapshot).toHaveBeenCalledWith(mockListed[1]);
     });
@@ -96,7 +116,7 @@ describe('runSubscriptionResync', () => {
         };
         jest.mocked(syncSubscriptionSnapshot).mockResolvedValue(conflict);
 
-        await runSubscriptionResync(LOCAL, true);
+        await runSubscriptionResync(LOCAL, 'live');
 
         expect(logged()).toContain(
             'sub_second: conflict (wpis ma sub_first, oplacona — do zwrotu)',
@@ -109,7 +129,7 @@ describe('runSubscriptionResync', () => {
             .mockRejectedValueOnce(new Error('timeout'))
             .mockResolvedValueOnce({ outcome: 'stale_ignored', serviceId: SERVICE_ID });
 
-        expect(await runSubscriptionResync(LOCAL, false)).toBe(1);
+        expect(await runSubscriptionResync(LOCAL, 'test')).toBe(1);
         expect(syncedIds()).toEqual(['sub_bad', 'sub_ok']);
         expect(console.log).toHaveBeenCalledWith('Podsumowanie:', {
             synced: 0,

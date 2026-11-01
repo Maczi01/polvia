@@ -1,6 +1,8 @@
 import { screen, within } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
+import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
+
 import {
     localServiceFixture,
     noLogoServiceFixture,
@@ -13,6 +15,7 @@ expect.extend(toHaveNoViolations);
 
 /** Akcja checkoutu nie jest wolana w tych testach — profil tylko renderuje CTA. */
 const checkoutAction = jest.fn(async () => null);
+const purchase: PremiumPurchase = { kind: 'checkout', action: checkoutAction };
 
 jest.mock('@/i18n/navigation', () => ({
     Link: jest.requireActual('../profile-test-utils').MockLink,
@@ -21,7 +24,7 @@ jest.mock('@/i18n/navigation', () => ({
 describe('ProfileFree', () => {
     it('renderuje nazwe jako h1 i przechodzi jest-axe', async () => {
         const { container } = renderWithIntl(
-            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+            <ProfileFree profile={localServiceFixture} purchase={purchase} />,
         );
 
         expect(
@@ -32,7 +35,7 @@ describe('ProfileFree', () => {
 
     it('pokazuje dane wpisu jak karta: kontakt, godziny, adresy, jezyki i tagi', () => {
         renderWithIntl(
-            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+            <ProfileFree profile={localServiceFixture} purchase={purchase} />,
         );
 
         expect(screen.getByRole('region', { name: 'Kontakt' })).toBeInTheDocument();
@@ -48,7 +51,7 @@ describe('ProfileFree', () => {
 
     it('renderuje "Podobne firmy" i CTA ulepszenia jako checkout tego wpisu', () => {
         renderWithIntl(
-            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+            <ProfileFree profile={localServiceFixture} purchase={purchase} />,
         );
 
         const similar = screen.getByRole('region', { name: 'Podobne firmy' });
@@ -63,7 +66,7 @@ describe('ProfileFree', () => {
 
     it('wpis online-only: badge "Online", bez adresu i mapy', async () => {
         const { container } = renderWithIntl(
-            <ProfileFree profile={onlineServiceFixture} checkoutAction={checkoutAction} />,
+            <ProfileFree profile={onlineServiceFixture} purchase={purchase} />,
         );
 
         expect(screen.getByText('Online')).toBeInTheDocument();
@@ -76,7 +79,7 @@ describe('ProfileFree', () => {
 
     it('wpis bez logo, opisu i podobnych firm: zastepcze logo, bez pustych sekcji', async () => {
         const { container } = renderWithIntl(
-            <ProfileFree profile={noLogoServiceFixture} checkoutAction={checkoutAction} />,
+            <ProfileFree profile={noLogoServiceFixture} purchase={purchase} />,
         );
 
         const logo = screen.getByRole('img', { name: `Logo firmy ${noLogoServiceFixture.name}` });

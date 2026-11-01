@@ -22,9 +22,6 @@ import {
 import { syncSubscriptionFromStripe } from './subscription-sync';
 
 /** Stripe, baza (za adapterem `subscription-store`) i SMTP to zewnetrzne serwisy. */
-jest.mock('../../env', () => ({
-    env: { STRIPE_PRICE_MONTHLY: 'price_monthly_test', STRIPE_PRICE_YEARLY: 'price_yearly_test' },
-}));
 jest.mock(
     '@/lib/stripe',
     () =>

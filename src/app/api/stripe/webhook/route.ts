@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 import { isLocalDatabaseUrl } from '@/lib/database-host';
-import { stripe, STRIPE_LIVE_MODE } from '@/lib/stripe';
+import { getStripe, STRIPE_LIVE_MODE, stripeConfig } from '@/lib/stripe';
+import type { StripeConfig } from '@/lib/stripe-config';
 import { isStripeEventProcessed, markStripeEventProcessed } from '@/lib/stripe-event-dedupe';
 import { subscriptionSyncTarget } from '@/lib/stripe-event-sync-target';
 import {
@@ -17,7 +18,8 @@ import { env } from '../../../../../env';
  * Webhook Stripe: utrzymuje w bazie stan subskrypcji premium (`service_subscriptions`)
  * i pozycje w rankingu (`promoted_services`).
  *
- * Kolejnosc: 1) podpis (400), 2) bramki trybu bez synchronizacji i bez oznaczenia: klucz
+ * Kolejnosc: 0) Stripe nieskonfigurowany (platnosci online wylaczone) → 404, jakby endpointu
+ * nie bylo — nikt go wtedy nie rejestruje w Stripe, 1) podpis (400), 2) bramki trybu bez synchronizacji i bez oznaczenia: klucz
  * testowy + baza nielokalna → 503 (blad konfiguracji, Stripe ponowi), `livemode` zdarzenia
  * niezgodny z kluczem → 200, 3) dedupe `stripe_events` (duplikat → 200),
  * 4) synchronizacja (blad → 500, Stripe ponowi), 5) oznaczenie zdarzenia, 6) skutki uboczne
@@ -43,6 +45,7 @@ export const maxDuration = 30;
 const RESPONSE_MARGIN_MS = 2000;
 
 type WebhookErrorCode =
+    | 'NOT_FOUND'
     | 'MISSING_SIGNATURE'
     | 'INVALID_SIGNATURE'
     | 'CONFIG_MISMATCH'
@@ -57,9 +60,13 @@ function received(): NextResponse {
 }
 
 /** `null`: podpis niepoprawny albo przeterminowany. Inne bledy (konfiguracja) leca wyzej. */
-function verifyEvent(payload: string, signature: string): Stripe.Event | null {
+function verifyEvent(
+    config: StripeConfig,
+    payload: string,
+    signature: string,
+): Stripe.Event | null {
     try {
-        return stripe.webhooks.constructEvent(payload, signature, env.STRIPE_WEBHOOK_SECRET);
+        return getStripe().webhooks.constructEvent(payload, signature, config.webhookSecret);
     } catch (error) {
         if (error instanceof Stripe.errors.StripeSignatureVerificationError) return null;
         throw error;
@@ -114,13 +121,16 @@ async function processEvent(event: Stripe.Event, deadline: number): Promise<void
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+    // Bez konfiguracji nie ma czym sprawdzic podpisu ani czego synchronizowac.
+    if (!stripeConfig) return jsonError('NOT_FOUND', 'Not found', 404);
+
     const deadline = Date.now() + maxDuration * 1000 - RESPONSE_MARGIN_MS;
     const signature = request.headers.get('stripe-signature');
     if (!signature) return jsonError('MISSING_SIGNATURE', 'Missing Stripe signature', 400);
 
     try {
         // Surowa tresc: podpis liczony jest z bajtow, nie z przeparsowanego JSON-a.
-        const event = verifyEvent(await request.text(), signature);
+        const event = verifyEvent(stripeConfig, await request.text(), signature);
         if (!event) return jsonError('INVALID_SIGNATURE', 'Invalid Stripe signature', 400);
 
         // Klucz testowy przy bazie nielokalnej (np. lokalny `.env` z produkcyjnym `DATABASE_URL`

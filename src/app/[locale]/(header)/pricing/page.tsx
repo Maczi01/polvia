@@ -3,9 +3,14 @@ import type { JSX } from 'react';
 
 import { toLocale } from '@/i18n/config';
 import { Link } from '@/i18n/navigation';
+import { stripeConfig } from '@/lib/stripe';
 
-import { env } from '../../../../../env';
-import { PricingPlans } from './_components/pricing-plans/pricing-plans';
+import { PricingPlans, type PricingPurchase } from './_components/pricing-plans/pricing-plans';
+
+/** Bez konfiguracji Stripe plan premium prowadzi do kontaktu (premium reczne, przelew). */
+const PRICING_PURCHASE: PricingPurchase = stripeConfig
+    ? { kind: 'checkout', portalUrl: stripeConfig.portalLoginUrl }
+    : { kind: 'contact' };
 
 interface PageProps {
     params: Promise<{ locale: string }>;
@@ -22,7 +27,7 @@ export default async function PricingPage({ params }: PageProps): Promise<JSX.El
         <div className="min-h-screen bg-gray-50 px-6 py-16 dark:bg-gray-900">
             <div className="mx-auto max-w-6xl">
                 <PricingPlans
-                    portalUrl={env.STRIPE_PORTAL_LOGIN_URL}
+                    purchase={PRICING_PURCHASE}
                     heading={
                         <div>
                             <h1 className="font-sans text-4xl font-extrabold leading-tight text-[#26364d] dark:text-white md:text-5xl">

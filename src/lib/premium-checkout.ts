@@ -11,7 +11,7 @@ import {
 } from '@/lib/premium-checkout-queries';
 import { hasOnlyPremiumPrices } from '@/lib/premium-prices';
 import { buildProfileCanonicalUrl } from '@/lib/service-profile-metadata';
-import { stripe } from '@/lib/stripe';
+import { getStripe, requireStripeConfig } from '@/lib/stripe';
 import { SUBSCRIPTION_METADATA_KEYS } from '@/lib/subscription-metadata';
 
 import { env } from '../../env';
@@ -20,6 +20,8 @@ import { env } from '../../env';
  * Stripe Checkout dla premium: tworzenie sesji z profilu i weryfikacja sesji po powrocie.
  *
  * Surowy blad Stripe zostaje w logu serwera — wolajacy dostaje tylko wynik bez szczegolow.
+ * Bez konfiguracji Stripe (`isStripeConfigured`) akcje nie wolaja tego modulu; wywolanie
+ * mimo to konczy sie `StripeNotConfiguredError` w logu i wynikiem jak przy awarii Stripe.
  */
 
 /** Strona sukcesu wzgledem profilu; `{CHECKOUT_SESSION_ID}` podstawia Stripe. */
@@ -27,7 +29,8 @@ export const CHECKOUT_SUCCESS_SUFFIX = '/premium/dziekujemy?session_id={CHECKOUT
 
 /** Allowlista cen: klient wybiera tylko interwal, nigdy kwote ani ID ceny. */
 function priceIdFor(interval: PremiumInterval): string {
-    return interval === 'yearly' ? env.STRIPE_PRICE_YEARLY : env.STRIPE_PRICE_MONTHLY;
+    const config = requireStripeConfig();
+    return interval === 'yearly' ? config.priceYearly : config.priceMonthly;
 }
 
 /** Jezyk strony Checkout. Stripe nie ma ukrainskiego — `auto` bierze jezyk przegladarki. */
@@ -64,7 +67,7 @@ export async function createPremiumCheckoutSession({
     const profileUrl = buildProfileCanonicalUrl(env.NEXT_PUBLIC_SITE_URL, locale, target.slug);
 
     try {
-        const session = await stripe.checkout.sessions.create({
+        const session = await getStripe().checkout.sessions.create({
             mode: 'subscription',
             // Tylko karta (z Apple/Google Pay): metoda z opoznionym rozliczeniem (SEPA, bank
             // przez Link) wlaczona w Dashboardzie konczylaby Checkout przed `active`, wiec mail
@@ -156,7 +159,9 @@ async function retrieveSession(
 ): Promise<Stripe.Checkout.Session | 'missing' | 'unavailable'> {
     try {
         // `line_items` nie sa domyslnie w odpowiedzi — potrzebne do sprawdzenia ceny.
-        return await stripe.checkout.sessions.retrieve(sessionId, { expand: ['line_items'] });
+        return await getStripe().checkout.sessions.retrieve(sessionId, {
+            expand: ['line_items'],
+        });
     } catch (error) {
         if (error instanceof Stripe.errors.StripeInvalidRequestError) return 'missing';
         console.error('premium-checkout: session retrieve failed', describeStripeError(error));

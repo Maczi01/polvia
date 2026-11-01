@@ -26,7 +26,7 @@ import { claimMaterialsSend, releaseMaterialsSend } from '@/lib/premium-material
 import { isWithinPremiumLimit } from '@/lib/premium-rate-limit';
 import { hasActivePremiumSubscription } from '@/lib/premium-subscription-search';
 import { buildProfileCanonicalUrl } from '@/lib/service-profile-metadata';
-import { STRIPE_LIVE_MODE } from '@/lib/stripe';
+import { isStripeConfigured, STRIPE_LIVE_MODE } from '@/lib/stripe';
 import { TimeoutError, withTimeout } from '@/lib/with-timeout';
 
 import { env } from '../../../../../env';
@@ -44,7 +44,8 @@ import {
  * (cena z allowlisty env, wpis i sesja sprawdzane na serwerze) i maja limit po IP
  * (`premium-rate-limit`; awaria Redisa konczy akcje bledem — fail-open ma tylko strona
  * `dziekujemy`). Bez `revalidatePath`: checkout niczego nie zapisuje (stan premium ustawia
- * webhook), a materialy ida mailem.
+ * webhook), a materialy ida mailem. Bez konfiguracji Stripe obie koncza sie od razu
+ * `CHECKOUT_DISABLED` — UI ich wtedy nie pokazuje, ale endpoint POST istnieje.
  */
 
 /**
@@ -76,6 +77,7 @@ export async function startPremiumCheckout(
         error: { code, message: t(code) },
     });
 
+    if (!isStripeConfigured) return fail('CHECKOUT_DISABLED');
     const input = parseCheckoutForm(formData);
     if (!input.success) return fail('BAD_INPUT');
     if (!(await isWithinPremiumLimit('checkout'))) return fail('RATE_LIMITED');
@@ -206,6 +208,7 @@ export async function submitPremiumMaterials(
         error: { code, message: t(code), fields },
     });
 
+    if (!isStripeConfigured) return fail('CHECKOUT_DISABLED');
     const input = parseMaterialsForm(formData);
     if (!input.success) {
         return fail('BAD_INPUT', toFieldErrors(invalidMaterialsFields(input.error), t));

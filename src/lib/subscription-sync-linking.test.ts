@@ -21,9 +21,6 @@ import { syncSubscriptionFromStripe, syncSubscriptionSnapshot } from './subscrip
  * Allowlista cen, zrodlo stanu (retrieve vs obiekt z listy CLI) i powiazanie z wpisem.
  * Stripe, baza (za adapterem `subscription-store`) i SMTP to zewnetrzne serwisy.
  */
-jest.mock('../../env', () => ({
-    env: { STRIPE_PRICE_MONTHLY: 'price_monthly_test', STRIPE_PRICE_YEARLY: 'price_yearly_test' },
-}));
 jest.mock(
     '@/lib/stripe',
     () =>

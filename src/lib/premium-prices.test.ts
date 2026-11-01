@@ -3,9 +3,20 @@
  */
 import { hasOnlyPremiumPrices, isPremiumPriceId } from './premium-prices';
 
-jest.mock('../../env', () => ({
-    env: { STRIPE_PRICE_MONTHLY: 'price_monthly', STRIPE_PRICE_YEARLY: 'price_yearly' },
+/** Konfiguracja Stripe (z env) to granica zewnetrzna; getter, bo testy ja podmieniaja. */
+const mockStripe: { config: { priceMonthly: string; priceYearly: string } | null } = {
+    config: null,
+};
+
+jest.mock('@/lib/stripe', () => ({
+    get stripeConfig() {
+        return mockStripe.config;
+    },
 }));
+
+beforeEach(() => {
+    mockStripe.config = { priceMonthly: 'price_monthly', priceYearly: 'price_yearly' };
+});
 
 describe('isPremiumPriceId', () => {
     it('akceptuje cene miesieczna i roczna z env', () => {
@@ -15,6 +26,13 @@ describe('isPremiumPriceId', () => {
 
     it('odrzuca obca cene', () => {
         expect(isPremiumPriceId('price_other_product')).toBe(false);
+    });
+
+    it('bez konfiguracji Stripe zadna cena nie jest cena premium', () => {
+        mockStripe.config = null;
+
+        expect(isPremiumPriceId('price_monthly')).toBe(false);
+        expect(hasOnlyPremiumPrices(['price_yearly'])).toBe(false);
     });
 });
 

@@ -129,7 +129,10 @@
     "thanks": "Dziękujemy za wiadomość!",
     "success": "Otrzymaliśmy Twoją wiadomość. Postaramy się odpowiedzieć jak najszybciej.",
     "goBack": "Strona główna",
-    "sendAnother": "Wyślij kolejną wiadomość"
+    "sendAnother": "Wyślij kolejną wiadomość",
+    "premiumTopic": "Premium",
+    "premiumMessage": "Dzień dobry, chcę włączyć stronę premium dla firmy polvia.pl/firma/{slug}. Proszę o dane do przelewu.",
+    "premiumMessageNoService": "Dzień dobry, chcę włączyć stronę premium dla mojej firmy: (nazwa firmy). Proszę o dane do przelewu."
   },
   "MapCard": {
     "nowOpen": "Teraz otwarte",
@@ -583,7 +586,9 @@
           "yearly": "/rok"
         },
         "cta": "Znajdź swoją firmę",
+        "contactCta": "Napisz do nas",
         "instruction": "Znajdź swoją firmę na mapie, otwórz jej profil i kliknij „To moja firma — ulepsz stronę”. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
+        "contactInstruction": "Napisz do nas z nazwą swojej firmy — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
         "features": {
           "basics": "Wszystko z planu Podstawowego",
           "templates": "Wybór szablonu strony firmy",
@@ -879,7 +884,8 @@
       "benefitPhotos": "Zdjęcie w nagłówku i galeria do {max} zdjęć",
       "benefitPrices": "Cennik usług i odpowiedzi na częste pytania",
       "benefitNoCompetitors": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
-      "cta": "To moja firma — ulepsz stronę"
+      "cta": "To moja firma — ulepsz stronę",
+      "contactNote": "Napisz do nas — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy."
     },
     "checkout": {
       "legend": "Okres rozliczenia",
@@ -889,6 +895,7 @@
       "pending": "Przekierowuję do płatności…",
       "note": "Płatność obsługuje Stripe. Subskrypcję anulujesz w każdej chwili.",
       "errors": {
+        "CHECKOUT_DISABLED": "Płatność online jest chwilowo niedostępna. Napisz do nas przez formularz kontaktowy.",
         "BAD_INPUT": "Wybierz okres rozliczenia i spróbuj ponownie.",
         "RATE_LIMITED": "Zbyt wiele prób. Spróbuj ponownie za godzinę.",
         "NOT_FOUND": "Tej firmy nie ma już w katalogu.",
@@ -930,6 +937,7 @@
       "pending": "Wysyłam…",
       "success": "Dziękujemy! Materiały dotarły — odezwiemy się mailem.",
       "errors": {
+        "CHECKOUT_DISABLED": "Płatność online jest wyłączona — materiały wyślij przez formularz kontaktowy.",
         "BAD_INPUT": "Popraw zaznaczone pola.",
         "RATE_LIMITED": "Zbyt wiele prób. Spróbuj ponownie za godzinę.",
         "FORBIDDEN": "Nie możemy potwierdzić płatności dla tej firmy.",

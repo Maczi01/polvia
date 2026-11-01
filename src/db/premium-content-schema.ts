@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { type Locale, locales } from '../i18n/config';
+import { isCalendarDate } from '../lib/manual-premium';
 import {
     PREMIUM_FAQ_MAX,
     PREMIUM_GALLERY_MAX,
@@ -126,6 +127,15 @@ export const premiumContentSchema = z
             .array(faqItemSchema)
             .max(PREMIUM_FAQ_MAX, `FAQ: najwyzej ${PREMIUM_FAQ_MAX} pytan`)
             .default([]),
+        /**
+         * Premium reczne (przelew): ostatni dzien premium, `RRRR-MM-DD`, wlacznie, w strefie
+         * Europe/Warsaw. Brak = bez premium recznego (sama tresc niczego nie wlacza).
+         * Zapis: kolumna `manual_premium_until` + ranking (`premium-content-store.ts`).
+         */
+        activeUntil: z
+            .string()
+            .refine(isCalendarDate, 'Data premium recznego: RRRR-MM-DD istniejacego dnia')
+            .optional(),
     })
     .strict()
     .superRefine((content, context) => {

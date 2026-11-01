@@ -10,7 +10,7 @@ import {
     type SubscriptionStatus,
 } from '@/lib/premium';
 import { isPremiumPriceId } from '@/lib/premium-prices';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { SUBSCRIPTION_METADATA_KEYS } from '@/lib/subscription-metadata';
 import {
     findServiceIdBySlug,
@@ -281,6 +281,6 @@ export async function syncSubscriptionFromStripe(
     stripeSubscriptionId: string,
     options: SyncOptions = {},
 ): Promise<SubscriptionSyncResult> {
-    const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    const subscription = await getStripe().subscriptions.retrieve(stripeSubscriptionId);
     return syncSubscriptionSnapshot(subscription, options);
 }

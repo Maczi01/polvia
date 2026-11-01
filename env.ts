@@ -1,6 +1,8 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
+import { resolveStripeConfig } from "./src/lib/stripe-config";
+
 const NonEmpty = z.string().min(1);
 
 export const env = createEnv({
@@ -25,15 +27,18 @@ export const env = createEnv({
         // wychodzacy). Bez sekretu zadanie jest publiczne i dostaje limit po IP klienta.
         // Losowy, min. 32 znaki: `openssl rand -hex 32`.
         SERVICE_SLUG_LOOKUP_SECRET: z.string().min(32),
-        // Stripe (premium). Sekretny klucz API (`sk_…` albo ograniczony `rk_…`) i sekret
-        // podpisu webhooka — wylacznie serwer. Ceny planu zyja w Stripe Dashboard; kod zna
-        // tylko ich ID (allowlista dla checkoutu).
-        STRIPE_SECRET_KEY: NonEmpty,
-        STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
-        STRIPE_PRICE_MONTHLY: z.string().startsWith('price_'),
-        STRIPE_PRICE_YEARLY: z.string().startsWith('price_'),
+        // Stripe (premium) — OPCJONALNY, ale wszystkie piec albo zadna (sprawdza
+        // `resolveStripeConfig` ponizej). Bez nich platnosci online sa wylaczone: checkout,
+        // webhook, `premium/dziekujemy` i `db:sync-subscriptions` nie dzialaja, a „Przejdz na
+        // Premium” prowadzi do formularza kontaktowego (premium reczne, `premium.activeUntil`).
+        // Sekretny klucz API (`sk_…` albo ograniczony `rk_…`) i sekret podpisu webhooka —
+        // wylacznie serwer. Ceny planu zyja w Stripe Dashboard; kod zna tylko ich ID.
+        STRIPE_SECRET_KEY: NonEmpty.optional(),
+        STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_').optional(),
+        STRIPE_PRICE_MONTHLY: z.string().startsWith('price_').optional(),
+        STRIPE_PRICE_YEARLY: z.string().startsWith('price_').optional(),
         // No-code login link do Customer Portal (Stripe Dashboard → Customer portal).
-        STRIPE_PORTAL_LOGIN_URL: z.string().url(),
+        STRIPE_PORTAL_LOGIN_URL: z.string().url().optional(),
     },
     client: {
         NEXT_PUBLIC_SITE_URL: NonEmpty,
@@ -59,3 +64,7 @@ export const env = createEnv({
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     },
 });
+
+// Czesciowa konfiguracja Stripe (np. sam klucz bez sekretu webhooka) to blad przy starcie,
+// a nie cicho wylaczone platnosci. Wersja 0.12 `createEnv` nie ma walidacji miedzy polami.
+resolveStripeConfig(env);

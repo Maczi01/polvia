@@ -43,6 +43,7 @@ function profile(overrides: Partial<ServiceProfile> = {}): ServiceProfile {
         locations: [location()],
         premium: null,
         subscription: null,
+        manualPremiumUntil: null,
         ...overrides,
     };
 }

@@ -192,7 +192,7 @@ founder publikuje tresc za nia. Wpis musi juz istniec w bazie (`db:add`). Tresc 
 
 Po kolei:
 
-1. **Weryfikacja, ze placi wlasciciel.** Porownaj dane z platnosci Stripe (e-mail, NIP z faktury)
+1. **Weryfikacja, ze placi wlasciciel.** Porownaj dane z platnosci (Stripe albo przelew: e-mail, NIP z faktury)
    z danymi wpisu: domena e-maila = domena `webpage`, NIP = `nip` wpisu, albo potwierdzenie
    z kontaktu podanego we wpisie (telefon, e-mail ze strony firmy). Brak zgodnosci = **stop**:
    nie publikuj, zglos userowi do zwrotu platnosci. Nie publikuj na podstawie domyslu.
@@ -244,8 +244,29 @@ Po kolei:
    Upsert jest idempotentny — poprawki w JSON-ie publikujesz ta sama komenda. Zdjecia w
    `public/` trafiaja na produkcje dopiero z deployem: zglos userowi, ze trzeba je zacommitowac.
 
-Strona pokazuje szablon premium tylko przy aktywnej subskrypcji; sama tresc w bazie niczego
-nie wlacza.
+Strona pokazuje szablon premium tylko przy aktywnym premium: subskrypcji Stripe **albo**
+premium recznym (`activeUntil`). Sama tresc w bazie niczego nie wlacza.
+
+### Premium reczne (przelew) — `premium.activeUntil`
+
+Platnosci online sa wylaczone, dopoki w Vercelu nie ma zmiennych `STRIPE_*`; wtedy „Przejdz na
+Premium” prowadzi do formularza kontaktowego (temat „Premium”, slug firmy w wiadomosci).
+
+- **Kiedy ustawiac:** dopiero po otrzymaniu przelewu (i weryfikacji wlasciciela z kroku 1 —
+  dane z przelewu zamiast danych ze Stripe). Nie ustawiaj „na zapas” przed wplata.
+- **Format:** `"activeUntil": "2026-11-30"` w bloku `premium` — ostatni dzien premium,
+  **wlacznie**, w strefie Europe/Warsaw (wygasa o polnocy czasu polskiego po tym dniu, samo,
+  bez crona). Data musi istniec w kalendarzu (`2026-02-30` odrzuci walidacja).
+- **Publikacja:** ten sam dry run i `npm run db:premium -- data/services/<plik>.json`. Diff
+  pokazuje zmiane daty (`~ premium reczne: … -> …`). Zapis ustawia
+  `service_profiles.manual_premium_until` i podbija ranking (`promoted_services`) do konca tej
+  daty — dluzszej istniejacej daty rankingu nie skraca.
+- **Przedluzenie:** nowa data w JSON-ie + ponownie `db:premium` (dry run, OK, zapis).
+- **Wylaczenie przed czasem:** usun `activeUntil` i opublikuj — widok premium i alias znikna od
+  razu, ale pozycja w rankingu zostaje do starej daty (zapis nigdy nie usuwa promocji). Skrocenie
+  rankingu to reczna zmiana `promoted_services` przez operatora.
+- Seed (`db:reset`) odtwarza date z JSON-a, wiec **plik jest zrodlem prawdy** — data wpisana
+  tylko w bazie zniknie.
 
 ## Czego nie robic
 

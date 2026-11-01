@@ -6,6 +6,7 @@ import { type ReactElement, type ReactNode, useId, useState } from 'react';
 
 import { Link } from '@/i18n/navigation';
 import { PREMIUM_INTERVALS, type PremiumInterval } from '@/lib/premium-checkout-fields';
+import { premiumContactQuery } from '@/lib/premium-contact';
 import { DEFAULT_PREMIUM_INTERVAL } from '@/lib/premium-plan';
 import { cn } from '@/lib/utilities';
 
@@ -65,14 +66,20 @@ const PLANS: readonly PlanConfig[] = [
 const FOCUS_RING =
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900';
 
+/**
+ * Jak sprzedajemy premium — decyduje serwer (`isStripeConfigured`). `checkout`: zakup z profilu
+ * firmy przez Stripe + logowanie do portalu klienta (`STRIPE_PORTAL_LOGIN_URL`). `contact`:
+ * platnosci online wylaczone, plan prowadzi do formularza kontaktowego (premium reczne).
+ */
+export type PricingPurchase = { kind: 'checkout'; portalUrl: string } | { kind: 'contact' };
+
 type PricingPlansProps = {
     /** Naglowek strony renderowany przez Server Component — przelacznik okresu stoi obok niego. */
     heading: ReactNode;
-    /** Logowanie do portalu klienta Stripe (`STRIPE_PORTAL_LOGIN_URL`), podane z serwera. */
-    portalUrl: string;
+    purchase: PricingPurchase;
 };
 
-export function PricingPlans({ heading, portalUrl }: PricingPlansProps): ReactElement {
+export function PricingPlans({ heading, purchase }: PricingPlansProps): ReactElement {
     const t = useTranslations('Pricing');
     const [selectedInterval, setSelectedInterval] =
         useState<PremiumInterval>(DEFAULT_PREMIUM_INTERVAL);
@@ -100,7 +107,7 @@ export function PricingPlans({ heading, portalUrl }: PricingPlansProps): ReactEl
                         key={plan.id}
                         plan={plan}
                         interval={selectedInterval}
-                        portalUrl={portalUrl}
+                        purchase={purchase}
                     />
                 ))}
             </div>
@@ -136,15 +143,29 @@ function PeriodButton({ isActive, onSelect, children }: PeriodButtonProps): Reac
 type PriceCardProps = {
     plan: PlanConfig;
     interval: PremiumInterval;
-    portalUrl: string;
+    purchase: PricingPurchase;
 };
 
-function PriceCard({ plan, interval, portalUrl }: PriceCardProps): ReactElement {
+type CardLink = {
+    href: PlanHref | { pathname: '/contact'; query: Record<string, string> };
+    ctaKey: string;
+};
+
+/** Plan premium bez Stripe prowadzi do kontaktu z tematem premium zamiast na mape. */
+function cardLink(plan: PlanConfig, purchase: PricingPurchase): CardLink {
+    if (plan.id === 'essentials' && purchase.kind === 'contact') {
+        return { href: { pathname: '/contact', query: premiumContactQuery() }, ctaKey: 'contactCta' };
+    }
+    return { href: plan.href, ctaKey: 'cta' };
+}
+
+function PriceCard({ plan, interval, purchase }: PriceCardProps): ReactElement {
     const t = useTranslations('Pricing');
     const titleId = useId();
     const instructionId = useId();
     const key = (name: string): string => `plans.${plan.id}.${name}`;
     const isEssentials = plan.id === 'essentials';
+    const link = cardLink(plan, purchase);
 
     return (
         <article
@@ -182,7 +203,7 @@ function PriceCard({ plan, interval, portalUrl }: PriceCardProps): ReactElement 
 
             <div className="mt-6">
                 <Link
-                    href={plan.href}
+                    href={link.href}
                     aria-describedby={isEssentials ? instructionId : undefined}
                     className={cn(
                         'inline-flex items-center gap-2 rounded-full px-6 py-3 font-sans font-medium text-white shadow-sm',
@@ -190,11 +211,11 @@ function PriceCard({ plan, interval, portalUrl }: PriceCardProps): ReactElement 
                         plan.isRecommended ? 'bg-green' : 'bg-[#26364d] dark:bg-gray-700',
                     )}
                 >
-                    {t(key('cta'))}
+                    {t(key(link.ctaKey))}
                     <ArrowRight className="size-4" aria-hidden="true" />
                 </Link>
                 {isEssentials && (
-                    <EssentialsHelp instructionId={instructionId} portalUrl={portalUrl} />
+                    <EssentialsHelp instructionId={instructionId} purchase={purchase} />
                 )}
             </div>
 
@@ -217,12 +238,22 @@ function PriceCard({ plan, interval, portalUrl }: PriceCardProps): ReactElement 
 
 type EssentialsHelpProps = {
     instructionId: string;
-    portalUrl: string;
+    purchase: PricingPurchase;
 };
 
-/** Zakup idzie z profilu konkretnej firmy (R14), wiec plan pokazuje, jak tam trafic. */
-function EssentialsHelp({ instructionId, portalUrl }: EssentialsHelpProps): ReactElement {
+/**
+ * Zakup idzie z profilu konkretnej firmy (R14), wiec plan pokazuje, jak tam trafic. Bez Stripe:
+ * „napisz do nas — aktywujemy w 1 dzien roboczy”, bez portalu subskrypcji (nie ma subskrypcji).
+ */
+function EssentialsHelp({ instructionId, purchase }: EssentialsHelpProps): ReactElement {
     const t = useTranslations('Pricing');
+    if (purchase.kind === 'contact') {
+        return (
+            <p id={instructionId} className="mt-3 font-sans text-sm text-gray-600 dark:text-gray-400">
+                {t('plans.essentials.contactInstruction')}
+            </p>
+        );
+    }
     return (
         <>
             <p id={instructionId} className="mt-3 font-sans text-sm text-gray-600 dark:text-gray-400">
@@ -231,7 +262,7 @@ function EssentialsHelp({ instructionId, portalUrl }: EssentialsHelpProps): Reac
             <p className="mt-3 font-sans text-sm text-gray-600 dark:text-gray-400">
                 {t('manageSubscriptionPrompt')}{' '}
                 <a
-                    href={portalUrl}
+                    href={purchase.portalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={cn(

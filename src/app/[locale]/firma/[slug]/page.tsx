@@ -6,6 +6,7 @@ import { cache, type ComponentType, type ReactElement } from 'react';
 import { type Locale, toLocale } from '@/i18n/config';
 import { getCategoryMessageKey } from '@/lib/categories';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
+import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 import type { PremiumTemplate } from '@/lib/premium-templates';
 import {
     buildProfileCanonicalUrl,
@@ -21,6 +22,7 @@ import {
     getSimilarServices,
     type ServiceProfile,
 } from '@/lib/service-profile-queries';
+import { isStripeConfigured } from '@/lib/stripe';
 
 import { env } from '../../../../../env';
 import { startPremiumCheckout } from './_actions';
@@ -75,9 +77,18 @@ const resolveProfileView = cache(
                     name: profile.name,
                 }),
             subscription: profile.subscription,
+            manualPremiumUntil: profile.manualPremiumUntil,
             now: getRequestNow(),
         }),
 );
+
+/**
+ * Sprzedaz premium z profilu: Stripe Checkout albo — bez konfiguracji Stripe — link do
+ * formularza kontaktowego (premium reczne). Decyzja na serwerze; klient nie czyta env.
+ */
+const PREMIUM_PURCHASE: PremiumPurchase = isStripeConfigured
+    ? { kind: 'checkout', action: startPremiumCheckout }
+    : { kind: 'contact' };
 
 const PREMIUM_TEMPLATE_COMPONENTS: Record<
     PremiumTemplate,
@@ -96,7 +107,7 @@ function ProfileView({
     viewKind: ProfileViewKind;
 }): ReactElement {
     if (viewKind.kind === 'free') {
-        return <ProfileFree profile={view} checkoutAction={startPremiumCheckout} />;
+        return <ProfileFree profile={view} purchase={PREMIUM_PURCHASE} />;
     }
 
     const Template = PREMIUM_TEMPLATE_COMPONENTS[viewKind.template];

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import type { CheckoutAction } from '@/lib/premium-checkout-fields';
+import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 
 import {
     localServiceFixture,
@@ -11,7 +11,7 @@ import { mobileViewport, profileStoryParameters, withProfileIntl } from '../prof
 import { ProfileFree } from './profile-free';
 
 /** Zastepstwo `startPremiumCheckout`: Storybook nie laczy sie ze Stripe. */
-const storyCheckoutAction: CheckoutAction = async () => null;
+const storyPurchase: PremiumPurchase = { kind: 'checkout', action: async () => null };
 
 const meta = {
     title: 'firma/Profil darmowy',
@@ -19,7 +19,7 @@ const meta = {
     decorators: [withProfileIntl],
     parameters: profileStoryParameters,
     globals: { theme: 'light' },
-    args: { profile: localServiceFixture, checkoutAction: storyCheckoutAction },
+    args: { profile: localServiceFixture, purchase: storyPurchase },
 } satisfies Meta<typeof ProfileFree>;
 
 export default meta;
@@ -28,6 +28,9 @@ type Story = StoryObj<typeof meta>;
 export const LocalDesktop: Story = {};
 
 export const LocalMobile: Story = { parameters: mobileViewport };
+
+/** Platnosci online wylaczone: CTA prowadzi do formularza kontaktowego. */
+export const ContactPurchaseDesktop: Story = { args: { purchase: { kind: 'contact' } } };
 
 export const OnlineDesktop: Story = { args: { profile: onlineServiceFixture } };
 

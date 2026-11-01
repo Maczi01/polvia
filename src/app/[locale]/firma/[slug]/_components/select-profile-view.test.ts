@@ -57,6 +57,7 @@ describe('selectProfileView', () => {
         const result = selectProfileView({
             loadPremiumContent: () => content,
             subscription: subscription(),
+            manualPremiumUntil: null,
             now: NOW,
         });
 
@@ -67,6 +68,7 @@ describe('selectProfileView', () => {
         const result = selectProfileView({
             loadPremiumContent: () => null,
             subscription: subscription(),
+            manualPremiumUntil: null,
             now: NOW,
         });
 
@@ -82,6 +84,7 @@ describe('selectProfileView', () => {
                 status: 'canceled',
                 currentPeriodEnd: new Date('2026-09-30T12:00:00Z'),
             }),
+            manualPremiumUntil: null,
             now: NOW,
         });
 
@@ -96,6 +99,7 @@ describe('selectProfileView', () => {
                 status: 'active',
                 currentPeriodEnd: new Date('2026-10-27T12:00:00Z'),
             }),
+            manualPremiumUntil: null,
             now: NOW,
         });
 
@@ -105,7 +109,57 @@ describe('selectProfileView', () => {
     it('brak subskrypcji daje profil free i nie wola ladowania tresci premium', () => {
         const loadPremiumContent = jest.fn(() => premiumContent());
 
-        const result = selectProfileView({ loadPremiumContent, subscription: null, now: NOW });
+        const result = selectProfileView({
+            loadPremiumContent,
+            subscription: null,
+            manualPremiumUntil: null,
+            now: NOW,
+        });
+
+        expect(result).toEqual({ kind: 'free' });
+        expect(loadPremiumContent).not.toHaveBeenCalled();
+    });
+});
+
+describe('selectProfileView — premium reczne (przelew)', () => {
+    /** Koniec dnia 2026-11-30 w Europe/Warsaw (`manualPremiumEnd`). */
+    const MANUAL_END = new Date('2026-11-30T23:00:00.000Z');
+
+    it('sama data premium recznego (bez subskrypcji) daje widok premium', () => {
+        const content = premiumContent({ template: 'professional' });
+
+        const result = selectProfileView({
+            loadPremiumContent: () => content,
+            subscription: null,
+            manualPremiumUntil: MANUAL_END,
+            now: NOW,
+        });
+
+        expect(result).toEqual({ kind: 'premium', template: 'professional', content });
+    });
+
+    it('ostatnia chwila dnia activeUntil czasu polskiego to jeszcze premium, polnoc juz free', () => {
+        const input = {
+            loadPremiumContent: () => premiumContent(),
+            subscription: null,
+            manualPremiumUntil: MANUAL_END,
+        };
+
+        expect(
+            selectProfileView({ ...input, now: new Date('2026-11-30T22:59:59.999Z') }).kind,
+        ).toBe('premium');
+        expect(selectProfileView({ ...input, now: MANUAL_END }).kind).toBe('free');
+    });
+
+    it('wygasla data i anulowana subskrypcja: free bez parsowania tresci', () => {
+        const loadPremiumContent = jest.fn(() => premiumContent());
+
+        const result = selectProfileView({
+            loadPremiumContent,
+            subscription: subscription({ status: 'canceled' }),
+            manualPremiumUntil: new Date('2026-10-01T22:00:00.000Z'),
+            now: NOW,
+        });
 
         expect(result).toEqual({ kind: 'free' });
         expect(loadPremiumContent).not.toHaveBeenCalled();

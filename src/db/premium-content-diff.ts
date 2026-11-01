@@ -34,8 +34,14 @@ function diffList<T>(
     return lines;
 }
 
+/** Premium reczne: ostatni dzien wlacznie, czas polski (`manual-premium.ts`). */
+function manualPremiumLabel(activeUntil: string | undefined): string {
+    return activeUntil === undefined ? 'brak' : `do ${activeUntil} wlacznie (Europe/Warsaw)`;
+}
+
 function summary(content: PremiumContentData): string[] {
     return [
+        `  premium reczne: ${manualPremiumLabel(content.activeUntil)}`,
         `  szablon: ${content.template}`,
         `  cover: ${content.coverImage ?? 'brak'}`,
         `  galeria: ${content.gallery.length} zdjec`,
@@ -47,6 +53,11 @@ function summary(content: PremiumContentData): string[] {
 function diffContent(previous: PremiumContentData, next: PremiumContentData): string[] {
     const lines: string[] = [];
 
+    if (previous.activeUntil !== next.activeUntil) {
+        lines.push(
+            `  ~ premium reczne: ${manualPremiumLabel(previous.activeUntil)} -> ${manualPremiumLabel(next.activeUntil)}`,
+        );
+    }
     if (previous.template !== next.template) {
         lines.push(`  ~ szablon: ${previous.template} -> ${next.template}`);
     }

@@ -43,6 +43,19 @@ describe('premiumContentSchema', () => {
         });
     });
 
+    it('przyjmuje activeUntil (premium reczne) jako date RRRR-MM-DD', () => {
+        const result = premiumContentSchema.safeParse(premiumBlock({ activeUntil: '2026-11-30' }));
+
+        expect(result.success && result.data.activeUntil).toBe('2026-11-30');
+    });
+
+    it.each(['2026-02-30', '30.11.2026', '2026-11-30T23:59:59Z', ''])(
+        'odrzuca activeUntil %p ze sciezka bledu',
+        activeUntil => {
+            expect(issuePaths(premiumBlock({ activeUntil }))).toEqual(['activeUntil']);
+        },
+    );
+
     it('odrzuca pozycje FAQ bez tlumaczenia ru, ze sciezka bledu', () => {
         const [faq] = VALID.faq;
         const { ru: _ru, ...withoutRu } = faq.q;

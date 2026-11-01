@@ -6,7 +6,7 @@ import en from '../../../../../../../messages/en.json';
 import pl from '../../../../../../../messages/pl.json';
 import ru from '../../../../../../../messages/ru.json';
 import uk from '../../../../../../../messages/uk.json';
-import { ESSENTIALS_FEATURE_KEYS, PricingPlans } from './pricing-plans';
+import { ESSENTIALS_FEATURE_KEYS, PricingPlans, type PricingPurchase } from './pricing-plans';
 
 expect.extend(toHaveNoViolations);
 
@@ -27,6 +27,7 @@ const MESSAGES = { pl, en, ru, uk };
 type Locale = keyof typeof MESSAGES;
 
 const PORTAL_URL = 'https://billing.stripe.com/p/login/test_123';
+const CHECKOUT: PricingPurchase = { kind: 'checkout', portalUrl: PORTAL_URL };
 
 /** Obietnice z R19, ktorych premium nie dostarcza albo ktore ma kazdy darmowy profil. */
 const REMOVED_PROMISES_PL = [
@@ -37,10 +38,13 @@ const REMOVED_PROMISES_PL = [
     'Profile w mediach społecznościowych',
 ];
 
-function renderPlans(locale: Locale = 'pl'): ReturnType<typeof render> {
+function renderPlans(
+    locale: Locale = 'pl',
+    purchase: PricingPurchase = CHECKOUT,
+): ReturnType<typeof render> {
     return render(
         <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]} timeZone="Europe/Warsaw">
-            <PricingPlans heading={<h1>{MESSAGES[locale].Pricing.choosePlan}</h1>} portalUrl={PORTAL_URL} />
+            <PricingPlans heading={<h1>{MESSAGES[locale].Pricing.choosePlan}</h1>} purchase={purchase} />
         </NextIntlClientProvider>,
     );
 }
@@ -132,6 +136,32 @@ describe('PricingPlans', () => {
         fireEvent.click(monthly);
 
         expect(within(card).getByText('9 zł')).toBeInTheDocument();
+    });
+
+    it.each([
+        ['pl', '/kontakt?topic=premium'],
+        ['en', '/en/contact?topic=premium'],
+        ['ru', '/ru/contact?topic=premium'],
+        ['uk', '/uk/contact?topic=premium'],
+    ] as const)(
+        'bez Stripe w %s plan Profesjonalny prowadzi do kontaktu z tematem premium',
+        (locale, contact) => {
+            renderPlans(locale, { kind: 'contact' });
+            const essentials = MESSAGES[locale].Pricing.plans.essentials;
+
+            const link = screen.getByRole('link', { name: essentials.contactCta });
+            expect(link).toHaveAttribute('href', contact);
+            expect(link).toHaveAccessibleDescription(essentials.contactInstruction);
+            expect(screen.queryByRole('link', { name: essentials.cta })).not.toBeInTheDocument();
+        },
+    );
+
+    it('bez Stripe nie ma linku do portalu subskrypcji ani obietnicy platnosci od reki', async () => {
+        const { container } = renderPlans('pl', { kind: 'contact' });
+
+        expect(screen.queryByRole('link', { name: /Zarządzaj subskrypcją/ })).not.toBeInTheDocument();
+        expect(within(essentialsCard()).getByText(/1 dzień roboczy/)).toBeInTheDocument();
+        expect(await axe(container)).toHaveNoViolations();
     });
 
     it('nie ma naruszen dostepnosci', async () => {

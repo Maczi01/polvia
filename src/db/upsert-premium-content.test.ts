@@ -232,6 +232,18 @@ describe('publishPremiumEntries', () => {
         expect(rows.get('svc-1')).toEqual(CONTENT);
     });
 
+    it('premium reczne z pliku (activeUntil) trafia do zapisu — przezywa db:reset', async () => {
+        addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
+        const premium = premiumBlock({ activeUntil: '2026-11-30' });
+        writeEntry('salon-roza.json', { ...ENTRY, premium });
+        const { store, rows } = createMemoryStore(SERVICES);
+
+        await publishPremiumEntries(store, { dataDir, publicDir });
+
+        expect(rows.get('svc-1')).toEqual(premiumContentSchema.parse(premium));
+        expect(rows.get('svc-1')).toMatchObject({ activeUntil: '2026-11-30' });
+    });
+
     it('nieparsowalny plik trafia do skipped, pozostale wpisy sa publikowane', async () => {
         addImages('salon-roza', ['cover.jpg', 'salon-1.webp']);
         writeFileSync(path.join(dataDir, 'roboczy.json'), '{');

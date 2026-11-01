@@ -6,17 +6,11 @@ import {
     SUBSCRIPTION_SEARCH_TIMEOUT_MS,
 } from './premium-subscription-search';
 
-/** Stripe to zewnetrzny serwis. Getter, bo fabryka `jest.mock` jest hoistowana. */
+/** Stripe to zewnetrzny serwis. Klient leniwy, bo fabryka `jest.mock` jest hoistowana. */
 const mockSearch = jest.fn();
 
 jest.mock('@/lib/stripe', () => ({
-    stripe: {
-        subscriptions: {
-            get search() {
-                return mockSearch;
-            },
-        },
-    },
+    getStripe: () => ({ subscriptions: { search: mockSearch } }),
 }));
 
 const SERVICE_ID = '6f1c2a9e-3b7d-4c55-9a10-2f4e8d7b1c01';

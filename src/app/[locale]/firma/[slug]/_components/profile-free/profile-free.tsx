@@ -1,7 +1,7 @@
 import { MapPin } from 'lucide-react';
 import type { ReactElement } from 'react';
 
-import type { CheckoutAction } from '@/lib/premium-checkout-fields';
+import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileBadges } from '../profile-badges/profile-badges';
@@ -16,8 +16,8 @@ import { SimilarServices } from '../similar-services/similar-services';
 
 type ProfileFreeProps = {
     profile: ServiceProfileView;
-    /** `startPremiumCheckout` — strona przekazuje Server Action do CTA. */
-    checkoutAction: CheckoutAction;
+    /** Checkout (`startPremiumCheckout`) albo kontakt — decyduje strona (`isStripeConfigured`). */
+    purchase: PremiumPurchase;
 };
 
 /** Naglowek wizytowki: logo, odznaki, nazwa i miasto. */
@@ -58,7 +58,7 @@ function ProfileFreeHeader({ profile }: { profile: ServiceProfileView }): ReactE
  * Desktop: tresc po lewej, kontakt i CTA w kolumnie po prawej. Mobile: kontakt
  * zaraz pod naglowkiem (najczestsza akcja), CTA na koncu tresci.
  */
-export function ProfileFree({ profile, checkoutAction }: ProfileFreeProps): ReactElement {
+export function ProfileFree({ profile, purchase }: ProfileFreeProps): ReactElement {
     const mainLocation = getMainLocation(profile.locations);
     const showNavigate = profile.coverage !== 'online';
 
@@ -85,7 +85,8 @@ export function ProfileFree({ profile, checkoutAction }: ProfileFreeProps): Reac
                     </div>
                     <ProfileUpgradeCta
                         serviceId={profile.serviceId}
-                        checkoutAction={checkoutAction}
+                        slug={profile.slug}
+                        purchase={purchase}
                         className="self-start lg:col-start-2 lg:row-start-2"
                     />
                 </div>

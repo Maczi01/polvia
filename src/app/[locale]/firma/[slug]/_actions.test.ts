@@ -33,13 +33,7 @@ class MockRedirectSignal extends Error {
     }
 }
 
-jest.mock('../../../../../env', () => ({
-    env: {
-        NEXT_PUBLIC_SITE_URL: 'https://polvia.pl',
-        STRIPE_PRICE_MONTHLY: 'price_monthly_test',
-        STRIPE_PRICE_YEARLY: 'price_yearly_test',
-    },
-}));
+jest.mock('../../../../../env', () => ({ env: { NEXT_PUBLIC_SITE_URL: 'https://polvia.pl' } }));
 jest.mock('@/db', () => ({ db: {} }));
 jest.mock('next/headers', () => ({
     headers: async () => new Headers({ 'x-forwarded-for': '203.0.113.7' }),
@@ -68,29 +62,22 @@ jest.mock('@/lib/mailer', () => ({
     sendMail: jest.fn(),
     getOperatorInbox: () => 'founder@polvia.pl',
 }));
-// Gettery, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje mockow.
-jest.mock('@/lib/stripe', () => ({
-    stripe: {
-        checkout: {
-            sessions: {
-                get create() {
-                    return mockCreate;
-                },
-                get retrieve() {
-                    return mockRetrieve;
-                },
-            },
+// Klient leniwy i getter, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje mockow.
+jest.mock('@/lib/stripe', () => {
+    const config = { priceMonthly: 'price_monthly_test', priceYearly: 'price_yearly_test' };
+    return {
+        getStripe: () => ({
+            checkout: { sessions: { create: mockCreate, retrieve: mockRetrieve } },
+            subscriptions: { search: mockSearch },
+        }),
+        stripeConfig: config,
+        requireStripeConfig: () => config,
+        isStripeConfigured: true,
+        get STRIPE_LIVE_MODE() {
+            return mockKeyMode.isLive;
         },
-        subscriptions: {
-            get search() {
-                return mockSearch;
-            },
-        },
-    },
-    get STRIPE_LIVE_MODE() {
-        return mockKeyMode.isLive;
-    },
-}));
+    };
+});
 jest.mock('@/lib/premium-checkout-queries', () => ({
     getPremiumCheckoutTarget: async (serviceId: string) => mockTargets.get(serviceId) ?? null,
 }));

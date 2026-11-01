@@ -26,7 +26,7 @@ const meta = {
                 {messages.Pricing.choosePlan}
             </h1>
         ),
-        portalUrl: 'https://billing.stripe.com/p/login/test_123',
+        purchase: { kind: 'checkout', portalUrl: 'https://billing.stripe.com/p/login/test_123' },
     },
 } satisfies Meta<typeof PricingPlans>;
 
@@ -34,3 +34,6 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+/** Platnosci online wylaczone: plan premium prowadzi do formularza kontaktowego. */
+export const ContactPurchase: Story = { args: { purchase: { kind: 'contact' } } };

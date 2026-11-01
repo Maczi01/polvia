@@ -33,7 +33,7 @@ describe('getServiceSlugStatus', () => {
     };
 
     it('aktywny wpis pod slugiem istnieje (bez subskrypcji: bez premium)', async () => {
-        fakeProfileDb.results = [[{ id: 'svc-1', subscription: null }]];
+        fakeProfileDb.results = [[{ id: 'svc-1', subscription: null, manualPremiumUntil: null }]];
 
         expect(await getServiceSlugStatus('roza', NOW)).toEqual({
             exists: true,
@@ -53,7 +53,7 @@ describe('getServiceSlugStatus', () => {
     });
 
     it('aktywna subskrypcja daje hasActivePremium (isPremiumActive)', async () => {
-        fakeProfileDb.results = [[{ id: 'svc-1', subscription: ACTIVE_SUBSCRIPTION }]];
+        fakeProfileDb.results = [[{ id: 'svc-1', subscription: ACTIVE_SUBSCRIPTION, manualPremiumUntil: null }]];
 
         expect(await getServiceSlugStatus('roza', NOW)).toEqual({
             exists: true,
@@ -63,18 +63,35 @@ describe('getServiceSlugStatus', () => {
 
     it('anulowana subskrypcja nie daje premium', async () => {
         const canceled = { ...ACTIVE_SUBSCRIPTION, status: 'canceled' };
-        fakeProfileDb.results = [[{ id: 'svc-1', subscription: canceled }]];
+        fakeProfileDb.results = [[{ id: 'svc-1', subscription: canceled, manualPremiumUntil: null }]];
 
         expect((await getServiceSlugStatus('roza', NOW)).hasActivePremium).toBe(false);
     });
 
-    it('join subskrypcji wylacznie po id wpisu spod slugu', async () => {
+    it('premium reczne (data w przyszlosci) daje hasActivePremium bez subskrypcji', async () => {
+        const manualPremiumUntil = new Date('2026-11-30T23:00:00.000Z');
+        fakeProfileDb.results = [[{ id: 'svc-1', subscription: null, manualPremiumUntil }]];
+
+        expect((await getServiceSlugStatus('roza', NOW)).hasActivePremium).toBe(true);
+        expect(query(0).selected).toHaveProperty('manualPremiumUntil');
+    });
+
+    it('wygasle premium reczne nie daje premium (alias wylaczony)', async () => {
+        const manualPremiumUntil = new Date('2026-10-31T23:00:00.000Z');
+        fakeProfileDb.results = [[{ id: 'svc-1', subscription: null, manualPremiumUntil }]];
+
+        expect((await getServiceSlugStatus('roza', NOW)).hasActivePremium).toBe(false);
+    });
+
+    it('joiny subskrypcji i daty premium recznego wylacznie po id wpisu spod slugu', async () => {
+        // Data albo subskrypcja wpisu A nie moze wlaczyc premium (aliasu) wpisowi B.
         fakeProfileDb.results = [[]];
 
         await getServiceSlugStatus('roza', NOW);
 
         expect(query(0).joins.map(join => render(join).sql)).toEqual([
             '"service_subscriptions"."service_id" = "services"."id"',
+            '"service_profiles"."service_id" = "services"."id"',
         ]);
     });
 });

@@ -1,9 +1,15 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import type { PgInsertBase, PgInsertWithout } from 'drizzle-orm/pg-core';
+import type { PgDatabase, PgInsertBase, PgInsertWithout } from 'drizzle-orm/pg-core';
 import type { PostgresJsDatabase, PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 
+import { manualPremiumEnd, manualPremiumLastDay } from '../lib/manual-premium';
 import type { PremiumContentData } from './premium-content-schema';
-import { serviceLocationsTable, serviceProfilesTable, servicesTable } from './schema';
+import {
+    promotedServicesTable,
+    serviceLocationsTable,
+    serviceProfilesTable,
+    servicesTable,
+} from './schema';
 import type { PremiumContentStore, ServiceRef } from './upsert-premium-content';
 
 /**
@@ -11,25 +17,37 @@ import type { PremiumContentStore, ServiceRef } from './upsert-premium-content';
  * `./index`), wiec zapytania da sie zbudowac na `drizzle.mock()` bez bazy.
  */
 
-/** Upsert `service_profiles` po `onConflictDoUpdate` — do `await` albo `toSQL()`. */
-type SavePremiumContentQuery = PgInsertWithout<
-    PgInsertBase<typeof serviceProfilesTable, PostgresJsQueryResultHKT>,
-    false,
-    'onConflictDoNothing' | 'onConflictDoUpdate'
->;
+/** Klient albo transakcja — zapytania zapisu ida w jednej transakcji. */
+type Database = PgDatabase<PostgresJsQueryResultHKT>;
 
-/** `insert … on conflict (service_id) do update` — jeden wiersz na usluge. */
+type UpsertQuery<Table extends typeof serviceProfilesTable | typeof promotedServicesTable> =
+    PgInsertWithout<
+        PgInsertBase<Table, PostgresJsQueryResultHKT>,
+        false,
+        'onConflictDoNothing' | 'onConflictDoUpdate'
+    >;
+
+/** Wylaczny koniec premium recznego z bloku albo `null`, gdy blok nie ma `activeUntil`. */
+export function manualPremiumUntilOf(content: PremiumContentData): Date | null {
+    return content.activeUntil === undefined ? null : manualPremiumEnd(content.activeUntil);
+}
+
+/**
+ * `insert … on conflict (service_id) do update` — jeden wiersz na usluge. Plik wpisu jest
+ * zrodlem prawdy, wiec blok bez `activeUntil` zeruje `manual_premium_until`.
+ */
 export function buildSavePremiumContentQuery(
-    db: PostgresJsDatabase,
+    db: Database,
     serviceId: string,
     content: PremiumContentData,
-): SavePremiumContentQuery {
+): UpsertQuery<typeof serviceProfilesTable> {
     const values = {
         template: content.template,
         coverImage: content.coverImage,
         gallery: content.gallery,
         priceList: content.priceList,
         faq: content.faq,
+        manualPremiumUntil: manualPremiumUntilOf(content),
     };
 
     return db
@@ -38,6 +56,27 @@ export function buildSavePremiumContentQuery(
         .onConflictDoUpdate({
             target: serviceProfilesTable.serviceId,
             set: { ...values, updatedAt: sql`now()` },
+        });
+}
+
+/**
+ * Pozycja w rankingu co najmniej do `expiresAt` — ta sama regula co przy subskrypcji
+ * (`subscription-store.ts`, `setPromotion`): istniejacemu wierszowi zmienia tylko termin,
+ * tylko na pozniejszy (`GREATEST`), a `priority` zostawia operatorowi. Nigdy nie usuwa.
+ */
+export function buildExtendPromotionQuery(
+    db: Database,
+    serviceId: string,
+    expiresAt: Date,
+): UpsertQuery<typeof promotedServicesTable> {
+    return db
+        .insert(promotedServicesTable)
+        .values({ serviceId, expiresAt })
+        .onConflictDoUpdate({
+            target: promotedServicesTable.serviceId,
+            set: {
+                expiresAt: sql`GREATEST(${promotedServicesTable.expiresAt}, excluded.expires_at)`,
+            },
         });
 }
 
@@ -68,16 +107,30 @@ export function createPremiumContentStore(db: PostgresJsDatabase): PremiumConten
                     gallery: serviceProfilesTable.gallery,
                     priceList: serviceProfilesTable.priceList,
                     faq: serviceProfilesTable.faq,
+                    manualPremiumUntil: serviceProfilesTable.manualPremiumUntil,
                 })
                 .from(serviceProfilesTable)
                 .where(eq(serviceProfilesTable.serviceId, serviceId))
                 .limit(1);
+            if (!row) return null;
 
-            return row ?? null;
+            // Ksztalt bloku z pliku: data zamiast chwili, zeby diff porownal je wprost.
+            const { manualPremiumUntil, ...content } = row;
+            return manualPremiumUntil === null
+                ? content
+                : { ...content, activeUntil: manualPremiumLastDay(manualPremiumUntil) };
         },
 
         async saveContent(serviceId, content) {
-            await buildSavePremiumContentQuery(db, serviceId, content);
+            const manualPremiumUntil = manualPremiumUntilOf(content);
+            // Tresc, data i ranking razem: premium bez pozycji w rankingu (albo odwrotnie)
+            // po przerwanym zapisie bylby stanem, ktorego nie opisuje plik wpisu.
+            await db.transaction(async tx => {
+                await buildSavePremiumContentQuery(tx, serviceId, content);
+                if (manualPremiumUntil !== null) {
+                    await buildExtendPromotionQuery(tx, serviceId, manualPremiumUntil);
+                }
+            });
         },
     };
 }

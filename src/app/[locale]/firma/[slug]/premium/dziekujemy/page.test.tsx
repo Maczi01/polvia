@@ -11,7 +11,7 @@ import PremiumThanksPage, { generateMetadata } from './page';
 expect.extend(toHaveNoViolations);
 
 // Granice zewnetrzne strony: Stripe (`premium-checkout`), Redis (licznik limitu i znacznik
-// wysylki), naglowki requestu, mailer i env. `premium-rate-limit` (adres i klucz) jest
+// wysylki), naglowki requestu, mailer i konfiguracja Stripe (env). `premium-rate-limit` (adres i klucz) jest
 // prawdziwy. Tlumaczenia zwracaja sam klucz — asercje sprawdzaja wariant.
 jest.mock('@/lib/premium-checkout', () => ({ verifyPaidCheckoutSession: jest.fn() }));
 jest.mock('@/lib/redis', () => ({ redis: {} }));
@@ -24,8 +24,12 @@ jest.mock('next/headers', () => ({
     headers: async () => new Headers({ 'x-forwarded-for': '203.0.113.7' }),
 }));
 jest.mock('@/lib/mailer', () => ({ getOperatorInbox: () => 'kontakt@example.com' }));
-jest.mock('../../../../../../../env', () => ({
-    env: { STRIPE_PORTAL_LOGIN_URL: 'https://billing.example.com/login' },
+/** Wariant bez konfiguracji Stripe: `page.disabled.test.tsx`. */
+const mockStripe: { config: { portalLoginUrl: string } | null } = { config: null };
+jest.mock('@/lib/stripe', () => ({
+    get stripeConfig() {
+        return mockStripe.config;
+    },
 }));
 jest.mock('../../_actions', () => ({ submitPremiumMaterials: jest.fn() }));
 jest.mock('../../_components/premium-materials-form/premium-materials-form', () => ({
@@ -98,6 +102,7 @@ async function renderPage(sessionId: string = SESSION_ID): Promise<HTMLElement> 
 
 beforeEach(() => {
     jest.clearAllMocks();
+    mockStripe.config = { portalLoginUrl: 'https://billing.example.com/login' };
     rateLimitMock.mockResolvedValue({ allowed: true, remaining: 19 });
     sentMock.mockResolvedValue(false);
 });

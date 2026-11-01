@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-// Bramki trybu (klucz testowy + baza nielokalna, `livemode`) i ich kolejnosc wzgledem dedupe.
+// Bramka konfiguracji (Stripe wylaczony), bramki trybu (klucz testowy + baza nielokalna, `livemode`) i ich kolejnosc wzgledem dedupe.
 import { sendMail } from '@/lib/mailer';
 import { syncSubscriptionFromStripe } from '@/lib/subscription-sync';
 
@@ -14,6 +14,7 @@ import {
     resetWebhookKit,
     SERVICE_ID,
     signedRequest,
+    stripeSetup,
     SUBSCRIPTION_UPDATED,
     webhookEnv,
 } from '../../../../../tests/fixtures/premium/stripe-webhook-kit';
@@ -182,5 +183,30 @@ describe('POST /api/stripe/webhook — kolejnosc bramek', () => {
         expect(response.status).toBe(400);
         expect((await response.json()).error.code).toBe('INVALID_SIGNATURE');
         expect(console.error).not.toHaveBeenCalled();
+    });
+});
+
+describe('POST /api/stripe/webhook — Stripe nieskonfigurowany', () => {
+    it('bez zmiennych STRIPE_* poprawnie podpisane zdarzenie dostaje 404 i nie dotyka bazy', async () => {
+        stripeSetup.isConfigured = false;
+
+        const response = await signed(CHECKOUT_COMPLETED);
+
+        expect(response.status).toBe(404);
+        expect(await response.json()).toEqual({
+            data: null,
+            error: { code: 'NOT_FOUND', message: expect.any(String) },
+        });
+        expect(syncSubscriptionFromStripe).not.toHaveBeenCalled();
+        expect(processedEvents.size).toBe(0);
+        expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    it('bez zmiennych STRIPE_* zadanie bez podpisu tez dostaje 404, nie 400', async () => {
+        stripeSetup.isConfigured = false;
+
+        const response = await POST(signedRequest(SUBSCRIPTION_UPDATED, 'whsec_attacker'));
+
+        expect(response.status).toBe(404);
     });
 });

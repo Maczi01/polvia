@@ -5,6 +5,11 @@
  *   npm run db:premium -- data/services/<plik>.json --dry-run   # walidacja + diff, bez zapisu
  *   npm run db:premium -- data/services/<plik>.json             # zapis (upsert)
  *
+ * Premium reczne (przelew): `premium.activeUntil` = ostatni dzien premium (RRRR-MM-DD, wlacznie,
+ * Europe/Warsaw). Zapis ustawia `service_profiles.manual_premium_until` i podbija ranking
+ * (`promoted_services`, bez skracania dluzszej daty); diff pokazuje zmiane daty. Przedluzenie
+ * = nowa data w JSON-ie + ta sama komenda.
+ *
  * Wpis musi juz byc w bazie (`db:add`). Zdjecia musza lezec w `public/services/<slug-uslugi>/`
  * — brak ktoregokolwiek przerywa przed zapisem. Upsert jest idempotentny, wiec ponowne
  * uruchomienie po poprawkach w JSON jest bezpieczne. Concierge: `.claude/skills/dodaj/SKILL.md`.
@@ -97,7 +102,12 @@ async function main(): Promise<void> {
 
     await store.saveContent(plan.serviceId, premium);
     console.log(`\nOpublikowano tresc premium dla /firma/${serviceSlug}.`);
-    console.log('Strona pokaze ja tylko przy aktywnej subskrypcji.');
+    console.log(
+        premium.activeUntil === undefined
+            ? 'Bez premium recznego: strona pokaze tresc tylko przy aktywnej subskrypcji Stripe.'
+            : `Premium reczne aktywne do ${premium.activeUntil} wlacznie (Europe/Warsaw), ` +
+                  'ranking podbity do tej daty.',
+    );
     process.exit(0);
 }
 

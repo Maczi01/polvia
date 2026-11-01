@@ -49,6 +49,36 @@ describe('describePremiumChanges', () => {
         ]);
     });
 
+    it('przedluzenie premium recznego: zmiana daty w diffie', () => {
+        const previous = { ...CONTENT, activeUntil: '2026-11-30' };
+        const next = { ...CONTENT, activeUntil: '2026-12-31' };
+
+        expect(describePremiumChanges({ kind: 'valid', content: previous }, next)).toEqual([
+            'Zmiany wzgledem bazy:',
+            '  ~ premium reczne: do 2026-11-30 wlacznie (Europe/Warsaw) -> do 2026-12-31 wlacznie (Europe/Warsaw)',
+        ]);
+    });
+
+    it('wlaczenie i usuniecie premium recznego: zmiana z/na "brak"', () => {
+        const manual = { ...CONTENT, activeUntil: '2026-11-30' };
+
+        expect(describePremiumChanges({ kind: 'valid', content: CONTENT }, manual)).toContain(
+            '  ~ premium reczne: brak -> do 2026-11-30 wlacznie (Europe/Warsaw)',
+        );
+        expect(describePremiumChanges({ kind: 'valid', content: manual }, CONTENT)).toContain(
+            '  ~ premium reczne: do 2026-11-30 wlacznie (Europe/Warsaw) -> brak',
+        );
+    });
+
+    it('nowa tresc z data: podsumowanie pokazuje premium reczne', () => {
+        const lines = describePremiumChanges(
+            { kind: 'none' },
+            { ...CONTENT, activeUntil: '2026-11-30' },
+        );
+
+        expect(lines).toContain('  premium reczne: do 2026-11-30 wlacznie (Europe/Warsaw)');
+    });
+
     it('nieczytelna tresc w bazie: ostrzezenie o nadpisaniu', () => {
         expect(describePremiumChanges({ kind: 'invalid' }, CONTENT)[0]).toContain('nadpisana');
     });

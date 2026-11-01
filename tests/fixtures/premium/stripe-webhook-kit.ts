@@ -1,7 +1,7 @@
 /**
  * Wspolne atrapy i pomocniki testow webhooka Stripe (`src/app/api/stripe/webhook/route*.test.ts`).
  *
- * Granice zewnetrzne: `env`, tryb klucza Stripe, baza za `@/lib/stripe-event-dedupe`
+ * Granice zewnetrzne: `env`, konfiguracja i tryb klucza Stripe, baza za `@/lib/stripe-event-dedupe`
  * (tabela `stripe_events` jako zbior w pamieci). Podpis liczy prawdziwa paczka `stripe`
  * (lokalne HMAC, bez sieci). Fabryka `jest.mock` nie widzi importow, wiec bierze moduly
  * stad przez `jest.requireActual` — rejestr modulow jest wspolny, wiec test i atrapy dziela stan.
@@ -15,10 +15,19 @@ export const SERVICE_ID = '11111111-1111-4111-8111-111111111111';
 
 /** Domyslnie klucz testowy + baza lokalna (docker-compose); testy bramek je zmieniaja. */
 export const webhookEnv = {
-    STRIPE_WEBHOOK_SECRET: WEBHOOK_SECRET,
     DATABASE_URL: LOCAL_DATABASE_URL,
 };
 export const keyMode = { isLive: false };
+/** `false` = brak zmiennych `STRIPE_*` (platnosci online wylaczone). */
+export const stripeSetup = { isConfigured: true };
+
+const STRIPE_CONFIG = {
+    secretKey: 'sk_test_dummy',
+    webhookSecret: WEBHOOK_SECRET,
+    priceMonthly: 'price_monthly_test',
+    priceYearly: 'price_yearly_test',
+    portalLoginUrl: 'https://billing.example.com/login',
+};
 export const processedEvents = new Set<string>();
 
 export const fakeEnvModule = {
@@ -28,8 +37,13 @@ export const fakeEnvModule = {
     },
 };
 
+const stripeClient = new Stripe('sk_test_dummy');
+
 export const fakeStripeModule = {
-    stripe: new Stripe('sk_test_dummy'),
+    getStripe: (): Stripe => stripeClient,
+    get stripeConfig(): typeof STRIPE_CONFIG | null {
+        return stripeSetup.isConfigured ? STRIPE_CONFIG : null;
+    },
     get STRIPE_LIVE_MODE(): boolean {
         return keyMode.isLive;
     },
@@ -48,6 +62,7 @@ export function resetWebhookKit(): void {
     processedEvents.clear();
     webhookEnv.DATABASE_URL = LOCAL_DATABASE_URL;
     keyMode.isLive = false;
+    stripeSetup.isConfigured = true;
 }
 
 const signer = new Stripe('sk_test_dummy');

@@ -55,7 +55,7 @@ beforeEach(() => {
 
 describe('getPremiumCheckoutTarget', () => {
     it('aktywny wpis bez subskrypcji: cel checkoutu bez premium', async () => {
-        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: null }];
+        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: null, manualPremiumUntil: null }];
 
         expect(await getPremiumCheckoutTarget(SERVICE_ID, NOW)).toEqual({
             serviceId: SERVICE_ID,
@@ -68,18 +68,33 @@ describe('getPremiumCheckoutTarget', () => {
     });
 
     it('aktywna subskrypcja daje hasActivePremium, a join idzie wylacznie po id wpisu', async () => {
-        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: ACTIVE }];
+        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: ACTIVE, manualPremiumUntil: null }];
 
         expect((await getPremiumCheckoutTarget(SERVICE_ID, NOW))?.hasActivePremium).toBe(true);
         expect(mockDb.joins.map(join => render(join).sql)).toEqual([
             '"service_subscriptions"."service_id" = "services"."id"',
+            '"service_profiles"."service_id" = "services"."id"',
         ]);
+    });
+
+    it('trwajace premium reczne blokuje checkout (hasActivePremium) bez subskrypcji', async () => {
+        const manualPremiumUntil = new Date('2026-11-30T23:00:00.000Z');
+        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: null, manualPremiumUntil }];
+
+        expect((await getPremiumCheckoutTarget(SERVICE_ID, NOW))?.hasActivePremium).toBe(true);
+    });
+
+    it('wygasle premium reczne nie blokuje checkoutu', async () => {
+        const manualPremiumUntil = new Date('2026-10-31T23:00:00.000Z');
+        mockDb.rows = [{ id: SERVICE_ID, slug: 'roza', name: 'Roza', subscription: null, manualPremiumUntil }];
+
+        expect((await getPremiumCheckoutTarget(SERVICE_ID, NOW))?.hasActivePremium).toBe(false);
     });
 
     it('brak aktywnego wpisu albo wpis bez slugu daje null', async () => {
         expect(await getPremiumCheckoutTarget(SERVICE_ID, NOW)).toBeNull();
 
-        mockDb.rows = [{ id: SERVICE_ID, slug: null, name: 'Roza', subscription: null }];
+        mockDb.rows = [{ id: SERVICE_ID, slug: null, name: 'Roza', subscription: null, manualPremiumUntil: null }];
         expect(await getPremiumCheckoutTarget(SERVICE_ID, NOW)).toBeNull();
     });
 });

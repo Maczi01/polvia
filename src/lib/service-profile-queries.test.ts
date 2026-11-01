@@ -49,6 +49,27 @@ describe('getServiceProfile', () => {
         expect(profile?.subscription).toEqual(subscription);
     });
 
+    it('profil niesie date premium recznego z left joina service_profiles', async () => {
+        const manualPremiumUntil = new Date('2026-11-30T23:00:00.000Z');
+        fakeProfileDb.results = [[{ ...SERVICE_ROW, manualPremiumUntil }], [location()]];
+
+        const profile = await getServiceProfile('roza', 'pl');
+
+        expect(profile?.manualPremiumUntil).toEqual(manualPremiumUntil);
+        expect(query(0).selected).toHaveProperty('manualPremiumUntil');
+    });
+
+    it('data premium recznego uslugi A nie wlacza premium usludze B: join po id tego wpisu', async () => {
+        fakeProfileDb.results = [[SERVICE_ROW], []];
+
+        await getServiceProfile('roza', 'pl');
+
+        const joins = query(0).joins.map(join => render(join).sql);
+        expect(joins.filter(join => join.includes('service_profiles'))).toEqual([
+            '"service_profiles"."service_id" = "services"."id"',
+        ]);
+    });
+
     it('subskrypcja uslugi A nie wlacza premium usludze B: join wylacznie po id tego wpisu', async () => {
         fakeProfileDb.results = [[SERVICE_ROW], []];
 

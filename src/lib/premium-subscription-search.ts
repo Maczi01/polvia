@@ -2,7 +2,7 @@ import 'server-only';
 
 import type Stripe from 'stripe';
 
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { SUBSCRIPTION_METADATA_KEYS } from '@/lib/subscription-metadata';
 import { TimeoutError, withTimeout } from '@/lib/with-timeout';
 
@@ -38,7 +38,7 @@ export async function hasActivePremiumSubscription(serviceId: string): Promise<b
     const query = `metadata['${SUBSCRIPTION_METADATA_KEYS.serviceId}']:'${serviceId}'`;
     try {
         const result = await withTimeout(
-            stripe.subscriptions.search({ query, limit: SEARCH_LIMIT }),
+            getStripe().subscriptions.search({ query, limit: SEARCH_LIMIT }),
             SUBSCRIPTION_SEARCH_TIMEOUT_MS,
             () => new TimeoutError('Stripe subscription search', SUBSCRIPTION_SEARCH_TIMEOUT_MS),
         );

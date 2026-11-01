@@ -16,7 +16,7 @@
 import type Stripe from 'stripe';
 
 import type { DatabaseHost } from '@/lib/database-host';
-import { stripe } from '@/lib/stripe';
+import { getStripe, type StripeKeyMode } from '@/lib/stripe';
 import { type SubscriptionSyncResult, syncSubscriptionSnapshot } from '@/lib/subscription-sync';
 
 /* eslint-disable no-console */
@@ -43,7 +43,8 @@ export function keyModeRefusal(database: DatabaseHost, isLiveKey: boolean): stri
 
 async function listSubscriptionsOldestFirst(): Promise<Stripe.Subscription[]> {
     const subscriptions: Stripe.Subscription[] = [];
-    for await (const subscription of stripe.subscriptions.list({ status: 'all', limit: 100 })) {
+    const list = getStripe().subscriptions.list({ status: 'all', limit: 100 });
+    for await (const subscription of list) {
         subscriptions.push(subscription);
     }
     return subscriptions.sort((a, b) => a.created - b.created);
@@ -83,11 +84,26 @@ export async function resyncAllSubscriptions(): Promise<ResyncSummary> {
     return summary;
 }
 
-/** Caly przebieg skryptu; zwraca kod wyjscia procesu. */
+/** Platnosci online wylaczone: nie ma czego synchronizowac, a klient Stripe nie istnieje. */
+export const STRIPE_DISABLED_REFUSAL =
+    '\n⛔ ODMOWA: Stripe nie jest skonfigurowany (brak zmiennych STRIPE_* w .env).\n\n' +
+    '   Platnosci online sa wylaczone — premium jest reczne (`premium.activeUntil` w\n' +
+    '   data/services/<plik>.json + npm run db:premium). Synchronizacja subskrypcji\n' +
+    '   ma sens dopiero po ustawieniu wszystkich pieciu zmiennych STRIPE_*.\n';
+
+/**
+ * Caly przebieg skryptu; zwraca kod wyjscia procesu. `keyMode` `null` = Stripe
+ * nieskonfigurowany: odmowa przed jakimkolwiek zapytaniem.
+ */
 export async function runSubscriptionResync(
     database: DatabaseHost,
-    isLiveKey: boolean,
+    keyMode: StripeKeyMode | null,
 ): Promise<number> {
+    if (keyMode === null) {
+        console.error(STRIPE_DISABLED_REFUSAL);
+        return 1;
+    }
+    const isLiveKey = keyMode === 'live';
     const refusal = keyModeRefusal(database, isLiveKey);
     if (refusal) {
         console.error(refusal);
