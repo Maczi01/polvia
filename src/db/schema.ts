@@ -164,7 +164,7 @@ export const serviceProfilesTable = pgTable('service_profiles', {
 
 /**
  * Stan subskrypcji premium (1:1 z usluga), odwzorowany ze Stripe przez webhook
- * (`syncSubscriptionFromStripe`). Kolumny `status`/`currentPeriodEnd`/`cancelAtPeriodEnd`
+ * (`syncSubscriptionFromStripe`). Kolumny `status`/`currentPeriod*`/`cancelAtPeriodEnd`
  * to wejscie `isPremiumActive` — premium liczone na odczycie, bez crona. Po `db:reset`
  * stan odtwarza `npm run db:sync-subscriptions`.
  */
@@ -175,6 +175,8 @@ export const serviceSubscriptionsTable = pgTable('service_subscriptions', {
     stripeCustomerId: varchar('stripe_customer_id', { length: 255 }).notNull(),
     stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }).notNull().unique(),
     status: subscriptionStatusEnum('status').notNull(),
+    /** Od niego liczona karencja `past_due` (Stripe przesuwa okres przed nieudanym odnowieniem). */
+    currentPeriodStart: timestamp('current_period_start', { withTimezone: true }).notNull(),
     currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }).notNull(),
     cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),

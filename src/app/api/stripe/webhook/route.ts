@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-import { stripe } from '@/lib/stripe';
+import { stripe, STRIPE_LIVE_MODE } from '@/lib/stripe';
 import { isStripeEventProcessed, markStripeEventProcessed } from '@/lib/stripe-events';
 import { subscriptionSyncTarget } from '@/lib/stripe-webhook-events';
-import { notifyPremiumPurchased } from '@/lib/subscription-notifications';
-import { syncSubscriptionFromStripe } from '@/lib/subscription-sync';
+import {
+    notifyPremiumPurchased,
+    notifySubscriptionConflict,
+} from '@/lib/subscription-notifications';
+import {
+    type SubscriptionSyncResult,
+    syncSubscriptionFromStripe,
+} from '@/lib/subscription-sync';
 
 import { env } from '../../../../../env';
 
@@ -13,9 +19,10 @@ import { env } from '../../../../../env';
  * Webhook Stripe: utrzymuje w bazie stan subskrypcji premium (`service_subscriptions`)
  * i pozycje w rankingu (`promoted_services`).
  *
- * Kolejnosc: 1) podpis (400), 2) dedupe `stripe_events` (duplikat → 200),
- * 3) synchronizacja (blad → 500, Stripe ponowi), 4) oznaczenie zdarzenia, 5) skutki uboczne
- * (mail do foundera) z limitem czasu i bledem tylko w logu.
+ * Kolejnosc: 1) podpis (400), 2) tryb konta (`livemode` niezgodny z kluczem → 200 bez
+ * synchronizacji i bez oznaczenia), 3) dedupe `stripe_events` (duplikat → 200),
+ * 4) synchronizacja (blad → 500, Stripe ponowi), 5) oznaczenie zdarzenia, 6) skutki uboczne
+ * (maile do foundera) tylko przy pierwszym dostarczeniu, z limitem czasu i bledem tylko w logu.
  *
  * Celowo BEZ rate limitu (wyjatek od reguly „limit na kazdym publicznym endpoincie"):
  * jedyna bramka jest podpis HMAC Stripe sprawdzany przed jakimkolwiek I/O. Niepodpisane
@@ -49,6 +56,29 @@ function verifyEvent(payload: string, signature: string): Stripe.Event | null {
     }
 }
 
+/**
+ * Maile wysylamy wylacznie po `checkout.session.completed`: zakup (i ewentualny konflikt)
+ * zglaszamy raz na sesje, a nie przy kazdym `subscription.*`/`invoice.*` tej subskrypcji.
+ * Sesja jest juz oplacona, wiec stan pobrany przy synchronizacji jest po platnosci.
+ */
+async function notifyAfterCheckout(
+    result: SubscriptionSyncResult,
+    stripeSubscriptionId: string,
+): Promise<void> {
+    if (result.outcome === 'synced') {
+        await notifyPremiumPurchased({ serviceId: result.serviceId, stripeSubscriptionId });
+        return;
+    }
+    // Nieoplacona druga subskrypcja nie wymaga zwrotu.
+    if (result.outcome === 'conflict' && result.isIncomingActive) {
+        await notifySubscriptionConflict({
+            serviceId: result.serviceId,
+            activeSubscriptionId: result.activeSubscriptionId,
+            conflictingSubscriptionId: result.conflictingSubscriptionId,
+        });
+    }
+}
+
 async function processEvent(event: Stripe.Event): Promise<void> {
     if (await isStripeEventProcessed(event.id)) return;
 
@@ -59,12 +89,8 @@ async function processEvent(event: Stripe.Event): Promise<void> {
     const result = await syncSubscriptionFromStripe(stripeSubscriptionId, options);
     const isFirstDelivery = await markStripeEventProcessed(event);
 
-    if (
-        isFirstDelivery &&
-        event.type === 'checkout.session.completed' &&
-        result.outcome === 'synced'
-    ) {
-        await notifyPremiumPurchased({ serviceId: result.serviceId, stripeSubscriptionId });
+    if (isFirstDelivery && event.type === 'checkout.session.completed') {
+        await notifyAfterCheckout(result, stripeSubscriptionId);
     }
 }
 
@@ -76,6 +102,16 @@ export async function POST(request: Request): Promise<NextResponse> {
         // Surowa tresc: podpis liczony jest z bajtow, nie z przeparsowanego JSON-a.
         const event = verifyEvent(await request.text(), signature);
         if (!event) return jsonError('INVALID_SIGNATURE', 'Invalid Stripe signature', 400);
+
+        // Zdarzenie z drugiego trybu konta (np. testowy endpoint wskazujacy na produkcje)
+        // nie dotyka bazy. 200, zeby Stripe nie ponawial; bez oznaczenia w `stripe_events`.
+        if (event.livemode !== STRIPE_LIVE_MODE) {
+            console.warn('Stripe webhook: event livemode does not match API key mode, ignored', {
+                eventId: event.id,
+                eventLivemode: event.livemode,
+            });
+            return received();
+        }
 
         await processEvent(event);
         return received();

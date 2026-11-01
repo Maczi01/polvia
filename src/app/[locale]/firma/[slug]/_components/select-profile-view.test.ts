@@ -13,6 +13,7 @@ const NOW = new Date('2026-10-31T12:00:00Z');
 function subscription(overrides: Partial<PremiumSubscriptionState> = {}): PremiumSubscriptionState {
     return {
         status: 'active',
+        currentPeriodStart: new Date('2026-10-30T12:00:00Z'),
         currentPeriodEnd: new Date('2026-11-30T12:00:00Z'),
         cancelAtPeriodEnd: false,
         ...overrides,

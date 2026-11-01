@@ -9,21 +9,22 @@ import {
     SUBSCRIPTION_STATUSES,
     type SubscriptionStatus,
 } from '@/lib/premium';
+import { isPremiumPriceId } from '@/lib/premium-prices';
 import { stripe } from '@/lib/stripe';
-import { notifySubscriptionConflict } from '@/lib/subscription-notifications';
 import {
     findServiceIdBySlug,
     findServiceIdBySubscriptionId,
     runSubscriptionTransaction,
     type StoredSubscription,
     type SubscriptionRecord,
+    type SubscriptionTransaction,
 } from '@/lib/subscription-store';
 
 /**
  * Pola subskrypcji Stripe, z ktorych liczymy stan. `Stripe.Subscription` jest do tego typu
  * przypisywalne; wezszy typ pozwala testom podac sam ksztalt bez rzutowania.
  *
- * API `2026-09-30.endive`: koniec okresu lezy na POZYCJACH (`items.data[].current_period_end`),
+ * API `2026-09-30.endive`: okres lezy na POZYCJACH (`items.data[].current_period_start|end`),
  * nie na subskrypcji.
  */
 export type StripeSubscriptionSnapshot = Pick<
@@ -31,7 +32,13 @@ export type StripeSubscriptionSnapshot = Pick<
     'id' | 'status' | 'cancel_at_period_end' | 'metadata'
 > & {
     customer: string | { id: string };
-    items: { data: Array<Pick<Stripe.SubscriptionItem, 'current_period_end'>> };
+    items: {
+        data: Array<
+            Pick<Stripe.SubscriptionItem, 'current_period_start' | 'current_period_end'> & {
+                price: { id: string };
+            }
+        >;
+    };
 };
 
 export type SubscriptionSyncErrorCode = 'UNSUPPORTED_STATUS' | 'MISSING_PERIOD';
@@ -47,15 +54,24 @@ export class SubscriptionSyncError extends Error {
 }
 
 /**
- * - `synced`: stan zapisany, ranking zaktualizowany,
- * - `conflict`: wpis ma inna aktywna subskrypcje — stan bez zmian (founder powiadomiony,
- *   jesli druga subskrypcja jest oplacona),
- * - `unlinked`: subskrypcji nie da sie powiazac z zadnym wpisem (np. utworzona poza checkoutem),
+ * - `synced`: stan w bazie odpowiada Stripe (zapisany albo — po stanie koncowym — juz aktualny),
+ * - `conflict`: wpis ma inna aktywna subskrypcje — stan bez zmian. Synchronizacja NIE
+ *   powiadamia (jest idempotentna i wolana przy kazdym zdarzeniu i resyncu); mail wysyla
+ *   wolajacy raz, czyli webhook przy pierwszym dostarczeniu jednego typu zdarzenia,
+ * - `unlinked`: subskrypcji nie da sie powiazac z wpisem (utworzona poza checkoutem albo
+ *   z cena spoza allowlisty premium),
  * - `service_missing`: wskazanego wpisu nie ma w bazie.
  */
 export type SubscriptionSyncResult =
     | { outcome: 'synced'; serviceId: string; isPremiumActive: boolean }
-    | { outcome: 'conflict'; serviceId: string }
+    | {
+          outcome: 'conflict';
+          serviceId: string;
+          activeSubscriptionId: string;
+          conflictingSubscriptionId: string;
+          /** Druga subskrypcja jest oplacona (wymaga zwrotu); nieoplacona nie wymaga. */
+          isIncomingActive: boolean;
+      }
     | { outcome: 'unlinked' }
     | { outcome: 'service_missing'; serviceId: string };
 
@@ -74,6 +90,16 @@ const serviceIdSchema = z.string().uuid();
 
 const KNOWN_STATUSES: ReadonlySet<string> = new Set(SUBSCRIPTION_STATUSES);
 
+/**
+ * Statusy, z ktorych subskrypcja Stripe nigdy nie wraca. Odczyt ze Stripe jest przed blokada
+ * wiersza, wiec rownolegle zdarzenie moze przyniesc starszy stan — po stanie koncowym kazdy
+ * inny stan TEJ SAMEJ subskrypcji jest z definicji nieswiezy.
+ */
+const TERMINAL_STATUSES: ReadonlySet<SubscriptionStatus> = new Set([
+    'canceled',
+    'incomplete_expired',
+]);
+
 function isSubscriptionStatus(status: string): status is SubscriptionStatus {
     return KNOWN_STATUSES.has(status);
 }
@@ -85,15 +111,19 @@ function toSubscriptionRecord(
     const { id, status, customer } = subscription;
     if (!isSubscriptionStatus(status)) throw new SubscriptionSyncError('UNSUPPORTED_STATUS', id);
 
-    const periodEnds = subscription.items.data.map(item => item.current_period_end);
-    if (periodEnds.length === 0) throw new SubscriptionSyncError('MISSING_PERIOD', id);
+    const items = subscription.items.data;
+    if (items.length === 0) throw new SubscriptionSyncError('MISSING_PERIOD', id);
+
+    const periodStart = Math.max(...items.map(item => item.current_period_start));
+    const periodEnd = Math.max(...items.map(item => item.current_period_end));
 
     return {
         serviceId,
         stripeSubscriptionId: id,
         stripeCustomerId: typeof customer === 'string' ? customer : customer.id,
         status,
-        currentPeriodEnd: new Date(Math.max(...periodEnds) * 1000),
+        currentPeriodStart: new Date(periodStart * 1000),
+        currentPeriodEnd: new Date(periodEnd * 1000),
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
     };
 }
@@ -133,15 +163,58 @@ function conflictingSubscriptionId(
     return isPremiumActive(stored, now) ? stored.stripeSubscriptionId : null;
 }
 
-type TransactionOutcome =
-    | { kind: 'done'; result: SubscriptionSyncResult }
-    | { kind: 'conflict'; activeSubscriptionId: string };
+/** Zapisany jest stan koncowy tej samej subskrypcji, a przychodzi stan sprzed niego. */
+function isStaleAfterTerminal(
+    stored: StoredSubscription | null,
+    record: SubscriptionRecord,
+): boolean {
+    if (!stored || stored.stripeSubscriptionId !== record.stripeSubscriptionId) return false;
+
+    return TERMINAL_STATUSES.has(stored.status) && !TERMINAL_STATUSES.has(record.status);
+}
+
+/** Decyzja i zapis pod blokada wiersza uslugi. */
+async function applySubscriptionState(
+    store: SubscriptionTransaction,
+    record: SubscriptionRecord,
+    now: Date,
+): Promise<SubscriptionSyncResult> {
+    const { serviceId, stripeSubscriptionId } = record;
+    if (!(await store.lockService(serviceId))) return { outcome: 'service_missing', serviceId };
+
+    const stored = await store.findSubscription(serviceId);
+    const isIncomingActive = isPremiumActive(record, now);
+
+    const activeSubscriptionId = conflictingSubscriptionId(stored, stripeSubscriptionId, now);
+    if (activeSubscriptionId) {
+        return {
+            outcome: 'conflict',
+            serviceId,
+            activeSubscriptionId,
+            conflictingSubscriptionId: stripeSubscriptionId,
+            isIncomingActive,
+        };
+    }
+
+    if (isStaleAfterTerminal(stored, record)) {
+        console.warn('subscription sync: stale state after terminal state ignored', {
+            stripeSubscriptionId,
+            incomingStatus: record.status,
+        });
+        return { outcome: 'synced', serviceId, isPremiumActive: false };
+    }
+
+    await store.saveSubscription(record);
+    await store.setPromotion(serviceId, isIncomingActive ? premiumRankingExpiry(record) : null);
+    return { outcome: 'synced', serviceId, isPremiumActive: isIncomingActive };
+}
 
 /**
  * Odwzorowuje w bazie stan subskrypcji Stripe: `service_subscriptions` i pozycje
  * w `promoted_services`, w jednej transakcji z blokada wiersza uslugi (rownolegle zdarzenia
- * tego samego wpisu ida po kolei). Stan zawsze ze swiezo pobranej subskrypcji, wiec
- * kolejnosc zdarzen nie ma znaczenia, a ponowienie jest idempotentne.
+ * tego samego wpisu ida po kolei). Stan ze swiezo pobranej subskrypcji; stanu koncowego
+ * (`canceled`) nie nadpisuje starszy odczyt z rownoleglego zdarzenia. Ponowienie jest
+ * idempotentne. Bez skutkow ubocznych (maili) — te naleza do wolajacego.
  *
  * Rzuca przy bledzie Stripe/bazy i `SubscriptionSyncError` — webhook odpowiada wtedy 500
  * i Stripe ponawia.
@@ -151,8 +224,18 @@ export async function syncSubscriptionFromStripe(
     options: SyncOptions = {},
 ): Promise<SubscriptionSyncResult> {
     const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
-    const serviceId = await resolveServiceId(subscription, options.serviceId);
 
+    // Brak pozycji nie jest tu odrzucany — to blad `MISSING_PERIOD` nizej.
+    const priceIds = subscription.items.data.map(item => item.price.id);
+    if (!priceIds.every(priceId => isPremiumPriceId(priceId))) {
+        console.warn('subscription sync: subscription without premium price ignored', {
+            stripeSubscriptionId,
+            priceIds,
+        });
+        return { outcome: 'unlinked' };
+    }
+
+    const serviceId = await resolveServiceId(subscription, options.serviceId);
     if (!serviceId) {
         console.warn('subscription sync: subscription not linked to a service', {
             stripeSubscriptionId,
@@ -162,39 +245,5 @@ export async function syncSubscriptionFromStripe(
 
     const record = toSubscriptionRecord(serviceId, subscription);
     const now = new Date();
-    const isActive = isPremiumActive(record, now);
-
-    const outcome = await runSubscriptionTransaction(async (store): Promise<TransactionOutcome> => {
-        if (!(await store.lockService(serviceId))) {
-            return { kind: 'done', result: { outcome: 'service_missing', serviceId } };
-        }
-
-        const stored = await store.findSubscription(serviceId);
-        const activeSubscriptionId = conflictingSubscriptionId(
-            stored,
-            record.stripeSubscriptionId,
-            now,
-        );
-        if (activeSubscriptionId) return { kind: 'conflict', activeSubscriptionId };
-
-        await store.saveSubscription(record);
-        await store.setPromotion(serviceId, isActive ? premiumRankingExpiry(record) : null);
-        return {
-            kind: 'done',
-            result: { outcome: 'synced', serviceId, isPremiumActive: isActive },
-        };
-    });
-
-    if (outcome.kind === 'done') return outcome.result;
-
-    // Powiadomienie po zamknieciu transakcji — mail nie trzyma blokady wiersza. Tylko gdy
-    // druga subskrypcja jest oplacona: anulowana/nieudana nie wymaga zwrotu.
-    if (isActive) {
-        await notifySubscriptionConflict({
-            serviceId,
-            activeSubscriptionId: outcome.activeSubscriptionId,
-            conflictingSubscriptionId: record.stripeSubscriptionId,
-        });
-    }
-    return { outcome: 'conflict', serviceId };
+    return runSubscriptionTransaction(store => applySubscriptionState(store, record, now));
 }

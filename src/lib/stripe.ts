@@ -17,6 +17,18 @@ export const STRIPE_API_VERSION = '2026-09-30.endive' satisfies Stripe.LatestApi
  */
 export const STRIPE_TIMEOUT_MS = 8000;
 
+/** Klucz produkcyjny: sekretny (`sk_live_`) albo ograniczony (`rk_live_`); reszta to test. */
+export function isLiveStripeKey(secretKey: string): boolean {
+    return secretKey.startsWith('sk_live_') || secretKey.startsWith('rk_live_');
+}
+
+/**
+ * Tryb konta, w ktorym dziala ta instancja. Zdarzenie albo subskrypcja z innym `livemode`
+ * nie moze zmienic stanu premium — inaczej testowa subskrypcja (karta 4242) zapisana do
+ * produkcyjnej bazy dalaby prawdziwemu wpisowi darmowe premium.
+ */
+export const STRIPE_LIVE_MODE = isLiveStripeKey(env.STRIPE_SECRET_KEY);
+
 export const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
     apiVersion: STRIPE_API_VERSION,
     timeout: STRIPE_TIMEOUT_MS,

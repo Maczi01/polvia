@@ -92,6 +92,7 @@ function paidSession(clientReferenceId: string, paymentStatus = 'paid') {
         status: 'complete',
         payment_status: paymentStatus,
         client_reference_id: clientReferenceId,
+        line_items: { data: [{ price: { id: 'price_monthly_test' } }] },
         customer_details: { email: 'jan@firma.pl', name: 'Jan Kowalski', tax_ids: [] },
     };
 }
@@ -209,7 +210,7 @@ describe('submitPremiumMaterials', () => {
         const result = await submitPremiumMaterials(null, form(valid));
 
         expect(result).toEqual({ data: { sent: true } });
-        expect(mockRetrieve).toHaveBeenCalledWith('cs_test_paid');
+        expect(mockRetrieve).toHaveBeenCalledWith('cs_test_paid', { expand: ['line_items'] });
         const mail = jest.mocked(sendMail).mock.calls[0][0];
         expect(mail.to).toBe('founder@polvia.pl');
         expect(mail.replyTo).toBe('jan@firma.pl');

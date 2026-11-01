@@ -51,15 +51,28 @@ const TARGET: PremiumCheckoutTarget = {
     hasActivePremium: false,
 };
 
-function paidSession(
-    overrides: Partial<Stripe.Checkout.Session> = {},
-): Partial<Stripe.Checkout.Session> {
+/**
+ * Pozycje sesji (`expand: ['line_items']`) — do sprawdzenia ceny wystarcza `price.id`,
+ * wiec fixture ma tylko ten ksztalt zamiast pelnego `Stripe.LineItem`.
+ */
+type LineItemsFixture = { data: Array<{ price: { id: string } | null }> };
+
+function lineItems(...priceIds: string[]): LineItemsFixture {
+    return { data: priceIds.map(id => ({ price: { id } })) };
+}
+
+type SessionFixture = Partial<Omit<Stripe.Checkout.Session, 'line_items'>> & {
+    line_items?: LineItemsFixture;
+};
+
+function paidSession(overrides: SessionFixture = {}): SessionFixture {
     return {
         id: 'cs_test_paid',
         mode: 'subscription',
         status: 'complete',
         payment_status: 'paid',
         client_reference_id: SERVICE_ID,
+        line_items: lineItems('price_monthly_test'),
         customer_details: {
             email: 'jan@firma.pl',
             name: 'Jan Kowalski',
@@ -159,6 +172,46 @@ describe('verifyPaidCheckoutSession', () => {
                 taxIds: ['eu_vat PL1234567890'],
                 address: 'Puławska 1, 00-001, Warszawa, PL',
             },
+        });
+    });
+
+    it('pobiera sesje z pozycjami (do sprawdzenia ceny)', async () => {
+        mockRetrieve.mockResolvedValue(paidSession());
+
+        await verifyPaidCheckoutSession('cs_test_paid', 'mistrz-remontu');
+
+        expect(mockRetrieve).toHaveBeenCalledWith('cs_test_paid', { expand: ['line_items'] });
+    });
+
+    it('oplacona sesja z cena roczna premium jest wazna', async () => {
+        mockRetrieve.mockResolvedValue(paidSession({ line_items: lineItems('price_yearly_test') }));
+
+        expect(await verifyPaidCheckoutSession('cs_test_paid', 'mistrz-remontu')).toMatchObject({
+            status: 'paid',
+        });
+    });
+
+    it('oplacona sesja z obca cena (inny Payment Link na koncie) jest niewazna', async () => {
+        mockRetrieve.mockResolvedValue(
+            paidSession({ line_items: lineItems('price_other_product') }),
+        );
+
+        expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
+            status: 'invalid',
+        });
+    });
+
+    it('sesja z obca pozycja obok ceny premium albo bez pozycji jest niewazna', async () => {
+        mockRetrieve.mockResolvedValue(
+            paidSession({ line_items: lineItems('price_monthly_test', 'price_other_product') }),
+        );
+        expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
+            status: 'invalid',
+        });
+
+        mockRetrieve.mockResolvedValue(paidSession({ line_items: undefined }));
+        expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
+            status: 'invalid',
         });
     });
 

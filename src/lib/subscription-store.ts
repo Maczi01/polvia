@@ -68,6 +68,7 @@ function createTransactionStore(tx: Transaction): SubscriptionTransaction {
                 .select({
                     stripeSubscriptionId: serviceSubscriptionsTable.stripeSubscriptionId,
                     status: serviceSubscriptionsTable.status,
+                    currentPeriodStart: serviceSubscriptionsTable.currentPeriodStart,
                     currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
                     cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
                 })

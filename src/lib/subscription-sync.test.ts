@@ -24,6 +24,12 @@ const mockDb = {
 
 const mockRetrieve = jest.fn<Promise<StripeSubscriptionSnapshot>, [string]>();
 
+const PRICE_MONTHLY = 'price_monthly_test';
+
+jest.mock('../../env', () => ({
+    env: { STRIPE_PRICE_MONTHLY: 'price_monthly_test', STRIPE_PRICE_YEARLY: 'price_yearly_test' },
+}));
+
 // Getter, bo fabryka `jest.mock` jest hoistowana nad inicjalizacje `mockRetrieve`.
 jest.mock('@/lib/stripe', () => ({
     stripe: {
@@ -66,27 +72,49 @@ const SERVICE_A = '11111111-1111-4111-8111-111111111111';
 const SERVICE_B = '22222222-2222-4222-8222-222222222222';
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Koniec okresu za 20 dni, z dokladnoscia do sekundy (Stripe podaje sekundy uniksowe). */
-const PERIOD_END = new Date(Math.floor((Date.now() + 20 * DAY_MS) / 1000) * 1000);
+/** Z dokladnoscia do sekundy (Stripe podaje sekundy uniksowe). */
+function wholeSeconds(ms: number): Date {
+    return new Date(Math.floor(ms / 1000) * 1000);
+}
+
+/** Okres: zaczal sie 10 dni temu, konczy za 20 dni. */
+const PERIOD_START = wholeSeconds(Date.now() - 10 * DAY_MS);
+const PERIOD_END = wholeSeconds(Date.now() + 20 * DAY_MS);
+
+function toUnix(date: Date): number {
+    return Math.floor(date.getTime() / 1000);
+}
 
 function stripeSubscription(overrides: {
     id?: string;
     status?: string;
+    periodStart?: Date;
     periodEnd?: Date;
+    priceId?: string;
     metadata?: Record<string, string>;
     hasItems?: boolean;
 }): StripeSubscriptionSnapshot {
-    const periodEnd = Math.floor((overrides.periodEnd ?? PERIOD_END).getTime() / 1000);
+    const item = {
+        current_period_start: toUnix(overrides.periodStart ?? PERIOD_START),
+        current_period_end: toUnix(overrides.periodEnd ?? PERIOD_END),
+        price: { id: overrides.priceId ?? PRICE_MONTHLY },
+    };
     return {
         id: overrides.id ?? 'sub_A',
         customer: 'cus_A',
         status: overrides.status ?? 'active',
         cancel_at_period_end: false,
         metadata: overrides.metadata ?? {},
-        items: {
-            data: overrides.hasItems === false ? [] : [{ current_period_end: periodEnd }],
-        },
+        items: { data: overrides.hasItems === false ? [] : [item] },
     };
+}
+
+function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
+    let resolve: (value: T) => void = () => {};
+    const promise = new Promise<T>(settle => {
+        resolve = settle;
+    });
+    return { promise, resolve };
 }
 
 function stripeReturns(subscription: StripeSubscriptionSnapshot): void {
@@ -99,6 +127,7 @@ function storedActive(serviceId: string, stripeSubscriptionId: string): Subscrip
         stripeSubscriptionId,
         stripeCustomerId: 'cus_first',
         status: 'active',
+        currentPeriodStart: PERIOD_START,
         currentPeriodEnd: PERIOD_END,
         cancelAtPeriodEnd: false,
     };
@@ -131,6 +160,7 @@ describe('syncSubscriptionFromStripe', () => {
             stripeSubscriptionId: 'sub_A',
             stripeCustomerId: 'cus_A',
             status: 'active',
+            currentPeriodStart: PERIOD_START,
             currentPeriodEnd: PERIOD_END,
             cancelAtPeriodEnd: false,
         });
@@ -151,13 +181,123 @@ describe('syncSubscriptionFromStripe', () => {
         expect(mockDb.subscriptions.get(SERVICE_A)?.status).toBe('canceled');
     });
 
-    it('past_due po karencji zdejmuje z rankingu', async () => {
-        const longAgo = new Date(Date.now() - (PREMIUM_GRACE_DAYS + 1) * DAY_MS);
-        stripeReturns(stripeSubscription({ status: 'past_due', periodEnd: longAgo }));
+    it('past_due po karencji zdejmuje z rankingu, choc przesuniety okres trwa', async () => {
+        // Stripe przesuwa okres przed nieudanym odnowieniem: start = nieudane odnowienie.
+        stripeReturns(
+            stripeSubscription({
+                status: 'past_due',
+                periodStart: wholeSeconds(Date.now() - (PREMIUM_GRACE_DAYS + 1) * DAY_MS),
+                periodEnd: wholeSeconds(Date.now() + 26 * DAY_MS),
+            }),
+        );
 
-        await syncSubscriptionFromStripe('sub_A', { serviceId: SERVICE_A });
+        const result = await syncSubscriptionFromStripe('sub_A', { serviceId: SERVICE_A });
 
+        expect(result).toMatchObject({ outcome: 'synced', isPremiumActive: false });
         expect(mockDb.promotions.has(SERVICE_A)).toBe(false);
+    });
+
+    it('past_due w karencji: ranking do poczatku okresu + karencja, nie do nowego konca', async () => {
+        const renewalFailedAt = wholeSeconds(Date.now() - DAY_MS);
+        stripeReturns(
+            stripeSubscription({
+                status: 'past_due',
+                periodStart: renewalFailedAt,
+                periodEnd: wholeSeconds(Date.now() + 29 * DAY_MS),
+            }),
+        );
+
+        const result = await syncSubscriptionFromStripe('sub_A', { serviceId: SERVICE_A });
+
+        expect(result).toMatchObject({ outcome: 'synced', isPremiumActive: true });
+        expect(mockDb.subscriptions.get(SERVICE_A)?.currentPeriodStart).toEqual(renewalFailedAt);
+        expect(mockDb.promotions.get(SERVICE_A)).toEqual(
+            new Date(renewalFailedAt.getTime() + PREMIUM_GRACE_DAYS * DAY_MS),
+        );
+    });
+
+    describe('stan koncowy (canceled) a nieswiezy odczyt', () => {
+        it('po zapisanym canceled starszy past_due tej samej subskrypcji nie przywraca premium', async () => {
+            mockDb.subscriptions.set(SERVICE_A, {
+                ...storedActive(SERVICE_A, 'sub_A'),
+                status: 'canceled',
+            });
+            stripeReturns(stripeSubscription({ status: 'past_due' }));
+
+            const result = await syncSubscriptionFromStripe('sub_A');
+
+            expect(result).toEqual({
+                outcome: 'synced',
+                serviceId: SERVICE_A,
+                isPremiumActive: false,
+            });
+            expect(mockDb.subscriptions.get(SERVICE_A)?.status).toBe('canceled');
+            expect(mockDb.promotions.has(SERVICE_A)).toBe(false);
+        });
+
+        it('wyscig: retrieve rozwiazany w odwrotnej kolejnosci — wygrywa canceled', async () => {
+            mockDb.subscriptions.set(SERVICE_A, storedActive(SERVICE_A, 'sub_A'));
+            mockDb.promotions.set(SERVICE_A, PERIOD_END);
+            const stale = deferred<StripeSubscriptionSnapshot>();
+            const fresh = deferred<StripeSubscriptionSnapshot>();
+            mockRetrieve.mockReturnValueOnce(stale.promise).mockReturnValueOnce(fresh.promise);
+
+            // A (invoice.payment_failed) pobiera stan pierwsze, ale konczy ostatnie.
+            const staleSync = syncSubscriptionFromStripe('sub_A');
+            const freshSync = syncSubscriptionFromStripe('sub_A');
+            fresh.resolve(stripeSubscription({ status: 'canceled' }));
+            await freshSync;
+            stale.resolve(
+                stripeSubscription({
+                    status: 'past_due',
+                    periodStart: wholeSeconds(Date.now() - DAY_MS),
+                }),
+            );
+            await staleSync;
+
+            expect(mockDb.subscriptions.get(SERVICE_A)?.status).toBe('canceled');
+            expect(mockDb.promotions.has(SERVICE_A)).toBe(false);
+        });
+    });
+
+    describe('cena spoza allowlisty premium', () => {
+        it('subskrypcja z obca cena nie daje premium, nawet ze wskazanym wpisem', async () => {
+            stripeReturns(stripeSubscription({ priceId: 'price_other_product' }));
+
+            const result = await syncSubscriptionFromStripe('sub_A', { serviceId: SERVICE_A });
+
+            expect(result).toEqual({ outcome: 'unlinked' });
+            expect(mockDb.subscriptions.size).toBe(0);
+            expect(mockDb.promotions.size).toBe(0);
+            expect(console.warn).toHaveBeenCalledWith(
+                expect.stringContaining('premium price'),
+                expect.objectContaining({ priceIds: ['price_other_product'] }),
+            );
+        });
+
+        it('zmiana planu na obca cene nie przedluza premium powiazanego wpisu', async () => {
+            const linked = storedActive(SERVICE_A, 'sub_A');
+            mockDb.subscriptions.set(SERVICE_A, linked);
+            stripeReturns(
+                stripeSubscription({
+                    priceId: 'price_other_product',
+                    periodEnd: wholeSeconds(Date.now() + 300 * DAY_MS),
+                }),
+            );
+
+            const result = await syncSubscriptionFromStripe('sub_A');
+
+            expect(result).toEqual({ outcome: 'unlinked' });
+            expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(linked);
+        });
+
+        it('cena roczna z allowlisty daje premium', async () => {
+            stripeReturns(stripeSubscription({ priceId: 'price_yearly_test' }));
+
+            const result = await syncSubscriptionFromStripe('sub_A', { serviceId: SERVICE_A });
+
+            expect(result).toMatchObject({ outcome: 'synced', isPremiumActive: true });
+        });
     });
 
     it('stan zawsze ze swiezo pobranej subskrypcji (pobiera ja po id)', async () => {
@@ -221,7 +361,7 @@ describe('syncSubscriptionFromStripe', () => {
     });
 
     describe('druga subskrypcja dla jednego wpisu', () => {
-        it('aktywna druga subskrypcja nie nadpisuje aktywnej pierwszej i powiadamia foundera', async () => {
+        it('aktywna druga subskrypcja nie nadpisuje aktywnej pierwszej; konflikt w wyniku, bez maila', async () => {
             const first = storedActive(SERVICE_A, 'sub_first');
             mockDb.subscriptions.set(SERVICE_A, first);
             mockDb.promotions.set(SERVICE_A, PERIOD_END);
@@ -231,17 +371,20 @@ describe('syncSubscriptionFromStripe', () => {
                 serviceId: SERVICE_A,
             });
 
-            expect(result).toEqual({ outcome: 'conflict', serviceId: SERVICE_A });
+            expect(result).toEqual({
+                outcome: 'conflict',
+                serviceId: SERVICE_A,
+                activeSubscriptionId: 'sub_first',
+                conflictingSubscriptionId: 'sub_second',
+                isIncomingActive: true,
+            });
             expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(first);
             expect(mockDb.promotions.get(SERVICE_A)).toEqual(PERIOD_END);
-            expect(sendMail).toHaveBeenCalledTimes(1);
-            const [message] = jest.mocked(sendMail).mock.calls[0] ?? [];
-            expect(message?.to).toBe('founder@polvia.pl');
-            expect(message?.text).toContain('sub_second');
-            expect(message?.text).toContain('sub_first');
+            // Mail o konflikcie wysyla webhook raz na checkout (route.test.ts), nie synchronizacja.
+            expect(sendMail).not.toHaveBeenCalled();
         });
 
-        it('nieaktywna druga subskrypcja nie nadpisuje stanu i nie powiadamia', async () => {
+        it('nieaktywna druga subskrypcja nie nadpisuje stanu; konflikt bez oplaty', async () => {
             const first = storedActive(SERVICE_A, 'sub_first');
             mockDb.subscriptions.set(SERVICE_A, first);
             stripeReturns(stripeSubscription({ id: 'sub_second', status: 'canceled' }));
@@ -250,7 +393,7 @@ describe('syncSubscriptionFromStripe', () => {
                 serviceId: SERVICE_A,
             });
 
-            expect(result).toEqual({ outcome: 'conflict', serviceId: SERVICE_A });
+            expect(result).toMatchObject({ outcome: 'conflict', isIncomingActive: false });
             expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(first);
             expect(sendMail).not.toHaveBeenCalled();
         });

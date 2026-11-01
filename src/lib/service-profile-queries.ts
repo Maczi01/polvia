@@ -122,6 +122,7 @@ function tagsInLocale(locale: string) {
  */
 export const subscriptionColumns = {
     status: serviceSubscriptionsTable.status,
+    currentPeriodStart: serviceSubscriptionsTable.currentPeriodStart,
     currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
     cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
 };

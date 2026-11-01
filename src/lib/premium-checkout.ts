@@ -9,6 +9,7 @@ import {
     getPremiumCheckoutTarget,
     type PremiumCheckoutTarget,
 } from '@/lib/premium-checkout-queries';
+import { hasOnlyPremiumPrices } from '@/lib/premium-prices';
 import { buildProfileCanonicalUrl } from '@/lib/service-profile-metadata';
 import { stripe } from '@/lib/stripe';
 import { SUBSCRIPTION_METADATA_KEYS } from '@/lib/subscription-sync';
@@ -101,11 +102,18 @@ export type CheckoutVerification =
 
 const serviceIdSchema = z.string().uuid();
 
-function isPaidSubscriptionSession(session: Stripe.Checkout.Session): boolean {
+/**
+ * Oplacona sesja subskrypcji NASZEJ ceny premium. Bez sprawdzenia ceny dowolny Payment Link
+ * subskrypcyjny na koncie (inny/tanszy produkt) z `?client_reference_id=<uuid wpisu>`
+ * przeszedlby jako zakup premium (UUID-y wpisow sa publiczne).
+ */
+function isPaidPremiumSession(session: Stripe.Checkout.Session): boolean {
+    const priceIds = (session.line_items?.data ?? []).map(item => item.price?.id ?? '');
     return (
         session.mode === 'subscription' &&
         session.status === 'complete' &&
-        session.payment_status === 'paid'
+        session.payment_status === 'paid' &&
+        hasOnlyPremiumPrices(priceIds)
     );
 }
 
@@ -136,7 +144,8 @@ async function retrieveSession(
     sessionId: string,
 ): Promise<Stripe.Checkout.Session | 'missing' | 'unavailable'> {
     try {
-        return await stripe.checkout.sessions.retrieve(sessionId);
+        // `line_items` nie sa domyslnie w odpowiedzi — potrzebne do sprawdzenia ceny.
+        return await stripe.checkout.sessions.retrieve(sessionId, { expand: ['line_items'] });
     } catch (error) {
         if (error instanceof Stripe.errors.StripeInvalidRequestError) return 'missing';
         console.error('premium-checkout: session retrieve failed', describeStripeError(error));
@@ -145,7 +154,7 @@ async function retrieveSession(
 }
 
 /**
- * Czy sesja Checkout jest oplacona i dotyczy wpisu spod `slug`. Strona sukcesu i akcja
+ * Czy sesja Checkout jest oplacona, z cena premium, i dotyczy wpisu spod `slug`. Strona sukcesu i akcja
  * materialow wolaja ja niezaleznie: akcja to publiczny POST, wiec nie ufa stronie.
  * Nie zalezy od webhooka — premium moze sie jeszcze nie wlaczyc.
  */
@@ -155,7 +164,7 @@ export async function verifyPaidCheckoutSession(
 ): Promise<CheckoutVerification> {
     const session = await retrieveSession(sessionId);
     if (session === 'unavailable') return { status: 'unavailable' };
-    if (session === 'missing' || !isPaidSubscriptionSession(session)) return { status: 'invalid' };
+    if (session === 'missing' || !isPaidPremiumSession(session)) return { status: 'invalid' };
 
     const serviceId = serviceIdSchema.safeParse(session.client_reference_id);
     if (!serviceId.success) return { status: 'invalid' };

@@ -20,7 +20,7 @@ jest.mock('../../../../../env', () => ({ env: { STRIPE_WEBHOOK_SECRET: 'whsec_te
 jest.mock('@/lib/stripe', () => {
     // Build CJS paczki eksportuje konstruktor jako `module.exports` (bez `default`).
     const StripeClient = jest.requireActual<typeof Stripe>('stripe');
-    return { stripe: new StripeClient('sk_test_dummy') };
+    return { stripe: new StripeClient('sk_test_dummy'), STRIPE_LIVE_MODE: false };
 });
 jest.mock('@/lib/stripe-events', () => ({
     isStripeEventProcessed: async (id: string) => mockProcessedEvents.has(id),
@@ -39,8 +39,14 @@ jest.mock('@/lib/mailer', () => ({
 const signer = new Stripe('sk_test_dummy');
 const SERVICE_ID = '11111111-1111-4111-8111-111111111111';
 
-function event(id: string, type: string, object: Record<string, unknown>): string {
-    return JSON.stringify({ id, object: 'event', type, data: { object } });
+/** `livemode: false` — tryb klucza testowego z mocka `@/lib/stripe`. */
+function event(
+    id: string,
+    type: string,
+    object: Record<string, unknown>,
+    livemode = false,
+): string {
+    return JSON.stringify({ id, object: 'event', type, livemode, data: { object } });
 }
 
 function deliver(payload: string, signature?: string): Promise<Response> {
@@ -71,6 +77,14 @@ const CHECKOUT_COMPLETED = event('evt_checkout', 'checkout.session.completed', {
     subscription: 'sub_1',
     client_reference_id: SERVICE_ID,
 });
+
+const CONFLICT = {
+    outcome: 'conflict',
+    serviceId: SERVICE_ID,
+    activeSubscriptionId: 'sub_first',
+    conflictingSubscriptionId: 'sub_1',
+    isIncomingActive: true,
+} as const;
 
 beforeEach(() => {
     mockProcessedEvents.clear();
@@ -145,16 +159,14 @@ describe('POST /api/stripe/webhook — routing zdarzen', () => {
         expect(jest.mocked(sendMail).mock.calls[0]?.[0].text).toContain(SERVICE_ID);
     });
 
-    it('checkout zakonczony konfliktem nie wysyla maila o zakupie (wysyla go synchronizacja)', async () => {
-        jest.mocked(syncSubscriptionFromStripe).mockResolvedValue({
-            outcome: 'conflict',
-            serviceId: SERVICE_ID,
-        });
+    it('checkout zakonczony konfliktem nie wysyla maila o zakupie', async () => {
+        jest.mocked(syncSubscriptionFromStripe).mockResolvedValue(CONFLICT);
 
         const response = await signed(CHECKOUT_COMPLETED);
 
         expect(response.status).toBe(200);
-        expect(sendMail).not.toHaveBeenCalled();
+        const subjects = jest.mocked(sendMail).mock.calls.map(([message]) => message.subject);
+        expect(subjects).not.toContain('Nowa subskrypcja premium');
     });
 
     it('invoice.payment_failed synchronizuje subskrypcje z faktury', async () => {
@@ -251,5 +263,104 @@ describe('POST /api/stripe/webhook — deduplikacja i awarie', () => {
         const response = await signed(CHECKOUT_COMPLETED);
 
         expect(response.status).toBe(200);
+    });
+});
+
+describe('POST /api/stripe/webhook — tryb konta (livemode)', () => {
+    it('zdarzenie live przy kluczu testowym: 200 bez synchronizacji i bez oznaczenia', async () => {
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
+        const payload = event(
+            'evt_live',
+            'customer.subscription.updated',
+            { id: 'sub_1', object: 'subscription' },
+            true,
+        );
+
+        const response = await signed(payload);
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).not.toHaveBeenCalled();
+        expect(mockProcessedEvents.has('evt_live')).toBe(false);
+        expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('livemode'), {
+            eventId: 'evt_live',
+            eventLivemode: true,
+        });
+    });
+
+    it('zdarzenie w trybie klucza jest synchronizowane', async () => {
+        const response = await signed(SUBSCRIPTION_UPDATED);
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('POST /api/stripe/webhook — mail o konflikcie subskrypcji', () => {
+    beforeEach(() => {
+        jest.mocked(syncSubscriptionFromStripe).mockResolvedValue(CONFLICT);
+    });
+
+    it('pierwsze checkout.session.completed z konfliktem: dokladnie jeden mail o konflikcie', async () => {
+        const response = await signed(CHECKOUT_COMPLETED);
+
+        expect(response.status).toBe(200);
+        expect(sendMail).toHaveBeenCalledTimes(1);
+        const [message] = jest.mocked(sendMail).mock.calls[0] ?? [];
+        expect(message?.to).toBe('founder@polvia.pl');
+        expect(message?.text).toContain('sub_first');
+        expect(message?.text).toContain('sub_1');
+    });
+
+    it('duplikat tego samego zdarzenia nie wysyla drugiego maila', async () => {
+        await signed(CHECKOUT_COMPLETED);
+        await signed(CHECKOUT_COMPLETED);
+
+        expect(sendMail).toHaveBeenCalledTimes(1);
+    });
+
+    it('rownolegle dostarczenie, ktore przegralo oznaczenie, nie wysyla maila', async () => {
+        // Inne dostarczenie oznaczylo zdarzenie miedzy sprawdzeniem a zapisem.
+        jest.mocked(syncSubscriptionFromStripe).mockImplementation(async () => {
+            mockProcessedEvents.add('evt_checkout');
+            return CONFLICT;
+        });
+
+        const response = await signed(CHECKOUT_COMPLETED);
+
+        expect(response.status).toBe(200);
+        expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        ['customer.subscription.updated', { id: 'sub_1', object: 'subscription' }],
+        ['customer.subscription.created', { id: 'sub_1', object: 'subscription' }],
+        [
+            'invoice.paid',
+            {
+                id: 'in_1',
+                object: 'invoice',
+                parent: {
+                    type: 'subscription_details',
+                    subscription_details: { subscription: 'sub_1' },
+                },
+            },
+        ],
+    ])('%s z konfliktem nie wysyla maila', async (type, object) => {
+        const response = await signed(event(`evt_${type}`, type, object));
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).toHaveBeenCalledTimes(1);
+        expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    it('konflikt z nieoplacona druga subskrypcja nie wysyla maila', async () => {
+        jest.mocked(syncSubscriptionFromStripe).mockResolvedValue({
+            ...CONFLICT,
+            isIncomingActive: false,
+        });
+
+        await signed(CHECKOUT_COMPLETED);
+
+        expect(sendMail).not.toHaveBeenCalled();
     });
 });
