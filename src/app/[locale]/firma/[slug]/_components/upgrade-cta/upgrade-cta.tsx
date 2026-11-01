@@ -9,6 +9,7 @@ import {
     PREMIUM_INTERVALS,
     type PremiumInterval,
 } from '@/lib/premium-checkout-fields';
+import { DEFAULT_PREMIUM_INTERVAL } from '@/lib/premium-plan';
 import { cn } from '@/lib/utilities';
 
 type UpgradeCtaProps = {
@@ -18,18 +19,20 @@ type UpgradeCtaProps = {
     className?: string;
 };
 
-const DEFAULT_INTERVAL: PremiumInterval = 'monthly';
-
-/** Jedna opcja interwalu: natywne radio (sr-only) + karta z nazwa i cena. */
+/**
+ * Jedna opcja interwalu: natywne radio (sr-only) + karta z nazwa i cena. Kwota z tych samych
+ * kluczy co `/cennik` (`Pricing.plans.essentials`) — zmiana ceny to jedna edycja tlumaczen.
+ */
 function IntervalOption({ interval }: { interval: PremiumInterval }): ReactElement {
     const t = useTranslations('ServiceProfile.checkout');
+    const tPlan = useTranslations('Pricing.plans.essentials');
     return (
         <label className="relative block cursor-pointer">
             <input
                 type="radio"
                 name="interval"
                 value={interval}
-                defaultChecked={interval === DEFAULT_INTERVAL}
+                defaultChecked={interval === DEFAULT_PREMIUM_INTERVAL}
                 className="peer sr-only"
             />
             <span
@@ -43,7 +46,7 @@ function IntervalOption({ interval }: { interval: PremiumInterval }): ReactEleme
                     {t(interval)}
                 </span>
                 <span className="text-sm text-gray-600 dark:text-gray-300">
-                    {t(`${interval}Price`)}
+                    {tPlan(`price.${interval}`)} {tPlan(`per.${interval}`)}
                 </span>
                 {interval === 'yearly' && (
                     <span className="mt-1 self-start rounded-full bg-brand px-2 py-0.5 text-xs font-semibold text-white">

@@ -1,8 +1,11 @@
 import { createFakeRedis, type FakeMulti } from '../../tests/fixtures/add-business/fake-redis';
 import {
     checkRateLimit,
+    checkRateLimitWithTimeout,
     getClientIp,
     peekRateLimit,
+    RATE_LIMIT_CHECK_TIMEOUT_MS,
+    RateLimitCheckTimeoutError,
     rateLimitSubject,
     RateLimitStoreError,
     type RequestWithHeaders,
@@ -169,6 +172,80 @@ describe('checkRateLimit', () => {
         const multi = jest.spyOn(mockRedis, 'multi').mockReturnValue(failing);
 
         await expect(checkRateLimit(options)).rejects.toBeInstanceOf(RateLimitStoreError);
+        multi.mockRestore();
+    });
+});
+
+describe('checkRateLimitWithTimeout', () => {
+    const options = { key: 'premium:thanks:1.2.3.4', max: 20, windowSeconds: 3600 };
+
+    function multiWithExec(exec: FakeMulti['exec']): FakeMulti {
+        const multi: FakeMulti = {
+            set: () => multi,
+            incr: () => multi,
+            expire: () => multi,
+            ttl: () => multi,
+            exec,
+        };
+        return multi;
+    }
+
+    /** `MULTI`, ktorego `EXEC` nigdy nie odpowiada — Redis przyjal polaczenie i milczy. */
+    function hangingMulti(): FakeMulti {
+        return multiWithExec(() => new Promise(() => {}));
+    }
+
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
+    it('oddaje wynik limitu i sprzata timer po rozwiazanym sprawdzeniu', async () => {
+        jest.useFakeTimers();
+
+        const result = await checkRateLimitWithTimeout(options);
+
+        expect(result).toEqual({ allowed: true, remaining: 19 });
+        expect(jest.getTimerCount()).toBe(0);
+    });
+
+    it('przepuszcza blad Redisa bez czekania na limit czasu', async () => {
+        jest.useFakeTimers();
+        const multi = jest
+            .spyOn(mockRedis, 'multi')
+            .mockReturnValue(multiWithExec(async () => []));
+
+        await expect(checkRateLimitWithTimeout(options)).rejects.toBeInstanceOf(
+            RateLimitStoreError,
+        );
+        expect(jest.getTimerCount()).toBe(0);
+        multi.mockRestore();
+    });
+
+    it('zawieszony Redis: odrzuca RateLimitCheckTimeoutError dopiero po 1500 ms', async () => {
+        jest.useFakeTimers();
+        const multi = jest.spyOn(mockRedis, 'multi').mockReturnValue(hangingMulti());
+        const settled = jest.fn();
+
+        const result = checkRateLimitWithTimeout(options);
+        result.catch(settled);
+        await jest.advanceTimersByTimeAsync(RATE_LIMIT_CHECK_TIMEOUT_MS - 1);
+        expect(settled).not.toHaveBeenCalled();
+
+        await jest.advanceTimersByTimeAsync(1);
+        await expect(result).rejects.toBeInstanceOf(RateLimitCheckTimeoutError);
+        await expect(result).rejects.toThrow('Rate limit check exceeded 1500 ms');
+        multi.mockRestore();
+    });
+
+    it('przyjmuje wlasny limit czasu', async () => {
+        jest.useFakeTimers();
+        const multi = jest.spyOn(mockRedis, 'multi').mockReturnValue(hangingMulti());
+
+        const result = checkRateLimitWithTimeout(options, 200);
+        const assertion = expect(result).rejects.toThrow('Rate limit check exceeded 200 ms');
+        await jest.advanceTimersByTimeAsync(200);
+
+        await assertion;
         multi.mockRestore();
     });
 });

@@ -3,6 +3,7 @@ import 'server-only';
 import { isIPv4, isIPv6 } from 'node:net';
 
 import { redis } from '@/lib/redis';
+import { TimeoutError, withTimeout } from '@/lib/with-timeout';
 
 /**
  * Wspoldzielony licznik zapytan na Redisie.
@@ -140,6 +141,36 @@ export async function checkRateLimit({
     }
 
     return { allowed: true, remaining: max - count };
+}
+
+/**
+ * Domyslny gorny limit czasu sprawdzenia limitu. Klient Redisa nie ma `commandTimeout`
+ * (globalny zmienilby zachowanie innych przeplywow, np. generowania wpisu), a zawieszony
+ * Redis trzymalby render albo akcje do konca `maxDuration`.
+ */
+export const RATE_LIMIT_CHECK_TIMEOUT_MS = 1500;
+
+export class RateLimitCheckTimeoutError extends TimeoutError {
+    constructor(timeoutMs: number) {
+        super('Rate limit check', timeoutMs);
+        this.name = 'RateLimitCheckTimeoutError';
+    }
+}
+
+/**
+ * `checkRateLimit` z gornym limitem czasu: po `timeoutMs` odrzuca `RateLimitCheckTimeoutError`.
+ * Awarie Redisa (`RateLimitStoreError`, blad ioredis, przekroczony czas) leca do wolajacego —
+ * to on wybiera polityke (fail-open albo fail-closed).
+ */
+export function checkRateLimitWithTimeout(
+    options: RateLimitOptions,
+    timeoutMs: number = RATE_LIMIT_CHECK_TIMEOUT_MS,
+): Promise<RateLimitResult> {
+    return withTimeout(
+        checkRateLimit(options),
+        timeoutMs,
+        () => new RateLimitCheckTimeoutError(timeoutMs),
+    );
 }
 
 /**

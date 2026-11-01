@@ -51,29 +51,33 @@ function view(premium: PremiumContent | null): ServiceProfileView {
 }
 
 describe('selectProfileView', () => {
-    it('aktywne premium z szablonem gallery daje widok premium gallery', () => {
+    it('aktywne premium z szablonem gallery daje widok premium gallery z trescia', () => {
+        const content = premiumContent({ template: 'gallery' });
+
         const result = selectProfileView({
-            premiumContent: premiumContent({ template: 'gallery' }),
+            loadPremiumContent: () => content,
             subscription: subscription(),
             now: NOW,
         });
 
-        expect(result).toEqual({ kind: 'premium', template: 'gallery' });
+        expect(result).toEqual({ kind: 'premium', template: 'gallery', content });
     });
 
     it('aktywne premium bez tresci daje domyslny szablon classic', () => {
         const result = selectProfileView({
-            premiumContent: null,
+            loadPremiumContent: () => null,
             subscription: subscription(),
             now: NOW,
         });
 
-        expect(result).toEqual({ kind: 'premium', template: 'classic' });
+        expect(result).toEqual({ kind: 'premium', template: 'classic', content: null });
     });
 
-    it('wygasle premium z zachowana trescia daje profil free', () => {
+    it('wygasle premium z zachowana trescia daje profil free bez parsowania tresci', () => {
+        const loadPremiumContent = jest.fn(() => premiumContent({ template: 'professional' }));
+
         const result = selectProfileView({
-            premiumContent: premiumContent({ template: 'professional' }),
+            loadPremiumContent,
             subscription: subscription({
                 status: 'canceled',
                 currentPeriodEnd: new Date('2026-09-30T12:00:00Z'),
@@ -82,11 +86,12 @@ describe('selectProfileView', () => {
         });
 
         expect(result).toEqual({ kind: 'free' });
+        expect(loadPremiumContent).not.toHaveBeenCalled();
     });
 
     it('status active po karencji (wygaslo bez webhooka) z zachowana trescia daje profil free', () => {
         const result = selectProfileView({
-            premiumContent: premiumContent({ template: 'gallery' }),
+            loadPremiumContent: () => premiumContent({ template: 'gallery' }),
             subscription: subscription({
                 status: 'active',
                 currentPeriodEnd: new Date('2026-10-27T12:00:00Z'),
@@ -97,40 +102,42 @@ describe('selectProfileView', () => {
         expect(result).toEqual({ kind: 'free' });
     });
 
-    it('brak subskrypcji z trescia daje profil free', () => {
-        const result = selectProfileView({
-            premiumContent: premiumContent(),
-            subscription: null,
-            now: NOW,
-        });
+    it('brak subskrypcji daje profil free i nie wola ladowania tresci premium', () => {
+        const loadPremiumContent = jest.fn(() => premiumContent());
+
+        const result = selectProfileView({ loadPremiumContent, subscription: null, now: NOW });
 
         expect(result).toEqual({ kind: 'free' });
+        expect(loadPremiumContent).not.toHaveBeenCalled();
     });
 });
 
 describe('selectOgCoverPath', () => {
     const COVER_SRC = '/services/mistrz-remontu/cover.jpg';
 
-    it('widok free z trescia z coverem nie wypuszcza coveru do Open Graph', () => {
-        expect(selectOgCoverPath({ kind: 'free' }, premiumContent())).toBeNull();
+    it('widok free nie wypuszcza coveru do Open Graph', () => {
+        expect(selectOgCoverPath({ kind: 'free' })).toBeNull();
     });
 
     it('widok premium z coverem daje sciezke coveru', () => {
-        expect(selectOgCoverPath({ kind: 'premium', template: 'gallery' }, premiumContent())).toBe(
-            COVER_SRC,
-        );
+        expect(
+            selectOgCoverPath({ kind: 'premium', template: 'gallery', content: premiumContent() }),
+        ).toBe(COVER_SRC);
     });
 
     it('widok premium bez tresci daje null', () => {
-        expect(selectOgCoverPath({ kind: 'premium', template: 'classic' }, null)).toBeNull();
+        expect(
+            selectOgCoverPath({ kind: 'premium', template: 'classic', content: null }),
+        ).toBeNull();
     });
 
     it('widok premium z trescia bez coveru daje null', () => {
         expect(
-            selectOgCoverPath(
-                { kind: 'premium', template: 'gallery' },
-                premiumContent({ coverImage: null }),
-            ),
+            selectOgCoverPath({
+                kind: 'premium',
+                template: 'gallery',
+                content: premiumContent({ coverImage: null }),
+            }),
         ).toBeNull();
     });
 });
@@ -141,9 +148,9 @@ describe('shouldLoadSimilarServices', () => {
     });
 
     it('widok premium nie pobiera podobnych firm', () => {
-        expect(shouldLoadSimilarServices({ kind: 'premium', template: 'professional' })).toBe(
-            false,
-        );
+        expect(
+            shouldLoadSimilarServices({ kind: 'premium', template: 'professional', content: null }),
+        ).toBe(false);
     });
 });
 

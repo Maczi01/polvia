@@ -1,7 +1,11 @@
 import type { ServiceProfile, ServiceProfileLocation } from '@/lib/service-profile-queries';
 import type { SimilarServiceRow } from '@/lib/similar-services';
 
+import type { ProfileViewKind } from './select-profile-view';
+import type { PremiumContent } from './service-profile-types';
 import { toProfileView, toServiceImagePath } from './to-profile-view';
+
+const FREE: ProfileViewKind = { kind: 'free' };
 
 function location(overrides: Partial<ServiceProfileLocation> = {}): ServiceProfileLocation {
     return {
@@ -37,7 +41,7 @@ function profile(overrides: Partial<ServiceProfile> = {}): ServiceProfile {
         image: 'remont.png  ',
         tags: ['Glazura'],
         locations: [location()],
-        premiumContent: null,
+        premium: null,
         subscription: null,
         ...overrides,
     };
@@ -67,7 +71,7 @@ describe('toServiceImagePath', () => {
 
 describe('toProfileView', () => {
     it('mapuje logo i jezyki obslugi, a lokalizacje przekazuje z nazwami z bazy', () => {
-        const view = toProfileView(profile(), similar, 'pl');
+        const view = toProfileView(profile(), similar, 'pl', FREE);
 
         expect(view.logo).toBe('/services/remont.png');
         expect(view.languages).toEqual(['pl', 'uk']);
@@ -80,8 +84,8 @@ describe('toProfileView', () => {
         expect(view.premium).toBeNull();
     });
 
-    it('przekazuje tresc premium z zapytania bez zmian', () => {
-        const premiumContent: ServiceProfile['premiumContent'] = {
+    it('widok premium przekazuje tresc z decyzji widoku bez zmian', () => {
+        const content: PremiumContent = {
             template: 'professional',
             coverImage: { src: '/services/mistrz-remontu/cover.jpg', alt: 'Mistrz Remontu' },
             gallery: [],
@@ -89,13 +93,23 @@ describe('toProfileView', () => {
             faq: [{ question: 'Czy dojezdzacie?', answer: 'Tak.' }],
         };
 
-        const view = toProfileView(profile({ premiumContent }), similar, 'pl');
+        const view = toProfileView(profile(), similar, 'pl', {
+            kind: 'premium',
+            template: 'professional',
+            content,
+        });
 
-        expect(view.premium).toBe(premiumContent);
+        expect(view.premium).toBe(content);
+    });
+
+    it('widok free ma premium null, nawet gdy w bazie jest zapisana tresc', () => {
+        const stored = profile({ premium: { template: 'gallery' } });
+
+        expect(toProfileView(stored, similar, 'pl', FREE).premium).toBeNull();
     });
 
     it('wpis bez obrazka ma logo null', () => {
-        expect(toProfileView(profile({ image: null }), [], 'pl').logo).toBeNull();
+        expect(toProfileView(profile({ image: null }), [], 'pl', FREE).logo).toBeNull();
     });
 
     it('mapHref wskazuje pin glownej lokalizacji na mapie', () => {
@@ -109,13 +123,14 @@ describe('toProfileView', () => {
             }),
             [],
             'uk',
+            FREE,
         );
 
         expect(view.mapHref).toEqual({ pathname: '/map', query: { place: 'centrala' } });
     });
 
     it('wpis online ma mapHref null', () => {
-        expect(toProfileView(profile({ coverage: 'online' }), [], 'pl').mapHref).toBeNull();
+        expect(toProfileView(profile({ coverage: 'online' }), [], 'pl', FREE).mapHref).toBeNull();
     });
 
     it('lokalizacja bez wspolrzednych ma mapHref null', () => {
@@ -123,13 +138,14 @@ describe('toProfileView', () => {
             profile({ locations: [location({ latitude: null, longitude: null })] }),
             [],
             'pl',
+            FREE,
         );
 
         expect(view.mapHref).toBeNull();
     });
 
     it('podobne firmy linkuja do /firma/[slug] z params', () => {
-        const [first] = toProfileView(profile(), similar, 'pl').similarServices;
+        const [first] = toProfileView(profile(), similar, 'pl', FREE).similarServices;
 
         expect(first.href).toEqual({ pathname: '/firma/[slug]', params: { slug: 'liga-remontu' } });
         expect(first.logo).toBeNull();

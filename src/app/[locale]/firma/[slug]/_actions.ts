@@ -1,12 +1,10 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { hasLocale } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 
-import { defaultLocale, type Locale, locales } from '@/i18n/config';
-import { getOperatorInbox, sendMail } from '@/lib/mailer';
+import { type Locale, toLocale } from '@/i18n/config';
+import { getOperatorInbox, type MailMessage, sendMail, type SendMailResult } from '@/lib/mailer';
 import {
     type CheckoutPayer,
     createPremiumCheckoutSession,
@@ -18,14 +16,20 @@ import type {
     MaterialsErrorCode,
     MaterialsFieldErrors,
     MaterialsState,
+    PremiumMaterialsField,
 } from '@/lib/premium-checkout-fields';
 import {
     getPremiumCheckoutTarget,
     type PremiumCheckoutTarget,
 } from '@/lib/premium-checkout-queries';
-import { checkRateLimit, getClientIp, rateLimitSubject } from '@/lib/rate-limit';
-import { buildServiceProfilePath } from '@/lib/service-profile-path';
+import { claimMaterialsSend, releaseMaterialsSend } from '@/lib/premium-materials-sent';
+import { isWithinPremiumLimit } from '@/lib/premium-rate-limit';
+import { hasActivePremiumSubscription } from '@/lib/premium-subscription-search';
+import { buildProfileCanonicalUrl } from '@/lib/service-profile-metadata';
 import { STRIPE_LIVE_MODE } from '@/lib/stripe';
+import { TimeoutError, withTimeout } from '@/lib/with-timeout';
+
+import { env } from '../../../../../env';
 
 import {
     invalidMaterialsFields,
@@ -37,16 +41,20 @@ import {
 
 /**
  * Akcje premium z profilu firmy. Kazda to publiczny endpoint POST: nie ufaja formularzowi
- * (cena z allowlisty env, wpis i sesja sprawdzane na serwerze) i maja limit po IP.
- * Bez `revalidatePath`: checkout niczego nie zapisuje (stan premium ustawia webhook),
- * a materialy ida mailem.
+ * (cena z allowlisty env, wpis i sesja sprawdzane na serwerze) i maja limit po IP
+ * (`premium-rate-limit`; awaria Redisa konczy akcje bledem — fail-open ma tylko strona
+ * `dziekujemy`). Bez `revalidatePath`: checkout niczego nie zapisuje (stan premium ustawia
+ * webhook), a materialy ida mailem.
  */
 
-const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
-/** Kilka prob na godzine miesci zmiane interwalu i powrot z anulowanego Checkout. */
-const CHECKOUT_PER_IP = 10;
-/** Formularz wysyla sie raz; zapas na poprawki po bledzie. */
-const MATERIALS_PER_IP = 5;
+/**
+ * Calkowity limit wysylki materialow. Nodemailer ma limit per faza SMTP (10 s), wiec
+ * polaczenie + powitanie + wysylka to do ~30 s. Budzet akcji opisuje `maxDuration` strony
+ * `dziekujemy`, z ktorej akcja jest wolana.
+ */
+const MATERIALS_MAIL_TIMEOUT_MS = 20_000;
+
+const MATERIALS_SENT: MaterialsState = { data: { sent: true } };
 
 /** Platnosc testowa (klucz `sk_test_`) — founder nie moze wziac maila za prawdziwy zakup. */
 function materialsMailSubject(serviceName: string): string {
@@ -55,18 +63,7 @@ function materialsMailSubject(serviceName: string): string {
 }
 
 async function requestLocale(): Promise<Locale> {
-    const locale = await getLocale();
-    return hasLocale(locales, locale) ? locale : defaultLocale;
-}
-
-async function isWithinLimit(endpoint: string, max: number): Promise<boolean> {
-    const ip = getClientIp({ headers: await headers() });
-    const result = await checkRateLimit({
-        key: `premium:${endpoint}:${rateLimitSubject(ip)}`,
-        max,
-        windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
-    });
-    return result.allowed;
+    return toLocale(await getLocale());
 }
 
 export async function startPremiumCheckout(
@@ -81,11 +78,13 @@ export async function startPremiumCheckout(
 
     const input = parseCheckoutForm(formData);
     if (!input.success) return fail('BAD_INPUT');
-    if (!(await isWithinLimit('checkout', CHECKOUT_PER_IP))) return fail('RATE_LIMITED');
+    if (!(await isWithinPremiumLimit('checkout'))) return fail('RATE_LIMITED');
 
     const target = await getPremiumCheckoutTarget(input.data.serviceId);
     if (!target) return fail('NOT_FOUND');
     if (target.hasActivePremium) return fail('ALREADY_PREMIUM');
+    // Oplacona subskrypcja, ktorej webhook jeszcze nie zapisal — druga karta = druga platnosc.
+    if (await hasActivePremiumSubscription(target.serviceId)) return fail('ALREADY_PREMIUM');
 
     const checkoutUrl = await createPremiumCheckoutSession({
         target,
@@ -109,7 +108,7 @@ function buildMaterialsMailText(
 ): string {
     return [
         `Firma: ${target.name}`,
-        `Profil: ${buildServiceProfilePath('pl', target.slug)}`,
+        `Profil: ${buildProfileCanonicalUrl(env.NEXT_PUBLIC_SITE_URL, 'pl', target.slug)}`,
         `ID wpisu: ${target.serviceId}`,
         `Sesja Checkout: ${input.sessionId}`,
         '',
@@ -134,7 +133,7 @@ function buildMaterialsMailText(
 type MaterialsTranslator = Awaited<ReturnType<typeof getTranslations>>;
 
 function toFieldErrors(
-    fields: ReturnType<typeof invalidMaterialsFields>,
+    fields: PremiumMaterialsField[],
     t: MaterialsTranslator,
 ): MaterialsFieldErrors {
     const errors: MaterialsFieldErrors = {};
@@ -145,6 +144,56 @@ function toFieldErrors(
                 : t('tooLong', { max: PREMIUM_MATERIALS_MAX_LENGTH[field] });
     }
     return errors;
+}
+
+function errorName(error: unknown): string {
+    return error instanceof Error ? error.name : typeof error;
+}
+
+/**
+ * `claimed` — ta proba wysyla; `already_sent` — sesja ma juz znacznik; `unmarked` — Redis
+ * niedostepny: wysylamy bez znacznika, bo duplikat maila jest mniejszym zlem niz platnik,
+ * ktory nie moze oddac materialow. Bledy Redisa nie maja wspolnej klasy, stad szeroki `catch`.
+ */
+async function claimSend(sessionId: string): Promise<'claimed' | 'already_sent' | 'unmarked'> {
+    try {
+        return (await claimMaterialsSend(sessionId)) ? 'claimed' : 'already_sent';
+    } catch (error) {
+        console.error('premium-materials: sent marker unavailable, sending without it', {
+            error: errorName(error),
+        });
+        return 'unmarked';
+    }
+}
+
+/** Po nieudanej wysylce platnik ma moc sprobowac ponownie, wiec znacznik znika. */
+async function releaseSend(sessionId: string): Promise<void> {
+    try {
+        await releaseMaterialsSend(sessionId);
+    } catch (error) {
+        console.error('premium-materials: could not release sent marker', {
+            error: errorName(error),
+        });
+    }
+}
+
+/**
+ * `sendMail` z calkowitym limitem czasu. Po przekroczeniu mail moze jeszcze dojsc —
+ * znacznik i tak jest zwalniany, bo zgubione materialy sa gorsze niz duplikat.
+ */
+async function sendMaterialsMail(message: MailMessage): Promise<SendMailResult> {
+    try {
+        return await withTimeout(
+            sendMail(message),
+            MATERIALS_MAIL_TIMEOUT_MS,
+            () => new TimeoutError('Materials mail', MATERIALS_MAIL_TIMEOUT_MS),
+        );
+    } catch (error) {
+        // `sendMail` nie rzuca — inny blad niz timeout to blad programistyczny.
+        if (!(error instanceof TimeoutError)) throw error;
+        console.error('premium-materials: mail timed out', { timeoutMs: error.timeoutMs });
+        return { ok: false, code: 'SEND_FAILED' };
+    }
 }
 
 export async function submitPremiumMaterials(
@@ -161,19 +210,29 @@ export async function submitPremiumMaterials(
     if (!input.success) {
         return fail('BAD_INPUT', toFieldErrors(invalidMaterialsFields(input.error), t));
     }
-    if (!(await isWithinLimit('materials', MATERIALS_PER_IP))) return fail('RATE_LIMITED');
+    if (!(await isWithinPremiumLimit('materials'))) return fail('RATE_LIMITED');
 
-    const checkout = await verifyPaidCheckoutSession(input.data.sessionId, input.data.slug);
+    const { sessionId, slug } = input.data;
+    const checkout = await verifyPaidCheckoutSession(sessionId, slug);
     if (checkout.status === 'unavailable') return fail('VERIFY_FAILED');
     if (checkout.status === 'invalid') return fail('FORBIDDEN');
 
-    const sent = await sendMail({
+    // Znacznik dopiero po weryfikacji: obcy nie zajmie wysylki cudzej sesji.
+    const claim = await claimSend(sessionId);
+    // Duplikat (odswiezenie, drugie klikniecie, ponowiony POST): wynik jak po pierwszej
+    // wysylce, bez drugiego maila.
+    if (claim === 'already_sent') return MATERIALS_SENT;
+
+    const sent = await sendMaterialsMail({
         to: getOperatorInbox(),
         replyTo: checkout.payer.email ?? undefined,
         subject: materialsMailSubject(checkout.target.name),
         text: buildMaterialsMailText(input.data, checkout.target, checkout.payer),
     });
-    if (!sent.ok) return fail('SEND_FAILED');
+    if (!sent.ok) {
+        if (claim === 'claimed') await releaseSend(sessionId);
+        return fail('SEND_FAILED');
+    }
 
-    return { data: { sent: true } };
+    return MATERIALS_SENT;
 }

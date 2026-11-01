@@ -28,8 +28,20 @@ export function databaseHostname(databaseUrl: string): string | null {
     return hostname.replace(/^\[(.*)]$/, '$1').toLowerCase();
 }
 
+/** Host bazy z jednego parsowania adresu: do logu (`hostname`) i do bramek (`isLocal`). */
+export type DatabaseHost = {
+    /** `null`, gdy adresu nie da sie przeparsowac. */
+    hostname: string | null;
+    /** Niepoprawny albo pusty adres traktujemy jak zdalny — bezpieczniej odmowic. */
+    isLocal: boolean;
+};
+
+export function inspectDatabaseUrl(databaseUrl: string): DatabaseHost {
+    const hostname = databaseHostname(databaseUrl);
+    return { hostname, isLocal: hostname !== null && LOCAL_HOSTS.has(hostname) };
+}
+
 /** Niepoprawny albo pusty adres traktujemy jak zdalny — bezpieczniej odmowic. */
 export function isLocalDatabaseUrl(databaseUrl: string): boolean {
-    const hostname = databaseHostname(databaseUrl);
-    return hostname !== null && LOCAL_HOSTS.has(hostname);
+    return inspectDatabaseUrl(databaseUrl).isLocal;
 }

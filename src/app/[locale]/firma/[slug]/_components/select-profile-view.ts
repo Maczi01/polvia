@@ -10,11 +10,21 @@ import type {
 /** Szablon premium, gdy wpis ma aktywne premium, a tresc nie jest jeszcze opublikowana. */
 const DEFAULT_PREMIUM_TEMPLATE: PremiumTemplate = 'classic';
 
-export type ProfileViewKind = { kind: 'free' } | { kind: 'premium'; template: PremiumTemplate };
+/**
+ * Wynik decyzji widoku. Tresc premium niesie tylko wariant `premium` — widok free nie ma
+ * do niej dostepu, wiec nie moze jej przypadkiem wyrenderowac ani wypuscic do OG (R18).
+ */
+export type ProfileViewKind =
+    | { kind: 'free' }
+    | { kind: 'premium'; template: PremiumTemplate; content: PremiumContent | null };
 
 export type SelectProfileViewInput = {
-    /** Tresc premium z `service_profiles`; zostaje w bazie takze po wygasnieciu premium. */
-    premiumContent: Pick<PremiumContent, 'template'> | null;
+    /**
+     * Tresc premium z `service_profiles` (walidacja Zod + lokalizacja). Wolana dopiero przy
+     * aktywnym premium: profil free nie parsuje jsonb, a uszkodzony wiersz nie loguje bledu
+     * przy kazdym wejsciu na profil darmowy. Tresc zostaje w bazie po wygasnieciu premium.
+     */
+    loadPremiumContent: () => PremiumContent | null;
     subscription: PremiumSubscriptionState | null;
     now: Date;
 };
@@ -24,23 +34,21 @@ export type SelectProfileViewInput = {
  * ja z tymi samymi danymi, wiec cover w Open Graph pojawia sie tylko przy szablonie premium.
  */
 export function selectProfileView({
-    premiumContent,
+    loadPremiumContent,
     subscription,
     now,
 }: SelectProfileViewInput): ProfileViewKind {
     if (!isPremiumActive(subscription, now)) return { kind: 'free' };
 
-    return { kind: 'premium', template: premiumContent?.template ?? DEFAULT_PREMIUM_TEMPLATE };
+    const content = loadPremiumContent();
+    return { kind: 'premium', template: content?.template ?? DEFAULT_PREMIUM_TEMPLATE, content };
 }
 
 /** Cover w Open Graph tylko przy widoku premium: tresc wygaslego premium zostaje w bazie (R18). */
-export function selectOgCoverPath(
-    viewKind: ProfileViewKind,
-    content: Pick<PremiumContent, 'coverImage'> | null,
-): string | null {
+export function selectOgCoverPath(viewKind: ProfileViewKind): string | null {
     if (viewKind.kind !== 'premium') return null;
 
-    return content?.coverImage?.src ?? null;
+    return viewKind.content?.coverImage?.src ?? null;
 }
 
 /** Szablony premium nie pokazuja „Podobnych firm”, wiec przy premium ich nie pobieramy. */

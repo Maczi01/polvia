@@ -1,15 +1,13 @@
-'use client';
-
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { type ReactElement, useRef, useState } from 'react';
+import type { ReactElement } from 'react';
 
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
 import { cn } from '@/lib/utilities';
 
 import { ProfileSection } from '../profile-section/profile-section';
 import type { ProfileImage } from '../service-profile-types';
-import { GalleryLightbox } from './gallery-lightbox';
+import { GalleryOpenButton, GalleryViewer } from './gallery-viewer';
 
 /**
  * - `mosaic`: pierwsze zdjecie 2x2, reszta siatka — szablon Galeria
@@ -45,6 +43,53 @@ type ProfileGalleryProps = {
     titleClassName?: string;
 };
 
+type GalleryThumbnailProps = {
+    image: ProfileImage;
+    index: number;
+    label: string;
+    layout: GalleryLayout;
+    /** Licznik „+N” na miniaturze; `0` — bez licznika. */
+    moreCount: number;
+};
+
+function GalleryThumbnail({
+    image,
+    index,
+    label,
+    layout,
+    moreCount,
+}: GalleryThumbnailProps): ReactElement {
+    return (
+        <li className={cn('relative', LAYOUT_ITEM[layout])}>
+            <GalleryOpenButton
+                index={index}
+                label={label}
+                className="group absolute inset-0 overflow-hidden rounded-xl bg-gray-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/60 dark:bg-gray-800"
+            >
+                <Image
+                    src={image.src}
+                    alt=""
+                    fill
+                    sizes={LAYOUT_SIZES[layout]}
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                {moreCount > 0 && (
+                    <span
+                        aria-hidden="true"
+                        className="absolute inset-0 flex items-center justify-center bg-black/55 text-2xl font-bold text-white"
+                    >
+                        +{moreCount}
+                    </span>
+                )}
+            </GalleryOpenButton>
+        </li>
+    );
+}
+
+/**
+ * Galeria jako Server Component: siatka i miniatury renderuja sie na serwerze, a do klienta
+ * trafiaja tylko przyciski otwierajace podglad i lightbox (`GalleryViewer`).
+ */
 export function ProfileGallery({
     images,
     layout,
@@ -53,8 +98,6 @@ export function ProfileGallery({
     titleClassName,
 }: ProfileGalleryProps): ReactElement | null {
     const t = useTranslations('ServiceProfile');
-    const dialogRef = useRef<HTMLDialogElement>(null);
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
     const allImages = images.slice(0, PREMIUM_GALLERY_MAX);
     if (allImages.length === 0) return null;
@@ -63,15 +106,6 @@ export function ProfileGallery({
     const hiddenCount = allImages.length - thumbnails.length;
     const total = allImages.length;
 
-    const handleOpen = (index: number): void => {
-        setActiveIndex(index);
-        dialogRef.current?.showModal();
-    };
-
-    const handleStep = (delta: number): void => {
-        setActiveIndex(index => (index === null ? null : (index + delta + total) % total));
-    };
-
     return (
         <ProfileSection
             id="gallery"
@@ -79,50 +113,20 @@ export function ProfileGallery({
             className={className}
             titleClassName={titleClassName}
         >
-            <ul className={LAYOUT_LIST[layout]}>
-                {thumbnails.map((image, index) => {
-                    const isLastWithMore = hiddenCount > 0 && index === thumbnails.length - 1;
-                    return (
-                        <li key={image.src} className={cn('relative', LAYOUT_ITEM[layout])}>
-                            <button
-                                type="button"
-                                onClick={() => handleOpen(index)}
-                                aria-label={t('galleryOpen', {
-                                    index: index + 1,
-                                    total,
-                                    alt: image.alt,
-                                })}
-                                className="group absolute inset-0 overflow-hidden rounded-xl bg-gray-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/60 dark:bg-gray-800"
-                            >
-                                <Image
-                                    src={image.src}
-                                    alt=""
-                                    fill
-                                    sizes={LAYOUT_SIZES[layout]}
-                                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                                />
-                                {isLastWithMore && (
-                                    <span
-                                        aria-hidden="true"
-                                        className="absolute inset-0 flex items-center justify-center bg-black/55 text-2xl font-bold text-white"
-                                    >
-                                        +{hiddenCount}
-                                    </span>
-                                )}
-                            </button>
-                        </li>
-                    );
-                })}
-            </ul>
-
-            <GalleryLightbox
-                ref={dialogRef}
-                images={allImages}
-                activeIndex={activeIndex}
-                onStep={handleStep}
-                onRequestClose={() => dialogRef.current?.close()}
-                onClose={() => setActiveIndex(null)}
-            />
+            <GalleryViewer images={allImages}>
+                <ul className={LAYOUT_LIST[layout]}>
+                    {thumbnails.map((image, index) => (
+                        <GalleryThumbnail
+                            key={image.src}
+                            image={image}
+                            index={index}
+                            label={t('galleryOpen', { index: index + 1, total, alt: image.alt })}
+                            layout={layout}
+                            moreCount={index === thumbnails.length - 1 ? hiddenCount : 0}
+                        />
+                    ))}
+                </ul>
+            </GalleryViewer>
         </ProfileSection>
     );
 }

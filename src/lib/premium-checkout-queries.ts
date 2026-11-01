@@ -6,7 +6,7 @@ import { db } from '@/db';
 import { servicesTable, serviceSubscriptionsTable } from '@/db/schema';
 import { isPremiumActive } from '@/lib/premium';
 import { isPublicService } from '@/lib/public-service-filter';
-import { subscriptionColumns, subscriptionJoin } from '@/lib/service-profile-queries';
+import { subscriptionColumns, subscriptionJoin } from '@/lib/subscription-query-parts';
 
 /** Wpis, dla ktorego mozna kupic premium: aktywny i z adresem profilu. */
 export type PremiumCheckoutTarget = {

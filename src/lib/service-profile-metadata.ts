@@ -13,6 +13,9 @@ import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
 /** Dlugosc opisu meta, ktora Google zwykle pokazuje bez obciecia. */
 export const META_DESCRIPTION_MAX_LENGTH = 160;
 
+/** Dlugosc tytulu, ktora Google zwykle pokazuje bez obciecia. */
+export const PROFILE_TITLE_MAX_LENGTH = 60;
+
 const ELLIPSIS = '…';
 
 /** Kraj wszystkich wpisow katalogu (adresy z polskich wojewodztw). */
@@ -44,10 +47,33 @@ export type ProfileTitleInput = {
     siteName: string;
 };
 
-/** `<nazwa> — <kategoria>, <miasto> | <serwis>`; bez miasta: `<nazwa> — <kategoria> | <serwis>`. */
+/**
+ * Tekst obciety na granicy slowa z wielokropkiem; biale znaki zwiniete do spacji.
+ * Pojedyncze slowo dluzsze niz limit jest ciete twardo.
+ */
+function truncateAtWord(text: string, maxLength: number): string {
+    const normalized = text.replace(/\s+/g, ' ').trim();
+    if (normalized.length <= maxLength) return normalized;
+
+    const room = normalized.slice(0, maxLength - ELLIPSIS.length);
+    const lastSpace = room.lastIndexOf(' ');
+    const cut = lastSpace > 0 ? room.slice(0, lastSpace) : room;
+    return `${cut.replace(/[\s,.;:!?—–-]+$/, '')}${ELLIPSIS}`;
+}
+
+/**
+ * `<nazwa> — <kategoria>, <miasto> | <serwis>`; bez miasta: `<nazwa> — <kategoria> | <serwis>`.
+ * Tytul dluzszy niz `PROFILE_TITLE_MAX_LENGTH` traci koniec czesci opisowej (na granicy
+ * slowa, z wielokropkiem) — sufiks ` | <serwis>` zostaje zawsze.
+ */
 export function buildProfileTitle({ name, categoryLabel, city, siteName }: ProfileTitleInput): string {
     const place = city?.trim() ? `, ${city.trim()}` : '';
-    return `${name} — ${categoryLabel}${place} | ${siteName}`;
+    const suffix = ` | ${siteName}`;
+    const head = truncateAtWord(
+        `${name} — ${categoryLabel}${place}`,
+        PROFILE_TITLE_MAX_LENGTH - suffix.length,
+    );
+    return `${head}${suffix}`;
 }
 
 /**
@@ -58,13 +84,23 @@ export function truncateMetaDescription(
     text: string,
     maxLength: number = META_DESCRIPTION_MAX_LENGTH,
 ): string {
-    const normalized = text.replace(/\s+/g, ' ').trim();
-    if (normalized.length <= maxLength) return normalized;
+    return truncateAtWord(text, maxLength);
+}
 
-    const room = normalized.slice(0, maxLength - ELLIPSIS.length);
-    const lastSpace = room.lastIndexOf(' ');
-    const cut = lastSpace > 0 ? room.slice(0, lastSpace) : room;
-    return `${cut.replace(/[\s,.;:!?—–-]+$/, '')}${ELLIPSIS}`;
+/** Klucz opisu zastepczego w `ServiceProfile.meta`. */
+export type FallbackDescriptionKey = 'descriptionLocal' | 'descriptionOnline' | 'descriptionGeneric';
+
+/**
+ * Opis zastepczy zgodny z zasiegiem: z miastem `descriptionLocal`; bez miasta wpis
+ * `online`/`hybrid` (obsluguje zdalnie) dostaje `descriptionOnline`, a `local` bez adresu —
+ * neutralny `descriptionGeneric`, bo „obsluga online” bylaby nieprawda.
+ */
+export function selectFallbackDescriptionKey(
+    coverage: Coverage,
+    city: string | null,
+): FallbackDescriptionKey {
+    if (city?.trim()) return 'descriptionLocal';
+    return coverage === 'local' ? 'descriptionGeneric' : 'descriptionOnline';
 }
 
 /** Absolutny adres sciezki z `public/` albo `null`, gdy sciezki nie ma. */
@@ -205,8 +241,9 @@ function buildOpeningHoursSpecification(openingHours: OpeningHours): JsonLdObjec
 }
 
 /**
- * JSON-LD profilu: `LocalBusiness` dla wpisu z punktem obslugi (`local`, `hybrid`),
- * `Organization` bez adresu, wspolrzednych i godzin dla wpisu `online`.
+ * JSON-LD profilu: typ wynika z zasiegu, nie z obecnosci lokalizacji. `LocalBusiness`
+ * dla wpisu z punktem obslugi (`local`, `hybrid`) — bez lokalizacji w danych po prostu
+ * bez adresu, wspolrzednych i godzin. `Organization` tylko dla wpisu `online`.
  */
 export function buildProfileJsonLd(input: ProfileJsonLdInput): JsonLdObject {
     const { location } = input;
@@ -221,9 +258,11 @@ export function buildProfileJsonLd(input: ProfileJsonLdInput): JsonLdObject {
         sameAs: input.sameAs,
     };
 
-    if (input.coverage === 'online' || !location) {
+    if (input.coverage === 'online') {
         return compact({ ...base, '@type': 'Organization' });
     }
+
+    if (!location) return compact({ ...base, '@type': 'LocalBusiness' });
 
     return compact({
         ...base,

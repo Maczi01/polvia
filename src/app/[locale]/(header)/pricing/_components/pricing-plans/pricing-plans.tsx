@@ -5,9 +5,9 @@ import { useTranslations } from 'next-intl';
 import { type ReactElement, type ReactNode, useId, useState } from 'react';
 
 import { Link } from '@/i18n/navigation';
+import { PREMIUM_INTERVALS, type PremiumInterval } from '@/lib/premium-checkout-fields';
+import { DEFAULT_PREMIUM_INTERVAL } from '@/lib/premium-plan';
 import { cn } from '@/lib/utilities';
-
-type BillingPeriod = 'monthly' | 'annual';
 
 type PlanId = 'free' | 'essentials' | 'team';
 
@@ -74,25 +74,23 @@ type PricingPlansProps = {
 
 export function PricingPlans({ heading, portalUrl }: PricingPlansProps): ReactElement {
     const t = useTranslations('Pricing');
-    const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('annual');
+    const [selectedInterval, setSelectedInterval] =
+        useState<PremiumInterval>(DEFAULT_PREMIUM_INTERVAL);
 
     return (
         <>
             <header className="mb-12 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                 {heading}
                 <div role="group" aria-label={t('billingLegend')} className="flex gap-4">
-                    <PeriodButton
-                        isActive={billingPeriod === 'monthly'}
-                        onSelect={() => setBillingPeriod('monthly')}
-                    >
-                        {t('monthly')}
-                    </PeriodButton>
-                    <PeriodButton
-                        isActive={billingPeriod === 'annual'}
-                        onSelect={() => setBillingPeriod('annual')}
-                    >
-                        {t('annual')}
-                    </PeriodButton>
+                    {PREMIUM_INTERVALS.map(option => (
+                        <PeriodButton
+                            key={option}
+                            isActive={selectedInterval === option}
+                            onSelect={() => setSelectedInterval(option)}
+                        >
+                            {t(option)}
+                        </PeriodButton>
+                    ))}
                 </div>
             </header>
 
@@ -101,7 +99,7 @@ export function PricingPlans({ heading, portalUrl }: PricingPlansProps): ReactEl
                     <PriceCard
                         key={plan.id}
                         plan={plan}
-                        billingPeriod={billingPeriod}
+                        interval={selectedInterval}
                         portalUrl={portalUrl}
                     />
                 ))}
@@ -137,15 +135,14 @@ function PeriodButton({ isActive, onSelect, children }: PeriodButtonProps): Reac
 
 type PriceCardProps = {
     plan: PlanConfig;
-    billingPeriod: BillingPeriod;
+    interval: PremiumInterval;
     portalUrl: string;
 };
 
-function PriceCard({ plan, billingPeriod, portalUrl }: PriceCardProps): ReactElement {
+function PriceCard({ plan, interval, portalUrl }: PriceCardProps): ReactElement {
     const t = useTranslations('Pricing');
     const titleId = useId();
     const instructionId = useId();
-    const isMonthly = billingPeriod === 'monthly';
     const key = (name: string): string => `plans.${plan.id}.${name}`;
     const isEssentials = plan.id === 'essentials';
 
@@ -164,13 +161,11 @@ function PriceCard({ plan, billingPeriod, portalUrl }: PriceCardProps): ReactEle
                     </h2>
                     <div className="mt-4 flex items-baseline gap-2">
                         <span className="font-sans text-5xl font-extrabold text-[#26364d] dark:text-white">
-                            {plan.hasPeriodPrice && isMonthly
-                                ? t(key('priceMonthly'))
-                                : t(key('price'))}
+                            {plan.hasPeriodPrice ? t(key(`price.${interval}`)) : t(key('price'))}
                         </span>
                         {plan.hasPeriodPrice && (
                             <span className="font-sans text-lg text-gray-500 dark:text-gray-400">
-                                {isMonthly ? t(key('perMonthly')) : t(key('per'))}
+                                {t(key(`per.${interval}`))}
                             </span>
                         )}
                     </div>

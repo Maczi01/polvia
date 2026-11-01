@@ -55,7 +55,7 @@ const TARGET: PremiumCheckoutTarget = {
  * Pozycje sesji (`expand: ['line_items']`) — do sprawdzenia ceny wystarcza `price.id`,
  * wiec fixture ma tylko ten ksztalt zamiast pelnego `Stripe.LineItem`.
  */
-type LineItemsFixture = { data: Array<{ price: { id: string } | null }> };
+type LineItemsFixture = { data: Array<{ price: { id: string } | null }>; has_more?: boolean };
 
 function lineItems(...priceIds: string[]): LineItemsFixture {
     return { data: priceIds.map(id => ({ price: { id } })) };
@@ -126,6 +126,7 @@ describe('createPremiumCheckoutSession', () => {
                 subscription_data: {
                     metadata: { serviceId: SERVICE_ID, serviceSlug: 'mistrz-remontu' },
                 },
+                allowed_payment_method_types: ['card'],
                 tax_id_collection: { enabled: true },
                 billing_address_collection: 'required',
                 success_url: `https://polvia.pl/uk/firma/mistrz-remontu${CHECKOUT_SUCCESS_SUFFIX}`,
@@ -210,6 +211,26 @@ describe('verifyPaidCheckoutSession', () => {
         });
 
         mockRetrieve.mockResolvedValue(paidSession({ line_items: undefined }));
+        expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
+            status: 'invalid',
+        });
+    });
+
+    it('sesja z ucietymi pozycjami (has_more) jest niewazna, nawet gdy widoczne sa premium', async () => {
+        mockRetrieve.mockResolvedValue(
+            paidSession({
+                line_items: { ...lineItems('price_monthly_test'), has_more: true },
+            }),
+        );
+
+        expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
+            status: 'invalid',
+        });
+    });
+
+    it('sesja bez wymaganej platnosci (kupon 100%, trial) nie jest zakupem premium', async () => {
+        mockRetrieve.mockResolvedValue(paidSession({ payment_status: 'no_payment_required' }));
+
         expect(await verifyPaidCheckoutSession('cs_test_x', 'mistrz-remontu')).toEqual({
             status: 'invalid',
         });

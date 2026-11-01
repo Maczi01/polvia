@@ -1,10 +1,8 @@
-import { hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { JSX } from 'react';
 
-import { defaultLocale, type Locale } from '@/i18n/config';
+import { toLocale } from '@/i18n/config';
 import { Link } from '@/i18n/navigation';
-import { routing } from '@/i18n/routing';
 
 import { env } from '../../../../../env';
 import { PricingPlans } from './_components/pricing-plans/pricing-plans';
@@ -13,19 +11,16 @@ interface PageProps {
     params: Promise<{ locale: string }>;
 }
 
-function toLocale(value: string): Locale {
-    return hasLocale(routing.locales, value) ? value : defaultLocale;
-}
-
 export default async function PricingPage({ params }: PageProps): Promise<JSX.Element> {
     const locale = toLocale((await params).locale);
     setRequestLocale(locale);
     const t = await getTranslations('Pricing');
 
+    // Korzen to `<div>`, nie `<main>`: landmark main daje layout grupy (header), a drugi
+    // bylby zdublowany.
     return (
         <div className="min-h-screen bg-gray-50 px-6 py-16 dark:bg-gray-900">
             <div className="mx-auto max-w-6xl">
-                {/* `<main>` daje layout grupy (header) — drugi landmark main bylby zdublowany. */}
                 <PricingPlans
                     portalUrl={env.STRIPE_PORTAL_LOGIN_URL}
                     heading={
@@ -39,7 +34,6 @@ export default async function PricingPage({ params }: PageProps): Promise<JSX.El
                         </div>
                     }
                 />
-
 
                 <footer className="mt-12 text-center font-sans text-sm text-gray-500 dark:text-gray-400">
                     {t('questions')}{' '}

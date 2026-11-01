@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
-import { hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { JSX } from 'react';
 
-import { defaultLocale, type Locale } from '@/i18n/config';
+import { type Locale, toLocale } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 
 import { env } from '../../../../../env';
@@ -18,10 +17,6 @@ export const maxDuration = 60;
 
 interface PageProps {
     params: Promise<{ locale: string }>;
-}
-
-function toLocale(value: string): Locale {
-    return hasLocale(routing.locales, value) ? value : defaultLocale;
 }
 
 export function generateStaticParams(): { locale: Locale }[] {

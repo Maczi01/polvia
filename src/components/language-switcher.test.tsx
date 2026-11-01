@@ -69,6 +69,29 @@ describe('<LanguageSwitcher /> — trasa z parametrem', () => {
     });
 });
 
+describe('<LanguageSwitcher /> — trasa bez parametru', () => {
+    it('przekazuje sam pathname, bez params', async () => {
+        mockPathname = '/contact';
+        mockParams = { locale: 'pl' };
+        renderSwitcher();
+
+        await chooseLanguage('English flag English');
+
+        expect(replace).toHaveBeenCalledWith({ pathname: '/contact', query: {} }, { locale: 'en' });
+    });
+});
+
+describe('<LanguageSwitcher /> — trasa z parametrem bez wartosci', () => {
+    it('brak slugu w params prowadzi na strone glowna zamiast rzucac', async () => {
+        mockParams = { locale: 'pl' };
+        renderSwitcher();
+
+        await chooseLanguage('English flag English');
+
+        expect(replace).toHaveBeenCalledWith({ pathname: '/', query: {} }, { locale: 'en' });
+    });
+});
+
 describe('<LanguageSwitcher /> — mapa', () => {
     it('sciezka mapy dalej tlumaczy slug kategorii, bez params', async () => {
         mockPathname = '/mapa/remonty';

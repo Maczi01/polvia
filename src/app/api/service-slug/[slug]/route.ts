@@ -42,19 +42,23 @@ const SLUG_LOOKUP_RATE_LIMIT = {
 };
 
 /**
- * `exists: true` zmienia sie rzadko (wpis znika tylko przy dezaktywacji), wiec dlugi cache;
- * `false` krotko, zeby nowo dodany wpis szybko przestal dawac 404. Odpowiedz nie zalezy
- * od sekretu (rozni sie tylko limitem), wiec CDN moze ja wspoldzielic miedzy ruchem
- * zaufanym i publicznym.
+ * Odpowiedz nie zalezy od sekretu (rozni sie tylko limitem), wiec CDN moze ja wspoldzielic
+ * miedzy ruchem zaufanym i publicznym.
  *
- * `hasActivePremium` jedzie w tej samej odpowiedzi i ma ten sam cache: krotki adres
- * `polvia.pl/<slug>` (middleware) zaczyna i przestaje przekierowywac z opoznieniem do
- * 5 minut po zmianie subskrypcji. Swiadomie akceptowane — osobny, krotszy cache dla
- * premium oznaczalby drugi lookup albo krotszy cache dla wszystkich profili.
+ * `exists` niesie tez `hasActivePremium`: krotki adres `polvia.pl/<slug>` (middleware)
+ * zaczyna i przestaje przekierowywac po zmianie subskrypcji z opoznieniem do 5 minut.
+ * Najstarsza odpowiedz, jaka CDN moze podac, ma `s-maxage + stale-while-revalidate` sekund,
+ * wiec ta suma wynosi 300. Osobny, krotszy cache dla premium oznaczalby drugi lookup albo
+ * krotszy cache dla wszystkich profili.
+ *
+ * `missing` krotko, zeby nowo dodany wpis szybko przestal dawac 404, ale ze
+ * `stale-while-revalidate`: unikalne sciezki skanerow i tak omijaja cache, a powtarzane
+ * 404 (linki z zewnatrz do usunietych wpisow) nie czekaja na funkcje. Nowy wpis moze
+ * dostac 404 jeszcze do ~5,5 min po dodaniu, jesli jego slug byl wczesniej odpytany.
  */
 const CACHE_CONTROL = {
-    exists: 'public, s-maxage=300, stale-while-revalidate=86400',
-    missing: 'public, s-maxage=30',
+    exists: 'public, s-maxage=240, stale-while-revalidate=60',
+    missing: 'public, s-maxage=30, stale-while-revalidate=300',
     /** 400/429/500 nie moga trafic do CDN — inaczej jeden klient zablokowalby slug wszystkim. */
     uncacheable: 'private, no-store',
 } as const;

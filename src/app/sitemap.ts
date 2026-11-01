@@ -225,26 +225,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // -------------------------------------------------------
     // 7. Profile firm — /firma/{slug} w 4 locale (opisy istnieja w 4 jezykach)
     // Tylko aktywne wpisy ze slugiem — filtr siedzi w zapytaniu.
+    //
+    // Blad bazy leci wyzej, NIE jest polykany: pusty wynik zostalby zapisany w ISR
+    // i przez `revalidate` (1 h) sitemapa nie mialaby ani jednego profilu. Rzucony blad
+    // przy rewalidacji zostawia poprzednia, pelna wersje i ponawia przy kolejnym zadaniu.
+    // Koszt: przy awarii bazy w trakcie builda build sie nie uda.
+    //
+    // `generateSitemaps` niepotrzebne przy obecnej skali: limit to 50 tys. URL na plik,
+    // a kazdy profil to 4 adresy — przejscie dopiero przy ~12 tys. aktywnych wpisow.
     // -------------------------------------------------------
-    const profilePages: MetadataRoute.Sitemap = [];
-
-    try {
-        const profiles = await getServiceProfileSitemapEntries();
-        for (const { slug, updatedAt } of profiles) {
-            for (const locale of locales) {
-                profilePages.push({
-                    url: `${baseUrl}${buildServiceProfilePath(locale, slug)}`,
-                    lastModified: updatedAt.toISOString(),
-                    changeFrequency: 'weekly',
-                    priority: 0.6,
-                });
-            }
-        }
-    } catch (error) {
-        // Awaria bazy nie moze zabrac z sitemapy stron statycznych — profile wroca
-        // przy nastepnej rewalidacji.
-        console.error('Error loading service profiles for sitemap:', error);
-    }
+    const profiles = await getServiceProfileSitemapEntries();
+    const profilePages: MetadataRoute.Sitemap = profiles.flatMap(({ slug, updatedAt }) =>
+        locales.map(locale => ({
+            url: `${baseUrl}${buildServiceProfilePath(locale, slug)}`,
+            lastModified: updatedAt.toISOString(),
+            changeFrequency: 'weekly' as const,
+            priority: 0.6,
+        })),
+    );
 
     // -------------------------------------------------------
     // 8. Łączymy wszystko

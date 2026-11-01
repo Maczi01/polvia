@@ -4,6 +4,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 
 import type { CheckoutState } from '@/lib/premium-checkout-fields';
 
+import messages from '../../../../../../../messages/pl.json';
 import { renderWithIntl } from '../profile-test-utils';
 import { UpgradeCta } from './upgrade-cta';
 
@@ -25,6 +26,14 @@ describe('UpgradeCta', () => {
         expect(screen.getByRole('radio', { name: /Miesięcznie.*9 zł/ })).toBeChecked();
         expect(screen.getByRole('radio', { name: /Rocznie.*49 zł/ })).not.toBeChecked();
         expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('kwoty bierze z tych samych kluczy co /cennik', () => {
+        renderCta(jest.fn<Promise<CheckoutState>, [CheckoutState, FormData]>());
+        const plan = messages.Pricing.plans.essentials;
+
+        expect(screen.getByText(`${plan.price.monthly} ${plan.per.monthly}`)).toBeInTheDocument();
+        expect(screen.getByText(`${plan.price.yearly} ${plan.per.yearly}`)).toBeInTheDocument();
     });
 
     it('wysyla serviceId i wybrany interwal, bez ceny z klienta', async () => {

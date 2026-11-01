@@ -109,4 +109,19 @@ describe('PremiumMaterialsForm', () => {
         ).toBeInTheDocument();
         expect(submit()).toBeInTheDocument();
     });
+
+    it('materialy tej sesji juz wyslane: od razu potwierdzenie, bez formularza', async () => {
+        const action = mockAction(async () => null);
+        const { container } = renderWithIntl(
+            <PremiumMaterialsForm sessionId={SESSION_ID} slug={SLUG} action={action} isAlreadySent />,
+        );
+
+        expect(
+            screen.getByText('Dziękujemy! Materiały dotarły — odezwiemy się mailem.'),
+        ).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Wyślij materiały' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+        expect(action).not.toHaveBeenCalled();
+        expect(await axe(container)).toHaveNoViolations();
+    });
 });

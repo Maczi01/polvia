@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
     type MaterialsAction,
     type MaterialsFieldErrors,
+    type MaterialsState,
     PREMIUM_MATERIALS_MAX_LENGTH,
     PREMIUM_MATERIALS_TEXT_FIELDS,
     type PremiumMaterialsTextField,
@@ -21,6 +22,8 @@ type PremiumMaterialsFormProps = {
     slug: string;
     /** `submitPremiumMaterials` z `_actions.ts` — wstrzykiwana, zeby test nie ciagnal Stripe. */
     action: MaterialsAction;
+    /** Materialy tej sesji juz wyslano (znacznik w Redisie) — od razu potwierdzenie, bez formularza. */
+    isAlreadySent?: boolean;
 };
 
 const FOCUS_RING =
@@ -135,6 +138,8 @@ function MaterialsSubmit({ isPending }: { isPending: boolean }): ReactElement {
     );
 }
 
+const SENT_STATE: MaterialsState = { data: { sent: true } };
+
 /**
  * Formularz materialow strony premium (R16): szablon i tekst, bez uploadu — zdjecia ida
  * mailem. Wynik akcji trafia do regionu `aria-live`; po sukcesie formularz znika.
@@ -145,8 +150,12 @@ export function PremiumMaterialsForm({
     sessionId,
     slug,
     action,
+    isAlreadySent = false,
 }: PremiumMaterialsFormProps): ReactElement {
-    const [state, formAction, isPending] = useActionState(action, null);
+    const [state, formAction, isPending] = useActionState(
+        action,
+        isAlreadySent ? SENT_STATE : null,
+    );
     const isSent = state !== null && 'data' in state;
     const error = state !== null && 'error' in state ? state.error : null;
     const fields: MaterialsFieldErrors = error?.fields ?? {};

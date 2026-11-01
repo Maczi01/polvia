@@ -3,6 +3,7 @@ import { z } from 'zod';
 import {
     PREMIUM_INTERVALS,
     PREMIUM_MATERIALS_MAX_LENGTH,
+    PREMIUM_MATERIALS_TEXT_FIELDS,
     type PremiumMaterialsField,
 } from '@/lib/premium-checkout-fields';
 import { PREMIUM_TEMPLATES } from '@/lib/premium-templates';
@@ -70,11 +71,10 @@ export function parseMaterialsForm(
     });
 }
 
+/** Pola widoczne w formularzu — z tych samych stalych co formularz, bez przepisywania unii. */
 const VISIBLE_FIELDS: ReadonlySet<string> = new Set<PremiumMaterialsField>([
     'template',
-    'priceList',
-    'faq',
-    'notes',
+    ...PREMIUM_MATERIALS_TEXT_FIELDS,
 ]);
 
 function isVisibleField(path: string | number | undefined): path is PremiumMaterialsField {

@@ -139,14 +139,10 @@ describe('sitemap — profile firm', () => {
         expect(profiles.every(url => url.endsWith('/firma/kancelaria-nowak'))).toBe(true);
     });
 
-    it('awaria bazy nie zabiera stron statycznych i jest logowana', async () => {
-        jest.spyOn(console, 'error').mockImplementation(() => {});
+    it('awaria bazy rzuca blad zamiast zwracac sitemape bez profili', async () => {
+        // Pusty wynik trafilby do ISR na godzine; blad zostawia poprzednia wersje.
         jest.mocked(getServiceProfileSitemapEntries).mockRejectedValue(new Error('connection refused'));
 
-        const list = await urls();
-
-        expect(list.some(url => url.endsWith('/mapa'))).toBe(true);
-        expect(list.some(url => url.includes('/firma/'))).toBe(false);
-        expect(console.error).toHaveBeenCalled();
+        await expect(sitemap()).rejects.toThrow('connection refused');
     });
 });

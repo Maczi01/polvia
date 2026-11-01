@@ -1,3 +1,4 @@
+import { isReservedRootSegment } from '../lib/service-slug-alias';
 import { buildServiceSlug } from './service-input-schema';
 
 /**
@@ -33,18 +34,30 @@ export function serviceSlugBase(name: string): string {
     return buildServiceSlug(name) || FALLBACK_SLUG_BASE;
 }
 
+/**
+ * Wolny slug: niezajety i poza segmentami zarezerwowanymi, wiec z krotkim adresem
+ * `polvia.pl/<slug>` obiecanym w `/cennik` (ta sama regula co `isAliasableServiceSlug`
+ * w middleware). Baza kolidujaca z segmentem (`blog`, `mapa`, `wp-admin`…) dostaje sufiks
+ * jak przy kolizji — `blog-2` nie jest juz zarezerwowany. Formatu tu nie sprawdzamy:
+ * sufiks go nie naprawi (petla bez konca), a pilnuje go walidacja pliku wpisu.
+ */
+function isFreeSlug(slug: string, taken: ReadonlySet<string>): boolean {
+    return !taken.has(slug) && !isReservedRootSegment(slug);
+}
+
 function uniqueSlug(base: string, taken: ReadonlySet<string>): string {
-    if (!taken.has(base)) return base;
+    if (isFreeSlug(base, taken)) return base;
 
     let suffix = FIRST_COLLISION_SUFFIX;
-    while (taken.has(`${base}-${suffix}`)) suffix += 1;
+    while (!isFreeSlug(`${base}-${suffix}`, taken)) suffix += 1;
 
     return `${base}-${suffix}`;
 }
 
 /**
  * Przydzielacz slugow uslug: `buildServiceSlug(name)`, a przy kolizji z juz
- * przydzielonym albo zajetym slugiem sufiks `-2`, `-3`… w kolejnosci wywolan.
+ * przydzielonym albo zajetym slugiem (albo z segmentem zarezerwowanym dla aliasu)
+ * sufiks `-2`, `-3`… w kolejnosci wywolan.
  * Wspolny rdzen backfillu (kolejnosc `createdAt`) i seeda (kolejnosc wstawiania),
  * zeby po `db:reset` wpis mial ten sam adres `/firma/<slug>` co na produkcji.
  */

@@ -14,12 +14,12 @@ import {
 } from '@/db/schema';
 import { isPremiumActive, type PremiumSubscriptionState } from '@/lib/premium';
 import { isPublicService } from '@/lib/public-service-filter';
-import { type LocalizedPremiumContent, toPremiumContent } from '@/lib/service-profile-premium';
 import {
     SIMILAR_SERVICES_LIMIT,
     type SimilarServiceRow,
     type SimilarServicesSource,
 } from '@/lib/similar-services';
+import { subscriptionColumns, subscriptionJoin } from '@/lib/subscription-query-parts';
 
 type ServiceRow = InferSelectModel<typeof servicesTable>;
 type LocationRow = InferSelectModel<typeof serviceLocationsTable>;
@@ -57,10 +57,11 @@ export type ServiceProfile = Pick<
     /** Glowna lokalizacja pierwsza. Wpis `online` moze miec `latitude`/`longitude` = null. */
     locations: ServiceProfileLocation[];
     /**
-     * Opublikowana tresc premium w danym locale, niezalezna od stanu subskrypcji (R18).
-     * `null`: brak tresci albo zapisany jsonb nie przechodzi walidacji (blad w logu).
+     * Surowe kolumny `service_profiles` z left joina, niezalezne od stanu subskrypcji (R18);
+     * `null`: brak wiersza. Bez walidacji: jsonb parsuje i lokalizuje `toPremiumContent`
+     * dopiero po decyzji widoku premium, wiec profil free nie placi za Zoda.
      */
-    premiumContent: LocalizedPremiumContent | null;
+    premium: object | null;
     /**
      * Stan subskrypcji tej uslugi — wejscie `isPremiumActive`. `null`: brak subskrypcji.
      * Czytany w tym samym zapytaniu co profil, wiec zawsze dotyczy wpisu spod `slug`.
@@ -115,23 +116,6 @@ function tagsInLocale(locale: string) {
       )
     `;
 }
-
-/**
- * Stan subskrypcji przy left joinie: obiekt, ktory Drizzle zamienia na `null`, gdy wpis
- * nie ma wiersza `service_subscriptions`. Ksztalt = wejscie `isPremiumActive`.
- */
-export const subscriptionColumns = {
-    status: serviceSubscriptionsTable.status,
-    currentPeriodStart: serviceSubscriptionsTable.currentPeriodStart,
-    currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
-    cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
-};
-
-/**
- * Join subskrypcji WYLACZNIE po `service_id` tego wpisu — subskrypcja innej uslugi nie moze
- * wlaczyc premium. Wspolny dla profilu i lookupu, zeby warunek byl jeden.
- */
-export const subscriptionJoin = eq(serviceSubscriptionsTable.serviceId, servicesTable.id);
 
 /** Czy pod `/firma/<slug>` jest aktywny wpis i czy ma aktywne premium. Lekkie zapytanie lookupu. */
 export async function getServiceSlugStatus(
@@ -207,15 +191,7 @@ export async function getServiceProfile(
 
     if (!service) return null;
 
-    const { premium, ...row } = service;
-    const premiumContent = toPremiumContent(premium, {
-        serviceId: row.id,
-        slug,
-        locale,
-        name: row.name,
-    });
-
-    return { ...row, slug, locations, premiumContent };
+    return { ...service, slug, locations };
 }
 
 function getServiceRow(slug: string, locale: string) {

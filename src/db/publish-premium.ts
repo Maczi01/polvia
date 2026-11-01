@@ -76,6 +76,10 @@ async function main(): Promise<void> {
 
     const service = await resolveEntryService(store, entry);
     const { serviceSlug } = service;
+    // Celowo `preparePremiumUpsert` + `saveContent`, a nie `upsertPremiumContent` (prepare +
+    // save w jednym): miedzy krokami jest wydruk diffu i wyjscie przy `--dry-run`. Hook
+    // w `upsertPremiumContent` decydujacy o zapisie zastapilby dwie czytelne linie flaga
+    // sterujaca, ktorej seed (`publishPremiumEntries`) nie potrzebuje.
     const plan = await preparePremiumUpsert(store, {
         service,
         content: premium,

@@ -1,11 +1,9 @@
-import { hasLocale } from 'next-intl';
-
 import {
     type PremiumContentData,
     type PremiumContentLocale,
     premiumContentSchema,
 } from '@/db/premium-content-schema';
-import { defaultLocale, locales } from '@/i18n/config';
+import { toLocale } from '@/i18n/config';
 
 /**
  * Projekcja tresci premium na widok profilu: wybor locale, sciezki zdjec pod `next/image`.
@@ -91,7 +89,7 @@ export function toPremiumContent(
 
     return localizePremiumContent(parsed.data, {
         serviceSlug: slug,
-        locale: hasLocale(locales, locale) ? locale : defaultLocale,
+        locale: toLocale(locale),
         coverAlt: name,
     });
 }

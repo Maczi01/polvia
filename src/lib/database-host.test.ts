@@ -1,4 +1,4 @@
-import { databaseHostname, isLocalDatabaseUrl } from './database-host';
+import { databaseHostname, inspectDatabaseUrl, isLocalDatabaseUrl } from './database-host';
 
 describe('isLocalDatabaseUrl', () => {
     it.each([
@@ -36,5 +36,22 @@ describe('databaseHostname', () => {
 
     it('zwraca null dla niepoprawnego adresu', () => {
         expect(databaseHostname('not a url')).toBeNull();
+    });
+});
+
+describe('inspectDatabaseUrl', () => {
+    it('host i lokalnosc z jednego adresu', () => {
+        expect(inspectDatabaseUrl('postgres://user:secret@[::1]:5432/mydb')).toEqual({
+            hostname: '::1',
+            isLocal: true,
+        });
+        expect(inspectDatabaseUrl('postgres://user:secret@DB.Example.com/postgres')).toEqual({
+            hostname: 'db.example.com',
+            isLocal: false,
+        });
+    });
+
+    it('niepoprawny adres: brak hosta i traktowany jak zdalny', () => {
+        expect(inspectDatabaseUrl('not a url')).toEqual({ hostname: null, isLocal: false });
     });
 });

@@ -77,6 +77,7 @@ describe('PricingPlans', () => {
         ['pl', '/dodaj-firme', '/mapa', '/kontakt'],
         ['en', '/en/add-business', '/en/map', '/en/contact'],
         ['ru', '/ru/add-business', '/ru/map', '/ru/contact'],
+        ['uk', '/uk/add-business', '/uk/map', '/uk/contact'],
     ] as const)('CTA planow w %s prowadza do istniejacych tras', (locale, free, map, contact) => {
         renderPlans(locale);
         const plans = MESSAGES[locale].Pricing.plans;
@@ -109,25 +110,28 @@ describe('PricingPlans', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
-    it('przelacznik okresu zmienia cene planu Profesjonalny miedzy 49 a 9 zl', () => {
+    it('domyslnie miesieczny jak na profilu; przelacznik zmienia cene miedzy 9 a 49 zl', () => {
         renderPlans();
         const card = essentialsCard();
         const monthly = screen.getByRole('button', { name: pl.Pricing.monthly });
-        const annual = screen.getByRole('button', { name: pl.Pricing.annual });
+        const yearly = screen.getByRole('button', { name: pl.Pricing.yearly });
+
+        expect(within(card).getByText('9 zł')).toBeInTheDocument();
+        expect(within(card).getByText('/miesiąc')).toBeInTheDocument();
+        expect(monthly).toHaveAttribute('aria-pressed', 'true');
+        expect(yearly).toHaveAttribute('aria-pressed', 'false');
+
+        fireEvent.click(yearly);
 
         expect(within(card).getByText('49 zł')).toBeInTheDocument();
-        expect(annual).toHaveAttribute('aria-pressed', 'true');
+        expect(within(card).getByText('/rok')).toBeInTheDocument();
+        expect(within(card).queryByText('9 zł')).not.toBeInTheDocument();
+        expect(yearly).toHaveAttribute('aria-pressed', 'true');
+        expect(monthly).toHaveAttribute('aria-pressed', 'false');
 
         fireEvent.click(monthly);
 
         expect(within(card).getByText('9 zł')).toBeInTheDocument();
-        expect(within(card).queryByText('49 zł')).not.toBeInTheDocument();
-        expect(monthly).toHaveAttribute('aria-pressed', 'true');
-        expect(annual).toHaveAttribute('aria-pressed', 'false');
-
-        fireEvent.click(annual);
-
-        expect(within(card).getByText('49 zł')).toBeInTheDocument();
     });
 
     it('nie ma naruszen dostepnosci', async () => {

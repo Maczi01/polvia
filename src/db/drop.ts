@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../db';
 import { env } from '../../env';
-import { databaseHostname, isLocalDatabaseUrl } from '../lib/database-host';
+import { inspectDatabaseUrl } from '../lib/database-host';
 
 /**
  * Zabezpieczenie przed skasowaniem zdalnej bazy.
@@ -16,11 +16,12 @@ import { databaseHostname, isLocalDatabaseUrl } from '../lib/database-host';
  * zakladajac, ze pracuje lokalnie, skasuje zdalna baze.
  */
 function assertDropAllowed(): void {
-    // Nie da sie ustalic hosta = traktujemy jako zdalny — bezpieczniej odmowic.
-    if (isLocalDatabaseUrl(env.DATABASE_URL)) {
+    // Jedno parsowanie adresu. Nie da sie ustalic hosta = traktujemy jako zdalny.
+    const database = inspectDatabaseUrl(env.DATABASE_URL);
+    if (database.isLocal) {
         return;
     }
-    const host = databaseHostname(env.DATABASE_URL) ?? '(nieznany)';
+    const host = database.hostname ?? '(nieznany)';
 
     if (env.ALLOW_REMOTE_DROP === 'yes') {
         console.warn(

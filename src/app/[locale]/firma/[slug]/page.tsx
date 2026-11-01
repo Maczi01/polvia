@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { cache, type ComponentType, type ReactElement } from 'react';
 
-import { defaultLocale, type Locale } from '@/i18n/config';
-import { routing } from '@/i18n/routing';
+import { type Locale, toLocale } from '@/i18n/config';
 import { getCategoryMessageKey } from '@/lib/categories';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
 import type { PremiumTemplate } from '@/lib/premium-templates';
@@ -13,9 +11,11 @@ import {
     buildProfileCanonicalUrl,
     buildProfileJsonLd,
     buildProfileMetadata,
+    selectFallbackDescriptionKey,
     serializeJsonLd,
     toAbsoluteUrl,
 } from '@/lib/service-profile-metadata';
+import { toPremiumContent } from '@/lib/service-profile-premium';
 import {
     getServiceProfile,
     getSimilarServices,
@@ -39,13 +39,16 @@ import { TemplateGallery } from './_components/template-gallery/template-gallery
 import { TemplateProfessional } from './_components/template-professional/template-professional';
 import { toProfileView, toServiceImagePath } from './_components/to-profile-view';
 
+/**
+ * Decyzja widoku premium zalezy od `new Date()` (koniec okresu, karencja) i stanu
+ * subskrypcji zapisywanego przez webhook Stripe, wiec strona nie moze trafic do
+ * Full Route Cache — inaczej webhook musialby wolac `revalidatePath` dla kazdego profilu.
+ */
+export const dynamic = 'force-dynamic';
+
 type PageProps = {
     params: Promise<{ locale: string; slug: string }>;
 };
-
-function toLocale(value: string): Locale {
-    return hasLocale(routing.locales, value) ? value : defaultLocale;
-}
 
 /** Jedno zapytanie na zadanie: `generateMetadata` i strona dziela wynik. */
 const getCachedServiceProfile = cache(getServiceProfile);
@@ -56,14 +59,25 @@ const getCachedServiceProfile = cache(getServiceProfile);
  */
 const getRequestNow = cache((): Date => new Date());
 
-/** Ta sama decyzja widoku dla strony i `generateMetadata`. */
-function resolveProfileView(profile: ServiceProfile): ProfileViewKind {
-    return selectProfileView({
-        premiumContent: profile.premiumContent,
-        subscription: profile.subscription,
-        now: getRequestNow(),
-    });
-}
+/**
+ * Ta sama decyzja widoku dla strony i `generateMetadata`. `cache` po obiekcie profilu
+ * (wspolnym dzieki `getCachedServiceProfile`): tresc premium parsowana raz na zadanie,
+ * a przy widoku free wcale.
+ */
+const resolveProfileView = cache(
+    (profile: ServiceProfile, locale: Locale): ProfileViewKind =>
+        selectProfileView({
+            loadPremiumContent: () =>
+                toPremiumContent(profile.premium, {
+                    serviceId: profile.id,
+                    slug: profile.slug,
+                    locale,
+                    name: profile.name,
+                }),
+            subscription: profile.subscription,
+            now: getRequestNow(),
+        }),
+);
 
 const PREMIUM_TEMPLATE_COMPONENTS: Record<
     PremiumTemplate,
@@ -101,11 +115,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const tCategories = await getTranslations({ locale, namespace: 'MapPage.Categories' });
 
     const city = getHeaderCity(profile);
-    const viewKind = resolveProfileView(profile);
+    const viewKind = resolveProfileView(profile, locale);
     const categoryLabel = tCategories(getCategoryMessageKey(profile.category));
-    const fallbackDescription = city
-        ? t('descriptionLocal', { name: profile.name, category: categoryLabel, city })
-        : t('descriptionOnline', { name: profile.name, category: categoryLabel });
+    // Klucz z zasiegu: wpis `local` bez adresu nie moze dostac opisu „obsluga online”.
+    const fallbackDescription = t(selectFallbackDescriptionKey(profile.coverage, city), {
+        name: profile.name,
+        category: categoryLabel,
+        city: city ?? '',
+    });
 
     return buildProfileMetadata({
         baseUrl: env.NEXT_PUBLIC_SITE_URL,
@@ -118,7 +135,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         description: profile.description,
         fallbackDescription,
         imagePath: toServiceImagePath(profile.image),
-        coverImagePath: selectOgCoverPath(viewKind, profile.premiumContent),
+        coverImagePath: selectOgCoverPath(viewKind),
     });
 }
 
@@ -135,7 +152,7 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
     const profile = await getCachedServiceProfile(slug, locale);
     if (!profile) notFound();
 
-    const viewKind = resolveProfileView(profile);
+    const viewKind = resolveProfileView(profile, locale);
     // Lokalizacje przychodza glowna pierwsza — to miasto glowne, jak `mainCity` w zapytaniu.
     const similarServices = shouldLoadSimilarServices(viewKind)
         ? await getSimilarServices(
@@ -147,7 +164,7 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
               locale,
           )
         : [];
-    const view = toProfileView(profile, similarServices, locale);
+    const view = toProfileView(profile, similarServices, locale, viewKind);
     const mainLocation = getMainLocation(view.locations);
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 

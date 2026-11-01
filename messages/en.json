@@ -542,7 +542,7 @@
     "recommended": "Recommended",
     "billingLegend": "Billing period",
     "monthly": "Monthly",
-    "annual": "Annual (save 54%)",
+    "yearly": "Annual (save 54%)",
     "questions": "Questions?",
     "contactSales": "Contact sales",
     "manageSubscriptionPrompt": "Already have a premium page?",
@@ -552,15 +552,19 @@
       "free": {
         "title": "Free",
         "subtitle": "Simple plan",
-        "price": "Free",
-        "priceMonthly": "Free",
-        "per": "forever",
-        "perMonthly": "forever",
+        "price": {
+          "monthly": "Free",
+          "yearly": "Free"
+        },
+        "per": {
+          "monthly": "forever",
+          "yearly": "forever"
+        },
         "cta": "Get started",
         "features": {
           "0": "Free business listing - free forever",
           "1": "Position on map and in list",
-          "2": "Contact details",
+          "2": "Contact details, website and social media",
           "3": "Bussiness description",
           "4": "Tags",
           "5": "Full visibility for thousands of users",
@@ -570,10 +574,14 @@
       "essentials": {
         "title": "Essentials",
         "subtitle": "For growing businesses",
-        "price": "PLN 49",
-        "priceMonthly": "PLN 9",
-        "per": "/year",
-        "perMonthly": "/month",
+        "price": {
+          "monthly": "PLN 9",
+          "yearly": "PLN 49"
+        },
+        "per": {
+          "monthly": "/month",
+          "yearly": "/year"
+        },
         "cta": "Find your business",
         "instruction": "Find your business on the map, open its profile and click “This is my business — upgrade the page”. Not listed yet? Add your business for free first.",
         "features": {
@@ -876,9 +884,7 @@
     "checkout": {
       "legend": "Billing period",
       "monthly": "Monthly",
-      "monthlyPrice": "PLN 9 / month",
       "yearly": "Yearly",
-      "yearlyPrice": "PLN 49 / year",
       "yearlySaving": "Best value",
       "pending": "Redirecting to payment…",
       "note": "Payments are handled by Stripe. Cancel your subscription at any time.",
@@ -944,7 +950,8 @@
     },
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
-      "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory."
+      "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory.",
+      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory."
     }
   }
 }

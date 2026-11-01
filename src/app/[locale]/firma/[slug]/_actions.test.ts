@@ -3,17 +3,26 @@
  */
 import { sendMail } from '@/lib/mailer';
 import type { PremiumCheckoutTarget } from '@/lib/premium-checkout-queries';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { checkRateLimitWithTimeout } from '@/lib/rate-limit';
 
-import { startPremiumCheckout, submitPremiumMaterials } from './_actions';
+import { createFakeRedis } from '../../../../../tests/fixtures/add-business/fake-redis';
+import { startPremiumCheckout } from './_actions';
 
 /**
  * Zewnetrzne serwisy: Stripe, baza (za `premium-checkout-queries`), Redis (limit), SMTP
  * i runtime Next (naglowki, przekierowanie, tlumaczenia). Logika akcji i weryfikacji sesji
- * (`@/lib/premium-checkout`) jest prawdziwa.
+ * (`@/lib/premium-checkout`) jest prawdziwa. Akcja materialow: `_actions.materials.test.ts`
+ * (te same atrapy — `jest.mock` musi stac w pliku testu).
  */
 const mockCreate = jest.fn();
 const mockRetrieve = jest.fn();
+const mockSearch = jest.fn();
+const fakeRedis = createFakeRedis();
+/** Atrapa nie ma `DEL` — ten sam efekt daje jej `GETDEL`. */
+const mockRedis = {
+    ...fakeRedis,
+    del: async (key: string): Promise<number> => ((await fakeRedis.getdel(key)) === null ? 0 : 1),
+};
 const mockTargets = new Map<string, PremiumCheckoutTarget>();
 /** Domyslnie klucz testowy (`sk_test_`), jak lokalnie i na Preview. */
 const mockKeyMode = { isLive: false };
@@ -45,9 +54,15 @@ jest.mock('next-intl/server', () => ({
     getTranslations: async () => (key: string) => `t:${key}`,
 }));
 jest.mock('@/lib/rate-limit', () => ({
-    checkRateLimit: jest.fn(),
+    checkRateLimitWithTimeout: jest.fn(),
     getClientIp: () => '203.0.113.7',
     rateLimitSubject: (ip: string) => ip,
+}));
+// Znacznik „materialy wyslane” (`premium-materials-sent`) jest prawdziwy, na atrapie Redisa.
+jest.mock('@/lib/redis', () => ({
+    get redis() {
+        return mockRedis;
+    },
 }));
 jest.mock('@/lib/mailer', () => ({
     sendMail: jest.fn(),
@@ -64,6 +79,11 @@ jest.mock('@/lib/stripe', () => ({
                 get retrieve() {
                     return mockRetrieve;
                 },
+            },
+        },
+        subscriptions: {
+            get search() {
+                return mockSearch;
             },
         },
     },
@@ -90,26 +110,18 @@ function form(fields: Record<string, string>): FormData {
     return formData;
 }
 
-function paidSession(clientReferenceId: string, paymentStatus = 'paid') {
-    return {
-        id: 'cs_test_paid',
-        mode: 'subscription',
-        status: 'complete',
-        payment_status: paymentStatus,
-        client_reference_id: clientReferenceId,
-        line_items: { data: [{ price: { id: 'price_monthly_test' } }] },
-        customer_details: { email: 'jan@firma.pl', name: 'Jan Kowalski', tax_ids: [] },
-    };
-}
-
 beforeEach(() => {
     mockCreate.mockReset();
     mockRetrieve.mockReset();
+    mockSearch.mockReset().mockResolvedValue({ data: [] });
+    fakeRedis.reset();
     mockTargets.clear();
     mockKeyMode.isLive = false;
     mockTargets.set(SERVICE_ID, TARGET);
     mockTargets.set(OTHER_SERVICE_ID, { ...TARGET, serviceId: OTHER_SERVICE_ID, slug: 'inna' });
-    jest.mocked(checkRateLimit).mockReset().mockResolvedValue({ allowed: true, remaining: 1 });
+    jest.mocked(checkRateLimitWithTimeout)
+        .mockReset()
+        .mockResolvedValue({ allowed: true, remaining: 1 });
     jest.mocked(sendMail).mockReset().mockResolvedValue({ ok: true });
     jest.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -127,11 +139,11 @@ describe('startPremiumCheckout', () => {
 
         expect(result).toEqual({ error: { code: 'BAD_INPUT', message: 't:BAD_INPUT' } });
         expect(mockCreate).not.toHaveBeenCalled();
-        expect(checkRateLimit).not.toHaveBeenCalled();
+        expect(checkRateLimitWithTimeout).not.toHaveBeenCalled();
     });
 
     it('po przekroczeniu limitu: RATE_LIMITED, Stripe niewolany', async () => {
-        jest.mocked(checkRateLimit).mockResolvedValue({ allowed: false, retryAfter: 60 });
+        jest.mocked(checkRateLimitWithTimeout).mockResolvedValue({ allowed: false, retryAfter: 60 });
 
         const result = await startPremiumCheckout(
             null,
@@ -139,7 +151,7 @@ describe('startPremiumCheckout', () => {
         );
 
         expect(result?.error.code).toBe('RATE_LIMITED');
-        expect(jest.mocked(checkRateLimit).mock.calls[0][0].key).toBe(
+        expect(jest.mocked(checkRateLimitWithTimeout).mock.calls[0][0].key).toBe(
             'premium:checkout:203.0.113.7',
         );
         expect(mockCreate).not.toHaveBeenCalled();
@@ -155,6 +167,35 @@ describe('startPremiumCheckout', () => {
 
         expect(result?.error.code).toBe('ALREADY_PREMIUM');
         expect(mockCreate).not.toHaveBeenCalled();
+    });
+
+    it('oplacona subskrypcja w Stripe przed webhookiem: ALREADY_PREMIUM bez sesji', async () => {
+        mockSearch.mockResolvedValue({ data: [{ status: 'active' }] });
+
+        const result = await startPremiumCheckout(
+            null,
+            form({ serviceId: SERVICE_ID, interval: 'monthly' }),
+        );
+
+        expect(result?.error.code).toBe('ALREADY_PREMIUM');
+        expect(mockSearch).toHaveBeenCalledWith({
+            query: `metadata['serviceId']:'${SERVICE_ID}'`,
+            limit: 10,
+        });
+        expect(mockCreate).not.toHaveBeenCalled();
+    });
+
+    it('awaria wyszukiwania subskrypcji nie blokuje sprzedazy', async () => {
+        mockSearch.mockRejectedValue(new Error('ETIMEDOUT'));
+        mockCreate.mockResolvedValue({ url: 'https://checkout.stripe.com/c/pay/cs_test_3' });
+
+        await expect(
+            startPremiumCheckout(null, form({ serviceId: SERVICE_ID, interval: 'monthly' })),
+        ).rejects.toEqual(new MockRedirectSignal('https://checkout.stripe.com/c/pay/cs_test_3'));
+        expect(console.error).toHaveBeenCalledWith(
+            expect.stringContaining('subscription search failed'),
+            { name: 'Error' },
+        );
     });
 
     it('nieaktywny albo nieistniejacy wpis: NOT_FOUND', async () => {
@@ -199,112 +240,5 @@ describe('startPremiumCheckout', () => {
         expect(result).toEqual({
             error: { code: 'CHECKOUT_FAILED', message: 't:CHECKOUT_FAILED' },
         });
-    });
-});
-
-describe('submitPremiumMaterials', () => {
-    const valid = {
-        sessionId: 'cs_test_paid',
-        slug: 'mistrz-remontu',
-        template: 'professional',
-        priceList: 'Wymiana zamka — od 150 zł',
-    };
-
-    it('oplacona sesja tego wpisu: mail do foundera z trescia i danymi platnika', async () => {
-        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ data: { sent: true } });
-        expect(mockRetrieve).toHaveBeenCalledWith('cs_test_paid', { expand: ['line_items'] });
-        const mail = jest.mocked(sendMail).mock.calls[0][0];
-        expect(mail.to).toBe('founder@polvia.pl');
-        expect(mail.replyTo).toBe('jan@firma.pl');
-        expect(mail.subject).toContain('Mistrz Remontu');
-        expect(mail.text).toContain('Szablon: professional');
-        expect(mail.text).toContain('Wymiana zamka — od 150 zł');
-        expect(mail.text).toContain('Jan Kowalski');
-        expect(mail.text).toContain(`ID wpisu: ${SERVICE_ID}`);
-    });
-
-    it('klucz testowy: temat maila z materialami oznaczony [TEST]', async () => {
-        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
-
-        await submitPremiumMaterials(null, form(valid));
-
-        const mail = jest.mocked(sendMail).mock.calls[0][0];
-        expect(mail.subject).toBe('[TEST] Premium: materialy od Mistrz Remontu');
-    });
-
-    it('klucz produkcyjny: temat maila z materialami bez oznaczenia [TEST]', async () => {
-        mockKeyMode.isLive = true;
-        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
-
-        await submitPremiumMaterials(null, form(valid));
-
-        const mail = jest.mocked(sendMail).mock.calls[0][0];
-        expect(mail.subject).toBe('Premium: materialy od Mistrz Remontu');
-    });
-
-    it('sesja nieoplacona: FORBIDDEN i brak maila', async () => {
-        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID, 'unpaid'));
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ error: { code: 'FORBIDDEN', message: 't:FORBIDDEN' } });
-        expect(sendMail).not.toHaveBeenCalled();
-    });
-
-    it('oplacona sesja innego wpisu: FORBIDDEN i brak maila', async () => {
-        mockRetrieve.mockResolvedValue(paidSession(OTHER_SERVICE_ID));
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ error: { code: 'FORBIDDEN', message: 't:FORBIDDEN' } });
-        expect(sendMail).not.toHaveBeenCalled();
-    });
-
-    it('blad sendMail: typowany SEND_FAILED bez surowego komunikatu', async () => {
-        mockRetrieve.mockResolvedValue(paidSession(SERVICE_ID));
-        jest.mocked(sendMail).mockResolvedValue({ ok: false, code: 'SEND_FAILED' });
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ error: { code: 'SEND_FAILED', message: 't:SEND_FAILED' } });
-    });
-
-    it('awaria Stripe przy weryfikacji: VERIFY_FAILED i brak maila', async () => {
-        mockRetrieve.mockRejectedValue(new Error('ETIMEDOUT'));
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ error: { code: 'VERIFY_FAILED', message: 't:VERIFY_FAILED' } });
-        expect(sendMail).not.toHaveBeenCalled();
-    });
-
-    it('bledne pola: BAD_INPUT z bledami pol, bez Stripe i bez limitu', async () => {
-        const result = await submitPremiumMaterials(
-            null,
-            form({ ...valid, template: 'neon', notes: 'x'.repeat(2001) }),
-        );
-
-        expect(result).toEqual({
-            error: {
-                code: 'BAD_INPUT',
-                message: 't:BAD_INPUT',
-                fields: { template: 't:templateRequired', notes: 't:tooLong' },
-            },
-        });
-        expect(mockRetrieve).not.toHaveBeenCalled();
-        expect(checkRateLimit).not.toHaveBeenCalled();
-    });
-
-    it('po przekroczeniu limitu: RATE_LIMITED bez Stripe', async () => {
-        jest.mocked(checkRateLimit).mockResolvedValue({ allowed: false, retryAfter: 60 });
-
-        const result = await submitPremiumMaterials(null, form(valid));
-
-        expect(result).toEqual({ error: { code: 'RATE_LIMITED', message: 't:RATE_LIMITED' } });
-        expect(mockRetrieve).not.toHaveBeenCalled();
     });
 });

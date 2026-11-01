@@ -1,10 +1,11 @@
 import 'server-only';
 
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
 import { promotedServicesTable, servicesTable, serviceSubscriptionsTable } from '@/db/schema';
 import type { PremiumSubscriptionState } from '@/lib/premium';
+import { subscriptionColumns } from '@/lib/subscription-query-parts';
 
 /**
  * Adapter Drizzle dla `syncSubscriptionFromStripe`: wszystko, co synchronizacja czyta
@@ -23,7 +24,18 @@ export interface SubscriptionTransaction {
     lockService(serviceId: string): Promise<boolean>;
     findSubscription(serviceId: string): Promise<StoredSubscription | null>;
     saveSubscription(record: SubscriptionRecord): Promise<void>;
-    /** `expiresAt` = pozycja w rankingu do tej chwili; `null` = zdjecie z rankingu. */
+    /**
+     * `expiresAt` = pozycja w rankingu co najmniej do tej chwili; `null` = zdjecie z rankingu.
+     *
+     * Wiersz `promoted_services` nie mowi, kto go zalozyl (subskrypcja czy operator recznie),
+     * a rozroznienie wymagaloby zmiany schematu. Dlatego:
+     * - zapis NIE skraca dluzszego `expiresAt` (reczne przedluzenie operatora przetrwa
+     *   odnowienie); koszt: skrocenie okresu subskrypcji przy aktywnym statusie (np. zmiana
+     *   planu rocznego na miesieczny) nie skraca rankingu — premium liczy `isPremiumActive`
+     *   z subskrypcji, nie z tej tabeli, a utrata uprawnien i tak konczy sie `null`,
+     * - `null` usuwa wiersz bez wzgledu na pochodzenie — po wygasnieciu subskrypcji reczna
+     *   promocje tego wpisu operator zaklada ponownie (krok w checkliscie operatora).
+     */
     setPromotion(serviceId: string, expiresAt: Date | null): Promise<void>;
 }
 
@@ -67,10 +79,7 @@ function createTransactionStore(tx: Transaction): SubscriptionTransaction {
             const [row] = await tx
                 .select({
                     stripeSubscriptionId: serviceSubscriptionsTable.stripeSubscriptionId,
-                    status: serviceSubscriptionsTable.status,
-                    currentPeriodStart: serviceSubscriptionsTable.currentPeriodStart,
-                    currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
-                    cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
+                    ...subscriptionColumns,
                 })
                 .from(serviceSubscriptionsTable)
                 .where(eq(serviceSubscriptionsTable.serviceId, serviceId))
@@ -96,21 +105,42 @@ function createTransactionStore(tx: Transaction): SubscriptionTransaction {
                 return;
             }
 
-            // Przy istniejacym wpisie zmieniamy tylko termin — `priority` ustawia operator.
+            // Przy istniejacym wpisie zmieniamy tylko termin — `priority` ustawia operator —
+            // i tylko na pozniejszy (`GREATEST`), patrz JSDoc `setPromotion`.
             await tx
                 .insert(promotedServicesTable)
                 .values({ serviceId, expiresAt })
                 .onConflictDoUpdate({
                     target: promotedServicesTable.serviceId,
-                    set: { expiresAt },
+                    set: {
+                        expiresAt: sql`GREATEST(${promotedServicesTable.expiresAt}, excluded.expires_at)`,
+                    },
                 });
         },
     };
 }
 
-/** Jedna transakcja: blokada uslugi, odczyt stanu, zapis subskrypcji i rankingu. */
+/**
+ * Limity czekania w transakcji synchronizacji. Bez nich `FOR UPDATE` czeka na blokade
+ * bez konca, a webhook ma `maxDuration` 30 s, z czego Stripe moze zajac 2 × 8 s — ubita
+ * funkcja nie zostawia logu. Przekroczenie = blad bazy → webhook 500, Stripe ponowi.
+ */
+const LOCK_TIMEOUT = '5s';
+const STATEMENT_TIMEOUT = '5s';
+
+/**
+ * Jedna transakcja: limity czekania, blokada uslugi, odczyt stanu, zapis subskrypcji
+ * i rankingu. `set_config(..., true)` = `SET LOCAL`: limit znika z koncem transakcji,
+ * wiec nie przecieka na inne zapytania wspoldzielonego polaczenia (pooler w trybie
+ * transakcyjnym). Jedno zapytanie zamiast dwoch `SET LOCAL`.
+ */
 export function runSubscriptionTransaction<T>(
     work: (store: SubscriptionTransaction) => Promise<T>,
 ): Promise<T> {
-    return db.transaction(tx => work(createTransactionStore(tx)));
+    return db.transaction(async tx => {
+        await tx.execute(
+            sql`SELECT set_config('lock_timeout', ${LOCK_TIMEOUT}, true), set_config('statement_timeout', ${STATEMENT_TIMEOUT}, true)`,
+        );
+        return work(createTransactionStore(tx));
+    });
 }

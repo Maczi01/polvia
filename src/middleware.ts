@@ -64,8 +64,8 @@ async function handleServiceProfile(request: NextRequest): Promise<NextResponse 
  * `null` = sciezka nie jest kandydatem albo firma nie ma premium / lookup zawiodl —
  * zadanie idzie dalej bez zmian i konczy sie 404 next-intl, jak przed aliasem.
  *
- * Kandydatem jest tylko jednosegmentowa sciezka bez locale, poza segmentami zarezerwowanymi
- * (`isReservedRootSegment`) i w formacie slugu, wiec lookup (ten sam handler co profil,
+ * Kandydatem jest tylko jednosegmentowa sciezka bez locale spelniajaca `isAliasableServiceSlug`
+ * (format slugu, poza segmentami zarezerwowanymi i sciezkami skanerow), wiec lookup (ten sam handler co profil,
  * wspolny cache CDN) dostaja wylacznie adresy, ktore inaczej dalyby 404. Query string
  * (np. `utm_*`) przechodzi na profil.
  *
@@ -159,6 +159,12 @@ export default async function middleware(request: NextRequest): Promise<NextResp
     return intlMiddleware(request);
 }
 
+/**
+ * `api/`, nie `api`: sam prefiks `api` wykluczalby kazda sciezke zaczynajaca sie od tych liter
+ * (`/apiary`), a firma o takim slugu nie dostalaby krotkiego adresu `/<slug>`. Trasy API
+ * zyja wylacznie pod `/api/**`; samo `/api` przechodzi przez middleware i konczy sie 404
+ * next-intl (segment `api` jest zarezerwowany dla aliasu).
+ */
 export const config = {
-    matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+    matcher: ['/((?!api/|_next|_vercel|.*\\..*).*)'],
 };

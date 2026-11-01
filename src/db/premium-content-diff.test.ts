@@ -37,6 +37,18 @@ describe('describePremiumChanges', () => {
         ]);
     });
 
+    it('sama zmiana kolejnosci pozycji: jedna linia o kolejnosci, bez + / -', () => {
+        const [photo] = CONTENT.gallery;
+        const second = { ...photo, file: 'salon-2.jpg' };
+        const previous = { ...CONTENT, gallery: [photo, second] };
+        const next = { ...CONTENT, gallery: [second, photo] };
+
+        expect(describePremiumChanges({ kind: 'valid', content: previous }, next)).toEqual([
+            'Zmiany wzgledem bazy:',
+            '  ~ galeria: zmieniona kolejnosc',
+        ]);
+    });
+
     it('nieczytelna tresc w bazie: ostrzezenie o nadpisaniu', () => {
         expect(describePremiumChanges({ kind: 'invalid' }, CONTENT)[0]).toContain('nadpisana');
     });

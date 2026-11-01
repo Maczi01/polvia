@@ -2,29 +2,36 @@ import { render, screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { cloneElement, isValidElement, type ReactNode } from 'react';
 
-import { verifyPaidCheckoutSession } from '@/lib/premium-checkout';
-import { checkRateLimit } from '@/lib/rate-limit';
+import { type CheckoutVerification, verifyPaidCheckoutSession } from '@/lib/premium-checkout';
+import { isMaterialsSent } from '@/lib/premium-materials-sent';
+import { checkRateLimitWithTimeout, RateLimitCheckTimeoutError } from '@/lib/rate-limit';
 
-import PremiumThanksPage from './page';
+import PremiumThanksPage, { generateMetadata } from './page';
 
 expect.extend(toHaveNoViolations);
 
-// Granice zewnetrzne strony: Stripe (`premium-checkout`), Redis (`rate-limit`), naglowki
-// requestu, mailer i env. Tlumaczenia zwracaja sam klucz — asercje sprawdzaja wariant.
+// Granice zewnetrzne strony: Stripe (`premium-checkout`), Redis (licznik limitu i znacznik
+// wysylki), naglowki requestu, mailer i env. `premium-rate-limit` (adres i klucz) jest
+// prawdziwy. Tlumaczenia zwracaja sam klucz — asercje sprawdzaja wariant.
 jest.mock('@/lib/premium-checkout', () => ({ verifyPaidCheckoutSession: jest.fn() }));
+jest.mock('@/lib/redis', () => ({ redis: {} }));
 jest.mock('@/lib/rate-limit', () => ({
-    checkRateLimit: jest.fn(),
-    getClientIp: () => '203.0.113.7',
-    rateLimitSubject: (ip: string) => ip,
+    ...jest.requireActual('@/lib/rate-limit'),
+    checkRateLimitWithTimeout: jest.fn(),
 }));
-jest.mock('next/headers', () => ({ headers: async () => new Headers() }));
+jest.mock('@/lib/premium-materials-sent', () => ({ isMaterialsSent: jest.fn() }));
+jest.mock('next/headers', () => ({
+    headers: async () => new Headers({ 'x-forwarded-for': '203.0.113.7' }),
+}));
 jest.mock('@/lib/mailer', () => ({ getOperatorInbox: () => 'kontakt@example.com' }));
 jest.mock('../../../../../../../env', () => ({
     env: { STRIPE_PORTAL_LOGIN_URL: 'https://billing.example.com/login' },
 }));
 jest.mock('../../_actions', () => ({ submitPremiumMaterials: jest.fn() }));
 jest.mock('../../_components/premium-materials-form/premium-materials-form', () => ({
-    PremiumMaterialsForm: () => <form aria-label="materials-form" />,
+    PremiumMaterialsForm: ({ isAlreadySent }: { isAlreadySent: boolean }) => (
+        <form aria-label="materials-form" data-already-sent={String(isAlreadySent)} />
+    ),
 }));
 // Klucz z przestrzenia nazw: `title` z dwoch sekcji nie moze dac dwoch identycznych nazw.
 jest.mock('next-intl/server', () => ({
@@ -50,7 +57,8 @@ jest.mock('@/i18n/navigation', () => ({
 }));
 
 const verifyMock = jest.mocked(verifyPaidCheckoutSession);
-const rateLimitMock = jest.mocked(checkRateLimit);
+const rateLimitMock = jest.mocked(checkRateLimitWithTimeout);
+const sentMock = jest.mocked(isMaterialsSent);
 
 function thanks(key: string): string {
     return `ServiceProfile.premiumThanks.${key}`;
@@ -91,7 +99,14 @@ async function renderPage(sessionId: string = SESSION_ID): Promise<HTMLElement> 
 beforeEach(() => {
     jest.clearAllMocks();
     rateLimitMock.mockResolvedValue({ allowed: true, remaining: 19 });
+    sentMock.mockResolvedValue(false);
 });
+
+const PAID: CheckoutVerification = {
+    status: 'paid',
+    target: { serviceId: 'id', slug: SLUG, name: 'Kancelaria Nowak', hasActivePremium: false },
+    payer: { name: null, email: null, taxIds: [], address: null },
+};
 
 describe('PremiumThanksPage', () => {
     it('awaria Stripe pokazuje "odswiez za chwile" z linkiem do tej samej sesji', async () => {
@@ -152,35 +167,34 @@ describe('PremiumThanksPage', () => {
         consoleError.mockRestore();
     });
 
-    it('zawieszony Redis po 1500 ms przepuszcza do Stripe, nie trzymajac renderu', async () => {
-        jest.useFakeTimers();
+    it('przekroczony czas limitu przepuszcza do Stripe z logiem', async () => {
+        // Sam limit czasu (1500 ms, sprzatanie timera) testuje `rate-limit.test.ts`.
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-        try {
-            // Licznik nigdy nie odpowiada — jak Redis, ktory przyjal polaczenie i milczy.
-            rateLimitMock.mockReturnValue(new Promise(() => {}));
-            verifyMock.mockResolvedValue({ status: 'invalid' });
+        rateLimitMock.mockRejectedValue(new RateLimitCheckTimeoutError(1500));
+        verifyMock.mockResolvedValue({ status: 'invalid' });
 
-            const page = PremiumThanksPage({
-                params: Promise.resolve({ locale: 'pl', slug: SLUG }),
-                searchParams: Promise.resolve({ session_id: SESSION_ID }),
-            });
-            await jest.advanceTimersByTimeAsync(1499);
-            expect(verifyMock).not.toHaveBeenCalled();
+        await renderPage();
 
-            await jest.advanceTimersByTimeAsync(1);
-            render(await resolveServerTree(await page));
+        expect(verifyMock).toHaveBeenCalledWith(SESSION_ID, SLUG);
+        expect(
+            screen.getByRole('heading', { level: 1, name: thanks('invalidTitle') }),
+        ).toBeInTheDocument();
+        expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('failing open'), {
+            error: 'RateLimitCheckTimeoutError: Rate limit check exceeded 1500 ms',
+        });
+        consoleError.mockRestore();
+    });
 
-            expect(verifyMock).toHaveBeenCalledWith(SESSION_ID, SLUG);
-            expect(
-                screen.getByRole('heading', { level: 1, name: thanks('invalidTitle') }),
-            ).toBeInTheDocument();
-            expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('failing open'), {
-                error: 'RateLimitCheckTimeoutError: Rate limit check exceeded 1500 ms',
-            });
-        } finally {
-            consoleError.mockRestore();
-            jest.useRealTimers();
-        }
+    it('limit liczy po adresie klienta pod kluczem strony', async () => {
+        verifyMock.mockResolvedValue({ status: 'invalid' });
+
+        await renderPage();
+
+        expect(rateLimitMock).toHaveBeenCalledWith({
+            key: 'premium:thanks:203.0.113.7',
+            max: 20,
+            windowSeconds: 3600,
+        });
     });
 
     it('niepoprawna sesja pokazuje "nie potwierdzono"', async () => {
@@ -224,5 +238,48 @@ describe('PremiumThanksPage', () => {
         expect(screen.getByRole('form', { name: 'materials-form' })).toBeInTheDocument();
         expect(verifyMock).toHaveBeenCalledWith(SESSION_ID, SLUG);
         expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it('materialy tej sesji juz wyslane: formularz dostaje znacznik', async () => {
+        verifyMock.mockResolvedValue(PAID);
+        sentMock.mockResolvedValue(true);
+
+        await renderPage();
+
+        expect(sentMock).toHaveBeenCalledWith(SESSION_ID);
+        expect(screen.getByRole('form', { name: 'materials-form' })).toHaveAttribute(
+            'data-already-sent',
+            'true',
+        );
+    });
+
+    it('awaria znacznika wysylki: formularz bez znacznika i log', async () => {
+        const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+        verifyMock.mockResolvedValue(PAID);
+        sentMock.mockRejectedValue(new Error('Connection is closed.'));
+
+        await renderPage();
+
+        expect(screen.getByRole('form', { name: 'materials-form' })).toHaveAttribute(
+            'data-already-sent',
+            'false',
+        );
+        expect(consoleError).toHaveBeenCalledWith(
+            expect.stringContaining('materials marker unavailable'),
+            { error: 'Error' },
+        );
+        consoleError.mockRestore();
+    });
+});
+
+describe('generateMetadata', () => {
+    it('strona poza indeksem i bez Referer — session_id nie wychodzi w naglowku', async () => {
+        const metadata = await generateMetadata({
+            params: Promise.resolve({ locale: 'xx', slug: SLUG }),
+            searchParams: Promise.resolve({ session_id: SESSION_ID }),
+        });
+
+        expect(metadata.robots).toEqual({ index: false, follow: false });
+        expect(metadata.referrer).toBe('no-referrer');
     });
 });

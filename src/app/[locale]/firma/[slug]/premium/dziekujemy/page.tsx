@@ -1,23 +1,15 @@
 import { CheckCircle2, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
-import { hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement, ReactNode } from 'react';
 
-import { defaultLocale, type Locale } from '@/i18n/config';
+import { toLocale } from '@/i18n/config';
 import { Link } from '@/i18n/navigation';
-import { routing } from '@/i18n/routing';
 import { getOperatorInbox } from '@/lib/mailer';
 import { verifyPaidCheckoutSession } from '@/lib/premium-checkout';
+import { isMaterialsSent } from '@/lib/premium-materials-sent';
+import { isWithinPremiumLimit } from '@/lib/premium-rate-limit';
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
-import {
-    checkRateLimit,
-    getClientIp,
-    type RateLimitOptions,
-    type RateLimitResult,
-    rateLimitSubject,
-} from '@/lib/rate-limit';
 import { isValidServiceSlug } from '@/lib/service-slug-format';
 
 import { env } from '../../../../../../../env';
@@ -25,48 +17,18 @@ import { submitPremiumMaterials } from '../../_actions';
 import { checkoutSessionIdSchema } from '../../_checkout-schema';
 import { PremiumMaterialsForm } from '../../_components/premium-materials-form/premium-materials-form';
 
-// Najgorszy render: Stripe 8 s × 2 (ponowienie) + limit 1,5 s — wzorem webhooka.
-export const maxDuration = 30;
+/**
+ * Limit funkcji obejmuje tez `submitPremiumMaterials` — akcja wolana z tej strony wykonuje sie
+ * w tej samej funkcji. Najgorszy przypadek akcji: limit 1,5 s + `retrieve` 8 s × 2 (ponowienie)
+ * + znacznik 1,5 s + SMTP 20 s (`MATERIALS_MAIL_TIMEOUT_MS`) + zwolnienie znacznika 1,5 s
+ * ≈ 41 s. Render: limit 1,5 s + Stripe 16 s + znacznik 1,5 s ≈ 19 s.
+ */
+export const maxDuration = 60;
 
 type PageProps = {
     params: Promise<{ locale: string; slug: string }>;
     searchParams: Promise<{ session_id?: string | string[] }>;
 };
-
-const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
-/**
- * Kazde wejscie to `checkout.sessions.retrieve` z limitu API Stripe wspolnego z checkoutem
- * i webhookiem. 20/h miesci wielokrotne odswiezanie przez platnika, a ucina skrypt.
- */
-const THANKS_PAGE_PER_IP = 20;
-
-/**
- * Gorny limit czasu na sprawdzenie limitu. Klient Redisa nie ma `commandTimeout` (globalny
- * zmienilby zachowanie innych przeplywow), wiec zawieszony Redis ogranicza sie tutaj.
- */
-const RATE_LIMIT_CHECK_TIMEOUT_MS = 1500;
-
-class RateLimitCheckTimeoutError extends Error {
-    constructor() {
-        super(`Rate limit check exceeded ${RATE_LIMIT_CHECK_TIMEOUT_MS} ms`);
-        this.name = 'RateLimitCheckTimeoutError';
-    }
-}
-
-async function checkRateLimitWithTimeout(options: RateLimitOptions): Promise<RateLimitResult> {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const timeout = new Promise<never>((_, reject) => {
-        timer = setTimeout(
-            () => reject(new RateLimitCheckTimeoutError()),
-            RATE_LIMIT_CHECK_TIMEOUT_MS,
-        );
-    });
-    try {
-        return await Promise.race([checkRateLimit(options), timeout]);
-    } finally {
-        clearTimeout(timer);
-    }
-}
 
 /**
  * Awaria Redisa (`RateLimitStoreError`, przekroczony czas, zerwane polaczenie ioredis — bez
@@ -75,14 +37,9 @@ async function checkRateLimitWithTimeout(options: RateLimitOptions): Promise<Rat
  * czas awarii, a strona nie ma tu nic do ochrony poza kwota zapytan do Stripe.
  */
 async function isWithinVerifyLimit(): Promise<boolean> {
-    const ip = getClientIp({ headers: await headers() });
     try {
-        const result = await checkRateLimitWithTimeout({
-            key: `premium:thanks:${rateLimitSubject(ip)}`,
-            max: THANKS_PAGE_PER_IP,
-            windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
-        });
-        return result.allowed;
+        // Adres i klucz liczone w `try`: blad programistyczny tez konczy sie logiem.
+        return await isWithinPremiumLimit('thanks');
     } catch (error) {
         // Bez IP w logu — to dane osobowe, a do diagnozy awarii Redisa niepotrzebne.
         console.error('premium-thanks: rate limit store unavailable, failing open', {
@@ -92,15 +49,28 @@ async function isWithinVerifyLimit(): Promise<boolean> {
     }
 }
 
-function toLocale(value: string): Locale {
-    return hasLocale(routing.locales, value) ? value : defaultLocale;
+/** Awaria Redisa: formularz zamiast potwierdzenia — duplikat i tak odrzuci akcja. */
+async function wasMaterialsSent(sessionId: string): Promise<boolean> {
+    try {
+        return await isMaterialsSent(sessionId);
+    } catch (error) {
+        console.error('premium-thanks: materials marker unavailable, showing form', {
+            error: error instanceof Error ? error.name : String(error),
+        });
+        return false;
+    }
 }
 
 /** Strona po platnosci: tylko dla platnika z linku Stripe, nigdy w indeksie. */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale: toLocale(locale), namespace: 'ServiceProfile' });
-    return { title: t('premiumThanks.metaTitle'), robots: { index: false, follow: false } };
+    return {
+        title: t('premiumThanks.metaTitle'),
+        robots: { index: false, follow: false },
+        // `session_id` w adresie nie moze wyjsc w `Referer` do portalu Stripe ani innych linkow.
+        referrer: 'no-referrer',
+    };
 }
 
 const CARD_CLASSES =
@@ -236,6 +206,7 @@ async function MaterialsCard({
     slug: string;
 }): Promise<ReactElement> {
     const t = await getTranslations('ServiceProfile.materials');
+    const isAlreadySent = await wasMaterialsSent(sessionId);
 
     return (
         <section aria-labelledby="premium-materials-heading" className={CARD_CLASSES}>
@@ -250,6 +221,7 @@ async function MaterialsCard({
                 sessionId={sessionId}
                 slug={slug}
                 action={submitPremiumMaterials}
+                isAlreadySent={isAlreadySent}
             />
         </section>
     );

@@ -7,26 +7,29 @@ import type { PreviousPremiumContent } from './upsert-premium-content';
  * poprawka tlumaczenia to `~`, a nie para `-`/`+`.
  */
 
-type Keyed<T> = { label: string; items: readonly T[]; keyOf: (item: T) => string };
+/** Lista do porownania: etykieta w diffie i klucz pozycji, wspolny dla obu stron. */
+type ListDiff<T> = { label: string; keyOf: (item: T) => string };
 
-function diffList<T>(previous: Keyed<T>, next: readonly T[]): string[] {
-    const before = new Map(
-        previous.items.map(item => [previous.keyOf(item), JSON.stringify(item)]),
-    );
-    const after = new Map(next.map(item => [previous.keyOf(item), JSON.stringify(item)]));
+function diffList<T>(
+    { label, keyOf }: ListDiff<T>,
+    previous: readonly T[],
+    next: readonly T[],
+): string[] {
+    const before = new Map(previous.map(item => [keyOf(item), JSON.stringify(item)]));
+    const after = new Map(next.map(item => [keyOf(item), JSON.stringify(item)]));
     const lines: string[] = [];
 
     for (const [key, value] of after) {
-        if (!before.has(key)) lines.push(`  + ${previous.label}: ${key}`);
-        else if (before.get(key) !== value) lines.push(`  ~ ${previous.label}: ${key}`);
+        if (!before.has(key)) lines.push(`  + ${label}: ${key}`);
+        else if (before.get(key) !== value) lines.push(`  ~ ${label}: ${key}`);
     }
     for (const key of before.keys()) {
-        if (!after.has(key)) lines.push(`  - ${previous.label}: ${key}`);
+        if (!after.has(key)) lines.push(`  - ${label}: ${key}`);
     }
 
-    const sameKeys =
+    const isOnlyReordered =
         lines.length === 0 && [...before.keys()].join('\n') !== [...after.keys()].join('\n');
-    if (sameKeys) lines.push(`  ~ ${previous.label}: zmieniona kolejnosc`);
+    if (isOnlyReordered) lines.push(`  ~ ${label}: zmieniona kolejnosc`);
 
     return lines;
 }
@@ -54,14 +57,16 @@ function diffContent(previous: PremiumContentData, next: PremiumContentData): st
     return [
         ...lines,
         ...diffList(
-            { label: 'galeria', items: previous.gallery, keyOf: item => item.file },
+            { label: 'galeria', keyOf: item => item.file },
+            previous.gallery,
             next.gallery,
         ),
         ...diffList(
-            { label: 'cennik', items: previous.priceList, keyOf: item => item.name.pl },
+            { label: 'cennik', keyOf: item => item.name.pl },
+            previous.priceList,
             next.priceList,
         ),
-        ...diffList({ label: 'FAQ', items: previous.faq, keyOf: item => item.q.pl }, next.faq),
+        ...diffList({ label: 'FAQ', keyOf: item => item.q.pl }, previous.faq, next.faq),
     ];
 }
 

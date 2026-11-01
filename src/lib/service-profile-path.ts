@@ -1,9 +1,10 @@
-import { type Locale, locales } from '@/i18n/config';
-import { routing } from '@/i18n/routing';
+import type { Locale } from '@/i18n/config';
 import { localePathPrefix } from '@/lib/map-url-builder';
-import { isValidServiceSlug } from '@/lib/service-slug-format';
+import { isAliasableServiceSlug } from '@/lib/service-slug-alias';
 import type { ServiceSlugLookupResult } from '@/lib/service-slug-lookup';
+import { splitLocalePrefix } from '@/lib/split-locale-prefix';
 
+export { isReservedRootSegment } from '@/lib/service-slug-alias';
 export { isValidServiceSlug } from '@/lib/service-slug-format';
 
 /**
@@ -22,12 +23,6 @@ export type ServiceProfilePathname = {
     slug: string;
 };
 
-const LOCALE_SET: ReadonlySet<string> = new Set(locales);
-
-function isLocale(value: string): value is Locale {
-    return LOCALE_SET.has(value);
-}
-
 /**
  * Locale i slug z adresu profilu albo `null`, gdy sciezka nie jest profilem.
  *
@@ -35,16 +30,11 @@ function isLocale(value: string): value is Locale {
  * pozostale. Dokladnie jeden segment slugu: `/firma`, `/firma/` i `/firma/a/b` daja `null`.
  */
 export function parseServiceProfilePathname(pathname: string): ServiceProfilePathname | null {
-    const segments = pathname.split('/').slice(1);
+    const { locale, segments } = splitLocalePrefix(pathname);
+    if (segments.length !== 2) return null;
 
-    if (segments.length === 2 && segments[0] === SERVICE_PROFILE_SEGMENT && segments[1] !== '') {
-        return { locale: 'pl', slug: segments[1] };
-    }
-
-    if (segments.length !== 3) return null;
-
-    const [locale, segment, slug] = segments;
-    if (!isLocale(locale) || segment !== SERVICE_PROFILE_SEGMENT || slug === '') return null;
+    const [segment, slug] = segments;
+    if (segment !== SERVICE_PROFILE_SEGMENT || slug === '') return null;
 
     return { locale, slug };
 }
@@ -62,63 +52,13 @@ export function buildServiceProfilePath(locale: Locale, slug: string): string {
  */
 export const SERVICE_PROFILE_NOT_FOUND_PATH = `/pl/${SERVICE_PROFILE_SEGMENT}/_brak-profilu/_404`;
 
-/** Pierwsze segmenty wszystkich tras next-intl, we wszystkich wersjach jezykowych. */
-function routingRootSegments(): string[] {
-    return Object.entries(routing.pathnames).flatMap(([internal, localized]) => {
-        const paths = typeof localized === 'string' ? [localized] : Object.values(localized);
-        return [internal, ...paths].map(path => path.split('/')[1]).filter(Boolean);
-    });
-}
-
-/**
- * Segmenty spoza `routing.pathnames`, ktore zyja w korzeniu domeny:
- * - trasy Next poza next-intl i pliki specjalne,
- * - zrodla i cele przekierowan z `next.config.ts` (`/year`, `/month`, `/privacy`),
- * - katalogi top-level z `public/`.
- * Pliki z kropka (`favicon.ico`, `robots.txt`) i tak nie maja formatu slugu.
- */
-const STATIC_RESERVED_SEGMENTS = [
-    'api',
-    'action',
-    'thanks',
-    '_next',
-    '_vercel',
-    'robots.txt',
-    'sitemap.xml',
-    'year',
-    'month',
-    'privacy',
-    'buttons',
-    'categoryCard',
-    'icons',
-    'images',
-    'logo',
-    'markers',
-    'serviceImages',
-    'services',
-];
-
-const RESERVED_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
-    ...locales,
-    ...routingRootSegments(),
-    ...STATIC_RESERVED_SEGMENTS,
-]);
-
-/**
- * Czy pierwszy segment sciezki jest zajety przez istniejaca trase, locale,
- * przekierowanie albo katalog `public/`. Krotki adres `polvia.pl/<slug>` (U10)
- * nie moze takiego segmentu przechwycic.
- */
-export function isReservedRootSegment(segment: string): boolean {
-    return RESERVED_ROOT_SEGMENTS.has(segment);
-}
-
 /**
  * Slug krotkiego adresu `polvia.pl/<slug>` albo `null`, gdy sciezka nim nie jest.
  *
  * Kandydat to dokladnie jeden segment bez prefiksu locale (alias istnieje tylko w `pl`),
- * poza segmentami zarezerwowanymi i w formacie slugu. Dzieki temu lookup dostaja tylko
- * sciezki, ktore bez aliasu i tak skonczylyby sie 404 — istniejace strony nie zwalniaja.
+ * spelniajacy `isAliasableServiceSlug` (format slugu, poza segmentami zarezerwowanymi).
+ * Dzieki temu lookup dostaja tylko sciezki, ktore bez aliasu i tak skonczylyby sie 404 —
+ * istniejace strony nie zwalniaja.
  * Pliki (`/robots.txt`, `/favicon.ico`) odpadaja na formacie: kropka nie jest w slugu.
  */
 export function parseRootAliasPathname(pathname: string): string | null {
@@ -126,7 +66,7 @@ export function parseRootAliasPathname(pathname: string): string | null {
     if (segments.length !== 1) return null;
 
     const [slug] = segments;
-    if (isReservedRootSegment(slug) || !isValidServiceSlug(slug)) return null;
+    if (!isAliasableServiceSlug(slug)) return null;
 
     return slug;
 }

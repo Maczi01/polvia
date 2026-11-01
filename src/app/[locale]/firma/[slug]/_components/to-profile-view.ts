@@ -4,6 +4,7 @@ import { buildServiceUrl } from '@/lib/map-url-builder';
 import type { ServiceProfile } from '@/lib/service-profile-queries';
 import type { SimilarServiceRow } from '@/lib/similar-services';
 
+import type { ProfileViewKind } from './select-profile-view';
 import type { ProfileHref, ServiceProfileView, SimilarService } from './service-profile-types';
 
 /** Sciezka obrazka z `public/services/` albo `null` (komponent pokaze `/default.png`). */
@@ -35,11 +36,15 @@ function toSimilarService(row: SimilarServiceRow): SimilarService {
     };
 }
 
-/** Wynik zapytan profilu -> kontrakt widoku darmowego profilu. */
+/**
+ * Wynik zapytan profilu -> kontrakt widoku. Tresc premium bierze z decyzji widoku
+ * (`selectProfileView`), wiec widok free dostaje `premium: null`.
+ */
 export function toProfileView(
     profile: ServiceProfile,
     similarServices: readonly SimilarServiceRow[],
     locale: Locale,
+    viewKind: ProfileViewKind,
 ): ServiceProfileView {
     return {
         serviceId: profile.id,
@@ -55,6 +60,6 @@ export function toProfileView(
         locations: profile.locations,
         mapHref: toMapHref(profile, locale),
         similarServices: similarServices.map(toSimilarService),
-        premium: profile.premiumContent,
+        premium: viewKind.kind === 'premium' ? viewKind.content : null,
     };
 }

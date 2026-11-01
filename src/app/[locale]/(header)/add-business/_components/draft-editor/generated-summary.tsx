@@ -1,9 +1,9 @@
 'use client';
 
-import { hasLocale, useLocale, useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import type { JSX } from 'react';
 
-import { locales } from '@/i18n/config';
+import { toLocale } from '@/i18n/config';
 import type { LocalizedText } from '@/lib/add-business/draft-schema';
 import { type Category, CATEGORY_DEFINITIONS } from '@/lib/categories';
 import type { Coverage } from '@/lib/coverage';
@@ -22,7 +22,7 @@ export function GeneratedSummary({ category, coverage, tags }: GeneratedSummaryP
     const t = useTranslations('addBusiness');
     const tCategories = useTranslations('MapPage.Categories');
     const locale = useLocale();
-    const contentLocale = hasLocale(locales, locale) ? locale : 'pl';
+    const contentLocale = toLocale(locale);
 
     return (
         <section

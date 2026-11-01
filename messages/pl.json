@@ -542,7 +542,7 @@
     "recommended": "Polecany",
     "billingLegend": "Okres rozliczenia",
     "monthly": "Miesięcznie",
-    "annual": "Rocznie (oszczędź 54%)",
+    "yearly": "Rocznie (oszczędź 54%)",
     "questions": "Pytania?",
     "contactSales": "Skontaktuj się z nami",
     "manageSubscriptionPrompt": "Masz już stronę premium?",
@@ -552,15 +552,19 @@
       "free": {
         "title": "Podstawowy",
         "subtitle": "Idealne dla nowych firm",
-        "price": "0 zł",
-        "priceMonthly": "0 zł",
-        "per": "/rok",
-        "perMonthly": "/miesiąc",
+        "price": {
+          "monthly": "0 zł",
+          "yearly": "0 zł"
+        },
+        "per": {
+          "monthly": "/miesiąc",
+          "yearly": "/rok"
+        },
         "cta": "Rozpocznij za darmo",
         "features": {
           "0": "Wizytówka na stronie - za darmo na zawsze",
           "1": "Lokalizacja na mapie i na liście",
-          "2": "Dane kontaktowe",
+          "2": "Dane kontaktowe, strona WWW i media społecznościowe",
           "3": "Opis działalności",
           "4": "Tagi",
           "5": "Pełna widoczność dla tysięcy użytkowników",
@@ -570,10 +574,14 @@
       "essentials": {
         "title": "Profesjonalny",
         "subtitle": "Dla rosnących firm",
-        "price": "49 zł",
-        "priceMonthly": "9 zł",
-        "per": "/rok",
-        "perMonthly": "/miesiąc",
+        "price": {
+          "monthly": "9 zł",
+          "yearly": "49 zł"
+        },
+        "per": {
+          "monthly": "/miesiąc",
+          "yearly": "/rok"
+        },
         "cta": "Znajdź swoją firmę",
         "instruction": "Znajdź swoją firmę na mapie, otwórz jej profil i kliknij „To moja firma — ulepsz stronę”. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
         "features": {
@@ -876,9 +884,7 @@
     "checkout": {
       "legend": "Okres rozliczenia",
       "monthly": "Miesięcznie",
-      "monthlyPrice": "9 zł / mies.",
       "yearly": "Rocznie",
-      "yearlyPrice": "49 zł / rok",
       "yearlySaving": "Najtaniej",
       "pending": "Przekierowuję do płatności…",
       "note": "Płatność obsługuje Stripe. Subskrypcję anulujesz w każdej chwili.",
@@ -944,7 +950,8 @@
     },
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
-      "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia."
+      "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
+      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia."
     }
   }
 }

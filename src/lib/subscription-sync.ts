@@ -11,14 +11,15 @@ import {
 } from '@/lib/premium';
 import { isPremiumPriceId } from '@/lib/premium-prices';
 import { stripe } from '@/lib/stripe';
+import { SUBSCRIPTION_METADATA_KEYS } from '@/lib/subscription-metadata';
 import {
     findServiceIdBySlug,
     findServiceIdBySubscriptionId,
     runSubscriptionTransaction,
-    type StoredSubscription,
     type SubscriptionRecord,
     type SubscriptionTransaction,
 } from '@/lib/subscription-store';
+import { decideSubscriptionWrite } from '@/lib/subscription-write-decision';
 
 /**
  * Pola subskrypcji Stripe, z ktorych liczymy stan. `Stripe.Subscription` jest do tego typu
@@ -54,8 +55,10 @@ export class SubscriptionSyncError extends Error {
 }
 
 /**
- * - `synced`: stan w bazie odpowiada Stripe (zapisany albo — po stanie koncowym — juz aktualny),
- * - `conflict`: wpis ma inna aktywna subskrypcje — stan bez zmian. Synchronizacja NIE
+ * - `synced`: stan zapisany — baza odpowiada Stripe,
+ * - `stale_ignored`: zapisany jest stan koncowy tej subskrypcji, a przyszedl starszy odczyt —
+ *   baza bez zmian (juz aktualna),
+ * - `conflict`: wpis ma inna subskrypcje z premium — stan bez zmian. Synchronizacja NIE
  *   powiadamia (jest idempotentna i wolana przy kazdym zdarzeniu i resyncu); mail wysyla
  *   wolajacy raz, czyli webhook przy pierwszym dostarczeniu jednego typu zdarzenia,
  * - `unlinked`: subskrypcji nie da sie powiazac z wpisem (utworzona poza checkoutem albo
@@ -64,12 +67,16 @@ export class SubscriptionSyncError extends Error {
  */
 export type SubscriptionSyncResult =
     | { outcome: 'synced'; serviceId: string; isPremiumActive: boolean }
+    | { outcome: 'stale_ignored'; serviceId: string }
     | {
           outcome: 'conflict';
           serviceId: string;
           activeSubscriptionId: string;
           conflictingSubscriptionId: string;
-          /** Druga subskrypcja jest oplacona (wymaga zwrotu); nieoplacona nie wymaga. */
+          /**
+           * Druga subskrypcja jest OPLACONA (`active`/`trialing`): podwojna oplata, wymaga
+           * zwrotu. `past_due` w karencji ma premium, ale niczego nie zaplacila — `false`.
+           */
           isIncomingActive: boolean;
       }
     | { outcome: 'unlinked' }
@@ -80,25 +87,9 @@ export interface SyncOptions {
     serviceId?: string;
 }
 
-/** Klucze `subscription.metadata`, ktore ustawia checkout (U9). Slug przezywa `db:reset`. */
-export const SUBSCRIPTION_METADATA_KEYS = {
-    serviceId: 'serviceId',
-    serviceSlug: 'serviceSlug',
-} as const;
-
 const serviceIdSchema = z.string().uuid();
 
 const KNOWN_STATUSES: ReadonlySet<string> = new Set(SUBSCRIPTION_STATUSES);
-
-/**
- * Statusy, z ktorych subskrypcja Stripe nigdy nie wraca. Odczyt ze Stripe jest przed blokada
- * wiersza, wiec rownolegle zdarzenie moze przyniesc starszy stan — po stanie koncowym kazdy
- * inny stan TEJ SAMEJ subskrypcji jest z definicji nieswiezy.
- */
-const TERMINAL_STATUSES: ReadonlySet<SubscriptionStatus> = new Set([
-    'canceled',
-    'incomplete_expired',
-]);
 
 function isSubscriptionStatus(status: string): status is SubscriptionStatus {
     return KNOWN_STATUSES.has(status);
@@ -131,13 +122,19 @@ function toSubscriptionRecord(
 /**
  * Wpis subskrypcji, w kolejnosci zaufania: wskazanie ze zdarzenia, istniejace powiazanie
  * w bazie, slug z metadanych (stabilny po `db:reset`, ktory nadaje uslugom nowe `id`),
- * na koncu `serviceId` z metadanych.
+ * na koncu `serviceId` z metadanych. Wskazanie, ktore nie jest UUID, nie przerywa lancucha:
+ * metadane ustawia nasz checkout, wiec sa co najmniej tak wiarygodne.
  */
 async function resolveServiceId(
     subscription: StripeSubscriptionSnapshot,
     hint: string | undefined,
 ): Promise<string | null> {
-    if (hint !== undefined) return serviceIdSchema.safeParse(hint).success ? hint : null;
+    if (hint !== undefined) {
+        if (serviceIdSchema.safeParse(hint).success) return hint;
+        console.warn('subscription sync: client_reference_id is not a service id, ignored', {
+            stripeSubscriptionId: subscription.id,
+        });
+    }
 
     const linked = await findServiceIdBySubscriptionId(subscription.id);
     if (linked) return linked;
@@ -152,47 +149,6 @@ async function resolveServiceId(
     return metadataId.success ? metadataId.data : null;
 }
 
-/**
- * „Ratunkowy” zakup: zapisana jest INNA subskrypcja `past_due` (jeszcze w karencji), a przychodzi
- * oplacona (`active`/`trialing`) — np. po wygasnieciu karty founder kupil premium ponownie.
- * Nowa wygrywa; pozniejsze zdarzenia starej trafia na zapisana aktywna nowa i skoncza sie
- * konfliktem bez zapisu.
- */
-function supersedesPastDue(
-    stored: StoredSubscription | null,
-    record: SubscriptionRecord,
-    now: Date,
-): boolean {
-    if (!stored || stored.stripeSubscriptionId === record.stripeSubscriptionId) return false;
-
-    return stored.status === 'past_due' && isPremiumActive(record, now);
-}
-
-/**
- * Inna subskrypcja wpisu, ktora wciaz daje premium, blokuje nadpisanie stanu — chyba ze to
- * `past_due` wypierana przez oplacona nowa (`supersedesPastDue`).
- */
-function conflictingSubscriptionId(
-    stored: StoredSubscription | null,
-    record: SubscriptionRecord,
-    now: Date,
-): string | null {
-    if (!stored || stored.stripeSubscriptionId === record.stripeSubscriptionId) return null;
-    if (supersedesPastDue(stored, record, now)) return null;
-
-    return isPremiumActive(stored, now) ? stored.stripeSubscriptionId : null;
-}
-
-/** Zapisany jest stan koncowy tej samej subskrypcji, a przychodzi stan sprzed niego. */
-function isStaleAfterTerminal(
-    stored: StoredSubscription | null,
-    record: SubscriptionRecord,
-): boolean {
-    if (!stored || stored.stripeSubscriptionId !== record.stripeSubscriptionId) return false;
-
-    return TERMINAL_STATUSES.has(stored.status) && !TERMINAL_STATUSES.has(record.status);
-}
-
 type SubscriptionConflict = Extract<SubscriptionSyncResult, { outcome: 'conflict' }>;
 
 /**
@@ -200,78 +156,97 @@ type SubscriptionConflict = Extract<SubscriptionSyncResult, { outcome: 'conflict
  * tylko po checkoucie, a ten sam stan przychodzi tez z `subscription.*`, `invoice.*` i resyncu
  * CLI. Same identyfikatory, bez danych klienta.
  */
-function reportConflict(conflict: SubscriptionConflict): SubscriptionConflict {
-    if (conflict.isIncomingActive) {
-        console.warn('subscription sync: second paid subscription for a service', {
-            serviceId: conflict.serviceId,
-            activeSubscriptionId: conflict.activeSubscriptionId,
-            conflictingSubscriptionId: conflict.conflictingSubscriptionId,
-        });
-    }
-    return conflict;
+function logPaidConflict(conflict: SubscriptionConflict): void {
+    if (!conflict.isIncomingActive) return;
+
+    console.warn('subscription sync: second paid subscription for a service', {
+        serviceId: conflict.serviceId,
+        activeSubscriptionId: conflict.activeSubscriptionId,
+        conflictingSubscriptionId: conflict.conflictingSubscriptionId,
+    });
 }
 
-/** Decyzja i zapis pod blokada wiersza uslugi. */
+async function writeSubscriptionState(
+    store: SubscriptionTransaction,
+    record: SubscriptionRecord,
+    replacedSubscriptionId: string | null,
+    now: Date,
+): Promise<SubscriptionSyncResult> {
+    const { serviceId, stripeSubscriptionId } = record;
+    if (replacedSubscriptionId) {
+        console.warn('subscription sync: paid subscription replaces past_due one', {
+            serviceId,
+            stripeSubscriptionId,
+            replacedSubscriptionId,
+        });
+    }
+
+    const hasPremium = isPremiumActive(record, now);
+    await store.saveSubscription(record);
+    await store.setPromotion(serviceId, hasPremium ? premiumRankingExpiry(record) : null);
+    return { outcome: 'synced', serviceId, isPremiumActive: hasPremium };
+}
+
+/** Wykonanie decyzji (`decideSubscriptionWrite`) pod blokada wiersza uslugi. */
 async function applySubscriptionState(
     store: SubscriptionTransaction,
     record: SubscriptionRecord,
     now: Date,
 ): Promise<SubscriptionSyncResult> {
     const { serviceId, stripeSubscriptionId } = record;
-    if (!(await store.lockService(serviceId))) return { outcome: 'service_missing', serviceId };
-
-    const stored = await store.findSubscription(serviceId);
-    const isIncomingActive = isPremiumActive(record, now);
-
-    const activeSubscriptionId = conflictingSubscriptionId(stored, record, now);
-    if (activeSubscriptionId) {
-        return reportConflict({
-            outcome: 'conflict',
-            serviceId,
-            activeSubscriptionId,
-            conflictingSubscriptionId: stripeSubscriptionId,
-            isIncomingActive,
-        });
+    if (!(await store.lockService(serviceId))) {
+        // Zaplacono, a nie ma czego zapisac — bez logu ta platnosc znika bez sladu.
+        console.warn('subscription sync: service not found', { serviceId, stripeSubscriptionId });
+        return { outcome: 'service_missing', serviceId };
     }
 
-    if (isStaleAfterTerminal(stored, record)) {
-        console.warn('subscription sync: stale state after terminal state ignored', {
-            stripeSubscriptionId,
-            incomingStatus: record.status,
-        });
-        return { outcome: 'synced', serviceId, isPremiumActive: false };
+    const decision = decideSubscriptionWrite(await store.findSubscription(serviceId), record, now);
+    switch (decision.kind) {
+        case 'conflict': {
+            const conflict: SubscriptionConflict = {
+                outcome: 'conflict',
+                serviceId,
+                activeSubscriptionId: decision.activeSubscriptionId,
+                conflictingSubscriptionId: stripeSubscriptionId,
+                isIncomingActive: decision.isIncomingPaid,
+            };
+            logPaidConflict(conflict);
+            return conflict;
+        }
+        case 'stale': {
+            console.warn('subscription sync: stale state after terminal state ignored', {
+                stripeSubscriptionId,
+                incomingStatus: record.status,
+            });
+            return { outcome: 'stale_ignored', serviceId };
+        }
+        case 'write': {
+            return writeSubscriptionState(store, record, decision.replacedSubscriptionId, now);
+        }
     }
-
-    if (supersedesPastDue(stored, record, now)) {
-        console.warn('subscription sync: paid subscription replaces past_due one', {
-            serviceId,
-            stripeSubscriptionId,
-            replacedSubscriptionId: stored?.stripeSubscriptionId,
-        });
-    }
-
-    await store.saveSubscription(record);
-    await store.setPromotion(serviceId, isIncomingActive ? premiumRankingExpiry(record) : null);
-    return { outcome: 'synced', serviceId, isPremiumActive: isIncomingActive };
 }
 
 /**
- * Odwzorowuje w bazie stan subskrypcji Stripe: `service_subscriptions` i pozycje
+ * Odwzorowuje w bazie stan podanej subskrypcji Stripe: `service_subscriptions` i pozycje
  * w `promoted_services`, w jednej transakcji z blokada wiersza uslugi (rownolegle zdarzenia
- * tego samego wpisu ida po kolei). Stan ze swiezo pobranej subskrypcji; stanu koncowego
- * (`canceled`) nie nadpisuje starszy odczyt z rownoleglego zdarzenia. Ponowienie jest
- * idempotentne. Bez skutkow ubocznych (maili) — te naleza do wolajacego.
+ * tego samego wpisu ida po kolei). Bez skutkow ubocznych (maili) — te naleza do wolajacego.
  *
- * Rzuca przy bledzie Stripe/bazy i `SubscriptionSyncError` — webhook odpowiada wtedy 500
- * i Stripe ponawia.
+ * Wolajacy daje obiekt swiezo pobrany ze Stripe: webhook przez `syncSubscriptionFromStripe`,
+ * CLI wprost z `subscriptions.list` (bez drugiego `retrieve`).
+ *
+ * Allowlista cen: KAZDA pozycja musi miec cene premium. Pusta lista pozycji tu przechodzi
+ * (`every` na pustej tablicy) i konczy sie bledem `MISSING_PERIOD` (webhook 500, Stripe
+ * ponowi) — subskrypcja bez pozycji to stan nieoczekiwany, nie „cudza cena”. Inaczej niz
+ * `hasOnlyPremiumPrices` (`premium-prices.ts`) przy weryfikacji sesji checkoutu: tam pusta
+ * lista znaczy „nic nie kupiono” i daje odmowe bez bledu.
+ *
+ * Rzuca przy bledzie bazy i `SubscriptionSyncError`.
  */
-export async function syncSubscriptionFromStripe(
-    stripeSubscriptionId: string,
+export async function syncSubscriptionSnapshot(
+    subscription: StripeSubscriptionSnapshot,
     options: SyncOptions = {},
 ): Promise<SubscriptionSyncResult> {
-    const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
-
-    // Brak pozycji nie jest tu odrzucany — to blad `MISSING_PERIOD` nizej.
+    const stripeSubscriptionId = subscription.id;
     const priceIds = subscription.items.data.map(item => item.price.id);
     if (!priceIds.every(priceId => isPremiumPriceId(priceId))) {
         console.warn('subscription sync: subscription without premium price ignored', {
@@ -292,4 +267,20 @@ export async function syncSubscriptionFromStripe(
     const record = toSubscriptionRecord(serviceId, subscription);
     const now = new Date();
     return runSubscriptionTransaction(store => applySubscriptionState(store, record, now));
+}
+
+/**
+ * Pobiera subskrypcje ze Stripe i synchronizuje ja (`syncSubscriptionSnapshot`). Stan zawsze
+ * ze swiezego odczytu, wiec ponowienie jest idempotentne, a kolejnosc zdarzen dostarczanych
+ * po kolei nie ma znaczenia. Wyscigi rownoleglych zdarzen opisuje `decideSubscriptionWrite`.
+ *
+ * Rzuca przy bledzie Stripe/bazy i `SubscriptionSyncError` — webhook odpowiada wtedy 500
+ * i Stripe ponawia.
+ */
+export async function syncSubscriptionFromStripe(
+    stripeSubscriptionId: string,
+    options: SyncOptions = {},
+): Promise<SubscriptionSyncResult> {
+    const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    return syncSubscriptionSnapshot(subscription, options);
 }

@@ -1,6 +1,8 @@
 import 'server-only';
 
 import { getOperatorInbox, type MailMessage, sendMail } from '@/lib/mailer';
+import { STRIPE_LIVE_MODE } from '@/lib/stripe';
+import { TimeoutError, withTimeout } from '@/lib/with-timeout';
 
 /**
  * Powiadomienia foundera o zdarzeniach subskrypcji. Skutek uboczny: nigdy nie rzuca,
@@ -12,24 +14,62 @@ export const NOTIFICATION_TIMEOUT_MS = 8000;
 
 type NotificationResult = 'sent' | 'failed' | 'timed_out';
 
-async function sendWithTimeout(message: MailMessage): Promise<NotificationResult> {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const timeout = new Promise<NotificationResult>(resolve => {
-        timer = setTimeout(() => resolve('timed_out'), NOTIFICATION_TIMEOUT_MS);
-    });
-    const delivery = sendMail(message).then<NotificationResult>(result =>
-        result.ok ? 'sent' : 'failed',
-    );
+export interface NotificationOptions {
+    /**
+     * Wspolny termin wolajacego (znacznik czasu jak `Date.now()`). Mail dostaje mniejsza
+     * z wartosci: `NOTIFICATION_TIMEOUT_MS` albo czas do terminu; po terminie nie wychodzi.
+     */
+    deadline?: number;
+}
 
+function timeoutFor({ deadline }: NotificationOptions): number {
+    if (deadline === undefined) return NOTIFICATION_TIMEOUT_MS;
+    return Math.min(NOTIFICATION_TIMEOUT_MS, deadline - Date.now());
+}
+
+async function sendWithTimeout(
+    message: MailMessage,
+    timeoutMs: number,
+): Promise<NotificationResult> {
     try {
-        return await Promise.race([delivery, timeout]);
-    } finally {
-        clearTimeout(timer);
+        const result = await withTimeout(
+            sendMail(message),
+            timeoutMs,
+            () => new TimeoutError('operator notification', timeoutMs),
+        );
+        return result.ok ? 'sent' : 'failed';
+    } catch (error) {
+        if (error instanceof TimeoutError) return 'timed_out';
+        throw error;
     }
 }
 
-async function notifyFounder(kind: string, message: Omit<MailMessage, 'to'>): Promise<void> {
-    const result = await sendWithTimeout({ ...message, to: getOperatorInbox() });
+/**
+ * Klucz testowy Stripe (lokalny `stripe listen`, Preview) wysyla na prawdziwa skrzynke
+ * foundera — `[TEST]` odroznia takie maile od prawdziwej sprzedazy. Ten sam znacznik co
+ * w mailu z materialami.
+ */
+function modeSubject(subject: string): string {
+    return STRIPE_LIVE_MODE ? subject : `[TEST] ${subject}`;
+}
+
+async function deliver(
+    message: Omit<MailMessage, 'to'>,
+    options: NotificationOptions,
+): Promise<NotificationResult> {
+    const timeoutMs = timeoutFor(options);
+    if (timeoutMs <= 0) return 'timed_out';
+
+    const subject = modeSubject(message.subject);
+    return sendWithTimeout({ ...message, subject, to: getOperatorInbox() }, timeoutMs);
+}
+
+async function notifyFounder(
+    kind: string,
+    message: Omit<MailMessage, 'to'>,
+    options: NotificationOptions,
+): Promise<void> {
+    const result = await deliver(message, options);
     if (result === 'sent') return;
 
     // Bez tresci maila: tylko rodzaj powiadomienia i wynik (identyfikatory Stripe sa w tresci).
@@ -41,11 +81,11 @@ export interface SubscriptionRef {
     stripeSubscriptionId: string;
 }
 
-export function notifyPremiumPurchased({
-    serviceId,
-    stripeSubscriptionId,
-}: SubscriptionRef): Promise<void> {
-    return notifyFounder('premium_purchased', {
+export function notifyPremiumPurchased(
+    { serviceId, stripeSubscriptionId }: SubscriptionRef,
+    options: NotificationOptions = {},
+): Promise<void> {
+    const message = {
         subject: 'Nowa subskrypcja premium',
         text: [
             'Firma oplacila plan premium. Czekaj na materialy (formularz po platnosci).',
@@ -53,7 +93,8 @@ export function notifyPremiumPurchased({
             `Usluga (services.id): ${serviceId}`,
             `Subskrypcja Stripe: ${stripeSubscriptionId}`,
         ].join('\n'),
-    });
+    };
+    return notifyFounder('premium_purchased', message, options);
 }
 
 export interface SubscriptionConflict {
@@ -62,12 +103,11 @@ export interface SubscriptionConflict {
     conflictingSubscriptionId: string;
 }
 
-export function notifySubscriptionConflict({
-    serviceId,
-    activeSubscriptionId,
-    conflictingSubscriptionId,
-}: SubscriptionConflict): Promise<void> {
-    return notifyFounder('subscription_conflict', {
+export function notifySubscriptionConflict(
+    { serviceId, activeSubscriptionId, conflictingSubscriptionId }: SubscriptionConflict,
+    options: NotificationOptions = {},
+): Promise<void> {
+    const message = {
         subject: 'Druga aktywna subskrypcja premium dla jednego wpisu — wymagany zwrot',
         text: [
             'Wpis ma juz aktywna subskrypcje premium, a oplacono kolejna.',
@@ -77,5 +117,6 @@ export function notifySubscriptionConflict({
             `Aktywna subskrypcja: ${activeSubscriptionId}`,
             `Druga subskrypcja (do zwrotu): ${conflictingSubscriptionId}`,
         ].join('\n'),
-    });
+    };
+    return notifyFounder('subscription_conflict', message, options);
 }

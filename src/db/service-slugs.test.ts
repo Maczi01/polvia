@@ -62,10 +62,17 @@ describe('assignMissingServiceSlugs', () => {
         expect(assignMissingServiceSlugs(services)).toEqual([{ id: 'c', slug: 'studio-3' }]);
     });
 
-    it('nazwa bez liter i cyfr dostaje bazowy slug zamiast pustego', () => {
+    it('nazwa bez liter i cyfr dostaje zastepcza baze zamiast pustego slugu', () => {
+        // Baza `firma` jest segmentem zarezerwowanym (`/firma/<slug>`), wiec od razu sufiks.
         expect(assignMissingServiceSlugs([candidate({ id: 'a', name: '!!!' })])).toEqual([
-            { id: 'a', slug: 'firma' },
+            { id: 'a', slug: 'firma-2' },
         ]);
+    });
+
+    it('nie rusza istniejacego slugu rownego segmentowi zarezerwowanemu', () => {
+        expect(assignMissingServiceSlugs([candidate({ id: 'a', name: 'Blog', slug: 'blog' })])).toEqual(
+            [],
+        );
     });
 });
 
@@ -88,6 +95,23 @@ describe('createServiceSlugAllocator', () => {
         expect([allocate('Kozaczok'), allocate('Kozaczok')]).toEqual(
             backfill.map(({ slug }) => slug),
         );
+    });
+    it.each([
+        ['Blog', 'blog-2'],
+        ['Mapa', 'mapa-2'],
+        ['Cennik', 'cennik-2'],
+        ['WP Admin', 'wp-admin-2'],
+        ['API', 'api-2'],
+    ])('nazwa %s kolidujaca z segmentem zarezerwowanym dostaje sufiks: %s', (name, expected) => {
+        expect(createServiceSlugAllocator()(name)).toBe(expected);
+    });
+
+    it('slug z prefiksem api nie jest zarezerwowany — matcher wyklucza tylko /api/**', () => {
+        expect(createServiceSlugAllocator()('Apiary')).toBe('apiary');
+    });
+
+    it('sufiks po segmencie zarezerwowanym omija takze slugi juz zajete', () => {
+        expect(createServiceSlugAllocator(['blog-2'])('Blog')).toBe('blog-3');
     });
 });
 

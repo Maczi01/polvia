@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { locales } from '../i18n/config';
+import { type Locale, locales } from '../i18n/config';
 import {
     PREMIUM_FAQ_MAX,
     PREMIUM_GALLERY_MAX,
@@ -49,17 +49,20 @@ const imageFileSchema = z
     );
 
 /**
- * Tekst w czterech jezykach tresci. Klucze jak w `translations` wpisu; brak ktoregokolwiek
- * odrzuca blok — strona w tym locale pokazalaby pusta pozycje (R13).
+ * Tekst w kazdym locale tresci (`locales` z `@/i18n/config`). Brak ktoregokolwiek odrzuca
+ * blok — strona w tym locale pokazalaby pusta pozycje (R13). Literal zamiast
+ * `Object.fromEntries(locales…)`, zeby typ pol nie wymagal `as`; `satisfies` wymusza, ze
+ * klucze to dokladnie `Locale` — nowe locale w configu nie skompiluje sie bez wpisu tutaj.
  */
 function translatedText(maxLength: number) {
     const text = z
         .string()
         .trim()
-        .min(1, 'Tekst jest wymagany w kazdym z czterech jezykow')
+        .min(1, 'Tekst jest wymagany w kazdym jezyku tresci')
         .max(maxLength);
+    const shape = { pl: text, uk: text, en: text, ru: text } satisfies Record<Locale, typeof text>;
 
-    return z.object({ pl: text, uk: text, en: text, ru: text }).strict();
+    return z.object(shape).strict();
 }
 
 const galleryItemSchema = z

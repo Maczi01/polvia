@@ -3,8 +3,8 @@ import Stripe from 'stripe';
 
 import { isLocalDatabaseUrl } from '@/lib/database-host';
 import { stripe, STRIPE_LIVE_MODE } from '@/lib/stripe';
-import { isStripeEventProcessed, markStripeEventProcessed } from '@/lib/stripe-events';
-import { subscriptionSyncTarget } from '@/lib/stripe-webhook-events';
+import { isStripeEventProcessed, markStripeEventProcessed } from '@/lib/stripe-event-dedupe';
+import { subscriptionSyncTarget } from '@/lib/stripe-event-sync-target';
 import {
     notifyPremiumPurchased,
     notifySubscriptionConflict,
@@ -22,6 +22,7 @@ import { env } from '../../../../../env';
  * niezgodny z kluczem → 200, 3) dedupe `stripe_events` (duplikat → 200),
  * 4) synchronizacja (blad → 500, Stripe ponowi), 5) oznaczenie zdarzenia, 6) skutki uboczne
  * (maile do foundera) tylko przy pierwszym dostarczeniu, z limitem czasu i bledem tylko w logu.
+ * Mail dostaje reszte wspolnego budzetu liczonego od wejscia do `POST`.
  *
  * Celowo BEZ rate limitu (wyjatek od reguly „limit na kazdym publicznym endpoincie"):
  * jedyna bramka jest podpis HMAC Stripe sprawdzany przed jakimkolwiek I/O. Niepodpisane
@@ -31,13 +32,23 @@ import { env } from '../../../../../env';
 export const runtime = 'nodejs';
 
 /**
- * Budzet: Stripe 2 × `STRIPE_TIMEOUT_MS` (z ponowieniem) + baza + `NOTIFICATION_TIMEOUT_MS`.
- * Ubicie funkcji przed oznaczeniem zdarzenia jest bezpieczne — Stripe ponowi, a synchronizacja
- * jest idempotentna.
+ * Budzet: Stripe 2 × `STRIPE_TIMEOUT_MS` (z ponowieniem) + baza (polaczenie 5 s, blokada
+ * i zapytanie po 5 s — `src/db/index.ts`, `subscription-store.ts`) + mail. Ubicie funkcji
+ * przed oznaczeniem zdarzenia jest bezpieczne — Stripe ponowi, a synchronizacja jest
+ * idempotentna. Po oznaczeniu (mail) juz nie — dlatego mail dostaje tylko reszte budzetu.
  */
 export const maxDuration = 30;
 
-function jsonError(code: string, message: string, status: number): NextResponse {
+/** Zapas na odpowiedz i log po terminie maila, zanim Vercel ubije funkcje. */
+const RESPONSE_MARGIN_MS = 2000;
+
+type WebhookErrorCode =
+    | 'MISSING_SIGNATURE'
+    | 'INVALID_SIGNATURE'
+    | 'CONFIG_MISMATCH'
+    | 'SYNC_FAILED';
+
+function jsonError(code: WebhookErrorCode, message: string, status: number): NextResponse {
     return NextResponse.json({ data: null, error: { code, message } }, { status });
 }
 
@@ -63,24 +74,31 @@ function verifyEvent(payload: string, signature: string): Stripe.Event | null {
 async function notifyAfterCheckout(
     result: SubscriptionSyncResult,
     stripeSubscriptionId: string,
+    deadline: number,
 ): Promise<void> {
     if (result.outcome === 'synced') {
-        // `synced` bywa stanem bez premium (np. pozny stan koncowy) — nie ma czego oglaszac.
+        // `synced` bywa stanem bez premium (np. `incomplete` przy 3DS/BLIK) — nie ma czego oglaszac.
         if (!result.isPremiumActive) return;
-        await notifyPremiumPurchased({ serviceId: result.serviceId, stripeSubscriptionId });
+        await notifyPremiumPurchased(
+            { serviceId: result.serviceId, stripeSubscriptionId },
+            { deadline },
+        );
         return;
     }
     // Nieoplacona druga subskrypcja nie wymaga zwrotu.
     if (result.outcome === 'conflict' && result.isIncomingActive) {
-        await notifySubscriptionConflict({
-            serviceId: result.serviceId,
-            activeSubscriptionId: result.activeSubscriptionId,
-            conflictingSubscriptionId: result.conflictingSubscriptionId,
-        });
+        await notifySubscriptionConflict(
+            {
+                serviceId: result.serviceId,
+                activeSubscriptionId: result.activeSubscriptionId,
+                conflictingSubscriptionId: result.conflictingSubscriptionId,
+            },
+            { deadline },
+        );
     }
 }
 
-async function processEvent(event: Stripe.Event): Promise<void> {
+async function processEvent(event: Stripe.Event, deadline: number): Promise<void> {
     if (await isStripeEventProcessed(event.id)) return;
 
     const target = subscriptionSyncTarget(event);
@@ -91,11 +109,12 @@ async function processEvent(event: Stripe.Event): Promise<void> {
     const isFirstDelivery = await markStripeEventProcessed(event);
 
     if (isFirstDelivery && event.type === 'checkout.session.completed') {
-        await notifyAfterCheckout(result, stripeSubscriptionId);
+        await notifyAfterCheckout(result, stripeSubscriptionId, deadline);
     }
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
+    const deadline = Date.now() + maxDuration * 1000 - RESPONSE_MARGIN_MS;
     const signature = request.headers.get('stripe-signature');
     if (!signature) return jsonError('MISSING_SIGNATURE', 'Missing Stripe signature', 400);
 
@@ -126,7 +145,7 @@ export async function POST(request: Request): Promise<NextResponse> {
             return received();
         }
 
-        await processEvent(event);
+        await processEvent(event, deadline);
         return received();
     } catch (error) {
         // Szczegoly tylko w logu serwera — surowy blad Stripe/bazy nie wraca w odpowiedzi.

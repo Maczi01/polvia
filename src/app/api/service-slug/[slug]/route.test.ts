@@ -40,6 +40,18 @@ function lookup(slug: string, ip = CLIENT_IP): ReturnType<typeof GET> {
     return lookupWith(slug, { 'x-real-ip': ip });
 }
 
+/** Obietnica z kontekstu zadania: krotki adres reaguje na zmiane premium w 5 min. */
+const PREMIUM_ALIAS_MAX_DELAY_SECONDS = 300;
+
+/** Najstarsza odpowiedz, jaka CDN moze podac: `s-maxage + stale-while-revalidate`. */
+function maxServedAgeSeconds(response: Response): number {
+    const directives = response.headers.get('Cache-Control') ?? '';
+    const seconds = (name: string): number =>
+        Number(new RegExp(`${name}=(\\d+)`).exec(directives)?.[1] ?? 0);
+
+    return seconds('s-maxage') + seconds('stale-while-revalidate');
+}
+
 async function exhaustLimit(headers: Record<string, string>): Promise<void> {
     for (let index = 0; index < RATE_LIMIT; index += 1) {
         expect((await lookupWith('kancelaria-nowak', headers)).status).toBe(200);
@@ -110,7 +122,7 @@ describe('GET /api/service-slug/[slug]', () => {
         const response = await lookup('kancelaria-nowak');
 
         expect(response.headers.get('Cache-Control')).toBe(
-            'public, s-maxage=300, stale-while-revalidate=86400',
+            'public, s-maxage=240, stale-while-revalidate=60',
         );
     });
 
@@ -213,22 +225,25 @@ describe('GET /api/service-slug/[slug]', () => {
         },
     );
 
-    it('exists: true jest cache-owane w CDN dlugo, ze stale-while-revalidate', async () => {
+    it('exists: true jest w CDN najwyzej 5 min razem ze stale-while-revalidate', async () => {
         jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         const response = await lookup('kancelaria-nowak');
 
         expect(response.headers.get('Cache-Control')).toBe(
-            'public, s-maxage=300, stale-while-revalidate=86400',
+            'public, s-maxage=240, stale-while-revalidate=60',
         );
+        expect(maxServedAgeSeconds(response)).toBeLessThanOrEqual(PREMIUM_ALIAS_MAX_DELAY_SECONDS);
     });
 
-    it('exists: false jest cache-owane krotko', async () => {
+    it('exists: false jest cache-owane krotko, ze stale-while-revalidate', async () => {
         jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false, hasActivePremium: false });
 
         const response = await lookup('nie-istnieje');
 
-        expect(response.headers.get('Cache-Control')).toBe('public, s-maxage=30');
+        expect(response.headers.get('Cache-Control')).toBe(
+            'public, s-maxage=30, stale-while-revalidate=300',
+        );
     });
 
     it('429, 400 i 500 nie trafiaja do cache publicznego', async () => {
