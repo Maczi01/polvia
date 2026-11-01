@@ -18,6 +18,7 @@ import { relations, sql } from 'drizzle-orm';
 
 import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
+import { SUBSCRIPTION_STATUSES } from '../lib/premium';
 import { PREMIUM_TEMPLATES } from '../lib/premium-templates';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
@@ -39,6 +40,9 @@ export const coverageEnum = pgEnum('coverage', COVERAGE_VALUES);
 
 /** Szablon strony premium. Wartosci i ich opis: `src/lib/premium-templates.ts`. */
 export const profileTemplateEnum = pgEnum('profile_template', PREMIUM_TEMPLATES);
+
+/** Status subskrypcji Stripe. Wartosci: `SUBSCRIPTION_STATUSES` w `src/lib/premium.ts`. */
+export const subscriptionStatusEnum = pgEnum('subscription_status', SUBSCRIPTION_STATUSES);
 
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -156,6 +160,32 @@ export const serviceProfilesTable = pgTable('service_profiles', {
     faq: jsonb('faq').$type<PremiumFaqItem[]>().notNull().default([]),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+/**
+ * Stan subskrypcji premium (1:1 z usluga), odwzorowany ze Stripe przez webhook
+ * (`syncSubscriptionFromStripe`). Kolumny `status`/`currentPeriodEnd`/`cancelAtPeriodEnd`
+ * to wejscie `isPremiumActive` — premium liczone na odczycie, bez crona. Po `db:reset`
+ * stan odtwarza `npm run db:sync-subscriptions`.
+ */
+export const serviceSubscriptionsTable = pgTable('service_subscriptions', {
+    serviceId: uuid('service_id')
+        .primaryKey()
+        .references(() => servicesTable.id, { onDelete: 'cascade' }),
+    stripeCustomerId: varchar('stripe_customer_id', { length: 255 }).notNull(),
+    stripeSubscriptionId: varchar('stripe_subscription_id', { length: 255 }).notNull().unique(),
+    status: subscriptionStatusEnum('status').notNull(),
+    currentPeriodEnd: timestamp('current_period_end', { withTimezone: true }).notNull(),
+    cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+/** Przetworzone zdarzenia webhooka Stripe — deduplikacja ponowien (`id` = `event.id`). */
+export const stripeEventsTable = pgTable('stripe_events', {
+    id: varchar('id', { length: 255 }).primaryKey(),
+    type: varchar('type', { length: 255 }).notNull(),
+    processedAt: timestamp('processed_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export const serviceEngagementsTable = pgTable('service_engagements', {

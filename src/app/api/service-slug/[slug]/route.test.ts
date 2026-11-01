@@ -58,7 +58,7 @@ afterEach(() => {
 
 describe('GET /api/service-slug/[slug]', () => {
     it('istniejacy slug daje 200 i exists: true', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         const response = await lookup('kancelaria-nowak');
 
@@ -68,7 +68,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('nieistniejacy slug daje 200 i exists: false', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false, hasActivePremium: false });
 
         const response = await lookup('nie-istnieje');
 
@@ -87,7 +87,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('po przekroczeniu limitu daje 429 z Retry-After i nie pyta bazy', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         for (let index = 0; index < 120; index += 1) {
             expect((await lookup('kancelaria-nowak')).status).toBe(200);
@@ -104,7 +104,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('limit liczy sie per IP klienta z naglowka platformy', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         for (let index = 0; index < 121; index += 1) {
             await lookup('kancelaria-nowak', CLIENT_IP);
@@ -119,7 +119,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('podrobiony x-forwarded-for bez sekretu nie omija limitu', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         for (let index = 0; index < RATE_LIMIT; index += 1) {
             await lookupWith('kancelaria-nowak', {
@@ -136,7 +136,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('bez naglowka platformy rotowany x-forwarded-for trafia do jednego kubelka', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         for (let index = 0; index < RATE_LIMIT; index += 1) {
             await lookupWith('kancelaria-nowak', { 'x-forwarded-for': `10.1.0.${index}` });
@@ -147,7 +147,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('poprawny sekret (ruch z middleware) omija limit po IP', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
         // Wszystkie fetche z middleware maja jeden adres wychodzacy — ten sam kubelek.
         const egressIp = '76.76.21.21';
         await exhaustLimit({ 'x-real-ip': egressIp });
@@ -164,7 +164,7 @@ describe('GET /api/service-slug/[slug]', () => {
     it.each(['zly-sekret', `${'s'.repeat(64)}x`, 's'.repeat(63), ''])(
         'zly sekret (%p) jest traktowany jak ruch publiczny',
         async secret => {
-            jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+            jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
             const headers = { 'x-real-ip': CLIENT_IP, [SECRET_HEADER]: secret };
             await exhaustLimit(headers);
 
@@ -173,7 +173,7 @@ describe('GET /api/service-slug/[slug]', () => {
     );
 
     it('exists: true jest cache-owane w CDN dlugo, ze stale-while-revalidate', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
 
         const response = await lookup('kancelaria-nowak');
 
@@ -183,7 +183,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('exists: false jest cache-owane krotko', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false, hasActivePremium: false });
 
         const response = await lookup('nie-istnieje');
 
@@ -191,7 +191,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('429, 400 i 500 nie trafiaja do cache publicznego', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
         await exhaustLimit({ 'x-real-ip': CLIENT_IP });
         const limited = await lookup('kancelaria-nowak');
         const badRequest = await lookupWith('ABC', { [SECRET_HEADER]: SECRET });
@@ -205,7 +205,7 @@ describe('GET /api/service-slug/[slug]', () => {
     });
 
     it('awaria store limitu nie blokuje lookupu (fail-open) i jest logowana', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true });
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
         // Transakcja bez wynikow (przerwane EXEC) — `checkRateLimit` rzuca RateLimitStoreError.
         const brokenMulti: FakeMulti = {
             set: () => brokenMulti,

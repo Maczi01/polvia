@@ -8,10 +8,11 @@ import {
     serviceLocationsTable,
     serviceProfilesTable,
     servicesTable,
+    serviceSubscriptionsTable,
     servicesTagsTable,
     tagsTranslationsTable,
 } from '@/db/schema';
-import type { PremiumSubscriptionState } from '@/lib/premium';
+import { isPremiumActive, type PremiumSubscriptionState } from '@/lib/premium';
 import { isPublicService } from '@/lib/public-service-filter';
 import { type LocalizedPremiumContent, toPremiumContent } from '@/lib/service-profile-premium';
 import {
@@ -67,7 +68,11 @@ export type ServiceProfile = Pick<
     subscription: PremiumSubscriptionState | null;
 };
 
-export type ServiceSlugStatus = { exists: boolean };
+export type ServiceSlugStatus = {
+    exists: boolean;
+    /** `isPremiumActive` w chwili zapytania; `false` dla nieistniejacego wpisu. */
+    hasActivePremium: boolean;
+};
 
 export type { SimilarServiceRow } from '@/lib/similar-services';
 
@@ -111,15 +116,37 @@ function tagsInLocale(locale: string) {
     `;
 }
 
-/** Czy pod `/firma/<slug>` jest aktywny wpis. Lekkie zapytanie dla lookupu w middleware. */
-export async function getServiceSlugStatus(slug: string): Promise<ServiceSlugStatus> {
+/**
+ * Stan subskrypcji przy left joinie: obiekt, ktory Drizzle zamienia na `null`, gdy wpis
+ * nie ma wiersza `service_subscriptions`. Ksztalt = wejscie `isPremiumActive`.
+ */
+const subscriptionColumns = {
+    status: serviceSubscriptionsTable.status,
+    currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
+    cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
+};
+
+/**
+ * Join subskrypcji WYLACZNIE po `service_id` tego wpisu — subskrypcja innej uslugi nie moze
+ * wlaczyc premium. Wspolny dla profilu i lookupu, zeby warunek byl jeden.
+ */
+const subscriptionJoin = eq(serviceSubscriptionsTable.serviceId, servicesTable.id);
+
+/** Czy pod `/firma/<slug>` jest aktywny wpis i czy ma aktywne premium. Lekkie zapytanie lookupu. */
+export async function getServiceSlugStatus(
+    slug: string,
+    now: Date = new Date(),
+): Promise<ServiceSlugStatus> {
     const [row] = await db
-        .select({ id: servicesTable.id })
+        .select({ id: servicesTable.id, subscription: subscriptionColumns })
         .from(servicesTable)
+        .leftJoin(serviceSubscriptionsTable, subscriptionJoin)
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);
 
-    return { exists: row !== undefined };
+    if (!row) return { exists: false, hasActivePremium: false };
+
+    return { exists: true, hasActivePremium: isPremiumActive(row.subscription, now) };
 }
 
 export type ServiceProfileSitemapEntry = { slug: string; updatedAt: Date };
@@ -164,9 +191,6 @@ function getServiceLocations(slug: string): Promise<ServiceProfileLocation[]> {
         .orderBy(sql`${serviceLocationsTable.isMainLocation} DESC`, serviceLocationsTable.slug);
 }
 
-/** U8: leftJoin(service_subscriptions) po service_id, tak jak service_profiles. */
-const NO_SUBSCRIPTION: PremiumSubscriptionState | null = null;
-
 /**
  * Komplet danych darmowego profilu `/firma/<slug>` albo `null`, gdy pod slugiem
  * nie ma aktywnego wpisu (`pending`/`inactive` sa niepubliczne).
@@ -190,7 +214,7 @@ export async function getServiceProfile(
         name: row.name,
     });
 
-    return { ...row, slug, locations, premiumContent, subscription: NO_SUBSCRIPTION };
+    return { ...row, slug, locations, premiumContent };
 }
 
 function getServiceRow(slug: string, locale: string) {
@@ -213,10 +237,12 @@ function getServiceRow(slug: string, locale: string) {
                 priceList: serviceProfilesTable.priceList,
                 faq: serviceProfilesTable.faq,
             },
+            subscription: subscriptionColumns,
         })
         .from(servicesTable)
         .leftJoin(servicesTranslationsAlias, translationJoin(locale))
         .leftJoin(serviceProfilesTable, eq(serviceProfilesTable.serviceId, servicesTable.id))
+        .leftJoin(serviceSubscriptionsTable, subscriptionJoin)
         .where(and(eq(servicesTable.slug, slug), isPublicService))
         .limit(1);
 }

@@ -25,6 +25,15 @@ export const env = createEnv({
         // wychodzacy). Bez sekretu zadanie jest publiczne i dostaje limit po IP klienta.
         // Losowy, min. 32 znaki: `openssl rand -hex 32`.
         SERVICE_SLUG_LOOKUP_SECRET: z.string().min(32),
+        // Stripe (premium). Sekretny klucz API (`sk_…` albo ograniczony `rk_…`) i sekret
+        // podpisu webhooka — wylacznie serwer. Ceny planu zyja w Stripe Dashboard; kod zna
+        // tylko ich ID (allowlista dla checkoutu).
+        STRIPE_SECRET_KEY: NonEmpty,
+        STRIPE_WEBHOOK_SECRET: z.string().startsWith('whsec_'),
+        STRIPE_PRICE_MONTHLY: z.string().startsWith('price_'),
+        STRIPE_PRICE_YEARLY: z.string().startsWith('price_'),
+        // No-code login link do Customer Portal (Stripe Dashboard → Customer portal).
+        STRIPE_PORTAL_LOGIN_URL: z.string().url(),
     },
     client: {
         NEXT_PUBLIC_SITE_URL: NonEmpty,
@@ -42,6 +51,11 @@ export const env = createEnv({
         RESEND_API_KEY: process.env.RESEND_API_KEY,
         ALLOW_REMOTE_DROP: process.env.ALLOW_REMOTE_DROP,
         SERVICE_SLUG_LOOKUP_SECRET: process.env.SERVICE_SLUG_LOOKUP_SECRET,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+        STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+        STRIPE_PRICE_MONTHLY: process.env.STRIPE_PRICE_MONTHLY,
+        STRIPE_PRICE_YEARLY: process.env.STRIPE_PRICE_YEARLY,
+        STRIPE_PORTAL_LOGIN_URL: process.env.STRIPE_PORTAL_LOGIN_URL,
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     },
 });

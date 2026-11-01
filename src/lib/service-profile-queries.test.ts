@@ -108,6 +108,7 @@ const SERVICE_ROW = {
     verified: true,
     image: 'roza.png',
     tags: ['Податки'],
+    subscription: null,
 };
 
 function location(overrides: Partial<ServiceProfileLocation> = {}): ServiceProfileLocation {
@@ -153,12 +154,28 @@ describe('getServiceProfile', () => {
         expect(render(query(0).joins[0]).params).toContain('uk');
     });
 
-    it('profil niesie stan subskrypcji (do U8 zawsze null)', async () => {
-        mockDb.results = [[SERVICE_ROW], [location()]];
+    it('profil niesie stan subskrypcji z left joina service_subscriptions', async () => {
+        const subscription = {
+            status: 'active',
+            currentPeriodEnd: new Date('2026-12-01T00:00:00Z'),
+            cancelAtPeriodEnd: false,
+        };
+        mockDb.results = [[{ ...SERVICE_ROW, subscription }], [location()]];
 
         const profile = await getServiceProfile('roza', 'uk');
 
-        expect(profile?.subscription).toBeNull();
+        expect(profile?.subscription).toEqual(subscription);
+    });
+
+    it('subskrypcja uslugi A nie wlacza premium usludze B: join wylacznie po id tego wpisu', async () => {
+        mockDb.results = [[SERVICE_ROW], []];
+
+        await getServiceProfile('roza', 'pl');
+
+        const joins = query(0).joins.map(join => render(join).sql);
+        expect(joins).toContain('"service_subscriptions"."service_id" = "services"."id"');
+        // Jedyny warunek joina subskrypcji — bez OR, bez stalej, bez innej kolumny.
+        expect(joins.filter(join => join.includes('service_subscriptions'))).toHaveLength(1);
     });
 
     it('lokalizacje pobiera rownolegle, po slugu aktywnego wpisu (nie po id z pierwszego zapytania)', async () => {
@@ -354,10 +371,20 @@ describe('getSimilarServices', () => {
 });
 
 describe('getServiceSlugStatus', () => {
-    it('aktywny wpis pod slugiem istnieje', async () => {
-        mockDb.results = [[{ id: 'svc-1' }]];
+    const NOW = new Date('2026-11-01T12:00:00Z');
+    const ACTIVE_SUBSCRIPTION = {
+        status: 'active',
+        currentPeriodEnd: new Date('2026-12-01T00:00:00Z'),
+        cancelAtPeriodEnd: false,
+    };
 
-        expect(await getServiceSlugStatus('roza')).toEqual({ exists: true });
+    it('aktywny wpis pod slugiem istnieje (bez subskrypcji: bez premium)', async () => {
+        mockDb.results = [[{ id: 'svc-1', subscription: null }]];
+
+        expect(await getServiceSlugStatus('roza', NOW)).toEqual({
+            exists: true,
+            hasActivePremium: false,
+        });
         expect(render(query(0).where).params).toEqual(['roza', 'active']);
         expect(query(0).limit).toBe(1);
     });
@@ -365,7 +392,36 @@ describe('getServiceSlugStatus', () => {
     it('brak aktywnego wpisu pod slugiem', async () => {
         mockDb.results = [[]];
 
-        expect(await getServiceSlugStatus('nie-ma')).toEqual({ exists: false });
+        expect(await getServiceSlugStatus('nie-ma', NOW)).toEqual({
+            exists: false,
+            hasActivePremium: false,
+        });
+    });
+
+    it('aktywna subskrypcja daje hasActivePremium (isPremiumActive)', async () => {
+        mockDb.results = [[{ id: 'svc-1', subscription: ACTIVE_SUBSCRIPTION }]];
+
+        expect(await getServiceSlugStatus('roza', NOW)).toEqual({
+            exists: true,
+            hasActivePremium: true,
+        });
+    });
+
+    it('anulowana subskrypcja nie daje premium', async () => {
+        const canceled = { ...ACTIVE_SUBSCRIPTION, status: 'canceled' };
+        mockDb.results = [[{ id: 'svc-1', subscription: canceled }]];
+
+        expect((await getServiceSlugStatus('roza', NOW)).hasActivePremium).toBe(false);
+    });
+
+    it('join subskrypcji wylacznie po id wpisu spod slugu', async () => {
+        mockDb.results = [[]];
+
+        await getServiceSlugStatus('roza', NOW);
+
+        expect(query(0).joins.map(join => render(join).sql)).toEqual([
+            '"service_subscriptions"."service_id" = "services"."id"',
+        ]);
     });
 });
 
