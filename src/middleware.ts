@@ -6,7 +6,9 @@ import { parseMapPathname } from '@/lib/map-pathname';
 import { localizedMapBasePath } from '@/lib/map-url-builder';
 import {
     isValidServiceSlug,
+    parseRootAliasPathname,
     parseServiceProfilePathname,
+    rootAliasRedirectPath,
     SERVICE_PROFILE_NOT_FOUND_PATH,
 } from '@/lib/service-profile-path';
 import { lookupServiceSlug } from '@/lib/service-slug-lookup';
@@ -58,12 +60,47 @@ async function handleServiceProfile(request: NextRequest): Promise<NextResponse 
 }
 
 /**
+ * Krotki adres `polvia.pl/<slug>` dla firmy z aktywnym premium: 307 na profil `pl`.
+ * `null` = sciezka nie jest kandydatem albo firma nie ma premium / lookup zawiodl —
+ * zadanie idzie dalej bez zmian i konczy sie 404 next-intl, jak przed aliasem.
+ *
+ * Kandydatem jest tylko jednosegmentowa sciezka bez locale, poza segmentami zarezerwowanymi
+ * (`isReservedRootSegment`) i w formacie slugu, wiec lookup (ten sam handler co profil,
+ * wspolny cache CDN) dostaja wylacznie adresy, ktore inaczej dalyby 404. Query string
+ * (np. `utm_*`) przechodzi na profil.
+ *
+ * 307, NIE 308 — z tego samego powodu co przy mapie: przekierowanie trwale zostaje
+ * w cache przegladarek i Google, a premium moze wygasnac. Zmiana na 308 to decyzja
+ * operatora po obserwacji na produkcji.
+ */
+async function handleRootAlias(request: NextRequest): Promise<NextResponse | null> {
+    const slug = parseRootAliasPathname(request.nextUrl.pathname);
+    if (!slug) return null;
+
+    const result = await lookupServiceSlug({
+        origin: request.nextUrl.origin,
+        slug,
+        secret: env.SERVICE_SLUG_LOOKUP_SECRET,
+    });
+
+    const target = rootAliasRedirectPath(slug, result);
+    if (!target) return null;
+
+    const url = request.nextUrl.clone();
+    url.pathname = target;
+    return NextResponse.redirect(url, 307);
+}
+
+/**
  * Kolejnosc galezi:
  * 1. walidacja slugu mapy (307 na baze mapy),
  * 2. profil `/firma/<slug>` (404 dla nieistniejacego),
- * 3. rewrite `/mapa/**` i redirect `/map/**`,
- * 4. next-intl.
- * Galezie walidacji ida przed rewrite'ami, bo musza widziec adres z przegladarki.
+ * 3. krotki adres `/<slug>` (307 na profil dla aktywnego premium),
+ * 4. rewrite `/mapa/**` i redirect `/map/**`,
+ * 5. next-intl.
+ * Galezie walidacji i alias ida przed rewrite'ami, bo musza widziec adres z przegladarki.
+ * Galezie 1, 2 i 3 sie nie nakladaja (`/mapa` i `/firma` sa zarezerwowane dla aliasu),
+ * wiec kolejnosc miedzy nimi nie zmienia wyniku — tylko unika zbednych lookupow.
  */
 export default async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
@@ -95,6 +132,9 @@ export default async function middleware(request: NextRequest): Promise<NextResp
 
     const profileResponse = await handleServiceProfile(request);
     if (profileResponse) return profileResponse;
+
+    const aliasResponse = await handleRootAlias(request);
+    if (aliasResponse) return aliasResponse;
 
     // Handle localized /mapa/{slug...} URLs for PL locale.
     // next-intl only maps the exact /mapa → /map pathname;

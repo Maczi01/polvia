@@ -1,10 +1,13 @@
 import { locales } from '@/i18n/config';
+import type { ServiceSlugLookupResult } from '@/lib/service-slug-lookup';
 
 import {
     buildServiceProfilePath,
     isReservedRootSegment,
     isValidServiceSlug,
+    parseRootAliasPathname,
     parseServiceProfilePathname,
+    rootAliasRedirectPath,
     SERVICE_PROFILE_NOT_FOUND_PATH,
 } from './service-profile-path';
 
@@ -117,4 +120,54 @@ describe('isReservedRootSegment', () => {
     it.each(['kancelaria-nowak', 'psychodnia', 'firma-2', ''])('%s nie jest zarezerwowany', segment => {
         expect(isReservedRootSegment(segment)).toBe(false);
     });
+});
+
+describe('parseRootAliasPathname', () => {
+    it('jednosegmentowa sciezka w formacie slugu to alias', () => {
+        expect(parseRootAliasPathname('/firma-x')).toBe('firma-x');
+        expect(parseRootAliasPathname('/kancelaria-nowak')).toBe('kancelaria-nowak');
+    });
+
+    it.each(['/mapa', '/en', '/cennik', '/api', '/firma', '/dodaj-firme', '/year'])(
+        '%s (segment zarezerwowany) nie jest aliasem',
+        pathname => {
+            expect(parseRootAliasPathname(pathname)).toBeNull();
+        },
+    );
+
+    it.each(['/a/b', '/', '/en/firma-x', '/firma-x/', '/firma/firma-x'])(
+        '%s (nie jeden segment) nie jest aliasem',
+        pathname => {
+            expect(parseRootAliasPathname(pathname)).toBeNull();
+        },
+    );
+
+    it.each(['/robots.txt', '/favicon.ico', '/sitemap.xml', '/googleedee5e595e28d66e.html'])(
+        '%s (plik z kropka) nie jest aliasem',
+        pathname => {
+            expect(parseRootAliasPathname(pathname)).toBeNull();
+        },
+    );
+
+    it.each(['/Abc', '/a--b', '/-abc', '/a_b', '/miesi%C4%85c'])(
+        '%s (zly format slugu) nie jest aliasem',
+        pathname => {
+            expect(parseRootAliasPathname(pathname)).toBeNull();
+        },
+    );
+});
+
+describe('rootAliasRedirectPath', () => {
+    it('aktywne premium przekierowuje na profil pl', () => {
+        expect(rootAliasRedirectPath('firma-x', 'premium')).toBe('/firma/firma-x');
+    });
+
+    const withoutRedirect: ServiceSlugLookupResult[] = ['found', 'missing', 'unknown'];
+
+    it.each(withoutRedirect)(
+        'wynik %s nie daje przekierowania (brak premium, brak wpisu, awaria lookupu)',
+        lookup => {
+            expect(rootAliasRedirectPath('firma-x', lookup)).toBeNull();
+        },
+    );
 });

@@ -16,7 +16,8 @@ import { SERVICE_SLUG_LOOKUP_SECRET_HEADER } from '@/lib/service-slug-lookup';
 import { env } from '../../../../../env';
 
 /**
- * Lookup istnienia profilu `/firma/<slug>` dla `src/middleware.ts`.
+ * Lookup istnienia profilu `/firma/<slug>` i aktywnego premium (krotki adres `/<slug>`)
+ * dla `src/middleware.ts`.
  *
  * Middleware dziala na edge bez dostepu do bazy, wiec pyta ten handler (Node + db)
  * przed renderem — tylko tam da sie jeszcze zwrocic prawdziwy status 404.
@@ -25,7 +26,8 @@ export const runtime = 'nodejs';
 
 /**
  * Limit dla ruchu publicznego (bez sekretu). Endpoint jest tani (indeksowany SELECT po
- * unikalnym slugu) i oddaje tylko `exists`; limit odbiera sens masowemu odpytywaniu.
+ * unikalnym slugu) i oddaje tylko `exists` i `hasActivePremium` — oba fakty i tak widac
+ * publicznie (profil, krotki adres); limit odbiera sens masowemu odpytywaniu.
  *
  * Ruch z middleware (z poprawnym sekretem) idzie BEZ limitu: na Vercelu wszystkie fetche
  * z middleware maja jeden adres wychodzacy, wiec limit po IP bylby globalnym kubelkiem,
@@ -44,6 +46,11 @@ const SLUG_LOOKUP_RATE_LIMIT = {
  * `false` krotko, zeby nowo dodany wpis szybko przestal dawac 404. Odpowiedz nie zalezy
  * od sekretu (rozni sie tylko limitem), wiec CDN moze ja wspoldzielic miedzy ruchem
  * zaufanym i publicznym.
+ *
+ * `hasActivePremium` jedzie w tej samej odpowiedzi i ma ten sam cache: krotki adres
+ * `polvia.pl/<slug>` (middleware) zaczyna i przestaje przekierowywac z opoznieniem do
+ * 5 minut po zmianie subskrypcji. Swiadomie akceptowane — osobny, krotszy cache dla
+ * premium oznaczalby drugi lookup albo krotszy cache dla wszystkich profili.
  */
 const CACHE_CONTROL = {
     exists: 'public, s-maxage=300, stale-while-revalidate=86400',
@@ -145,10 +152,10 @@ export async function GET(request: NextRequest, { params }: RouteContext): Promi
             );
         }
 
-        const { exists } = await getServiceSlugStatus(parsed.data.slug);
+        const { exists, hasActivePremium } = await getServiceSlugStatus(parsed.data.slug);
 
         return NextResponse.json(
-            { data: { exists }, error: null },
+            { data: { exists, hasActivePremium }, error: null },
             { headers: { 'Cache-Control': exists ? CACHE_CONTROL.exists : CACHE_CONTROL.missing } },
         );
     } catch (error) {

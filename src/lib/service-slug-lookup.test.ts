@@ -33,7 +33,7 @@ afterEach(() => {
 
 describe('lookupServiceSlug', () => {
     it('exists: true daje found; pyta handler tej samej aplikacji z sekretem', async () => {
-        fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: false }, error: null }));
 
         expect(await lookupServiceSlug(OPTIONS)).toBe('found');
 
@@ -43,8 +43,20 @@ describe('lookupServiceSlug', () => {
         expect(init?.signal).toBeInstanceOf(AbortSignal);
     });
 
-    it('nie wylacza cache HTTP — powtorzony slug moze obsluzyc CDN', async () => {
+    it('exists: true z aktywnym premium daje premium', async () => {
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: true }, error: null }));
+
+        expect(await lookupServiceSlug(OPTIONS)).toBe('premium');
+    });
+
+    it('odpowiedz bez hasActivePremium daje unknown (nie zgaduje premium)', async () => {
         fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
+
+        expect(await lookupServiceSlug(OPTIONS)).toBe('unknown');
+    });
+
+    it('nie wylacza cache HTTP — powtorzony slug moze obsluzyc CDN', async () => {
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: false }, error: null }));
 
         await lookupServiceSlug(OPTIONS);
 
@@ -52,13 +64,13 @@ describe('lookupServiceSlug', () => {
     });
 
     it('exists: false daje missing', async () => {
-        fetchMock.mockResolvedValue(json({ data: { exists: false }, error: null }));
+        fetchMock.mockResolvedValue(json({ data: { exists: false, hasActivePremium: false }, error: null }));
 
         expect(await lookupServiceSlug(OPTIONS)).toBe('missing');
     });
 
     it('nie przekazuje x-forwarded-for — limit zaufanego ruchu nie zalezy od IP', async () => {
-        fetchMock.mockResolvedValue(json({ data: { exists: true }, error: null }));
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: false }, error: null }));
 
         await lookupServiceSlug(OPTIONS);
 

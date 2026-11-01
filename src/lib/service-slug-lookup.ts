@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Lookup istnienia profilu z middleware: `GET /api/service-slug/<slug>`.
+ * Lookup istnienia profilu i aktywnego premium z middleware: `GET /api/service-slug/<slug>`.
  *
  * Wydzielony z `src/middleware.ts` (nie laduje sie w Jescie przez ESM `next-intl/middleware`).
  * Middleware dziala na edge bez bazy, wiec pyta route handler na Node.
@@ -21,11 +21,13 @@ export const SERVICE_SLUG_LOOKUP_TIMEOUT_MS = 1500;
 export const SERVICE_SLUG_LOOKUP_SECRET_HEADER = 'x-service-slug-lookup-secret';
 
 /**
- * - `found` / `missing` — handler odpowiedzial poprawnie,
+ * - `premium` — wpis istnieje i ma aktywne premium (krotki adres `/<slug>` przekierowuje),
+ * - `found` — wpis istnieje bez aktywnego premium,
+ * - `missing` — wpisu nie ma,
  * - `unknown` — timeout, blad sieci, status inny niz 2xx albo odpowiedz w zlym ksztalcie.
  *   Wolajacy przepuszcza wtedy zadanie (fail-open), zamiast blokowac profil.
  */
-export type ServiceSlugLookupResult = 'found' | 'missing' | 'unknown';
+export type ServiceSlugLookupResult = 'premium' | 'found' | 'missing' | 'unknown';
 
 export interface ServiceSlugLookupOptions {
     /** `request.nextUrl.origin` — lookup idzie do tej samej aplikacji. */
@@ -36,7 +38,9 @@ export interface ServiceSlugLookupOptions {
     secret: string;
 }
 
-const lookupResponseSchema = z.object({ data: z.object({ exists: z.boolean() }) });
+const lookupResponseSchema = z.object({
+    data: z.object({ exists: z.boolean(), hasActivePremium: z.boolean() }),
+});
 
 /**
  * Bez `cache: 'no-store'`: odpowiedz handlera niesie `Cache-Control` z `s-maxage`, wiec
@@ -64,7 +68,10 @@ export async function lookupServiceSlug({
             return 'unknown';
         }
 
-        return parsed.data.data.exists ? 'found' : 'missing';
+        const { exists, hasActivePremium } = parsed.data.data;
+        if (!exists) return 'missing';
+
+        return hasActivePremium ? 'premium' : 'found';
     } catch (error) {
         // Timeout (`TimeoutError`), blad sieci albo niepoprawny JSON — profil nie moze przez to pasc.
         console.error('Service slug lookup failed, passing request through', error);

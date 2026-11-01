@@ -63,7 +63,10 @@ describe('GET /api/service-slug/[slug]', () => {
         const response = await lookup('kancelaria-nowak');
 
         expect(response.status).toBe(200);
-        expect(await response.json()).toEqual({ data: { exists: true }, error: null });
+        expect(await response.json()).toEqual({
+            data: { exists: true, hasActivePremium: false },
+            error: null,
+        });
         expect(getServiceSlugStatus).toHaveBeenCalledWith('kancelaria-nowak');
     });
 
@@ -73,7 +76,42 @@ describe('GET /api/service-slug/[slug]', () => {
         const response = await lookup('nie-istnieje');
 
         expect(response.status).toBe(200);
-        expect(await response.json()).toEqual({ data: { exists: false }, error: null });
+        expect(await response.json()).toEqual({
+            data: { exists: false, hasActivePremium: false },
+            error: null,
+        });
+    });
+
+    it('wpis z aktywnym premium daje hasActivePremium: true', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: true });
+
+        const response = await lookup('kancelaria-nowak');
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+            data: { exists: true, hasActivePremium: true },
+            error: null,
+        });
+    });
+
+    it('wpis z wygaslym premium daje hasActivePremium: false', async () => {
+        // Wygasniecie rozstrzyga `isPremiumActive` w module zapytan (testy U8);
+        // handler musi oddac jego wynik, a nie np. samo istnienie subskrypcji.
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
+
+        const response = await lookup('kancelaria-nowak');
+
+        expect((await response.json()).data.hasActivePremium).toBe(false);
+    });
+
+    it('premium ma ten sam cache CDN co exists: true', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: true });
+
+        const response = await lookup('kancelaria-nowak');
+
+        expect(response.headers.get('Cache-Control')).toBe(
+            'public, s-maxage=300, stale-while-revalidate=86400',
+        );
     });
 
     it.each(['ABC', 'a_b', 'a--b', '-abc'])('niepoprawny format %s daje 400 bez zapytania do bazy', async slug => {
@@ -158,7 +196,10 @@ describe('GET /api/service-slug/[slug]', () => {
         });
 
         expect(response.status).toBe(200);
-        expect(await response.json()).toEqual({ data: { exists: true }, error: null });
+        expect(await response.json()).toEqual({
+            data: { exists: true, hasActivePremium: false },
+            error: null,
+        });
     });
 
     it.each(['zly-sekret', `${'s'.repeat(64)}x`, 's'.repeat(63), ''])(
@@ -219,7 +260,10 @@ describe('GET /api/service-slug/[slug]', () => {
         const response = await lookup('kancelaria-nowak');
 
         expect(response.status).toBe(200);
-        expect(await response.json()).toEqual({ data: { exists: true }, error: null });
+        expect(await response.json()).toEqual({
+            data: { exists: true, hasActivePremium: false },
+            error: null,
+        });
         expect(console.error).toHaveBeenCalled();
     });
 

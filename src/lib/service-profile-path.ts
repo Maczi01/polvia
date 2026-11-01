@@ -1,6 +1,8 @@
 import { type Locale, locales } from '@/i18n/config';
 import { routing } from '@/i18n/routing';
 import { localePathPrefix } from '@/lib/map-url-builder';
+import { isValidServiceSlug } from '@/lib/service-slug-format';
+import type { ServiceSlugLookupResult } from '@/lib/service-slug-lookup';
 
 export { isValidServiceSlug } from '@/lib/service-slug-format';
 
@@ -109,4 +111,31 @@ const RESERVED_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
  */
 export function isReservedRootSegment(segment: string): boolean {
     return RESERVED_ROOT_SEGMENTS.has(segment);
+}
+
+/**
+ * Slug krotkiego adresu `polvia.pl/<slug>` albo `null`, gdy sciezka nim nie jest.
+ *
+ * Kandydat to dokladnie jeden segment bez prefiksu locale (alias istnieje tylko w `pl`),
+ * poza segmentami zarezerwowanymi i w formacie slugu. Dzieki temu lookup dostaja tylko
+ * sciezki, ktore bez aliasu i tak skonczylyby sie 404 — istniejace strony nie zwalniaja.
+ * Pliki (`/robots.txt`, `/favicon.ico`) odpadaja na formacie: kropka nie jest w slugu.
+ */
+export function parseRootAliasPathname(pathname: string): string | null {
+    const segments = pathname.split('/').slice(1);
+    if (segments.length !== 1) return null;
+
+    const [slug] = segments;
+    if (isReservedRootSegment(slug) || !isValidServiceSlug(slug)) return null;
+
+    return slug;
+}
+
+/**
+ * Cel przekierowania krotkiego adresu: profil `pl`, ale tylko dla aktywnego premium.
+ * Brak premium, brak wpisu i awaria lookupu (`unknown`) daja `null` — zadanie idzie
+ * dalej bez zmian i konczy sie 404 next-intl, jak przed wprowadzeniem aliasu.
+ */
+export function rootAliasRedirectPath(slug: string, lookup: ServiceSlugLookupResult): string | null {
+    return lookup === 'premium' ? buildServiceProfilePath('pl', slug) : null;
 }
