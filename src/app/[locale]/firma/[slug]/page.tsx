@@ -23,6 +23,7 @@ import {
 } from '@/lib/service-profile-queries';
 
 import { env } from '../../../../../env';
+import { startPremiumCheckout } from './_actions';
 import { getHeaderCity, getMainLocation, toSameAs } from './_components/profile-helpers';
 import { ProfileFree } from './_components/profile-free/profile-free';
 import {
@@ -80,7 +81,9 @@ function ProfileView({
     view: ServiceProfileView;
     viewKind: ProfileViewKind;
 }): ReactElement {
-    if (viewKind.kind === 'free') return <ProfileFree profile={view} />;
+    if (viewKind.kind === 'free') {
+        return <ProfileFree profile={view} checkoutAction={startPremiumCheckout} />;
+    }
 
     const Template = PREMIUM_TEMPLATE_COMPONENTS[viewKind.template];
     return <Template profile={toPremiumProfileView(view)} />;

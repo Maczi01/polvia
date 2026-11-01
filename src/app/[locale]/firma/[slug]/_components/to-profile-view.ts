@@ -6,9 +6,6 @@ import type { SimilarServiceRow } from '@/lib/similar-services';
 
 import type { ProfileHref, ServiceProfileView, SimilarService } from './service-profile-types';
 
-/** CTA darmowego profilu w fazie 1 prowadzi do cennika (`/cennik` w pl). */
-const UPGRADE_HREF: ProfileHref = '/pricing';
-
 /** Sciezka obrazka z `public/services/` albo `null` (komponent pokaze `/default.png`). */
 export function toServiceImagePath(image: string | null): string | null {
     return image?.trim() ? `/services/${image.trimEnd()}` : null;
@@ -45,6 +42,7 @@ export function toProfileView(
     locale: Locale,
 ): ServiceProfileView {
     return {
+        serviceId: profile.id,
         slug: profile.slug,
         name: profile.name,
         description: profile.description,
@@ -57,7 +55,6 @@ export function toProfileView(
         locations: profile.locations,
         mapHref: toMapHref(profile, locale),
         similarServices: similarServices.map(toSimilarService),
-        upgradeHref: UPGRADE_HREF,
         premium: profile.premiumContent,
     };
 }

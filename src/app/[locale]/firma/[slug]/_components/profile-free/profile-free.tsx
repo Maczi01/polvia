@@ -1,6 +1,8 @@
 import { MapPin } from 'lucide-react';
 import type { ReactElement } from 'react';
 
+import type { CheckoutAction } from '@/lib/premium-checkout-fields';
+
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileBadges } from '../profile-badges/profile-badges';
 import { ProfileContact } from '../profile-contact/profile-contact';
@@ -14,6 +16,8 @@ import { SimilarServices } from '../similar-services/similar-services';
 
 type ProfileFreeProps = {
     profile: ServiceProfileView;
+    /** `startPremiumCheckout` — strona przekazuje Server Action do CTA. */
+    checkoutAction: CheckoutAction;
 };
 
 /**
@@ -21,7 +25,7 @@ type ProfileFreeProps = {
  * Desktop: tresc po lewej, kontakt i CTA w kolumnie po prawej. Mobile: kontakt
  * zaraz pod naglowkiem (najczestsza akcja), CTA na koncu tresci.
  */
-export function ProfileFree({ profile }: ProfileFreeProps): ReactElement {
+export function ProfileFree({ profile, checkoutAction }: ProfileFreeProps): ReactElement {
     const mainLocation = getMainLocation(profile.locations);
     const city = getHeaderCity(profile);
     const showNavigate = profile.coverage !== 'online';
@@ -72,7 +76,8 @@ export function ProfileFree({ profile }: ProfileFreeProps): ReactElement {
                         {mainLocation && <ProfileHours openingHours={mainLocation.openingHours} />}
                     </div>
                     <ProfileUpgradeCta
-                        href={profile.upgradeHref}
+                        serviceId={profile.serviceId}
+                        checkoutAction={checkoutAction}
                         className="self-start lg:col-start-2 lg:row-start-2"
                     />
                 </div>

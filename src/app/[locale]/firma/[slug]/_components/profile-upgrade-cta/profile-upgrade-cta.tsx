@@ -1,22 +1,30 @@
-import { ArrowRight, Check, Sparkles } from 'lucide-react';
+import { Check, Sparkles } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactElement } from 'react';
 
-import { Link } from '@/i18n/navigation';
+import type { CheckoutAction } from '@/lib/premium-checkout-fields';
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
 import { cn } from '@/lib/utilities';
 
-import type { ProfileHref } from '../service-profile-types';
+import { UpgradeCta } from '../upgrade-cta/upgrade-cta';
 
 type ProfileUpgradeCtaProps = {
-    href: ProfileHref;
+    serviceId: string;
+    checkoutAction: CheckoutAction;
     className?: string;
 };
 
 const BENEFIT_KEYS = ['benefitPhotos', 'benefitPrices', 'benefitNoCompetitors'] as const;
 
-/** CTA ulepszenia — tylko na darmowym profilu (R4); szablony premium go nie maja (R10). */
-export function ProfileUpgradeCta({ href, className }: ProfileUpgradeCtaProps): ReactElement {
+/**
+ * CTA ulepszenia — tylko na darmowym profilu (R4); szablony premium go nie maja (R10).
+ * Zakup idzie z profilu wprost do Stripe Checkout (`UpgradeCta`), bez przystanku na `/cennik`.
+ */
+export function ProfileUpgradeCta({
+    serviceId,
+    checkoutAction,
+    className,
+}: ProfileUpgradeCtaProps): ReactElement {
     const t = useTranslations('ServiceProfile.upgrade');
 
     return (
@@ -42,7 +50,10 @@ export function ProfileUpgradeCta({ href, className }: ProfileUpgradeCtaProps): 
             </p>
             <ul className="mt-4 flex flex-col gap-2.5">
                 {BENEFIT_KEYS.map(key => (
-                    <li key={key} className="flex items-start gap-2.5 text-sm text-gray-800 dark:text-gray-200">
+                    <li
+                        key={key}
+                        className="flex items-start gap-2.5 text-sm text-gray-800 dark:text-gray-200"
+                    >
                         <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand text-white">
                             <Check size={12} strokeWidth={3} aria-hidden="true" />
                         </span>
@@ -50,16 +61,7 @@ export function ProfileUpgradeCta({ href, className }: ProfileUpgradeCtaProps): 
                     </li>
                 ))}
             </ul>
-            <Link
-                href={href}
-                className={cn(
-                    'mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-brand px-5 py-3 text-center text-sm font-semibold text-white shadow-md shadow-brand/25 transition-all',
-                    'hover:bg-brand/90 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
-                )}
-            >
-                {t('cta')}
-                <ArrowRight size={16} aria-hidden="true" />
-            </Link>
+            <UpgradeCta serviceId={serviceId} action={checkoutAction} className="mt-6" />
         </section>
     );
 }

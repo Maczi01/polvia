@@ -11,20 +11,29 @@ import { ProfileFree } from './profile-free';
 
 expect.extend(toHaveNoViolations);
 
+/** Akcja checkoutu nie jest wolana w tych testach — profil tylko renderuje CTA. */
+const checkoutAction = jest.fn(async () => null);
+
 jest.mock('@/i18n/navigation', () => ({
     Link: jest.requireActual('../profile-test-utils').MockLink,
 }));
 
 describe('ProfileFree', () => {
     it('renderuje nazwe jako h1 i przechodzi jest-axe', async () => {
-        const { container } = renderWithIntl(<ProfileFree profile={localServiceFixture} />);
+        const { container } = renderWithIntl(
+            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+        );
 
-        expect(screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' }),
+        ).toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
     });
 
     it('pokazuje dane wpisu jak karta: kontakt, godziny, adresy, jezyki i tagi', () => {
-        renderWithIntl(<ProfileFree profile={localServiceFixture} />);
+        renderWithIntl(
+            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+        );
 
         expect(screen.getByRole('region', { name: 'Kontakt' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'WhatsApp' })).toBeInTheDocument();
@@ -37,18 +46,25 @@ describe('ProfileFree', () => {
         expect(within(about).getByText('Łazienki')).toBeInTheDocument();
     });
 
-    it('renderuje "Podobne firmy" i CTA ulepszenia jako link', () => {
-        renderWithIntl(<ProfileFree profile={localServiceFixture} />);
+    it('renderuje "Podobne firmy" i CTA ulepszenia jako checkout tego wpisu', () => {
+        renderWithIntl(
+            <ProfileFree profile={localServiceFixture} checkoutAction={checkoutAction} />,
+        );
 
         const similar = screen.getByRole('region', { name: 'Podobne firmy' });
         expect(within(similar).getAllByRole('link')).toHaveLength(4);
-        expect(
-            screen.getByRole('link', { name: 'To moja firma — ulepsz stronę' }),
-        ).toHaveAttribute('href', '/pricing');
+        const cta = screen.getByRole('button', { name: 'To moja firma — ulepsz stronę' });
+        expect(cta.closest('form')).toHaveFormValues({
+            serviceId: localServiceFixture.serviceId,
+            interval: 'monthly',
+        });
+        expect(checkoutAction).not.toHaveBeenCalled();
     });
 
     it('wpis online-only: badge "Online", bez adresu i mapy', async () => {
-        const { container } = renderWithIntl(<ProfileFree profile={onlineServiceFixture} />);
+        const { container } = renderWithIntl(
+            <ProfileFree profile={onlineServiceFixture} checkoutAction={checkoutAction} />,
+        );
 
         expect(screen.getByText('Online')).toBeInTheDocument();
         expect(screen.queryByRole('region', { name: /Adres|Lokalizacje/ })).not.toBeInTheDocument();
@@ -59,12 +75,16 @@ describe('ProfileFree', () => {
     });
 
     it('wpis bez logo, opisu i podobnych firm: zastepcze logo, bez pustych sekcji', async () => {
-        const { container } = renderWithIntl(<ProfileFree profile={noLogoServiceFixture} />);
+        const { container } = renderWithIntl(
+            <ProfileFree profile={noLogoServiceFixture} checkoutAction={checkoutAction} />,
+        );
 
         const logo = screen.getByRole('img', { name: `Logo firmy ${noLogoServiceFixture.name}` });
         expect(logo.getAttribute('src')).toContain(encodeURIComponent('/default.png'));
         expect(screen.queryByRole('region', { name: 'Podobne firmy' })).not.toBeInTheDocument();
-        expect(screen.getByRole('link', { name: 'To moja firma — ulepsz stronę' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('button', { name: 'To moja firma — ulepsz stronę' }),
+        ).toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
     });
 });

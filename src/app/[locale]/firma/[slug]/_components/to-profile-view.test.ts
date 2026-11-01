@@ -76,7 +76,7 @@ describe('toProfileView', () => {
             isMainLocation: true,
             city: 'Warszawa',
         });
-        expect(view.upgradeHref).toBe('/pricing');
+        expect(view.serviceId).toBe('service-1');
         expect(view.premium).toBeNull();
     });
 

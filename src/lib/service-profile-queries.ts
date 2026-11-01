@@ -120,7 +120,7 @@ function tagsInLocale(locale: string) {
  * Stan subskrypcji przy left joinie: obiekt, ktory Drizzle zamienia na `null`, gdy wpis
  * nie ma wiersza `service_subscriptions`. Ksztalt = wejscie `isPremiumActive`.
  */
-const subscriptionColumns = {
+export const subscriptionColumns = {
     status: serviceSubscriptionsTable.status,
     currentPeriodEnd: serviceSubscriptionsTable.currentPeriodEnd,
     cancelAtPeriodEnd: serviceSubscriptionsTable.cancelAtPeriodEnd,
@@ -130,7 +130,7 @@ const subscriptionColumns = {
  * Join subskrypcji WYLACZNIE po `service_id` tego wpisu — subskrypcja innej uslugi nie moze
  * wlaczyc premium. Wspolny dla profilu i lookupu, zeby warunek byl jeden.
  */
-const subscriptionJoin = eq(serviceSubscriptionsTable.serviceId, servicesTable.id);
+export const subscriptionJoin = eq(serviceSubscriptionsTable.serviceId, servicesTable.id);
 
 /** Czy pod `/firma/<slug>` jest aktywny wpis i czy ma aktywne premium. Lekkie zapytanie lookupu. */
 export async function getServiceSlugStatus(

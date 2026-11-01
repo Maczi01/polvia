@@ -41,6 +41,8 @@ export type PremiumContent = LocalizedPremiumContent;
 export type { FaqItem, PriceListItem, ProfileImage } from '@/lib/service-profile-premium';
 
 export type ServiceProfileView = {
+    /** `services.id` — wejscie checkoutu premium (`upgrade-cta`); serwer sprawdza je ponownie. */
+    serviceId: string;
     slug: string;
     name: string;
     description: string | null;
@@ -57,7 +59,6 @@ export type ServiceProfileView = {
     /** Link „Pokaz na mapie”; `null` dla wpisow bez punktu obslugi. */
     mapHref: ProfileHref | null;
     similarServices: SimilarService[];
-    upgradeHref: ProfileHref;
     premium: PremiumContent | null;
 };
 

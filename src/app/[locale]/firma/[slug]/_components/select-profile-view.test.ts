@@ -32,6 +32,7 @@ function premiumContent(overrides: Partial<PremiumContent> = {}): PremiumContent
 
 function view(premium: PremiumContent | null): ServiceProfileView {
     return {
+        serviceId: '6f1c2a9e-3b7d-4c55-9a10-2f4e8d7b1c01',
         slug: 'mistrz-remontu',
         name: 'Mistrz Remontu',
         description: null,
@@ -44,7 +45,6 @@ function view(premium: PremiumContent | null): ServiceProfileView {
         locations: [],
         mapHref: null,
         similarServices: [],
-        upgradeHref: '/pricing',
         premium,
     };
 }

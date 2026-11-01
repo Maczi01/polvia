@@ -84,6 +84,7 @@ const SIMILAR_SERVICES: SimilarService[] = [
 ];
 
 export const localServiceFixture: ServiceProfileView = {
+    serviceId: '6f1c2a9e-3b7d-4c55-9a10-2f4e8d7b1c01',
     slug: 'mistrz-remontu',
     name: 'Mistrz Remontu',
     description:
@@ -110,11 +111,11 @@ export const localServiceFixture: ServiceProfileView = {
     ],
     mapHref: { pathname: '/map', query: { place: 'mistrz-remontu' } },
     similarServices: SIMILAR_SERVICES,
-    upgradeHref: '/pricing',
     premium: null,
 };
 
 export const onlineServiceFixture: ServiceProfileView = {
+    serviceId: '0b9d3e47-8a26-4f1e-b5c3-7d2a6e9f4b02',
     slug: 'taxovia-online',
     name: 'Księgowość Online Taxovia',
     description:
@@ -147,12 +148,12 @@ export const onlineServiceFixture: ServiceProfileView = {
         ...service,
         category: 'financial',
     })),
-    upgradeHref: '/pricing',
     premium: null,
 };
 
 export const noLogoServiceFixture: ServiceProfileView = {
     ...localServiceFixture,
+    serviceId: 'c4e8a1f2-5d39-4b67-8e0a-9f3b2c6d7e03',
     slug: 'smaki-domu',
     name: 'Smaki Domu — pierogi i wareniki',
     description: null,

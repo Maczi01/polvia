@@ -873,6 +873,63 @@
       "benefitNoCompetitors": "No “Similar businesses” section — we do not promote competitors",
       "cta": "This is my business — upgrade the page"
     },
+    "checkout": {
+      "legend": "Billing period",
+      "monthly": "Monthly",
+      "monthlyPrice": "PLN 9 / month",
+      "yearly": "Yearly",
+      "yearlyPrice": "PLN 49 / year",
+      "yearlySaving": "Best value",
+      "pending": "Redirecting to payment…",
+      "note": "Payments are handled by Stripe. Cancel your subscription at any time.",
+      "errors": {
+        "BAD_INPUT": "Choose a billing period and try again.",
+        "RATE_LIMITED": "Too many attempts. Try again in an hour.",
+        "NOT_FOUND": "This business is no longer listed in the directory.",
+        "ALREADY_PREMIUM": "This business already has an active premium page.",
+        "CHECKOUT_FAILED": "We could not open the payment page. Try again in a moment."
+      }
+    },
+    "premiumThanks": {
+      "metaTitle": "Thank you for buying premium",
+      "title": "Thank you! Payment received",
+      "activation": "Your premium page will switch on within a few minutes — as soon as we confirm the subscription.",
+      "photos": "Send photos (logo, cover and up to {max} gallery photos) by email to <mail>{email}</mail>, with your business name in the subject.",
+      "portal": "Invoices and your subscription are in the customer portal.",
+      "portalLink": "Open the customer portal",
+      "backToProfile": "Back to the business profile",
+      "invalidTitle": "We cannot confirm the payment",
+      "invalidDescription": "This link does not belong to a paid subscription for this business, or the payment is still being processed. If you have just paid, refresh the page in a minute."
+    },
+    "materials": {
+      "title": "Materials for your premium page",
+      "description": "Tell us what should be on the page. We will prepare it and email you when it is ready.",
+      "templateLegend": "Page template",
+      "templates": {
+        "gallery": "Gallery — photos first",
+        "professional": "Professional — price list and FAQ first",
+        "classic": "Classic — business description and contact details"
+      },
+      "optional": "(optional)",
+      "priceList": "Price list",
+      "priceListHint": "One service per line, e.g. “Lock replacement — from PLN 150”.",
+      "faq": "Frequently asked questions",
+      "faqHint": "Question and answer, e.g. “Do you travel to clients? — Yes, across Warsaw.”",
+      "notes": "Notes",
+      "notesHint": "Anything else you would like to tell us.",
+      "submit": "Send materials",
+      "pending": "Sending…",
+      "success": "Thank you! We have received your materials and will get back to you by email.",
+      "errors": {
+        "BAD_INPUT": "Please correct the highlighted fields.",
+        "RATE_LIMITED": "Too many attempts. Try again in an hour.",
+        "FORBIDDEN": "We cannot confirm a payment for this business.",
+        "VERIFY_FAILED": "We could not check the payment. Try again in a moment.",
+        "SEND_FAILED": "We could not send your materials. Try again in a moment.",
+        "templateRequired": "Choose a page template.",
+        "tooLong": "At most {max} characters."
+      }
+    },
     "days": {
       "monday": "Monday",
       "tuesday": "Tuesday",

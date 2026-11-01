@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
+import type { CheckoutAction } from '@/lib/premium-checkout-fields';
+
 import {
     localServiceFixture,
     noLogoServiceFixture,
@@ -8,13 +10,16 @@ import {
 import { mobileViewport, profileStoryParameters, withProfileIntl } from '../profile-story-parameters';
 import { ProfileFree } from './profile-free';
 
+/** Zastepstwo `startPremiumCheckout`: Storybook nie laczy sie ze Stripe. */
+const storyCheckoutAction: CheckoutAction = async () => null;
+
 const meta = {
     title: 'firma/Profil darmowy',
     component: ProfileFree,
     decorators: [withProfileIntl],
     parameters: profileStoryParameters,
     globals: { theme: 'light' },
-    args: { profile: localServiceFixture },
+    args: { profile: localServiceFixture, checkoutAction: storyCheckoutAction },
 } satisfies Meta<typeof ProfileFree>;
 
 export default meta;
