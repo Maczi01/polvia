@@ -167,11 +167,11 @@ Przed fazą 2 naprawić #5–#8 (adresy profili i kontrakt widoku) oraz #1. Pozo
   - Pusty lub biały opis daje pusty `<meta description>`; dać fallback po `trim()`.
   - Testy: `null` daje `noindex`; opis `null` / `''` / `'   '`; brak logo w `openGraph`.
 - [x] 🟡 [nit] **`profile-helpers.ts`, `page.tsx:38`**: `toSafeExternalHref` (tylko `https?:`) dla socials i `sameAs`; puste i białe stringi pominięte.
-- [ ] 🟡 [nit] **`language-switcher.tsx:56`**: ogólna obsługa tras z parametrem (`pathname.includes('[')`).
+- [x] 🟡 [nit] **`language-switcher.tsx:56`**: ogólna obsługa tras z parametrem (`pathname.includes('[')`).
 - [x] 🟡 [nit] **`service-card.tsx:766`, `marker-popup.tsx:101`**: wspólny `ServiceProfileLink` z tokenem `brand`.
-- [ ] 🟡 [nit] **`template-*.tsx`, `profile-free.tsx`**: funkcje JSX > 50 linii; wydzielić hero/nagłówek.
+- [x] 🟡 [nit] **`template-*.tsx`, `profile-free.tsx`**: funkcje JSX > 50 linii; wydzielić hero/nagłówek.
 - [x] 🟡 [nit] **`template-classic.tsx:46,62`**: `priority` tylko na cover.
-- [ ] 🟡 [nit] Pozostałe P3 (#18, #20–#23, #25) według raportu, do rozważenia. Zrobione przy poprawkach: #11 (świadomie bez zmiany, komentarz), #15, #17, #24, #26.
+- [x] 🟡 [nit] Pozostałe P3 (#18, #20–#23, #25) według raportu, do rozważenia. Zrobione przy poprawkach: #11 (świadomie bez zmiany, komentarz), #15, #17, #24, #26. → 2026-11-01: #18 `splitLocalePrefix`, #20 galeria jako RSC + wyspa kliencka, #21 JSON-LD wg zasięgu, #22 obcięcie tytułu do 60 zn., #23 sitemapa rzuca przy błędzie bazy. #25 bez zmian (middleware nietestowalny w Jeście) — weryfikacja `curl` w „Po wdrożeniu”.
 
 ---
 
@@ -245,8 +245,8 @@ Raport: [review-faza-2.md](review-faza-2.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [x] 🟡 [nit] **`premium-content-schema.ts:84-89`**: limit liczby pozycji `priceList`/`faq` (stałe w `premium-templates.ts`) i unikalność `file`/`name`/`q` przez `superRefine` (P3 #12, #13).
 - [x] 🟡 [nit] **`upsert-premium-content.ts:74`**: sprawdzanie zdjęć wrażliwe na wielkość liter (Windows vs Vercel) (P3 #14).
 - [x] 🟡 [nit] **`.claude/skills/dodaj/SKILL.md`**: blok `premium` w JSON dopiero po weryfikacji płacącego; katalog zdjęć zależy od slugu usługi (P3 #15, #16).
-- [ ] 🟡 [nit] **przed U8**: sprawdzić w `npm run build`, czy `/[locale]/firma/[slug]` jest dynamiczna; jeśli nie — `revalidatePath` w webhooku (P3 #17).
-- [ ] 🟡 [nit] Pozostałe P3 według raportu: zrobione #1 (jeden lookup + adapter w `premium-content-store.ts`), #2, #3, #7–#11, #19, #20; otwarte #4, #5, #6, #18 (do rozważenia).
+- [x] 🟡 [nit] **przed U8**: sprawdzić w `npm run build`, czy `/[locale]/firma/[slug]` jest dynamiczna; jeśli nie — `revalidatePath` w webhooku (P3 #17). → 2026-11-01: jawne `export const dynamic = 'force-dynamic'` w `page.tsx`; `revalidatePath` niepotrzebny.
+- [x] 🟡 [nit] Pozostałe P3 według raportu: zrobione #1 (jeden lookup + adapter w `premium-content-store.ts`), #2, #3, #7–#11, #19, #20; otwarte #4, #5, #6, #18 (do rozważenia). → 2026-11-01: #4 komentarz z uzasadnieniem, #5, #6 (`satisfies Record<Locale, …>`), #18 leniwe parsowanie po decyzji widoku — zrobione.
 
 ---
 
@@ -420,11 +420,11 @@ Raport: [review-faza-3.md](review-faza-3.md). Werdykt: ⚠️ kontynuuj z zastrz
 - [x] 🟠 [important] **`subscription-sync.ts:188-200`**: mail o konflikcie przy każdym zdarzeniu, odnowieniu i resyncu. Sync zwraca konflikt bez maila; mail w `processEvent` przy `isFirstDelivery` i jednym typie zdarzenia. CLI wiąże od najstarszej subskrypcji.
 - [x] 🟠 [important] **`premium/dziekujemy/page.tsx:157-162`**: publiczny GET bez limitu woła `checkout.sessions.retrieve` (zużycie limitu API Stripe wspólnego z checkoutem i webhookiem). `checkRateLimit` po IP przed weryfikacją.
 - [x] 🟠 [important] **`premium/dziekujemy/page.tsx:162-163`**: `unavailable` (awaria Stripe) pokazuje „nie potwierdzono” płacącemu. Osobny wariant „odśwież za chwilę” (4 × `messages/`) + test gałęzi strony.
-- [ ] 🟡 [nit] Webhook/sync: #8 mail „opłacono” tylko przy `isPremiumActive`; #9 log dla `service_missing`/nie-UUID; #10 `setPromotion(null)` a ręczna promocja; #11 wspólny deadline webhooka i timeout bazy; #12 CLI bez drugiego `retrieve`; #13 slug + `db:reset` w dokumentacji operatora.
-- [ ] 🟡 [nit] Alias: #14 SWR 86400 vs obiecane „do 5 min”; #15 negatywny cache / segmenty skanerów; #16 slug kolidujący z zarezerwowanym lub `api*` bez aliasu.
-- [ ] 🟡 [nit] Checkout/materiały: #17 druga płatność przed webhookiem; #18 wielokrotne wysłanie materiałów + timeout `sendMail`; #19 `referrer: 'no-referrer'`; #20 komentarz o `no_payment_required`; #21 pełny URL profilu w mailu.
-- [ ] 🟡 [nit] Kod: #22 `SUBSCRIPTION_METADATA_KEYS` do lekkiego modułu; #23 `subscription-query-parts.ts`; ~~#24 `syncSubscriptionFromStripe` 52 linie~~ (rozwiązane przy #2); #25 nazwy `stripe-events`/`stripe-webhook-events`; #26 `VISIBLE_FIELDS`; #27 helper `toLocale()`; #28 jedno źródło kwot i `PremiumInterval`, spójny domyślny interwał; #29 typ `WebhookErrorCode`, drobne w `/cennik`.
-- [ ] 🟡 [nit] Testy: #30 typy zdarzeń webhooka i równoległy duplikat; #31 `sync-subscriptions.ts`; #32 `uk` w `pricing-plans.test.tsx`, 456 linii w `service-profile-queries.test.ts`; #33 `dziekujemy` poza `pathnames` — potwierdzić w teście ręcznym U9.
+- [x] 🟡 [nit] Webhook/sync: #8 mail „opłacono” tylko przy `isPremiumActive`; #9 log dla `service_missing`/nie-UUID; #10 `setPromotion(null)` a ręczna promocja; #11 wspólny deadline webhooka i timeout bazy; #12 CLI bez drugiego `retrieve`; #13 slug + `db:reset` w dokumentacji operatora.
+- [x] 🟡 [nit] Alias: #14 SWR 86400 vs obiecane „do 5 min”; #15 negatywny cache / segmenty skanerów; #16 slug kolidujący z zarezerwowanym lub `api*` bez aliasu.
+- [x] 🟡 [nit] Checkout/materiały: #17 druga płatność przed webhookiem; #18 wielokrotne wysłanie materiałów + timeout `sendMail`; #19 `referrer: 'no-referrer'`; #20 komentarz o `no_payment_required`; #21 pełny URL profilu w mailu.
+- [x] 🟡 [nit] Kod: #22 `SUBSCRIPTION_METADATA_KEYS` do lekkiego modułu; #23 `subscription-query-parts.ts`; ~~#24 `syncSubscriptionFromStripe` 52 linie~~ (rozwiązane przy #2); #25 nazwy `stripe-events`/`stripe-webhook-events`; #26 `VISIBLE_FIELDS`; #27 helper `toLocale()`; #28 jedno źródło kwot i `PremiumInterval`, spójny domyślny interwał; #29 typ `WebhookErrorCode`, drobne w `/cennik`.
+- [x] 🟡 [nit] Testy: #30 typy zdarzeń webhooka i równoległy duplikat; #31 `sync-subscriptions.ts`; #32 `uk` w `pricing-plans.test.tsx`, 456 linii w `service-profile-queries.test.ts`; #33 `dziekujemy` poza `pathnames` — potwierdzić w teście ręcznym U9. → #33 zostaje krokiem `Operator:` testu ręcznego U9.
 
 ---
 
@@ -437,7 +437,7 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po popr
 - [x] 🟠 [important] **R1 `api/stripe/webhook/route.ts:108`, `src/db/sync-subscriptions.ts:53,67`**: klucz testowy + produkcyjna baza nadal zapisuje testowe subskrypcje (lokalny test checkoutu z `.env` na produkcję). Bramka wzorem `assertDropAllowed`/`LOCAL_HOSTS` z `src/db/drop.ts`: `!STRIPE_LIVE_MODE` i host bazy nielokalny → webhook 200 bez sync, CLI odmawia startu. Usunąć martwy filtr `wrong_mode`.
 - [x] 🟠 [important] **R2 `premium/dziekujemy/page.tsx:34-42`, `src/lib/redis.ts:5-8`**: awaria Redisa → strona błędu płacącemu. `try/catch` z logiem (fail-open albo `CheckoutUnavailable`) + `commandTimeout` ~1–2 s w ioredis. Test „`checkRateLimit` rzuca”.
 - [x] 🟠 [important] **R3 `src/lib/subscription-sync.ts:156-164`**: nowy zakup w karencji `past_due` starej subskrypcji → `conflict`, opłacona subskrypcja nie zapisana do odnowienia, mail „zwróć”. Przychodząca `active`/`trialing` wygrywa z zapisaną `past_due`. Test.
-- [ ] 🟡 [nit] R5–R17 (R4, R9 zrobione): `line_items.has_more`, 2 testy z osłabioną/kruchą asercją, brakujące testy (`past_due`→`active`, `trialing`, wiele pozycji, `incomplete_expired`), log konfliktu w CLI, timeouty Postgresa, `NOT NULL` bez default. Szczegóły w raporcie.
+- [x] 🟡 [nit] R5–R17 (R4, R9 zrobione): `line_items.has_more`, 2 testy z osłabioną/kruchą asercją, brakujące testy (`past_due`→`active`, `trialing`, wiele pozycji, `incomplete_expired`), log konfliktu w CLI, timeouty Postgresa, `NOT NULL` bez default. Szczegóły w raporcie. → 2026-11-01: wszystkie zrobione; R16 bez zmian (tabela nie istnieje na produkcji, krok operatora niżej), R17 przez `premium-rate-limit.ts`.
 
 ---
 
@@ -450,9 +450,9 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 - [x] 🟠 [important] **T1 `src/app/api/stripe/webhook/route.ts:112-117`**: bramka „klucz testowy + baza nielokalna” odpowiada 200 → przy pomyłce w zmiennych produkcji (test key + live `whsec`) Stripe nie ponawia i zdarzenia (z mailami) przepadają. Zwracać 503 + `console.error`; test: 503, sync niewołany, zdarzenie nieoznaczone.
 - [x] 🟡 [nit] T2 `export const maxDuration = 30` na stronie `dziekujemy`.
 - [x] 🟡 [nit] T3 log przy każdym `conflict && isIncomingActive` + test „stara `past_due` → `active` po wyparciu”; krok operatora przy podwójnej płatności.
-- [ ] 🟡 [nit] T4 `checkRateLimitWithTimeout` do `src/lib/rate-limit.ts`, scalić z `isWithinLimit` (R17); `page.tsx` ma 297/300 linii.
-- [ ] 🟡 [nit] T5 decyzja: checkout przy `past_due` dozwolony czy R3 tylko jako obrona na wyścig (JSDoc).
-- [ ] 🟡 [nit] T6–T11 (T9, T10 zrobione): unia decyzji w `applySubscriptionState`, brakujące testy (kolejność bramek, sekwencje R3, timer), `payment_method_types`, `[TEST]` w mailu materiałów, JSDoc o tunelu, drobne — szczegóły w raporcie.
+- [x] 🟡 [nit] T4 `checkRateLimitWithTimeout` do `src/lib/rate-limit.ts`, scalić z `isWithinLimit` (R17); `page.tsx` ma 297/300 linii.
+- [x] 🟡 [nit] T5 decyzja: checkout przy `past_due` dozwolony czy R3 tylko jako obrona na wyścig (JSDoc).
+- [x] 🟡 [nit] T6–T11 (T9, T10 zrobione): unia decyzji w `applySubscriptionState`, brakujące testy (kolejność bramek, sekwencje R3, timer), `payment_method_types`, `[TEST]` w mailu materiałów, JSDoc o tunelu, drobne — szczegóły w raporcie. → T5: decyzja (ii), JSDoc. T8: `allowed_payment_method_types: ['card']` (API `2026-09-30` nie ma `payment_method_types`).
 
 ---
 
@@ -460,11 +460,13 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 4”. Werdykt: ✅ gotowe do kontynuacji (0 × P1, 0 × P2, 5 × P3). T1–T3, T9, T10 zamknięte.
 
-- [ ] 🟡 [nit] U1 **`src/lib/subscription-sync.ts:203-224`** — log „second paid subscription” odpala też dla starej `past_due` w karencji (fałszywa „podwójna opłata”); warunek `active`/`trialing` + test negatywny.
-- [ ] 🟡 [nit] U2 **`premium/dziekujemy/page.tsx:28`** — `maxDuration = 30` obejmuje też akcję materiałów (SMTP do 10 s/fazę); `60` albo świadoma decyzja w komentarzu.
-- [ ] 🟡 [nit] U3 **sekcja „Po wdrożeniu”** — poprawić zdanie o ponowieniach przy `stripe listen`, zakaz testowego endpointu dla Preview, procedura po `CONFIG_MISMATCH` na produkcji (redeploy, włączenie endpointu, resync, resend checkoutów).
-- [ ] 🟡 [nit] U4 **`src/lib/subscription-notifications.ts:49,71`** — `[TEST]` także w mailach o zakupie i konflikcie.
-- [ ] 🟡 [nit] U5 **`src/lib/subscription-sync.ts:203`** — `reportConflict` jako jawny krok (razem z T6).
+✅ 2026-11-01: wszystkie otwarte P3 z faz 1–3 (U1–U5, T4–T8, T11, R5–R17, #8–#32, F1, F2) naprawione. Kod zmieniony przez 4 subagentów; bramka: tsc OK, jest 183 suite'y / 1979 testów, lint 0 błędów.
+
+- [x] 🟡 [nit] U1 **`src/lib/subscription-sync.ts:203-224`** — log „second paid subscription” odpala też dla starej `past_due` w karencji (fałszywa „podwójna opłata”); warunek `active`/`trialing` + test negatywny.
+- [x] 🟡 [nit] U2 **`premium/dziekujemy/page.tsx:28`** — `maxDuration = 30` obejmuje też akcję materiałów (SMTP do 10 s/fazę); `60` albo świadoma decyzja w komentarzu.
+- [x] 🟡 [nit] U3 **sekcja „Po wdrożeniu”** — poprawić zdanie o ponowieniach przy `stripe listen`, zakaz testowego endpointu dla Preview, procedura po `CONFIG_MISMATCH` na produkcji (redeploy, włączenie endpointu, resync, resend checkoutów).
+- [x] 🟡 [nit] U4 **`src/lib/subscription-notifications.ts:49,71`** — `[TEST]` także w mailach o zakupie i konflikcie.
+- [x] 🟡 [nit] U5 **`src/lib/subscription-sync.ts:203`** — `reportConflict` jako jawny krok (razem z T6).
 
 ---
 
@@ -472,22 +474,36 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną
 - [ ] `Operator:` lokalny test checkoutu wymaga `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (`success_url` budowany z tej zmiennej, inaczej powrót na produkcję)
-- [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 503 `CONFIG_MISMATCH` (Stripe ponawia do 3 dni) i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu
+- [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 503 `CONFIG_MISMATCH` i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu. `stripe listen` **nie ponawia** zdarzeń: po poprawieniu bazy wyślij je ponownie przez `stripe events resend <evt_id>`
+- [ ] `Operator:` **nie rejestrować** testowego endpointu webhooka dla Preview — Preview ma nielokalną bazę, więc każde zdarzenie dostanie 503, Stripe wyśle maile o awarii i w końcu wyłączy endpoint. Testy checkoutu tylko lokalnie z `stripe listen`
+- [ ] `Operator:` procedura po `CONFIG_MISMATCH` w logach **produkcji** (testowy klucz na produkcji):
+  1. poprawić `STRIPE_SECRET_KEY` w Vercelu (Production) i zrobić redeploy,
+  2. w Stripe Dashboard → Webhooks sprawdzić, czy endpoint jest włączony (po serii błędów Stripe go wyłącza) i włączyć,
+  3. `npm run db:sync-subscriptions` z kluczem live — odtwarza stan premium,
+  4. ponownie wysłać nieudane `checkout.session.completed` spoza okna ponowień (Dashboard → zdarzenie → „Resend”) — tylko to odtwarza maile o zakupie
+- [ ] `Operator:` slug usługi jest niezmienny: zmiana nazwy firmy w `data/services/*.json` albo w seedzie zmienia slug po `db:reset`, a wtedy subskrypcja (powiązana przez `metadata.serviceSlug` i UUID) kończy się `service_missing` i premium znika po resyncu. Przed zmianą slugu płacącej firmy — zaktualizować `metadata.serviceSlug` subskrypcji w Stripe
 - [ ] Do rozważenia: staging z kluczami testowymi i zdalną bazą testową wymagałby flagi override w `env.ts` (dziś zablokowany przez R1)
 - [ ] `Operator:` przeglądać logi Vercela: `second paid subscription for a service` (podwójna opłata → anulować starszą subskrypcję w Stripe i `db:sync-subscriptions`), `failing open` (awaria Redisa na stronie `dziekujemy`), `CONFIG_MISMATCH` (zły klucz/baza w webhooku)
 - [ ] `Operator:` przeglądać logi `conflict` webhooka (np. stara subskrypcja odzyskała płatność po zakupie „ratunkowym” → podwójna opłata, bez maila)
-- [ ] Do rozważenia: globalny timeout klienta Redis — ryzyko dla `GETDEL` w `add-business/draft-store.ts`
+- [x] ~~Do rozważenia: globalny timeout klienta Redis~~ — decyzja: bez globalnego `commandTimeout`; operacje premium mają własne limity (`withTimeout`, 1,5 s)
 - [ ] `Operator:` po każdym `db:reset`: `npm run db:sync-subscriptions`
 - [ ] `Operator:` `drizzle-kit push` dla fazy 3 obejmuje kolumnę `service_subscriptions.current_period_start timestamptz NOT NULL` (tabela jeszcze nie istnieje na bazie, więc bez wartości domyślnej)
 - [ ] `Operator:` Customer Portal w Stripe — przy zmianie planu dopuścić tylko ceny `STRIPE_PRICE_MONTHLY` i `STRIPE_PRICE_YEARLY` (inna cena kończy premium z końcem opłaconego okresu)
 - [x] ~~`Operator:` Preview z testowymi kluczami Stripe NIE może wskazywać na produkcyjny `DATABASE_URL`~~ — wymuszone w kodzie (R1)
-- [ ] Do rozważenia: awaria Redisa na stronie `dziekujemy` kończy się stroną błędu (jak akcje w `_actions.ts`); ewentualny łagodny fallback to osobna decyzja
+- [x] ~~Do rozważenia: awaria Redisa na stronie `dziekujemy` kończy się stroną błędu~~ — fail-open wdrożony w R2
 - [ ] `Operator:` w teście ręcznym U9 sprawdzić wariant „odśwież za chwilę” na stronie `dziekujemy` (razem z P3 #33)
-- [ ] Do rozważenia: slugi zaczynające się od `api` (np. `apiary-x`) nie dostaną aliasu `/<slug>` — matcher middleware je pomija; profil `/firma/<slug>` działa
-- [ ] Do rozważenia: lista cech planu darmowego w `/cennik` nie wspomina WWW i social mediów, które darmowy profil ma (R2)
+- [x] ~~Do rozważenia: slugi zaczynające się od `api` bez aliasu~~ — matcher wyklucza tylko `/api/**` (#16)
+- [x] ~~Do rozważenia: lista cech planu darmowego bez WWW i social mediów~~ — „Dane kontaktowe, strona WWW i media społecznościowe” w 4 locale
 - [ ] `Operator:` zmienić 307 aliasu na 308 po obserwacji na produkcji
-- [ ] `Operator:` sekcja o profilu i premium w `CLAUDE.md`:
+- [x] sekcja „Profil firmy i Premium” w `CLAUDE.md` (2026-11-01):
   - `isPremiumActive` jako jedyne źródło prawdy,
   - lista zarezerwowanych słów,
   - Stripe tylko przez `src/lib/stripe.ts`
 - [ ] `Operator:` `/dev-compound` dla wniosków o Stripe i aliasie
+- [ ] `Operator:` klucz ograniczony `rk_live_` potrzebuje odczytu **Subscriptions** (`subscriptions.search` przed checkoutem, #17). Bez uprawnienia sprzedaż idzie dalej, w logu `subscription search failed`
+- [ ] `Operator:` dodatkowe logi do obserwacji w Vercelu: `subscription sync: service not found` (płatność bez wpisu — sprawdzić ręcznie), `subscription search failed`, `sent marker unavailable`, `materials marker unavailable`, `mail timed out`
+- [ ] `Operator:` po wygaśnięciu/anulowaniu subskrypcji ręczna promocja tego wpisu znika (wiersz `promoted_services` nie zna pochodzenia) — założyć ją ponownie. Ręczne przedłużenie nie jest już skracane przy odnowieniu (`GREATEST`)
+- [ ] `Operator:` przy podwójnej płatności zwrot dotyczy subskrypcji wskazanej w mailu jako „druga”; log CLI: `sub_X: conflict (wpis ma sub_Y, oplacona — do zwrotu)`, w podsumowaniu osobno `stale_ignored`
+- [ ] `Operator:` przed sprzedażą na lokalnej bazie (docker-compose) przepuścić jedno zdarzenie webhooka przez `stripe listen` — sprawdza SQL bez testów: upsert promocji z `GREATEST` i `set_config` (`lock_timeout`/`statement_timeout`)
+- [ ] `Operator:` po `npm run build` na Preview (zmieniony matcher middleware, `force-dynamic`, wyspa kliencka galerii): `curl -sI /api/service-slug/<istniejący>` → `s-maxage=240, stale-while-revalidate=60`; nieistniejący → `s-maxage=30, stale-while-revalidate=300`; `/wp-admin` → 404 bez lookupu; `/api/service-slug/x` → JSON; `/sitemap.xml` z profilami
+- Informacyjnie: płatność premium przyjmuje tylko kartę (z Apple/Google Pay), niezależnie od metod w Dashboardzie. Materiały: jedno wysłanie na sesję Checkout przez 7 dni, poprawki mailem. Domyślny interwał `monthly` na profilu i w `/cennik`; „oszczędź 54%” w `Pricing.yearly` to tekst — poprawić ręcznie przy zmianie cen

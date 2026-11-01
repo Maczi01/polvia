@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (poprawki po rundzie 3 review fazy 3)
+**Ostatnia aktualizacja:** 2026-11-01 (domknięcie wszystkich P3 faz 1–3)
 
 ## Źródła
 
@@ -387,6 +387,20 @@ Commity `e6aab21` (feature-builder-web-data: R1, R3, R4) i `ed2ffcc` (feature-bu
 - **Wniosek o `livemode`:** porównanie trybu klucza z trybem zdarzenia nie chroni przed niczym realnym (inny `whsec` per tryb, `list` zwraca jeden tryb). Prawdziwe ryzyko to *klucz testowy + baza produkcyjna*. Potrzebna bramka na host bazy (R1).
 - **Wniosek o rate limicie:** limit na stronie po płatności wprowadził twardą zależność od Redisa (R2). Każdy nowy `checkRateLimit` na ścieżce płacącego potrzebuje fail-open albo łagodnego wariantu.
 - **R3:** blokada konfliktu przez `past_due` w karencji uniemożliwia „ratunkowy” zakup po wygaśnięciu karty.
+
+## Domknięcie wszystkich P3 faz 1–3 (2026-11-01)
+
+Polecenie usera: „naprawiaj, musi być gotowe”. Cztery subagenty równolegle, rozłączne zestawy plików:
+
+- **feature-builder-web-data (Stripe sync/webhook/CLI):** U1, U4, U5+T6 (`subscription-write-decision.ts`), T5 (decyzja ii — R3 jako obrona na wyścig, JSDoc), T7, T11, #9–#12, #22 (`subscription-metadata.ts`), #23 (`subscription-query-parts.ts`), #25 (`stripe-event-dedupe.ts`, `stripe-event-sync-target.ts`), #29, #30, #31 (`subscription-resync.ts` + test), R6, R8, R10–R15 (`stale_ignored`, `connect_timeout`, `lock_timeout`/`statement_timeout` w transakcji, wspólny deadline webhooka). Podział testów > 300 linii, atrapy w `tests/fixtures/premium/`.
+- **feature-builder-web-fullstack (checkout/dziekujemy/cennik):** U2 (`maxDuration = 60`), T4+R17 (`with-timeout.ts`, `checkRateLimitWithTimeout`, `premium-rate-limit.ts`), T8 (`allowed_payment_method_types: ['card']`), R5, #17 (`premium-subscription-search.ts`), #18 (`premium-materials-sent.ts`, znacznik `SET NX` 7 dni + limit `sendMail` 20 s), #19–#21, #26, #27 (`toLocale()` w `@/i18n/config`), #28 (jedno źródło kwot, `PremiumInterval`, domyślnie `monthly`), #29, #32.
+- **feature-builder-web-fullstack (alias/profil):** #14 (`s-maxage=240, swr=60` = max 5 min), #15 (`SCANNER_SEGMENTS`, negatywny cache), #16 (`service-slug-alias.ts`, allocator omija zarezerwowane, matcher wyklucza tylko `/api/**`), F1 #18 (`split-locale-prefix.ts`), #20 (galeria RSC + `gallery-viewer.tsx`), #21 (JSON-LD wg zasięgu, klucz `ServiceProfile.meta.descriptionGeneric`), #22, #23 (sitemapa rzuca przy błędzie bazy), przełącznik języka z `useParams`, podkomponenty szablonów, F2 #17 (`force-dynamic`).
+- **feature-builder-web-data (treść premium):** F2 #4 (komentarz), #5, #6 (`satisfies Record<Locale, …>`), #18 (leniwe parsowanie: `getServiceProfile` zwraca surowe `premium`, `selectProfileView` woła loader dopiero po `isPremiumActive`).
+- **Orkiestrator:** `subscription-notifications.ts` na `withTimeout`; `toLocale` w `firma/[slug]/page.tsx` i `service-profile-premium.ts`; cechy planu darmowego w `/cennik` (WWW i social media, 4 locale); podział `service-profile-metadata.test.ts` (337 → 230 + 119); dokumentacja operatora (U3, #13, nowe logi i kroki); sekcja „Profil firmy i Premium” w `CLAUDE.md`.
+
+Odchylenia: #10 tylko częściowo (bez zmiany schematu `null` dalej usuwa ręczną promocję — krok operatora); `resolveServerTree` bez wspólnego helpera (1 użycie); brak globalnego `commandTimeout` w Redisie (limity per operacja); #17 zawęża okno, nie gwarantuje (indeks search Stripe ~1 min). Zmiana zachowania: nazwa bez `[a-z0-9]` dostaje slug `firma-2` zamiast `firma`.
+
+Bramka: `npx tsc --noEmit` OK; `npx jest` 183 suite'y / 1979 testów; `npx next lint` 0 błędów. Build niewykonalny w worktree (brak `.env`) — krok operatora.
 
 ## Środowisko worktree
 

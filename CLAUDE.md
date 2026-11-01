@@ -115,6 +115,15 @@ Konsekwencje w kodzie: `serviceLocationsTable.latitude`/`longitude` są **nullow
 - **Nowa oś filtra = wpis w `semanticSearchKey`** (`src/lib/semantic-search-key.ts`). Typ wymusza komplet osi `CoverageFilters`; oś spoza klucza czyściła wyniki semantyczne bez ponownego zapytania.
 - **Select w arkuszu mobilnym** potrzebuje `contentClassName` z wyższym z-index (lista Radix jest w portalu, arkusz ma `z-[999]`) — wzorzec w `mobile-filter-modal.tsx`.
 
+### Profil firmy i Premium
+
+Profil: `/firma/<slug>` (`src/app/[locale]/firma/[slug]/`), krótki alias `polvia.pl/<slug>` (307 z middleware, tylko dla premium). `services.slug` jest unikalny i **niezmienny** — przydziela go `src/db/service-slugs.ts` z nazwy; subskrypcja Stripe wiąże się z wpisem przez UUID i `metadata.serviceSlug`.
+
+- **`isPremiumActive` (`src/lib/premium.ts`) to jedyne źródło prawdy** o premium (widok, ranking, blokada checkoutu). Nie sprawdzaj statusu subskrypcji ręcznie.
+- **Stripe tylko przez `src/lib/stripe.ts`** (`server-only`). Stan subskrypcji zapisuje wyłącznie synchronizacja (`src/lib/subscription-sync.ts`) z webhooka (`/api/stripe/webhook`) albo CLI `npm run db:sync-subscriptions`. Klucz testowy + baza nielokalna = webhook 503 `CONFIG_MISMATCH`, CLI odmawia startu.
+- **Segmenty zarezerwowane** (nie mogą być slugiem aliasu): `src/lib/service-slug-alias.ts` (`isReservedRootSegment`, `isAliasableServiceSlug`) — nowa trasa najwyższego poziomu musi tam trafić, inaczej middleware potraktuje ją jak alias.
+- Strona profilu jest `force-dynamic` (widok zależy od czasu i stanu subskrypcji). Treść premium parsuje się leniwie, dopiero po decyzji widoku.
+
 ### Mutacje
 - **Server Action** (`_actions.ts` z `'use server'`) — mutacja z UI tego repo. Zawsze: walidacja Zod + sprawdzenie uprawnień + `revalidatePath` po zapisie.
 - **Route handler** (`src/app/api/**/route.ts`) — endpoint dla zewnętrznych konsumentów. Zawsze: walidacja Zod + rate limiting (wzorzec: `src/app/api/submit-contact-query/route.ts`).
