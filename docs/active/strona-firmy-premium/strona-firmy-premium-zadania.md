@@ -1,7 +1,7 @@
 # Zadania: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`)
-**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3)
+**Ostatnia aktualizacja:** 2026-11-01 (poprawki po review fazy 3, runda 5)
 
 ## Źródła
 
@@ -474,18 +474,18 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 5”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 6 × P2, 30 × P3). Przed wdrożeniem bez Stripe: V2, V4. Przed powrotem Stripe: V1, V3. V5, V6: luki testów na regułach premium ręcznego.
 
-- [ ] 🟠 [important] V1 **`env.ts:70`** — `resolveStripeConfig(env)` na końcu modułu rzuca w przeglądarce (proxy `@t3-oss/env` przy odczycie zmiennej `server`); pierwszy klient importujący `env` wywali hydratację. `if (typeof window === 'undefined')` + komentarz; `emptyStringAsUndefined: true`.
-- [ ] 🟠 [important] V2 **`premium/dziekujemy/page.tsx:242`** — bez Stripe `notFound()` w streamowanej stronie (`[locale]/loading.tsx`) daje soft-404 (200). Rewrite na `SERVICE_PROFILE_NOT_FOUND_PATH` w middleware przy braku konfiguracji; czysta funkcja dopasowania ścieżki z testem.
+- [x] 🟠 [important] V1 **`env.ts:70`** — `resolveStripeConfig(env)` na końcu modułu rzuca w przeglądarce (proxy `@t3-oss/env` przy odczycie zmiennej `server`); pierwszy klient importujący `env` wywali hydratację. `if (typeof window === 'undefined')` + komentarz; `emptyStringAsUndefined: true`. — ✅ `if (typeof window === 'undefined')` w `env.ts` (2026-11-01).
+- [x] 🟠 [important] V2 **`premium/dziekujemy/page.tsx:242`** — bez Stripe `notFound()` w streamowanej stronie (`[locale]/loading.tsx`) daje soft-404 (200). Rewrite na `SERVICE_PROFILE_NOT_FOUND_PATH` w middleware przy braku konfiguracji; czysta funkcja dopasowania ścieżki z testem. — ✅ `isPremiumThanksPathname` + rewrite w middleware przy `resolveStripeConfig(env) === null`; testy 4 locale + negatywne.
 - [ ] 🟠 [important] V3 **`firma/[slug]/_actions.ts:216`** — awaria Redisa w `isWithinPremiumLimit('materials')` rzuca przed fail-open `claimSend`; płacący dostaje stronę błędu. Limit w `try/catch` + fail-open; w checkoutcie (`:83`) wyjątek → `fail('CHECKOUT_FAILED')`; testy „limit rzuca”.
-- [ ] 🟠 [important] V4 **`api/service-slug/[slug]/route.ts:60`** — cache `exists` 240/60 + timeout lookupu 1,5 s → zimny start na rzadkim `/<slug>` daje 404 zamiast 307. Osobny klucz cache dla aliasu (`?premium=1`, 240/60), profil `s-maxage=300, stale-while-revalidate=86400`; testy nagłówków.
-- [ ] 🟠 [important] V5 **`src/lib/subscription-store.ts:107-124`** — `setPromotion(null)` z `NOT EXISTS` bez testu, atrapa (`fake-subscription-store.ts:53`) usuwa bezwarunkowo. `buildRemovePromotionQuery` z testem SQL; atrapa z `manualPremiumUntil` + scenariusz; razem z P3 #3 (jeden builder `GREATEST`) i #4 (`LEAST`).
-- [ ] 🟠 [important] V6 **`src/db/premium-content-store.ts:102-134`** — mapowanie daty w `findContent` i transakcja `saveContent` bez testu. Czysta `toEntryShape(row)` z testem round-trip; test `saveContent` (z datą 2 zapisy, bez daty 1, jedna transakcja).
+- [x] 🟠 [important] V4 **`api/service-slug/[slug]/route.ts:60`** — cache `exists` 240/60 + timeout lookupu 1,5 s → zimny start na rzadkim `/<slug>` daje 404 zamiast 307. Osobny klucz cache dla aliasu (`?premium=1`, 240/60), profil `s-maxage=300, stale-while-revalidate=86400`; testy nagłówków. — ✅ `purpose: 'profile' | 'alias'`: alias pyta `?premium=1` (240/60, timeout 5 s), profil 300/86400 (1,5 s); testy URL, timeoutu i nagłówków.
+- [x] 🟠 [important] V5 **`src/lib/subscription-store.ts:107-124`** — `setPromotion(null)` z `NOT EXISTS` bez testu, atrapa (`fake-subscription-store.ts:53`) usuwa bezwarunkowo. `buildRemovePromotionQuery` z testem SQL; atrapa z `manualPremiumUntil` + scenariusz; razem z P3 #3 (jeden builder `GREATEST`) i #4 (`LEAST`). — ✅ `src/db/promotion-queries.ts` (`buildRemovePromotionQuery` + przeniesiony `buildExtendPromotionQuery`, P3 #3) z testami SQL; atrapa z `manualPremiumUntil`, scenariusze sync.
+- [x] 🟠 [important] V6 **`src/db/premium-content-store.ts:102-134`** — mapowanie daty w `findContent` i transakcja `saveContent` bez testu. Czysta `toEntryShape(row)` z testem round-trip; test `saveContent` (z datą 2 zapisy, bez daty 1, jedna transakcja). — ✅ `toEntryShape` + round-trip CET/CEST; `saveContent` na atrapie sterownika `postgres` (1 transakcja, 2/1 zapis).
 - [ ] 🟡 [nit] Stripe/bezpieczeństwo: #1 bramka trybu klucza w checkoutcie, #2 `maxDuration` profilu, #3 jeden builder `GREATEST`, #4 `LEAST` przy premium ręcznym, #5 nazwa `hasActivePremiumSubscription`, #6 budżet webhooka w komentarzu, #7 znacznik `pending`, #8 decyzja: premium ręczne blokuje przedpłatę online.
-- [ ] 🟡 [nit] Premium ręczne/dokumentacja: #9 ostrzeżenie dla daty z przeszłości/odległej, #10 „alias do 5 min”, #11 zastrzeżenie o rankingu w CLAUDE.md, #12 `db:sync-subscriptions` jako krok Stripe, #13 testy dni zmiany czasu.
+- [ ] 🟡 [nit] Premium ręczne/dokumentacja (✅ #9: `describeActiveUntilProblem`, `db:premium` wstrzymuje zapis bez `--force`, seed ostrzega; ✅ #10: procedura niżej): #9 ostrzeżenie dla daty z przeszłości/odległej, #10 „alias do 5 min”, #11 zastrzeżenie o rankingu w CLAUDE.md, #12 `db:sync-subscriptions` jako krok Stripe, #13 testy dni zmiany czasu.
 - [ ] 🟡 [nit] Wydajność: #14 SDK Stripe na zimnym starcie, #15 tłumaczenia per locale, #16 `emptyStringAsUndefined`, #17 cache profilu (na później), #18 jsonb dla free (na później).
 - [ ] 🟡 [nit] Kod: #19 `isLocale` ×3, #20 `premiumStateColumns`, #21 unia `ServiceSlugStatus`, #22 wrapper `sendMail` ×2, #23 `premium-plan.ts`, #24 `contact-form.tsx` 350 linii, #25 funkcje > 50 linii, #26 linie > 100 znaków.
 - [ ] 🟡 [nit] Testy: #27 CTA profilu w 4 locale bez mocka `Link`, #28 matcher `api/`, #29 wysłanie formularza z prefill + slug > 255, #30 wybór `PremiumPurchase`.
-- [ ] 🟡 [nit] Poza zakresem: `api/submit-contact-query/route.ts:64-65` bez `safeParse` (500 zamiast 400) — osobne zadanie.
+- [x] 🟡 [nit] Poza zakresem: `api/submit-contact-query/route.ts:64-65` bez `safeParse` (500 zamiast 400) — osobne zadanie. — ✅ `safeParse` + `readJsonBody` → 400 `BAD_REQUEST`, klucz `contact.invalidInput` w 4 locale, testy.
 
 ---
 
@@ -506,9 +506,9 @@ Płatności online odłożone (mały popyt). Kod Stripe uśpiony: `STRIPE_*` opc
 1. weryfikacja właściciela (krok 1 w `.claude/skills/dodaj/SKILL.md`),
 2. w `data/services/<plik>.json`, w bloku `premium`: `"activeUntil": "RRRR-MM-DD"` (aktywne do końca tego dnia czasu polskiego),
 3. `npm run db:premium -- data/services/<plik>.json --dry-run` → sprawdzić diff z datą,
-4. `npm run db:premium -- data/services/<plik>.json`,
+4. `npm run db:premium -- data/services/<plik>.json` (data z przeszłości albo > 2 lata naprzód wstrzymuje zapis; świadomie: `--force`),
 5. zacommitować JSON (seed odtwarza datę po `db:reset`).
-Przedłużenie = nowa data i te same kroki. Wyłączenie przed czasem: usunąć `activeUntil` — widok i alias znikają od razu, ranking trwa do starej daty (skrócenie: ręcznie `promoted_services`).
+Przedłużenie = nowa data i te same kroki. Wyłączenie przed czasem: usunąć `activeUntil` — widok premium znika od razu, krótki adres `/<slug>` przestaje przekierowywać najpóźniej po 5 min (cache CDN lookupu), ranking trwa do starej daty (skrócenie: ręcznie `promoted_services`). Tak samo przy włączeniu: alias może zacząć działać do 5 min po `db:premium`.
 
 **Powrót do Stripe:** pięć `STRIPE_*` w Vercelu + redeploy + webhook w Stripe Dashboard, potem kroki oznaczone niżej jako Stripe. Kod bez zmian.
 

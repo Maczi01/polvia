@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (review fazy 3, runda 5)
+**Ostatnia aktualizacja:** 2026-11-01 (poprawki po review fazy 3, runda 5)
 
 ## Źródła
 
@@ -428,6 +428,18 @@ Zakres `d5fa59c..HEAD` (P3 + uśpienie Stripe). 4 agentów (security, performanc
 - **Skrócenie cache lookupu ma koszt dla aliasu, nie tylko świeżość** — timeout 1,5 s w middleware + zimny start bez SWR = 404 na rzadkim `/<slug>` (V4). Profil i alias potrzebują różnych kluczy cache.
 - **Reguły zapisane tylko w SQL adaptera muszą mieć test buildera** — atrapa magazynu w testach sync modelowała usuwanie bezwarunkowo, więc reguła z `NOT EXISTS` była niesprawdzana (V5, V6).
 - Uśpienie Stripe szczelne (bramki przed I/O na wszystkich ścieżkach), `hasActivePremium` jedynym odczytem premium firmy, testy nie osłabione.
+
+## Poprawki po review fazy 3 — runda 5 (2026-11-01)
+
+Zakres: wszystko, co blokowało wdrożenie bez Stripe, plus luki testów i tani V1. V3 (fail-open limitu materiałów) zostaje do powrotu Stripe — ścieżka jest uśpiona.
+- **V1:** `resolveStripeConfig(env)` w `env.ts` tylko gdy `typeof window === 'undefined'`.
+- **V2:** middleware liczy `isStripeEnabled` raz (moduł `stripe-config` jest czysty, działa na edge); bez Stripe `isPremiumThanksPathname` → rewrite na `SERVICE_PROFILE_NOT_FOUND_PATH` (prawdziwe 404).
+- **V4:** `lookupServiceSlug({ purpose })`. Profil: URL bez query, `s-maxage=300, swr=86400`, timeout 1,5 s. Alias: `?premium=1` (osobny klucz CDN), `240/60` (≤ 5 min świeżości premium), timeout 5 s — kandydaci aliasu to tylko ścieżki, które inaczej dałyby 404, więc dłuższe czekanie nie spowalnia żadnej strony.
+- **V5/V6 (feature-builder-web-data):** `src/db/promotion-queries.ts` — jedyne miejsce SQL rankingu (`GREATEST` i usunięcie z `NOT EXISTS`); atrapa sync zna `manualPremiumUntil`; `toEntryShape` i `saveContent` przetestowane na atrapie sterownika `postgres` (`tests/fixtures/premium/fake-postgres.ts`).
+- **P3 #9:** `describeActiveUntilProblem` (`past` / `too_far` > 2 lata); `db:premium` wstrzymuje zapis bez `--force`, seed tylko ostrzega. Zakończenie premium datą z przeszłości wymaga teraz `--force` — prościej usunąć `activeUntil`.
+- **P3 #10:** procedura w zadaniach mówi o opóźnieniu aliasu do 5 min.
+- **Kontakt:** `/api/submit-contact-query` waliduje `safeParse` i zwraca 400 `BAD_REQUEST` (`contact.invalidInput` w 4 locale); `JSON.parse` zamiast `req.json()`, bo undici rzuca SyntaxError z innego realmu.
+- Gate: `tsc` OK, `jest` 191 suite'ów / 2097 testów, `next lint` 0 błędów.
 
 ## Środowisko worktree
 
