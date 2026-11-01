@@ -43,6 +43,19 @@ async function incrementContactRateLimit(ip: string) {
 
 export type ContactFormData = z.infer<typeof ContactFormSchema>;
 
+/** Tresc zadania jako JSON; niepoprawny JSON = `null`, ktory odrzuci walidacja schematu. */
+async function readJsonBody(req: Request): Promise<unknown> {
+    // `JSON.parse`, nie `req.json()`: ten drugi (undici) rzuca SyntaxError z innego realmu,
+    // ktorego nie rozpozna `instanceof`.
+    const text = await req.text();
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        if (!(error instanceof SyntaxError)) throw error;
+        return null;
+    }
+}
+
 export async function POST(req: Request) {
     const ip = getClientIp(req);
 
@@ -65,8 +78,16 @@ export async function POST(req: Request) {
         );
     }
 
-    const body = await req.json();
-    const { email, topic, message } = ContactFormSchema.parse(body);
+    // Zly JSON albo dane spoza schematu to blad klienta (400), nie awaria serwera (500).
+    const parsed = ContactFormSchema.safeParse(await readJsonBody(req));
+    if (!parsed.success) {
+        const invalid = t('invalidInput');
+        return NextResponse.json(
+            { success: false, message: invalid, error: { code: 'BAD_REQUEST', message: invalid } },
+            { status: 400 },
+        );
+    }
+    const { email, topic, message } = parsed.data;
 
     const sent = await sendMail({
         to: env.MY_GMAIL,

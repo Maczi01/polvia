@@ -161,6 +161,40 @@ describe('syncSubscriptionFromStripe — stan subskrypcji', () => {
     });
 });
 
+describe('syncSubscriptionFromStripe — koniec subskrypcji a premium reczne', () => {
+    const MANUAL_RANKING = wholeSeconds(Date.now() + 60 * DAY_MS);
+
+    it.each(['canceled', 'incomplete_expired'])(
+        '%s przy trwajacym premium recznym: wiersz rankingu zostaje',
+        async status => {
+            db.subscriptions.set(SERVICE_A, storedActive(SERVICE_A, 'sub_A'));
+            db.promotions.set(SERVICE_A, MANUAL_RANKING);
+            db.manualPremiumUntil.set(SERVICE_A, wholeSeconds(Date.now() + 30 * DAY_MS));
+            stripeReturns(stripeSubscription({ status }));
+
+            const result = await syncSubscriptionFromStripe('sub_A');
+
+            expect(result).toEqual({
+                outcome: 'synced',
+                serviceId: SERVICE_A,
+                isPremiumActive: false,
+            });
+            expect(db.promotions.get(SERVICE_A)).toEqual(MANUAL_RANKING);
+        },
+    );
+
+    it('canceled po wygasnieciu premium recznego: wiersz rankingu usuniety', async () => {
+        db.subscriptions.set(SERVICE_A, storedActive(SERVICE_A, 'sub_A'));
+        db.promotions.set(SERVICE_A, MANUAL_RANKING);
+        db.manualPremiumUntil.set(SERVICE_A, wholeSeconds(Date.now() - DAY_MS));
+        stripeReturns(stripeSubscription({ status: 'canceled' }));
+
+        await syncSubscriptionFromStripe('sub_A');
+
+        expect(db.promotions.has(SERVICE_A)).toBe(false);
+    });
+});
+
 describe('syncSubscriptionFromStripe — stan koncowy a nieswiezy odczyt', () => {
     it('po zapisanym canceled starszy past_due tej samej subskrypcji: stale_ignored, bez premium', async () => {
         // Wyscig: `retrieve` jest przed blokada, wiec past_due pobrany przed anulowaniem

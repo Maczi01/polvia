@@ -9,6 +9,7 @@
  *   jest.mock('@/lib/subscription-store', () =>
  *       jest.requireActual('<sciezka>/fake-subscription-store').fakeSubscriptionStoreModule);
  */
+import { isManualPremiumActive } from '@/lib/manual-premium';
 import type { StripeSubscriptionSnapshot } from '@/lib/subscription-sync';
 import type {
     StoredSubscription,
@@ -27,6 +28,8 @@ export const fakeSubscriptionDb = {
     slugs: new Map<string, string>(),
     subscriptions: new Map<string, SubscriptionRecord>(),
     promotions: new Map<string, Date>(),
+    /** `service_profiles.manual_premium_until` (wylaczny koniec premium recznego). */
+    manualPremiumUntil: new Map<string, Date>(),
 };
 
 /** Dwa wpisy (A ze slugiem `kancelaria-a`, B bez), bez subskrypcji i rankingu. */
@@ -35,6 +38,7 @@ export function resetFakeSubscriptionDb(): void {
     fakeSubscriptionDb.slugs = new Map([['kancelaria-a', SERVICE_A]]);
     fakeSubscriptionDb.subscriptions = new Map();
     fakeSubscriptionDb.promotions = new Map();
+    fakeSubscriptionDb.manualPremiumUntil = new Map();
 }
 
 const transactionStore: SubscriptionTransaction = {
@@ -48,10 +52,14 @@ const transactionStore: SubscriptionTransaction = {
     saveSubscription: async record => {
         fakeSubscriptionDb.subscriptions.set(record.serviceId, record);
     },
-    // Kontrakt adaptera: zapis nie skraca dluzszego terminu, `null` usuwa wiersz.
+    // Kontrakt adaptera: zapis nie skraca dluzszego terminu, `null` usuwa wiersz, chyba ze
+    // trwa premium reczne (`buildRemovePromotionQuery`: `manual_premium_until > NOW()`).
     setPromotion: async (serviceId, expiresAt) => {
         if (expiresAt === null) {
-            fakeSubscriptionDb.promotions.delete(serviceId);
+            const manualUntil = fakeSubscriptionDb.manualPremiumUntil.get(serviceId) ?? null;
+            if (!isManualPremiumActive(manualUntil, new Date())) {
+                fakeSubscriptionDb.promotions.delete(serviceId);
+            }
             return;
         }
         const current = fakeSubscriptionDb.promotions.get(serviceId);

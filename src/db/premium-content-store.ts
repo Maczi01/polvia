@@ -1,15 +1,11 @@
-import { eq, inArray, sql } from 'drizzle-orm';
+import { eq, type InferSelectModel, inArray, sql } from 'drizzle-orm';
 import type { PgDatabase, PgInsertBase, PgInsertWithout } from 'drizzle-orm/pg-core';
 import type { PostgresJsDatabase, PostgresJsQueryResultHKT } from 'drizzle-orm/postgres-js';
 
 import { manualPremiumEnd, manualPremiumLastDay } from '../lib/manual-premium';
 import type { PremiumContentData } from './premium-content-schema';
-import {
-    promotedServicesTable,
-    serviceLocationsTable,
-    serviceProfilesTable,
-    servicesTable,
-} from './schema';
+import { buildExtendPromotionQuery } from './promotion-queries';
+import { serviceLocationsTable, serviceProfilesTable, servicesTable } from './schema';
 import type { PremiumContentStore, ServiceRef } from './upsert-premium-content';
 
 /**
@@ -20,12 +16,17 @@ import type { PremiumContentStore, ServiceRef } from './upsert-premium-content';
 /** Klient albo transakcja — zapytania zapisu ida w jednej transakcji. */
 type Database = PgDatabase<PostgresJsQueryResultHKT>;
 
-type UpsertQuery<Table extends typeof serviceProfilesTable | typeof promotedServicesTable> =
-    PgInsertWithout<
-        PgInsertBase<Table, PostgresJsQueryResultHKT>,
-        false,
-        'onConflictDoNothing' | 'onConflictDoUpdate'
-    >;
+type SavePremiumContentQuery = PgInsertWithout<
+    PgInsertBase<typeof serviceProfilesTable, PostgresJsQueryResultHKT>,
+    false,
+    'onConflictDoNothing' | 'onConflictDoUpdate'
+>;
+
+/** Zapisany wiersz tresci w kolumnach, ktore czyta `findContent`. */
+export type StoredPremiumContent = Pick<
+    InferSelectModel<typeof serviceProfilesTable>,
+    'template' | 'coverImage' | 'gallery' | 'priceList' | 'faq' | 'manualPremiumUntil'
+>;
 
 /** Wylaczny koniec premium recznego z bloku albo `null`, gdy blok nie ma `activeUntil`. */
 export function manualPremiumUntilOf(content: PremiumContentData): Date | null {
@@ -40,7 +41,7 @@ export function buildSavePremiumContentQuery(
     db: Database,
     serviceId: string,
     content: PremiumContentData,
-): UpsertQuery<typeof serviceProfilesTable> {
+): SavePremiumContentQuery {
     const values = {
         template: content.template,
         coverImage: content.coverImage,
@@ -60,24 +61,19 @@ export function buildSavePremiumContentQuery(
 }
 
 /**
- * Pozycja w rankingu co najmniej do `expiresAt` — ta sama regula co przy subskrypcji
- * (`subscription-store.ts`, `setPromotion`): istniejacemu wierszowi zmienia tylko termin,
- * tylko na pozniejszy (`GREATEST`), a `priority` zostawia operatorowi. Nigdy nie usuwa.
+ * Wiersz w ksztalcie bloku `premium` z pliku wpisu: data `activeUntil` (ostatni dzien,
+ * Europe/Warsaw) zamiast chwili `manual_premium_until`, zeby diff `db:premium` porownal je
+ * wprost. Odwrotnosc `manualPremiumUntilOf`.
  */
-export function buildExtendPromotionQuery(
-    db: Database,
-    serviceId: string,
-    expiresAt: Date,
-): UpsertQuery<typeof promotedServicesTable> {
-    return db
-        .insert(promotedServicesTable)
-        .values({ serviceId, expiresAt })
-        .onConflictDoUpdate({
-            target: promotedServicesTable.serviceId,
-            set: {
-                expiresAt: sql`GREATEST(${promotedServicesTable.expiresAt}, excluded.expires_at)`,
-            },
-        });
+export function toEntryShape({
+    manualPremiumUntil,
+    ...content
+}: StoredPremiumContent): Omit<StoredPremiumContent, 'manualPremiumUntil'> & {
+    activeUntil?: string;
+} {
+    return manualPremiumUntil === null
+        ? content
+        : { ...content, activeUntil: manualPremiumLastDay(manualPremiumUntil) };
 }
 
 /** Usluga bez slugu (przed backfillem) nie ma adresu profilu ani katalogu zdjec. */
@@ -112,13 +108,7 @@ export function createPremiumContentStore(db: PostgresJsDatabase): PremiumConten
                 .from(serviceProfilesTable)
                 .where(eq(serviceProfilesTable.serviceId, serviceId))
                 .limit(1);
-            if (!row) return null;
-
-            // Ksztalt bloku z pliku: data zamiast chwili, zeby diff porownal je wprost.
-            const { manualPremiumUntil, ...content } = row;
-            return manualPremiumUntil === null
-                ? content
-                : { ...content, activeUntil: manualPremiumLastDay(manualPremiumUntil) };
+            return row ? toEntryShape(row) : null;
         },
 
         async saveContent(serviceId, content) {

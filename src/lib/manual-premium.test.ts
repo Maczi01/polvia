@@ -1,4 +1,5 @@
 import {
+    describeActiveUntilProblem,
     InvalidManualPremiumDateError,
     isCalendarDate,
     isManualPremiumActive,
@@ -72,5 +73,31 @@ describe('isManualPremiumActive — granica dnia', () => {
 
     it('brak daty to brak premium recznego', () => {
         expect(isManualPremiumActive(null, new Date('2026-11-01T12:00:00Z'))).toBe(false);
+    });
+});
+
+describe('describeActiveUntilProblem — podejrzana data activeUntil', () => {
+    const now = new Date('2026-11-01T12:00:00.000Z');
+
+    it('data w rozsadnym zakresie (takze dzisiejsza i dokladnie 2 lata naprzod) jest ok', () => {
+        expect(describeActiveUntilProblem('2026-11-30', now)).toBeNull();
+        expect(describeActiveUntilProblem('2026-11-01', now)).toBeNull();
+        expect(describeActiveUntilProblem('2028-10-31', now)).toBeNull();
+    });
+
+    it('wczorajsza i starsza data: past (premium reczne juz wygaslo)', () => {
+        expect(describeActiveUntilProblem('2026-10-31', now)).toBe('past');
+        expect(describeActiveUntilProblem('2025-12-31', now)).toBe('past');
+    });
+
+    it('ponad 2 lata naprzod (literowka roku): too_far', () => {
+        expect(describeActiveUntilProblem('2028-11-02', now)).toBe('too_far');
+        expect(describeActiveUntilProblem('2062-11-30', now)).toBe('too_far');
+    });
+
+    it('niepoprawna data rzuca typowany blad, nie zgaduje', () => {
+        expect(() => describeActiveUntilProblem('2026-02-30', now)).toThrow(
+            InvalidManualPremiumDateError,
+        );
     });
 });

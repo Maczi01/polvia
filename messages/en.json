@@ -463,7 +463,8 @@
   },
   "contact": {
     "rateLimitExceeded": "Message limit exceeded. Please try again later.",
-    "sendFailed": "We could not send your message. Please try again later."
+    "sendFailed": "We could not send your message. Please try again later.",
+    "invalidInput": "Please check your email address, topic and message."
   },
   "images": {
     "logo": "Polvia - Ukrainian Business Directory Poland",

@@ -11,7 +11,10 @@ import {
 } from '@/lib/rate-limit';
 import { getServiceSlugStatus } from '@/lib/service-profile-queries';
 import { isValidServiceSlug } from '@/lib/service-slug-format';
-import { SERVICE_SLUG_LOOKUP_SECRET_HEADER } from '@/lib/service-slug-lookup';
+import {
+    ALIAS_QUERY_PARAM,
+    SERVICE_SLUG_LOOKUP_SECRET_HEADER,
+} from '@/lib/service-slug-lookup';
 
 import { env } from '../../../../../env';
 
@@ -45,11 +48,13 @@ const SLUG_LOOKUP_RATE_LIMIT = {
  * Odpowiedz nie zalezy od sekretu (rozni sie tylko limitem), wiec CDN moze ja wspoldzielic
  * miedzy ruchem zaufanym i publicznym.
  *
- * `exists` niesie tez `hasActivePremium`: krotki adres `polvia.pl/<slug>` (middleware)
- * zaczyna i przestaje przekierowywac po zmianie subskrypcji z opoznieniem do 5 minut.
- * Najstarsza odpowiedz, jaka CDN moze podac, ma `s-maxage + stale-while-revalidate` sekund,
- * wiec ta suma wynosi 300. Osobny, krotszy cache dla premium oznaczalby drugi lookup albo
- * krotszy cache dla wszystkich profili.
+ * Dwa klucze cache dla tego samego slugu (`ALIAS_QUERY_PARAM`):
+ * - profil `/firma/<slug>` potrzebuje tylko `exists`, wiec dlugie `stale-while-revalidate`:
+ *   CDN odpowiada od razu z kopii, a funkcja (zimny start + baza) odswieza ja w tle —
+ *   wejscie na profil nie czeka na lookup,
+ * - krotki adres `polvia.pl/<slug>` zalezy od `hasActivePremium` i zaczyna/przestaje
+ *   przekierowywac najpozniej 5 min po zmianie premium: najstarsza odpowiedz, jaka CDN moze
+ *   podac, ma `s-maxage + stale-while-revalidate` sekund, wiec ta suma wynosi 300.
  *
  * `missing` krotko, zeby nowo dodany wpis szybko przestal dawac 404, ale ze
  * `stale-while-revalidate`: unikalne sciezki skanerow i tak omijaja cache, a powtarzane
@@ -57,7 +62,8 @@ const SLUG_LOOKUP_RATE_LIMIT = {
  * dostac 404 jeszcze do ~5,5 min po dodaniu, jesli jego slug byl wczesniej odpytany.
  */
 const CACHE_CONTROL = {
-    exists: 'public, s-maxage=240, stale-while-revalidate=60',
+    profileExists: 'public, s-maxage=300, stale-while-revalidate=86400',
+    aliasExists: 'public, s-maxage=240, stale-while-revalidate=60',
     missing: 'public, s-maxage=30, stale-while-revalidate=300',
     /** 400/429/500 nie moga trafic do CDN — inaczej jeden klient zablokowalby slug wszystkim. */
     uncacheable: 'private, no-store',
@@ -134,6 +140,12 @@ function errorResponse(
     );
 }
 
+function cacheControlFor(exists: boolean, isAliasLookup: boolean): string {
+    if (!exists) return CACHE_CONTROL.missing;
+
+    return isAliasLookup ? CACHE_CONTROL.aliasExists : CACHE_CONTROL.profileExists;
+}
+
 export async function GET(request: NextRequest, { params }: RouteContext): Promise<NextResponse> {
     try {
         if (!isTrustedLookup(request)) {
@@ -157,10 +169,11 @@ export async function GET(request: NextRequest, { params }: RouteContext): Promi
         }
 
         const { exists, hasActivePremium } = await getServiceSlugStatus(parsed.data.slug);
+        const isAliasLookup = request.nextUrl.searchParams.has(ALIAS_QUERY_PARAM);
 
         return NextResponse.json(
             { data: { exists, hasActivePremium }, error: null },
-            { headers: { 'Cache-Control': exists ? CACHE_CONTROL.exists : CACHE_CONTROL.missing } },
+            { headers: { 'Cache-Control': cacheControlFor(exists, isAliasLookup) } },
         );
     } catch (error) {
         // Szczegoly tylko w logach serwera — surowy blad bazy nie leci do klienta.

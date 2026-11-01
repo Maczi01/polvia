@@ -3,13 +3,19 @@
  */
 // fetch, Response i AbortSignal.timeout z Node — jsdom ich nie ma.
 import {
+    ALIAS_QUERY_PARAM,
     lookupServiceSlug,
     SERVICE_SLUG_LOOKUP_SECRET_HEADER,
     SERVICE_SLUG_LOOKUP_TIMEOUT_MS,
 } from './service-slug-lookup';
 
 const SECRET = 'a'.repeat(64);
-const OPTIONS = { origin: 'https://www.polvia.pl', slug: 'kancelaria-nowak', secret: SECRET };
+const OPTIONS = {
+    origin: 'https://www.polvia.pl',
+    slug: 'kancelaria-nowak',
+    secret: SECRET,
+    purpose: 'profile',
+} as const;
 
 // Route handler za `fetch` to zewnetrzna (dla middleware) usluga HTTP.
 const fetchMock = jest.fn<Promise<Response>, Parameters<typeof fetch>>();
@@ -107,6 +113,36 @@ describe('lookupServiceSlug', () => {
         const started = Date.now();
 
         expect(await lookupServiceSlug(OPTIONS)).toBe('unknown');
-        expect(Date.now() - started).toBeGreaterThanOrEqual(SERVICE_SLUG_LOOKUP_TIMEOUT_MS - 50);
+        expect(Date.now() - started).toBeGreaterThanOrEqual(
+            SERVICE_SLUG_LOOKUP_TIMEOUT_MS.profile - 50,
+        );
+    });
+
+    it('alias pyta osobny URL (osobny klucz cache CDN) z dluzszym limitem czasu', async () => {
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: true }, error: null }));
+        const timeoutSpy = jest.spyOn(AbortSignal, 'timeout');
+
+        expect(await lookupServiceSlug({ ...OPTIONS, purpose: 'alias' })).toBe('premium');
+
+        expect(fetchMock.mock.calls[0][0]).toBe(
+            `https://www.polvia.pl/api/service-slug/kancelaria-nowak?${ALIAS_QUERY_PARAM}=1`,
+        );
+        expect(timeoutSpy).toHaveBeenCalledWith(SERVICE_SLUG_LOOKUP_TIMEOUT_MS.alias);
+    });
+
+    it('alias czeka dluzej niz profil — zimny start nie zamienia przekierowania w 404', () => {
+        expect(SERVICE_SLUG_LOOKUP_TIMEOUT_MS.alias).toBeGreaterThan(
+            SERVICE_SLUG_LOOKUP_TIMEOUT_MS.profile,
+        );
+    });
+
+    it('profil pyta URL bez parametru aliasu z krotkim limitem', async () => {
+        fetchMock.mockResolvedValue(json({ data: { exists: true, hasActivePremium: false }, error: null }));
+        const timeoutSpy = jest.spyOn(AbortSignal, 'timeout');
+
+        await lookupServiceSlug(OPTIONS);
+
+        expect(String(fetchMock.mock.calls[0][0])).not.toContain('?');
+        expect(timeoutSpy).toHaveBeenCalledWith(SERVICE_SLUG_LOOKUP_TIMEOUT_MS.profile);
     });
 });

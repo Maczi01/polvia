@@ -5,6 +5,7 @@ import { parseMapSlug } from '@/lib/map-slug-parser';
 import { parseMapPathname } from '@/lib/map-pathname';
 import { localizedMapBasePath } from '@/lib/map-url-builder';
 import {
+    isPremiumThanksPathname,
     isValidServiceSlug,
     parseRootAliasPathname,
     parseServiceProfilePathname,
@@ -12,6 +13,7 @@ import {
     SERVICE_PROFILE_NOT_FOUND_PATH,
 } from '@/lib/service-profile-path';
 import { lookupServiceSlug } from '@/lib/service-slug-lookup';
+import { resolveStripeConfig } from '@/lib/stripe-config';
 
 import { env } from '../env';
 
@@ -19,6 +21,18 @@ const intlMiddleware = createMiddleware({
     ...routing,
     localeDetection: false
 });
+
+/**
+ * Bez konfiguracji Stripe nie ma platnosci, ktora moglaby wrocic na `premium/dziekujemy`.
+ * Strona sama konczy sie `notFound()`, ale streamuje (`[locale]/loading.tsx`), wiec
+ * dalaby soft-404 (200) — prawdziwe 404 da sie zwrocic tylko tutaj. Modul `stripe-config`
+ * jest czysty (bez SDK Stripe), wiec dziala na edge.
+ */
+const isStripeEnabled = resolveStripeConfig(env) !== null;
+
+function notFoundRewrite(request: NextRequest): NextResponse {
+    return NextResponse.rewrite(new URL(SERVICE_PROFILE_NOT_FOUND_PATH, request.url));
+}
 
 /**
  * Profil firmy `/firma/<slug>` (i `/{locale}/firma/<slug>`): prawdziwe 404 dla slugu,
@@ -43,20 +57,18 @@ async function handleServiceProfile(request: NextRequest): Promise<NextResponse 
     const profilePath = parseServiceProfilePathname(request.nextUrl.pathname);
     if (!profilePath) return null;
 
-    const notFound = (): NextResponse =>
-        NextResponse.rewrite(new URL(SERVICE_PROFILE_NOT_FOUND_PATH, request.url));
-
-    if (!isValidServiceSlug(profilePath.slug)) return notFound();
+    if (!isValidServiceSlug(profilePath.slug)) return notFoundRewrite(request);
 
     const result = await lookupServiceSlug({
         origin: request.nextUrl.origin,
         slug: profilePath.slug,
         secret: env.SERVICE_SLUG_LOOKUP_SECRET,
+        purpose: 'profile',
     });
 
     // `unknown` (timeout, 5xx, 429) = fail-open: profil renderuje sie albo konczy
     // `notFound()` strony — swiadomie akceptowany soft-404 w wyjatku.
-    return result === 'missing' ? notFound() : null;
+    return result === 'missing' ? notFoundRewrite(request) : null;
 }
 
 /**
@@ -81,6 +93,7 @@ async function handleRootAlias(request: NextRequest): Promise<NextResponse | nul
         origin: request.nextUrl.origin,
         slug,
         secret: env.SERVICE_SLUG_LOOKUP_SECRET,
+        purpose: 'alias',
     });
 
     const target = rootAliasRedirectPath(slug, result);
@@ -94,7 +107,8 @@ async function handleRootAlias(request: NextRequest): Promise<NextResponse | nul
 /**
  * Kolejnosc galezi:
  * 1. walidacja slugu mapy (307 na baze mapy),
- * 2. profil `/firma/<slug>` (404 dla nieistniejacego),
+ * 2. profil `/firma/<slug>` (404 dla nieistniejacego; bez Stripe 404 takze dla
+ *    `/firma/<slug>/premium/dziekujemy`),
  * 3. krotki adres `/<slug>` (307 na profil dla aktywnego premium),
  * 4. rewrite `/mapa/**` i redirect `/map/**`,
  * 5. next-intl.
@@ -129,6 +143,8 @@ export default async function middleware(request: NextRequest): Promise<NextResp
             return NextResponse.redirect(url, 307);
         }
     }
+
+    if (!isStripeEnabled && isPremiumThanksPathname(pathname)) return notFoundRewrite(request);
 
     const profileResponse = await handleServiceProfile(request);
     if (profileResponse) return profileResponse;

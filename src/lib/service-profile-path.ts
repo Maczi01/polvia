@@ -52,6 +52,27 @@ export function buildServiceProfilePath(locale: Locale, slug: string): string {
  */
 export const SERVICE_PROFILE_NOT_FOUND_PATH = `/pl/${SERVICE_PROFILE_SEGMENT}/_brak-profilu/_404`;
 
+/** Segmenty strony powrotu ze Stripe Checkout pod profilem: `/firma/<slug>/premium/dziekujemy`. */
+const PREMIUM_THANKS_SEGMENTS = ['premium', 'dziekujemy'] as const;
+
+/**
+ * Czy sciezka to strona powrotu ze Stripe Checkout (`/firma/<slug>/premium/dziekujemy`,
+ * w kazdym locale, z dowolnym slugiem). Bez konfiguracji Stripe middleware odpowiada na nia
+ * prawdziwym 404 — `notFound()` w streamowanej stronie dalby soft-404 (200).
+ */
+export function isPremiumThanksPathname(pathname: string): boolean {
+    const { segments } = splitLocalePrefix(pathname);
+    if (segments.length !== 4) return false;
+
+    const [segment, slug, ...rest] = segments;
+    return (
+        segment === SERVICE_PROFILE_SEGMENT &&
+        slug !== '' &&
+        rest[0] === PREMIUM_THANKS_SEGMENTS[0] &&
+        rest[1] === PREMIUM_THANKS_SEGMENTS[1]
+    );
+}
+
 /**
  * Slug krotkiego adresu `polvia.pl/<slug>` albo `null`, gdy sciezka nim nie jest.
  *

@@ -3,6 +3,7 @@ import type { ServiceSlugLookupResult } from '@/lib/service-slug-lookup';
 
 import {
     buildServiceProfilePath,
+    isPremiumThanksPathname,
     isReservedRootSegment,
     isValidServiceSlug,
     parseRootAliasPathname,
@@ -19,6 +20,26 @@ describe('SERVICE_PROFILE_NOT_FOUND_PATH', () => {
 
     it('lezy w poddrzewie profilu z jawnym locale (rewrite omija next-intl)', () => {
         expect(SERVICE_PROFILE_NOT_FOUND_PATH).toMatch(/^\/pl\/firma\/_[^/]+\/_[^/]+$/);
+    });
+});
+
+describe('isPremiumThanksPathname', () => {
+    it.each(locales)('strona powrotu ze Stripe pod profilem w locale %s', locale => {
+        const profile = buildServiceProfilePath(locale, 'kancelaria-nowak');
+
+        expect(isPremiumThanksPathname(`${profile}/premium/dziekujemy`)).toBe(true);
+    });
+
+    it.each([
+        '/firma/abc',
+        '/firma/abc/premium',
+        '/firma/abc/premium/dziekujemy/x',
+        '/firma//premium/dziekujemy',
+        '/mapa/abc/premium/dziekujemy',
+        '/de/firma/abc/premium/dziekujemy',
+        '/firma/abc/premium/inne',
+    ])('%s nie jest strona powrotu', pathname => {
+        expect(isPremiumThanksPathname(pathname)).toBe(false);
     });
 });
 

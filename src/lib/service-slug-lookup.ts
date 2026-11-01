@@ -8,11 +8,26 @@ import { z } from 'zod';
  */
 
 /**
- * Lookup blokuje odpowiedz strony, wiec ma twardy limit. Zapytanie to jeden indeksowany
- * SELECT; 1,5 s pokrywa zimny start funkcji, a dluzej nie ma sensu czekac — po timeoucie
- * zadanie i tak przechodzi dalej.
+ * - `profile` — `/firma/<slug>`: rozstrzyga tylko 404, wiec po timeoucie profil i tak sie
+ *   renderuje (fail-open). Lookup blokuje KAZDE wejscie na profil — krotki limit.
+ * - `alias` — `polvia.pl/<slug>`: po timeoucie 404 zamiast przekierowania na profil.
+ *   Kandydatami sa wylacznie sciezki, ktore bez aliasu i tak dalyby 404, wiec dluzsze
+ *   czekanie nie spowalnia zadnej istniejacej strony, a pokrywa zimny start funkcji
+ *   z polaczeniem do bazy (rzadki adres z ulotki prawie zawsze trafia na miss CDN).
  */
-export const SERVICE_SLUG_LOOKUP_TIMEOUT_MS = 1500;
+export type ServiceSlugLookupPurpose = 'profile' | 'alias';
+
+export const SERVICE_SLUG_LOOKUP_TIMEOUT_MS: Record<ServiceSlugLookupPurpose, number> = {
+    profile: 1500,
+    alias: 5000,
+};
+
+/**
+ * Parametr zapytania lookupu dla krotkiego adresu. Osobny URL = osobny klucz cache CDN:
+ * alias potrzebuje swiezego `hasActivePremium` (≤ 5 min), profil tylko `exists`
+ * i moze dostac dluga kopie z `stale-while-revalidate` (patrz route handler).
+ */
+export const ALIAS_QUERY_PARAM = 'premium';
 
 /**
  * Naglowek z sekretem `SERVICE_SLUG_LOOKUP_SECRET`: handler rozpoznaje po nim ruch
@@ -36,6 +51,12 @@ export interface ServiceSlugLookupOptions {
     slug: string;
     /** `env.SERVICE_SLUG_LOOKUP_SECRET` — zaufany ruch omija limit po IP w handlerze. */
     secret: string;
+    purpose: ServiceSlugLookupPurpose;
+}
+
+function lookupUrl(origin: string, slug: string, purpose: ServiceSlugLookupPurpose): string {
+    const url = `${origin}/api/service-slug/${encodeURIComponent(slug)}`;
+    return purpose === 'alias' ? `${url}?${ALIAS_QUERY_PARAM}=1` : url;
 }
 
 const lookupResponseSchema = z.object({
@@ -50,11 +71,12 @@ export async function lookupServiceSlug({
     origin,
     slug,
     secret,
+    purpose,
 }: ServiceSlugLookupOptions): Promise<ServiceSlugLookupResult> {
     try {
-        const response = await fetch(`${origin}/api/service-slug/${encodeURIComponent(slug)}`, {
+        const response = await fetch(lookupUrl(origin, slug, purpose), {
             headers: { [SERVICE_SLUG_LOOKUP_SECRET_HEADER]: secret },
-            signal: AbortSignal.timeout(SERVICE_SLUG_LOOKUP_TIMEOUT_MS),
+            signal: AbortSignal.timeout(SERVICE_SLUG_LOOKUP_TIMEOUT_MS[purpose]),
         });
 
         if (!response.ok) {

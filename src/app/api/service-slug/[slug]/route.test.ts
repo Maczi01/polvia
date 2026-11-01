@@ -5,6 +5,7 @@
 import { NextRequest } from 'next/server';
 
 import { getServiceSlugStatus } from '@/lib/service-profile-queries';
+import { ALIAS_QUERY_PARAM } from '@/lib/service-slug-lookup';
 
 import { createFakeRedis, type FakeMulti } from'../../../../../tests/fixtures/add-business/fake-redis';
 import { GET } from './route';
@@ -30,9 +31,18 @@ const SECRET_HEADER = 'x-service-slug-lookup-secret';
 const CLIENT_IP = '203.0.113.7';
 const RATE_LIMIT = 120;
 
-function lookupWith(slug: string, headers: Record<string, string>): ReturnType<typeof GET> {
-    const request = new NextRequest(`https://www.polvia.pl/api/service-slug/${slug}`, { headers });
-    return GET(request, { params: Promise.resolve({ slug }) });
+function lookupWith(
+    slug: string,
+    headers: Record<string, string>,
+    query = '',
+): ReturnType<typeof GET> {
+    const url = `https://www.polvia.pl/api/service-slug/${slug}${query}`;
+    return GET(new NextRequest(url, { headers }), { params: Promise.resolve({ slug }) });
+}
+
+/** Lookup krotkiego adresu z middleware — osobny klucz cache CDN. */
+function aliasLookup(slug: string): ReturnType<typeof GET> {
+    return lookupWith(slug, { [SECRET_HEADER]: SECRET }, `?${ALIAS_QUERY_PARAM}=1`);
 }
 
 /** Klient publiczny z adresem ustawionym przez platforme (Vercel: `x-real-ip`). */
@@ -116,14 +126,16 @@ describe('GET /api/service-slug/[slug]', () => {
         expect((await response.json()).data.hasActivePremium).toBe(false);
     });
 
-    it('premium ma ten sam cache CDN co exists: true', async () => {
+    it('lookup aliasu oddaje te same dane co lookup profilu', async () => {
         jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: true });
 
-        const response = await lookup('kancelaria-nowak');
+        const response = await aliasLookup('kancelaria-nowak');
 
-        expect(response.headers.get('Cache-Control')).toBe(
-            'public, s-maxage=240, stale-while-revalidate=60',
-        );
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+            data: { exists: true, hasActivePremium: true },
+            error: null,
+        });
     });
 
     it.each(['ABC', 'a_b', 'a--b', '-abc'])('niepoprawny format %s daje 400 bez zapytania do bazy', async slug => {
@@ -225,15 +237,40 @@ describe('GET /api/service-slug/[slug]', () => {
         },
     );
 
-    it('exists: true jest w CDN najwyzej 5 min razem ze stale-while-revalidate', async () => {
-        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: false });
+    it.each([true, false])(
+        'alias: exists: true (premium %p) jest w CDN najwyzej 5 min razem ze stale-while-revalidate',
+        async hasActivePremium => {
+            jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium });
+
+            const response = await aliasLookup('kancelaria-nowak');
+
+            expect(response.headers.get('Cache-Control')).toBe(
+                'public, s-maxage=240, stale-while-revalidate=60',
+            );
+            expect(maxServedAgeSeconds(response)).toBeLessThanOrEqual(
+                PREMIUM_ALIAS_MAX_DELAY_SECONDS,
+            );
+        },
+    );
+
+    it('profil: exists: true z dlugim stale-while-revalidate — wejscie nie czeka na funkcje', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: true, hasActivePremium: true });
 
         const response = await lookup('kancelaria-nowak');
 
         expect(response.headers.get('Cache-Control')).toBe(
-            'public, s-maxage=240, stale-while-revalidate=60',
+            'public, s-maxage=300, stale-while-revalidate=86400',
         );
-        expect(maxServedAgeSeconds(response)).toBeLessThanOrEqual(PREMIUM_ALIAS_MAX_DELAY_SECONDS);
+    });
+
+    it('alias: exists: false ma ten sam krotki cache co profil', async () => {
+        jest.mocked(getServiceSlugStatus).mockResolvedValue({ exists: false, hasActivePremium: false });
+
+        const response = await aliasLookup('nie-istnieje');
+
+        expect(response.headers.get('Cache-Control')).toBe(
+            'public, s-maxage=30, stale-while-revalidate=300',
+        );
     });
 
     it('exists: false jest cache-owane krotko, ze stale-while-revalidate', async () => {

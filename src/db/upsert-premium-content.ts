@@ -2,6 +2,10 @@ import { existsSync, readdirSync } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import {
+    describeActiveUntilProblem,
+    MANUAL_PREMIUM_MAX_YEARS_AHEAD,
+} from '../lib/manual-premium';
 import { formatZodIssue } from './format-zod-issue';
 import {
     type PremiumContentData,
@@ -145,6 +149,22 @@ function toPrevious(stored: unknown): PreviousPremiumContent {
     return parsed.success ? { kind: 'valid', content: parsed.data } : { kind: 'invalid' };
 }
 
+/**
+ * Ostrzezenie o podejrzanej dacie premium recznego (`db:premium`, seed) albo `null`.
+ * Schemat sprawdza tylko format — data z przeszlosci albo literowka roku przeszlaby cicho.
+ */
+export function activeUntilWarning(content: PremiumContentData, now: Date): string | null {
+    const { activeUntil } = content;
+    if (activeUntil === undefined) return null;
+
+    const problem = describeActiveUntilProblem(activeUntil, now);
+    if (problem === null) return null;
+    return problem === 'past'
+        ? `premium.activeUntil ${activeUntil} jest w przeszlosci — premium reczne juz wygaslo`
+        : `premium.activeUntil ${activeUntil} wypada ponad ${MANUAL_PREMIUM_MAX_YEARS_AHEAD} ` +
+              'lata naprzod — literowka w roku?';
+}
+
 /** Idempotentny upsert: ponowne uruchomienie z ta sama trescia nic nie zmienia. */
 export async function upsertPremiumContent(
     store: PremiumContentStore,
@@ -164,6 +184,8 @@ export type PremiumEntriesReport = {
      * seeda), albo nieparsowalne (bez parsowania nie wiadomo, czy to wpis premium).
      */
     skipped: { file: string; reason: string }[];
+    /** Opublikowane mimo podejrzanej daty `activeUntil` (`activeUntilWarning`). */
+    warnings: { file: string; message: string }[];
 };
 
 function hasPremiumBlock(raw: unknown): boolean {
@@ -191,7 +213,7 @@ export async function publishPremiumEntries(
     store: PremiumContentStore,
     { dataDir, publicDir }: { dataDir: string; publicDir: string },
 ): Promise<PremiumEntriesReport> {
-    const report: PremiumEntriesReport = { published: [], skipped: [] };
+    const report: PremiumEntriesReport = { published: [], skipped: [], warnings: [] };
     const files = (await readdir(dataDir)).filter(file => file.endsWith('.json')).toSorted();
 
     // Kolejno, nie rownolegle: kilka wpisow premium, a czytelny log bledu jest wazniejszy.
@@ -223,6 +245,8 @@ export async function publishPremiumEntries(
 
         await upsertPremiumContent(store, { service, content: entry.premium, publicDir });
         report.published.push(service.serviceSlug);
+        const warning = activeUntilWarning(entry.premium, new Date());
+        if (warning !== null) report.warnings.push({ file, message: warning });
     }
 
     return report;

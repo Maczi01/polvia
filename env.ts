@@ -67,4 +67,6 @@ export const env = createEnv({
 
 // Czesciowa konfiguracja Stripe (np. sam klucz bez sekretu webhooka) to blad przy starcie,
 // a nie cicho wylaczone platnosci. Wersja 0.12 `createEnv` nie ma walidacji miedzy polami.
-resolveStripeConfig(env);
+// Tylko na serwerze: w przegladarce odczyt zmiennej `server` z proxy `env` rzuca, wiec
+// pierwszy komponent kliencki importujacy `env` wywalilby hydratacje calej strony.
+if (typeof window === 'undefined') resolveStripeConfig(env);

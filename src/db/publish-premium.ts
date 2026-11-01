@@ -4,11 +4,13 @@
  * Uruchomienie:
  *   npm run db:premium -- data/services/<plik>.json --dry-run   # walidacja + diff, bez zapisu
  *   npm run db:premium -- data/services/<plik>.json             # zapis (upsert)
+ *   npm run db:premium -- data/services/<plik>.json --force     # zapis mimo podejrzanej daty
  *
  * Premium reczne (przelew): `premium.activeUntil` = ostatni dzien premium (RRRR-MM-DD, wlacznie,
  * Europe/Warsaw). Zapis ustawia `service_profiles.manual_premium_until` i podbija ranking
  * (`promoted_services`, bez skracania dluzszej daty); diff pokazuje zmiane daty. Przedluzenie
- * = nowa data w JSON-ie + ta sama komenda.
+ * = nowa data w JSON-ie + ta sama komenda. Data z przeszlosci albo dalej niz 2 lata naprzod
+ * (literowka roku) daje ostrzezenie w diffie, a zapis bez `--force` jest wstrzymany.
  *
  * Wpis musi juz byc w bazie (`db:add`). Zdjecia musza lezec w `public/services/<slug-uslugi>/`
  * — brak ktoregokolwiek przerywa przed zapisem. Upsert jest idempotentny, wiec ponowne
@@ -22,9 +24,11 @@ import path from 'node:path';
 import { formatZodIssue } from './format-zod-issue';
 import { db } from './index';
 import { describePremiumChanges } from './premium-content-diff';
+import type { PremiumContentData } from './premium-content-schema';
 import { createPremiumContentStore } from './premium-content-store';
 import { serviceInputSchema } from './service-input-schema';
 import {
+    activeUntilWarning,
     PremiumContentError,
     preparePremiumUpsert,
     resolveEntryService,
@@ -32,7 +36,7 @@ import {
 
 /* eslint-disable no-console, unicorn/no-process-exit */
 
-type Options = { filePath: string; isDryRun: boolean };
+type Options = { filePath: string; isDryRun: boolean; isForced: boolean };
 
 function fail(message: string): never {
     console.error(`BLAD: ${message}`);
@@ -41,12 +45,13 @@ function fail(message: string): never {
 
 function parseOptions(argv: string[]): Options {
     const isDryRun = argv.includes('--dry-run');
+    const isForced = argv.includes('--force');
     const filePath = argv.find(argument => !argument.startsWith('--'));
 
     if (!filePath) fail('podaj plik wpisu, np. npm run db:premium -- data/services/ifiora.json');
     if (!existsSync(filePath)) fail(`plik ${filePath} nie istnieje`);
 
-    return { filePath, isDryRun };
+    return { filePath, isDryRun, isForced };
 }
 
 async function readEntry(filePath: string) {
@@ -74,8 +79,24 @@ async function readEntry(filePath: string) {
     return { entry: result.data, premium };
 }
 
+/** Podejrzana data premium recznego: ostrzezenie zawsze, zapis tylko z `--force`. */
+function warnAboutActiveUntil(
+    premium: PremiumContentData,
+    { isDryRun, isForced }: Omit<Options, 'filePath'>,
+): void {
+    const warning = activeUntilWarning(premium, new Date());
+    if (warning === null) return;
+
+    console.warn(`\nUWAGA: ${warning}`);
+    if (isDryRun) {
+        console.warn('Zapis bez --force zostanie wstrzymany.');
+        return;
+    }
+    if (!isForced) fail('zapis wstrzymany — popraw date w pliku albo potwierdz ja flaga --force');
+}
+
 async function main(): Promise<void> {
-    const { filePath, isDryRun } = parseOptions(process.argv.slice(2));
+    const { filePath, isDryRun, isForced } = parseOptions(process.argv.slice(2));
     const { entry, premium } = await readEntry(filePath);
     const store = createPremiumContentStore(db);
 
@@ -94,6 +115,8 @@ async function main(): Promise<void> {
     console.log(`Wpis:   ${entry.name}`);
     console.log(`Profil: /firma/${serviceSlug} (service id ${plan.serviceId})`);
     for (const line of describePremiumChanges(plan.previous, premium)) console.log(line);
+
+    warnAboutActiveUntil(premium, { isDryRun, isForced });
 
     if (isDryRun) {
         console.log('\n--dry-run: nic nie zapisano.');

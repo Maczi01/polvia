@@ -102,3 +102,25 @@ export function isManualPremiumActive(manualPremiumUntil: Date | null, now: Date
     if (!manualPremiumUntil) return false;
     return now.getTime() < manualPremiumUntil.getTime();
 }
+
+/** Data dalej niz tyle lat naprzod to prawie na pewno literowka w roku (2062 zamiast 2026). */
+export const MANUAL_PREMIUM_MAX_YEARS_AHEAD = 2;
+
+export type ActiveUntilProblem = 'past' | 'too_far';
+
+/**
+ * Podejrzana data `activeUntil` w chwili `now`: `past` = premium reczne juz wygaslo
+ * (dzisiejsza data jeszcze nie — trwa do polnocy), `too_far` = koniec dalej niz
+ * `MANUAL_PREMIUM_MAX_YEARS_AHEAD` lat. `null` = data wiarygodna.
+ */
+export function describeActiveUntilProblem(
+    activeUntil: string,
+    now: Date,
+): ActiveUntilProblem | null {
+    const end = manualPremiumEnd(activeUntil);
+    if (!isManualPremiumActive(end, now)) return 'past';
+
+    const limit = new Date(now);
+    limit.setUTCFullYear(limit.getUTCFullYear() + MANUAL_PREMIUM_MAX_YEARS_AHEAD);
+    return end.getTime() > limit.getTime() ? 'too_far' : null;
+}

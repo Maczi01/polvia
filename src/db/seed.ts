@@ -3590,6 +3590,9 @@ async function mainSeed() {
     for (const { file, reason } of premium.skipped) {
         console.warn(`UWAGA: tresc premium z ${file} pominieta — ${reason}`);
     }
+    for (const { file, message } of premium.warnings) {
+        console.warn(`UWAGA: ${file}: ${message}`);
+    }
 
     console.log('✅ Seed zakończony z tagami!');
 }

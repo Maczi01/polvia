@@ -463,7 +463,8 @@
   },
   "contact": {
     "rateLimitExceeded": "Limit wiadomości wyczerpany. Spróbuj ponownie póżniej.",
-    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później."
+    "sendFailed": "Nie udało się wysłać wiadomości. Spróbuj ponownie później.",
+    "invalidInput": "Sprawdź adres e-mail, temat i treść wiadomości."
   },
   "images": {
     "logo": "Logo Polvia - katalog ukraińskich firm w Polsce",

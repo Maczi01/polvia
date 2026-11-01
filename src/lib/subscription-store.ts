@@ -1,14 +1,10 @@
 import 'server-only';
 
-import { and, eq, gt, notExists, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 
 import { db } from '@/db';
-import {
-    promotedServicesTable,
-    serviceProfilesTable,
-    servicesTable,
-    serviceSubscriptionsTable,
-} from '@/db/schema';
+import { buildExtendPromotionQuery, buildRemovePromotionQuery } from '@/db/promotion-queries';
+import { servicesTable, serviceSubscriptionsTable } from '@/db/schema';
 import type { PremiumSubscriptionState } from '@/lib/premium';
 import { subscriptionColumns } from '@/lib/subscription-query-parts';
 
@@ -104,39 +100,11 @@ function createTransactionStore(tx: Transaction): SubscriptionTransaction {
         },
 
         async setPromotion(serviceId, expiresAt) {
-            if (expiresAt === null) {
-                // Trwajace premium reczne (przelew) trzyma ranking — ustawil go seed /
-                // `db:premium` z `GREATEST`, wiec wiersz siega co najmniej konca tej daty.
-                await tx.delete(promotedServicesTable).where(
-                    and(
-                        eq(promotedServicesTable.serviceId, serviceId),
-                        notExists(
-                            tx
-                                .select({ serviceId: serviceProfilesTable.serviceId })
-                                .from(serviceProfilesTable)
-                                .where(
-                                    and(
-                                        eq(serviceProfilesTable.serviceId, serviceId),
-                                        gt(serviceProfilesTable.manualPremiumUntil, sql`NOW()`),
-                                    ),
-                                ),
-                        ),
-                    ),
-                );
-                return;
-            }
-
-            // Przy istniejacym wpisie zmieniamy tylko termin — `priority` ustawia operator —
-            // i tylko na pozniejszy (`GREATEST`), patrz JSDoc `setPromotion`.
-            await tx
-                .insert(promotedServicesTable)
-                .values({ serviceId, expiresAt })
-                .onConflictDoUpdate({
-                    target: promotedServicesTable.serviceId,
-                    set: {
-                        expiresAt: sql`GREATEST(${promotedServicesTable.expiresAt}, excluded.expires_at)`,
-                    },
-                });
+            // Regula zapisu i usuniecia (`GREATEST`, `NOT EXISTS` premium recznego) — JSDoc
+            // `setPromotion` i `@/db/promotion-queries`.
+            await (expiresAt === null
+                ? buildRemovePromotionQuery(tx, serviceId)
+                : buildExtendPromotionQuery(tx, serviceId, expiresAt));
         },
     };
 }

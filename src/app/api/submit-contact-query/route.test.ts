@@ -97,6 +97,29 @@ describe('POST /api/submit-contact-query', () => {
         expect(mockExec).not.toHaveBeenCalled();
     });
 
+    it.each([
+        ['zly email', JSON.stringify({ email: 'nie-email', topic: 'Premium', message: 'x' })],
+        ['brak wiadomosci', JSON.stringify({ email: 'jan@example.com', topic: 'Premium' })],
+        ['za dluga wiadomosc', JSON.stringify({ email: 'jan@example.com', topic: 'P', message: 'x'.repeat(501) })],
+        ['niepoprawny JSON', '{"email":'],
+    ])('%s daje 400 BAD_REQUEST bez wysylki i bez liczenia limitu', async (_case, body) => {
+        const response = await POST(
+            new Request('https://www.polvia.pl/api/submit-contact-query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-forwarded-for': '203.0.113.7' },
+                body,
+            }),
+        );
+        const json = await response.json();
+
+        expect(response.status).toBe(400);
+        expect(json.success).toBe(false);
+        expect(json.error).toEqual({ code: 'BAD_REQUEST', message: pl.contact.invalidInput });
+        expect(json.message).toBe(pl.contact.invalidInput);
+        expect(mockTransportSendMail).not.toHaveBeenCalled();
+        expect(mockExec).not.toHaveBeenCalled();
+    });
+
     it('po wyczerpaniu limitu zwraca 429 bez wysylki', async () => {
         jest.mocked(redis.get).mockResolvedValue('5');
         jest.mocked(redis.ttl).mockResolvedValue(120);
