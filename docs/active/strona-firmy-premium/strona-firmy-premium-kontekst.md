@@ -343,6 +343,14 @@ Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-build
 - **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
 - **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
 
+## Review fazy 3 — runda 4 (2026-11-01)
+
+3 agentów (security, kieran-typescript, spec-flow) na `1298f72..HEAD`. Werdykt ✅ 0 × P1, 0 × P2, 5 × P3 (U1–U5). T1–T3, T9, T10 zamknięte.
+
+- **Wniosek o 503 w webhooku:** sygnał błędu konfiguracji jest skuteczny tylko z procedurą powrotu — Stripe po serii porażek wyłącza endpoint, a `stripe listen` w ogóle nie ponawia. Kod bez zmian, brakuje kroków operatora (U3).
+- **Wniosek o `isPremiumActive` jako „opłacona”:** uprawnienie (karencja `past_due`) ≠ płatność. Do alarmów o pieniądzach używać statusu `active`/`trialing` (U1).
+- **`maxDuration` strony obejmuje jej Server Actions** — budżet liczyć dla renderu i akcji (U2).
+
 ## Poprawki po rundzie 3 review fazy 3 (2026-11-01)
 
 Commit `4b11e94` (feature-builder-web-fullstack). Gate: tsc OK, jest 164 suite'y / 1817 testów, lint 0 błędów.

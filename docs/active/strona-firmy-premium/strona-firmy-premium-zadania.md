@@ -456,6 +456,18 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 
 
 ---
 
+## Do poprawy po review fazy 3 — runda 4
+
+Raport: [review-faza-3.md](review-faza-3.md), sekcja „Review fazy 3 — runda 4”. Werdykt: ✅ gotowe do kontynuacji (0 × P1, 0 × P2, 5 × P3). T1–T3, T9, T10 zamknięte.
+
+- [ ] 🟡 [nit] U1 **`src/lib/subscription-sync.ts:203-224`** — log „second paid subscription” odpala też dla starej `past_due` w karencji (fałszywa „podwójna opłata”); warunek `active`/`trialing` + test negatywny.
+- [ ] 🟡 [nit] U2 **`premium/dziekujemy/page.tsx:28`** — `maxDuration = 30` obejmuje też akcję materiałów (SMTP do 10 s/fazę); `60` albo świadoma decyzja w komentarzu.
+- [ ] 🟡 [nit] U3 **sekcja „Po wdrożeniu”** — poprawić zdanie o ponowieniach przy `stripe listen`, zakaz testowego endpointu dla Preview, procedura po `CONFIG_MISMATCH` na produkcji (redeploy, włączenie endpointu, resync, resend checkoutów).
+- [ ] 🟡 [nit] U4 **`src/lib/subscription-notifications.ts:49,71`** — `[TEST]` także w mailach o zakupie i konflikcie.
+- [ ] 🟡 [nit] U5 **`src/lib/subscription-sync.ts:203`** — `reportConflict` jako jawny krok (razem z T6).
+
+---
+
 ## Po wdrożeniu
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną

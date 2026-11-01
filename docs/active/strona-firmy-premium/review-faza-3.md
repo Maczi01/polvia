@@ -255,3 +255,38 @@ Scenariusz: na produkcji `sk_test_` razem z live `whsec` (pomyłka w zmiennych V
 
 - Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
 - E2E: 0; Manual: 0; Niejasne: 0; Failujące: 0
+
+---
+
+# Review fazy 3 — runda 4 (po poprawkach rundy 3, 2026-11-01)
+
+**Zakres:** `git diff 1298f72..HEAD -- . ':!docs'` (commit `4b11e94`; 8 plików, +148/−19).
+**Agenci:** security-sentinel, kieran-typescript-reviewer (+ perspektywa architecture-strategist), spec-flow-analyzer. Performance oceniony przez orkiestratora (jedyna zmiana w tym obszarze to `maxDuration`, patrz U2). E2E pominięte (brak `.env`, brak otwartych checkboxów `Weryfikacja:`).
+**Gate:** tsc OK, jest 3 dotknięte suite'y 69/69 (pełny: 164 / 1817 z rundy poprawek), eslint 0 błędów (nowe `no-console` warn — przyjęty wzorzec modułu).
+
+## Werdykt: ✅ GOTOWE DO KONTYNUACJI — 0 × P1, 0 × P2, 5 × P3
+
+### Status T1–T3, T9, T10
+
+| # | Status |
+|---|---|
+| T1 webhook 503 `CONFIG_MISMATCH` | ✅ bramka po HMAC — niepodpisany klient nie wymusi 503 ani nie pozna konfiguracji; zdarzenie nieoznaczone, więc ponowienie przechodzi przez dedupe; kolejność bramek zablokowana testem. Zmiana testu 200→503 to świadoma zmiana kontraktu, asercje pełniejsze niż wcześniej |
+| T2 `maxDuration = 30` | ✅ dla renderu; skutek dla Server Action → U2 |
+| T3 log konfliktu | ✅ obejmuje wszystkie typy zdarzeń i CLI, bez spamu przy ponowieniach (dedupe przed sync); fałszywy alarm dla `past_due` → U1 |
+| T9 `[TEST]` w mailu materiałów | ✅; pozostałe maile → U4 |
+| T10 JSDoc o tunelu | ✅ |
+
+Scenariusze wdrożeń przy T1 (spec-flow): produkcja poprawna — bez zmian; `sk_test_` na produkcji — 503 i ponowienia (cel poprawki; checkout i tak pada na „No such price”, więc okno strat to odnowienia/anulowania); endpoint testowy na domenę produkcyjną — 400 na podpisie, bez zmian; lokalnie z dockerem — sync; lokalnie z bazą produkcyjną — 503 widoczne w CLI zamiast cichego 200.
+
+## 🟡 P3
+
+- **U1** `src/lib/subscription-sync.ts:203-210, 224` — log „second paid subscription” bazuje na `isIncomingActive = isPremiumActive(...)`, a `past_due` w karencji jest uprawniony (`premium.ts:41`). Po wyparciu starej `past_due` (R3) każde jej `invoice.payment_failed` / `subscription.updated` (Smart Retries) loguje „podwójną opłatę”, choć stara nic nie zapłaciła — operator szuka płatności do zwrotu, której nie ma. Poprawka: w `reportConflict` (i w polu sterującym mailem „wymagany zwrot”) warunek `record.status ∈ {active, trialing}`; test: zapisana nowa `active` + przychodząca stara `past_due` w karencji → brak logu. (spec-flow; zweryfikowane w kodzie)
+- **U2** `premium/dziekujemy/page.tsx:28-29` — `maxDuration` dotyczy też `submitPremiumMaterials` (akcja wołana z tej strony wykonuje się w tej samej funkcji). Najgorszy przypadek akcji: limit + `retrieve` 8 s × 2 + SMTP do 10 s/fazę > 30 s; przy Fluid compute (domyślnie 300 s) eksport realnie obniża limit akcji → błąd sieci zamiast `SEND_FAILED`. Poprawka: `60` + komentarz z budżetem akcji, albo świadoma decyzja w komentarzu (akcja do ponowienia, płatność niezagrożona). (kieran)
+- **U3** `strona-firmy-premium-zadania.md` „Po wdrożeniu” — dokumentacja operatora po T1: (a) „Stripe ponawia do 3 dni” nieprawdziwe dla `stripe listen` (brak ponowień; tryb testowy ponawia kilka razy w godzinach) → po zmianie bazy `stripe events resend <evt>`; (b) nie rejestrować testowego endpointu webhooka dla Preview — Preview ma nielokalną bazę, więc 503 na każde zdarzenie, maile o awarii, w końcu wyłączenie endpointu; (c) procedura po `CONFIG_MISMATCH` na produkcji: poprawić klucz + redeploy, sprawdzić/włączyć endpoint w Dashboardzie, `db:sync-subscriptions` z kluczem live, ponownie wysłać nieudane `checkout.session.completed` spoza okna ponowień (tylko to odtwarza maile). Kod bez zmian. (security, spec-flow, kieran — zduplikowane)
+- **U4** `src/lib/subscription-notifications.ts:49,71` — `[TEST]` tylko w mailu materiałów; lokalny test z `stripe listen` wysyła na prawdziwą skrzynkę „Nowa subskrypcja premium” i „…wymagany zwrot” bez oznaczenia. Ten sam prefiks z `STRIPE_LIVE_MODE` w `notifyFounder` + test obu trybów. (spec-flow)
+- **U5** `src/lib/subscription-sync.ts:203-212, 228` — `reportConflict` zwraca swój argument, żeby owinąć `return` (log w środku wyrażenia). Jawny krok: `const conflict: SubscriptionConflict = {…}; logPaidConflict(conflict); return conflict;` — najlepiej razem z T6 (unia decyzji). (kieran)
+
+## Bookkeeping checkboxów Weryfikacja: (runda 4)
+
+- Odznaczone automatycznie (CLI/grep): 0 (wszystkie 16 odznaczone w pierwszym review)
+- E2E: 0; Manual: 0; Niejasne: 0; Failujące: 0
