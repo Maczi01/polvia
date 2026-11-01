@@ -899,7 +899,10 @@
       "portalLink": "Open the customer portal",
       "backToProfile": "Back to the business profile",
       "invalidTitle": "We cannot confirm the payment",
-      "invalidDescription": "This link does not belong to a paid subscription for this business, or the payment is still being processed. If you have just paid, refresh the page in a minute."
+      "invalidDescription": "This link does not belong to a paid subscription for this business, or the payment is still being processed. If you have just paid, refresh the page in a minute.",
+      "unavailableTitle": "We can't confirm the payment right now",
+      "unavailableDescription": "We couldn't check the payment at the moment. If you have just paid, there is nothing to repeat — refresh the page in a moment.",
+      "refresh": "Refresh the page"
     },
     "materials": {
       "title": "Materials for your premium page",

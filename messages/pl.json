@@ -899,7 +899,10 @@
       "portalLink": "Otwórz portal klienta",
       "backToProfile": "Wróć do profilu firmy",
       "invalidTitle": "Nie możemy potwierdzić płatności",
-      "invalidDescription": "Ten link nie dotyczy opłaconej subskrypcji tej firmy albo płatność jeszcze trwa. Jeśli płacisz przed chwilą, odśwież stronę za minutę."
+      "invalidDescription": "Ten link nie dotyczy opłaconej subskrypcji tej firmy albo płatność jeszcze trwa. Jeśli płacisz przed chwilą, odśwież stronę za minutę.",
+      "unavailableTitle": "Nie możemy teraz potwierdzić płatności",
+      "unavailableDescription": "Chwilowo nie udało się sprawdzić płatności. Jeśli właśnie zapłaciłeś, nic nie musisz powtarzać — odśwież stronę za chwilę.",
+      "refresh": "Odśwież stronę"
     },
     "materials": {
       "title": "Materiały do strony premium",

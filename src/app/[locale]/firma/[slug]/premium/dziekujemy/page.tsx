@@ -1,5 +1,6 @@
 import { CheckCircle2, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { hasLocale } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactElement, ReactNode } from 'react';
@@ -10,6 +11,7 @@ import { routing } from '@/i18n/routing';
 import { getOperatorInbox } from '@/lib/mailer';
 import { verifyPaidCheckoutSession } from '@/lib/premium-checkout';
 import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
+import { checkRateLimit, getClientIp, rateLimitSubject } from '@/lib/rate-limit';
 import { isValidServiceSlug } from '@/lib/service-slug-format';
 
 import { env } from '../../../../../../../env';
@@ -21,6 +23,23 @@ type PageProps = {
     params: Promise<{ locale: string; slug: string }>;
     searchParams: Promise<{ session_id?: string | string[] }>;
 };
+
+const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
+/**
+ * Kazde wejscie to `checkout.sessions.retrieve` z limitu API Stripe wspolnego z checkoutem
+ * i webhookiem. 20/h miesci wielokrotne odswiezanie przez platnika, a ucina skrypt.
+ */
+const THANKS_PAGE_PER_IP = 20;
+
+async function isWithinVerifyLimit(): Promise<boolean> {
+    const ip = getClientIp({ headers: await headers() });
+    const result = await checkRateLimit({
+        key: `premium:thanks:${rateLimitSubject(ip)}`,
+        max: THANKS_PAGE_PER_IP,
+        windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+    });
+    return result.allowed;
+}
 
 function toLocale(value: string): Locale {
     return hasLocale(routing.locales, value) ? value : defaultLocale;
@@ -67,6 +86,51 @@ async function CheckoutNotConfirmed({ slug }: { slug: string }): Promise<ReactEl
                 >
                     {t('backToProfile')}
                 </Link>
+            </section>
+        </PageShell>
+    );
+}
+
+/**
+ * Chwilowy brak potwierdzenia (awaria Stripe albo limit zapytan): platnik nie moze
+ * zobaczyc „nie potwierdzono”. Odswiezenie to ten sam adres z tym samym `session_id`.
+ */
+async function CheckoutUnavailable({
+    sessionId,
+    slug,
+}: {
+    sessionId: string;
+    slug: string;
+}): Promise<ReactElement> {
+    const t = await getTranslations('ServiceProfile.premiumThanks');
+    return (
+        <PageShell>
+            <section aria-labelledby="premium-thanks-heading" className={CARD_CLASSES}>
+                <h1
+                    id="premium-thanks-heading"
+                    className="text-2xl font-bold text-gray-900 dark:text-gray-50"
+                >
+                    {t('unavailableTitle')}
+                </h1>
+                <p className="mt-3 text-gray-600 dark:text-gray-300">
+                    {t('unavailableDescription')}
+                </p>
+                <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
+                    {/* Trasy `dziekujemy` nie ma w `pathnames`, a wzgledny adres z samym
+                        query zostaje na biezacej sciezce razem z prefiksem locale. */}
+                    <a
+                        href={`?${new URLSearchParams({ session_id: sessionId }).toString()}`}
+                        className={LINK_CLASSES}
+                    >
+                        {t('refresh')}
+                    </a>
+                    <Link
+                        href={{ pathname: '/firma/[slug]', params: { slug } }}
+                        className={LINK_CLASSES}
+                    >
+                        {t('backToProfile')}
+                    </Link>
+                </div>
             </section>
         </PageShell>
     );
@@ -159,8 +223,16 @@ export default async function PremiumThanksPage({
         return <CheckoutNotConfirmed slug={slug} />;
     }
 
+    // Limit przed Stripe: po przekroczeniu nie wolamy API, platnik widzi „odswiez za chwile”.
+    if (!(await isWithinVerifyLimit())) {
+        return <CheckoutUnavailable sessionId={sessionId.data} slug={slug} />;
+    }
+
     const verification = await verifyPaidCheckoutSession(sessionId.data, slug);
-    if (verification.status !== 'paid') return <CheckoutNotConfirmed slug={slug} />;
+    if (verification.status === 'unavailable') {
+        return <CheckoutUnavailable sessionId={sessionId.data} slug={slug} />;
+    }
+    if (verification.status === 'invalid') return <CheckoutNotConfirmed slug={slug} />;
 
     return (
         <PageShell>
