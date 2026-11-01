@@ -1,8 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { db } from '../db';
 import { env } from '../../env';
-
-const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '0.0.0.0']);
+import { databaseHostname, isLocalDatabaseUrl } from '../lib/database-host';
 
 /**
  * Zabezpieczenie przed skasowaniem zdalnej bazy.
@@ -17,17 +16,11 @@ const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '0.0.0.0']);
  * zakladajac, ze pracuje lokalnie, skasuje zdalna baze.
  */
 function assertDropAllowed(): void {
-    let host: string;
-    try {
-        host = new URL(env.DATABASE_URL).hostname;
-    } catch {
-        // Nie da sie ustalic hosta, wiec traktujemy jako zdalny — bezpieczniej odmowic.
-        host = '(nieznany)';
-    }
-
-    if (LOCAL_HOSTS.has(host)) {
+    // Nie da sie ustalic hosta = traktujemy jako zdalny — bezpieczniej odmowic.
+    if (isLocalDatabaseUrl(env.DATABASE_URL)) {
         return;
     }
+    const host = databaseHostname(env.DATABASE_URL) ?? '(nieznany)';
 
     if (env.ALLOW_REMOTE_DROP === 'yes') {
         console.warn(

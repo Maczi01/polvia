@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
+import { isLocalDatabaseUrl } from '@/lib/database-host';
 import { stripe, STRIPE_LIVE_MODE } from '@/lib/stripe';
 import { isStripeEventProcessed, markStripeEventProcessed } from '@/lib/stripe-events';
 import { subscriptionSyncTarget } from '@/lib/stripe-webhook-events';
@@ -19,8 +20,9 @@ import { env } from '../../../../../env';
  * Webhook Stripe: utrzymuje w bazie stan subskrypcji premium (`service_subscriptions`)
  * i pozycje w rankingu (`promoted_services`).
  *
- * Kolejnosc: 1) podpis (400), 2) tryb konta (`livemode` niezgodny z kluczem → 200 bez
- * synchronizacji i bez oznaczenia), 3) dedupe `stripe_events` (duplikat → 200),
+ * Kolejnosc: 1) podpis (400), 2) bramka trybu (klucz testowy + baza nielokalna albo
+ * `livemode` zdarzenia niezgodny z kluczem → 200 bez synchronizacji i bez oznaczenia),
+ * 3) dedupe `stripe_events` (duplikat → 200),
  * 4) synchronizacja (blad → 500, Stripe ponowi), 5) oznaczenie zdarzenia, 6) skutki uboczne
  * (maile do foundera) tylko przy pierwszym dostarczeniu, z limitem czasu i bledem tylko w logu.
  *
@@ -66,6 +68,8 @@ async function notifyAfterCheckout(
     stripeSubscriptionId: string,
 ): Promise<void> {
     if (result.outcome === 'synced') {
+        // `synced` bywa stanem bez premium (np. pozny stan koncowy) — nie ma czego oglaszac.
+        if (!result.isPremiumActive) return;
         await notifyPremiumPurchased({ serviceId: result.serviceId, stripeSubscriptionId });
         return;
     }
@@ -103,8 +107,18 @@ export async function POST(request: Request): Promise<NextResponse> {
         const event = verifyEvent(await request.text(), signature);
         if (!event) return jsonError('INVALID_SIGNATURE', 'Invalid Stripe signature', 400);
 
-        // Zdarzenie z drugiego trybu konta (np. testowy endpoint wskazujacy na produkcje)
-        // nie dotyka bazy. 200, zeby Stripe nie ponawial; bez oznaczenia w `stripe_events`.
+        // Klucz testowy przy bazie nielokalnej (np. lokalny `.env` z produkcyjnym `DATABASE_URL`
+        // + `stripe listen`): karta 4242 dalaby prawdziwemu wpisowi premium. Bez adresu bazy w logu.
+        if (!STRIPE_LIVE_MODE && !isLocalDatabaseUrl(env.DATABASE_URL)) {
+            console.warn('Stripe webhook: test key with non-local database, event ignored', {
+                eventId: event.id,
+            });
+            return received();
+        }
+
+        // Zdarzenie z drugiego trybu konta nie dotyka bazy. W praktyce lapie je juz podpis
+        // (kazdy tryb ma wlasny `whsec`); zostaje jako tania druga linia obrony.
+        // 200, zeby Stripe nie ponawial; bez oznaczenia w `stripe_events`.
         if (event.livemode !== STRIPE_LIVE_MODE) {
             console.warn('Stripe webhook: event livemode does not match API key mode, ignored', {
                 eventId: event.id,

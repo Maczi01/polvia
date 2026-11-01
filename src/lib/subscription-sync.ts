@@ -152,13 +152,33 @@ async function resolveServiceId(
     return metadataId.success ? metadataId.data : null;
 }
 
-/** Inna subskrypcja wpisu, ktora wciaz daje premium, blokuje nadpisanie stanu. */
+/**
+ * „Ratunkowy” zakup: zapisana jest INNA subskrypcja `past_due` (jeszcze w karencji), a przychodzi
+ * oplacona (`active`/`trialing`) — np. po wygasnieciu karty founder kupil premium ponownie.
+ * Nowa wygrywa; pozniejsze zdarzenia starej trafia na zapisana aktywna nowa i skoncza sie
+ * konfliktem bez zapisu.
+ */
+function supersedesPastDue(
+    stored: StoredSubscription | null,
+    record: SubscriptionRecord,
+    now: Date,
+): boolean {
+    if (!stored || stored.stripeSubscriptionId === record.stripeSubscriptionId) return false;
+
+    return stored.status === 'past_due' && isPremiumActive(record, now);
+}
+
+/**
+ * Inna subskrypcja wpisu, ktora wciaz daje premium, blokuje nadpisanie stanu — chyba ze to
+ * `past_due` wypierana przez oplacona nowa (`supersedesPastDue`).
+ */
 function conflictingSubscriptionId(
     stored: StoredSubscription | null,
-    incomingId: string,
+    record: SubscriptionRecord,
     now: Date,
 ): string | null {
-    if (!stored || stored.stripeSubscriptionId === incomingId) return null;
+    if (!stored || stored.stripeSubscriptionId === record.stripeSubscriptionId) return null;
+    if (supersedesPastDue(stored, record, now)) return null;
 
     return isPremiumActive(stored, now) ? stored.stripeSubscriptionId : null;
 }
@@ -185,7 +205,7 @@ async function applySubscriptionState(
     const stored = await store.findSubscription(serviceId);
     const isIncomingActive = isPremiumActive(record, now);
 
-    const activeSubscriptionId = conflictingSubscriptionId(stored, stripeSubscriptionId, now);
+    const activeSubscriptionId = conflictingSubscriptionId(stored, record, now);
     if (activeSubscriptionId) {
         return {
             outcome: 'conflict',
@@ -202,6 +222,14 @@ async function applySubscriptionState(
             incomingStatus: record.status,
         });
         return { outcome: 'synced', serviceId, isPremiumActive: false };
+    }
+
+    if (supersedesPastDue(stored, record, now)) {
+        console.warn('subscription sync: paid subscription replaces past_due one', {
+            serviceId,
+            stripeSubscriptionId,
+            replacedSubscriptionId: stored?.stripeSubscriptionId,
+        });
     }
 
     await store.saveSubscription(record);

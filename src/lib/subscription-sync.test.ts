@@ -398,6 +398,103 @@ describe('syncSubscriptionFromStripe', () => {
             expect(sendMail).not.toHaveBeenCalled();
         });
 
+        describe('nowy zakup w karencji past_due starej subskrypcji', () => {
+            const renewalFailedAt = wholeSeconds(Date.now() - DAY_MS);
+            const oldPastDue: SubscriptionRecord = {
+                ...storedActive(SERVICE_A, 'sub_old'),
+                status: 'past_due',
+                currentPeriodStart: renewalFailedAt,
+                currentPeriodEnd: wholeSeconds(Date.now() + 29 * DAY_MS),
+            };
+
+            it('oplacona nowa wypiera zapisana past_due: zapis, premium, ranking, bez konfliktu', async () => {
+                mockDb.subscriptions.set(SERVICE_A, oldPastDue);
+                mockDb.promotions.set(
+                    SERVICE_A,
+                    new Date(renewalFailedAt.getTime() + PREMIUM_GRACE_DAYS * DAY_MS),
+                );
+                stripeReturns(stripeSubscription({ id: 'sub_new', status: 'active' }));
+
+                const result = await syncSubscriptionFromStripe('sub_new', {
+                    serviceId: SERVICE_A,
+                });
+
+                expect(result).toEqual({
+                    outcome: 'synced',
+                    serviceId: SERVICE_A,
+                    isPremiumActive: true,
+                });
+                expect(mockDb.subscriptions.get(SERVICE_A)).toEqual({
+                    serviceId: SERVICE_A,
+                    stripeSubscriptionId: 'sub_new',
+                    stripeCustomerId: 'cus_A',
+                    status: 'active',
+                    currentPeriodStart: PERIOD_START,
+                    currentPeriodEnd: PERIOD_END,
+                    cancelAtPeriodEnd: false,
+                });
+                expect(mockDb.promotions.get(SERVICE_A)).toEqual(
+                    new Date(PERIOD_END.getTime() + PREMIUM_GRACE_DAYS * DAY_MS),
+                );
+                expect(console.warn).toHaveBeenCalledWith(
+                    expect.stringContaining('replaces past_due'),
+                    {
+                        serviceId: SERVICE_A,
+                        stripeSubscriptionId: 'sub_new',
+                        replacedSubscriptionId: 'sub_old',
+                    },
+                );
+                expect(sendMail).not.toHaveBeenCalled();
+            });
+
+            it('pozniejsze anulowanie starej nie zmienia wiersza nowej (konflikt bez oplaty)', async () => {
+                mockDb.subscriptions.set(SERVICE_A, oldPastDue);
+                stripeReturns(stripeSubscription({ id: 'sub_new', status: 'active' }));
+                await syncSubscriptionFromStripe('sub_new', { serviceId: SERVICE_A });
+                const newRow = mockDb.subscriptions.get(SERVICE_A);
+                const newPromotion = mockDb.promotions.get(SERVICE_A);
+
+                // customer.subscription.deleted starej: bez wskazowki, wiaze po zapisie/metadanych.
+                stripeReturns(
+                    stripeSubscription({
+                        id: 'sub_old',
+                        status: 'canceled',
+                        metadata: { serviceSlug: 'kancelaria-a' },
+                    }),
+                );
+                const result = await syncSubscriptionFromStripe('sub_old');
+
+                expect(result).toEqual({
+                    outcome: 'conflict',
+                    serviceId: SERVICE_A,
+                    activeSubscriptionId: 'sub_new',
+                    conflictingSubscriptionId: 'sub_old',
+                    isIncomingActive: false,
+                });
+                expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(newRow);
+                expect(mockDb.promotions.get(SERVICE_A)).toEqual(newPromotion);
+                expect(sendMail).not.toHaveBeenCalled();
+            });
+
+            it('nieoplacona nowa (incomplete) nie wypiera past_due w karencji', async () => {
+                mockDb.subscriptions.set(SERVICE_A, oldPastDue);
+                stripeReturns(stripeSubscription({ id: 'sub_new', status: 'incomplete' }));
+
+                const result = await syncSubscriptionFromStripe('sub_new', {
+                    serviceId: SERVICE_A,
+                });
+
+                expect(result).toEqual({
+                    outcome: 'conflict',
+                    serviceId: SERVICE_A,
+                    activeSubscriptionId: 'sub_old',
+                    conflictingSubscriptionId: 'sub_new',
+                    isIncomingActive: false,
+                });
+                expect(mockDb.subscriptions.get(SERVICE_A)).toEqual(oldPastDue);
+            });
+        });
+
         it('nowa subskrypcja po wygasnieciu poprzedniej zastepuje ja', async () => {
             mockDb.subscriptions.set(SERVICE_A, {
                 ...storedActive(SERVICE_A, 'sub_old'),

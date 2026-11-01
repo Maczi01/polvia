@@ -13,11 +13,15 @@
  * sie pierwsza (ta, ktora wpis ma zachowac), a druga konczy sie konfliktem — tak jak przy
  * zdarzeniach webhooka. Konflikty tylko w logu: mail o konflikcie wysyla wylacznie webhook.
  *
+ * Klucz testowy Stripe + baza nielokalna = odmowa startu (exit 1) przed jakimkolwiek zapisem:
+ * testowa subskrypcja (karta 4242) dalaby prawdziwemu wpisowi premium.
+ *
  * Wymaga `--conditions=react-server` (moduly `src/lib` maja `import 'server-only'`).
  */
 
 import type Stripe from 'stripe';
 
+import { databaseHostname, isLocalDatabaseUrl } from '@/lib/database-host';
 import { stripe, STRIPE_LIVE_MODE } from '@/lib/stripe';
 import { type SubscriptionSyncResult, syncSubscriptionFromStripe } from '@/lib/subscription-sync';
 
@@ -25,19 +29,19 @@ import { env } from '../../env';
 
 /* eslint-disable no-console, unicorn/no-process-exit */
 
-type Outcome = SubscriptionSyncResult['outcome'] | 'failed' | 'wrong_mode';
+type Outcome = SubscriptionSyncResult['outcome'] | 'failed';
 
-/** Host bazy bez danych logowania — do potwierdzenia, gdzie skrypt zapisuje. */
-function databaseHost(): string {
-    try {
-        return new URL(env.DATABASE_URL).host;
-    } catch (error) {
-        // Bez tresci bledu: komunikat moze zawierac caly adres razem z haslem.
-        console.warn('Nie da sie odczytac hosta z DATABASE_URL', {
-            error: error instanceof Error ? error.name : typeof error,
-        });
-        return '(nieznany)';
-    }
+/** Wzorem `assertDropAllowed` (`drop.ts`): czytelny komunikat dla czlowieka, nie stack trace. */
+function assertKeyModeMatchesDatabase(host: string): void {
+    if (STRIPE_LIVE_MODE || isLocalDatabaseUrl(env.DATABASE_URL)) return;
+
+    console.error(
+        `\n⛔ ODMOWA: klucz Stripe jest TESTOWY, a DATABASE_URL nie wskazuje na localhost.\n\n` +
+            `   host: ${host}\n\n` +
+            '   Testowe subskrypcje nadalyby premium prawdziwym wpisom w tej bazie.\n' +
+            '   Uzyj klucza sk_live_ albo lokalnej bazy z docker-compose (port 5433).\n',
+    );
+    process.exit(1);
 }
 
 async function listSubscriptionsOldestFirst(): Promise<Stripe.Subscription[]> {
@@ -49,27 +53,21 @@ async function listSubscriptionsOldestFirst(): Promise<Stripe.Subscription[]> {
 }
 
 async function main(): Promise<void> {
-    console.log(
-        `Tryb klucza Stripe: ${STRIPE_LIVE_MODE ? 'LIVE' : 'TEST'}, baza: ${databaseHost()}`,
-    );
+    // Sam host, bez loginu i hasla.
+    const host = databaseHostname(env.DATABASE_URL) ?? '(nieznany)';
+    assertKeyModeMatchesDatabase(host);
+    console.log(`Tryb klucza Stripe: ${STRIPE_LIVE_MODE ? 'LIVE' : 'TEST'}, baza: ${host}`);
 
     const counts: Record<Outcome, number> = {
         synced: 0,
         conflict: 0,
         unlinked: 0,
         service_missing: 0,
-        wrong_mode: 0,
         failed: 0,
     };
 
     // Kolejno, nie rownolegle: limit zapytan Stripe, czytelny log i kolejnosc od najstarszej.
     for (const subscription of await listSubscriptionsOldestFirst()) {
-        if (subscription.livemode !== STRIPE_LIVE_MODE) {
-            counts.wrong_mode += 1;
-            console.warn(`${subscription.id}: pominieta (livemode niezgodny z kluczem)`);
-            continue;
-        }
-
         try {
             const result = await syncSubscriptionFromStripe(subscription.id);
             counts[result.outcome] += 1;

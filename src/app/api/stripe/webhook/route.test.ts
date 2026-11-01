@@ -15,12 +15,29 @@ const WEBHOOK_SECRET = 'whsec_test_secret';
 /** Baza (tabela `stripe_events`) jako zbior w pamieci. */
 const mockProcessedEvents = new Set<string>();
 
-jest.mock('../../../../../env', () => ({ env: { STRIPE_WEBHOOK_SECRET: 'whsec_test_secret' } }));
+const LOCAL_DATABASE_URL = 'postgres://user:secret@localhost:5433/mydb';
+const REMOTE_DATABASE_URL = 'postgres://user:secret@db.prod.example.com:5432/postgres';
+
+/** Domyslnie klucz testowy + baza lokalna (docker-compose); testy bramki trybu je zmieniaja. */
+const mockEnv = { STRIPE_WEBHOOK_SECRET: 'whsec_test_secret', DATABASE_URL: LOCAL_DATABASE_URL };
+const mockKeyMode = { isLive: false };
+
+// Getter: `jest.mock` jest wynoszony nad deklaracje `mockEnv`, a modul czyta `env` dopiero w handlerze.
+jest.mock('../../../../../env', () => ({
+    get env() {
+        return mockEnv;
+    },
+}));
 // Prawdziwa weryfikacja podpisu z paczki `stripe` (lokalne HMAC, bez sieci).
 jest.mock('@/lib/stripe', () => {
     // Build CJS paczki eksportuje konstruktor jako `module.exports` (bez `default`).
     const StripeClient = jest.requireActual<typeof Stripe>('stripe');
-    return { stripe: new StripeClient('sk_test_dummy'), STRIPE_LIVE_MODE: false };
+    return {
+        stripe: new StripeClient('sk_test_dummy'),
+        get STRIPE_LIVE_MODE() {
+            return mockKeyMode.isLive;
+        },
+    };
 });
 jest.mock('@/lib/stripe-events', () => ({
     isStripeEventProcessed: async (id: string) => mockProcessedEvents.has(id),
@@ -88,6 +105,8 @@ const CONFLICT = {
 
 beforeEach(() => {
     mockProcessedEvents.clear();
+    mockEnv.DATABASE_URL = LOCAL_DATABASE_URL;
+    mockKeyMode.isLive = false;
     jest.mocked(syncSubscriptionFromStripe)
         .mockReset()
         .mockResolvedValue({ outcome: 'synced', serviceId: SERVICE_ID, isPremiumActive: true });
@@ -292,6 +311,68 @@ describe('POST /api/stripe/webhook — tryb konta (livemode)', () => {
 
         expect(response.status).toBe(200);
         expect(syncSubscriptionFromStripe).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('POST /api/stripe/webhook — klucz testowy a baza nielokalna', () => {
+    it('klucz testowy + baza produkcyjna: 200 bez synchronizacji, bez oznaczenia i bez adresu bazy w logu', async () => {
+        jest.spyOn(console, 'warn').mockImplementation(() => {});
+        mockEnv.DATABASE_URL = REMOTE_DATABASE_URL;
+
+        const response = await signed(CHECKOUT_COMPLETED);
+
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({ data: { received: true }, error: null });
+        expect(syncSubscriptionFromStripe).not.toHaveBeenCalled();
+        expect(mockProcessedEvents.has('evt_checkout')).toBe(false);
+        expect(sendMail).not.toHaveBeenCalled();
+        expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('non-local database'), {
+            eventId: 'evt_checkout',
+        });
+        const logged = JSON.stringify(jest.mocked(console.warn).mock.calls);
+        expect(logged).not.toContain('db.prod.example.com');
+        expect(logged).not.toContain('secret');
+    });
+
+    it('klucz testowy + baza lokalna: synchronizuje', async () => {
+        const response = await signed(SUBSCRIPTION_UPDATED);
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).toHaveBeenCalledWith('sub_1', {});
+    });
+
+    it('klucz produkcyjny + baza produkcyjna: synchronizuje', async () => {
+        mockKeyMode.isLive = true;
+        mockEnv.DATABASE_URL = REMOTE_DATABASE_URL;
+        const payload = event(
+            'evt_live_updated',
+            'customer.subscription.updated',
+            { id: 'sub_1', object: 'subscription' },
+            true,
+        );
+
+        const response = await signed(payload);
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).toHaveBeenCalledWith('sub_1', {});
+        expect(mockProcessedEvents.has('evt_live_updated')).toBe(true);
+    });
+});
+
+describe('POST /api/stripe/webhook — mail o zakupie', () => {
+    it('synced bez aktywnego premium nie wysyla maila o zakupie', async () => {
+        jest.mocked(syncSubscriptionFromStripe).mockResolvedValue({
+            outcome: 'synced',
+            serviceId: SERVICE_ID,
+            isPremiumActive: false,
+        });
+
+        const response = await signed(CHECKOUT_COMPLETED);
+
+        expect(response.status).toBe(200);
+        expect(syncSubscriptionFromStripe).toHaveBeenCalledTimes(1);
+        expect(mockProcessedEvents.has('evt_checkout')).toBe(true);
+        expect(sendMail).not.toHaveBeenCalled();
     });
 });
 
