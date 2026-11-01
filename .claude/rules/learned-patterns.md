@@ -2,7 +2,7 @@
 
 Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane przez `/dev-compound` i `/dev-compound-refresh`.
 
-<!-- rule-count: 11 -->
+<!-- rule-count: 13 -->
 
 - **Zmiany schematu aplikuj przez `npx drizzle-kit push`, nie `generate`**: katalog `drizzle/` w tym repo jest martwy (snapshoty znaja 2 z 4 enumow i nie znaja tabeli `service_locations`), wiec `generate` produkuje migracje tworzaca od zera obiekty juz istniejace w bazie. Jesli `generate` zapyta o `rename`, ZATRZYMAJ SIE — wybor `~ county > coverage rename enum` jest destrukcyjny. Skrypt `npm run drizzle:generate` wola przedawniony `generate:pg` i nic nie robi.
   Source: docs/solutions/database-issues/2026-08-22-drizzle-generate-nieuzywalny-snapshoty.md
@@ -36,3 +36,9 @@ Reguly wyciagniete z rozwiazanych problemow w `docs/solutions/`. Zarzadzane prze
 
 - **Akcje „w locie” w tescie zawsze rozwiazuj przed koncem testu**: React 19 splata trwajace akcje async, wiec niezakonczona obietnica z mocka akcji blokuje commit przejsc we WSZYSTKICH kolejnych testach pliku („Unable to find …” w testach, ktore przechodza osobno). Trzymaj `resolve` i wolaj go na koncu testu z `await findBy…` na stan koncowy.
   Source: docs/solutions/testing-issues/2026-10-11-react-19-niezakonczona-akcja-blokuje-kolejne-testy.md
+
+- **Fetch z middleware do wlasnego API: sekret, nie limit po IP; linki bez prefetchu**: na Vercelu caly ruch z middleware ma jeden adres (limit po IP = globalny kubelek), a surowy `x-forwarded-for` klient podrobi. Ruch wewnetrzny uwierzytelniaj sekretem z `env.ts` (`timingSafeEqual`), publiczny limituj po `x-vercel-forwarded-for`/`x-real-ip`. Linki do tras walidowanych w middleware dostaja `prefetch={false}`, a odpowiedz lookupu `Cache-Control: s-maxage` (bledy `private, no-store`).
+  Source: docs/solutions/deployment-issues/2026-11-01-lookup-z-middleware-limit-ip-prefetch-cache.md
+
+- **Publiczny slug: jedna funkcja przydzialu i jeden predykat formatu przed backfillem**: seed, backfill, CLI i routing musza liczyc i walidowac slug tym samym kodem, inaczej `db:reset` zmienia adresy z outreachu. Dry-run backfillu przeglada czlowiek (`slugify` robi z `|` „-or-”). `drizzle-kit push` przy `UNIQUE` na nowej kolumnie pyta o truncate — zawsze „No” (NULL nie lamie UNIQUE). `.notNull()` w typecheck wylistuje inserty bez slugu.
+  Source: docs/solutions/database-issues/2026-11-01-slug-jako-publiczny-adres-jedna-regula-przed-backfillem.md
