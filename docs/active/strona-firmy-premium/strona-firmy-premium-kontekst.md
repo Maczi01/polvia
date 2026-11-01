@@ -1,7 +1,7 @@
 # Kontekst: Strona firmy — darmowy profil + Premium
 
 **Branch:** `feature/strona-firmy-premium` (worktree: `C:\Users\mateu\WebstormProjects\polvia-strona-firmy`, od `origin/master` @ `84638df`)
-**Ostatnia aktualizacja:** 2026-11-01 (re-review fazy 3 po poprawkach)
+**Ostatnia aktualizacja:** 2026-11-01 (poprawki po re-review fazy 3)
 
 ## Źródła
 
@@ -342,6 +342,17 @@ Commity `3b8df5a` (feature-builder-web-data, #1–#5) i `0661ce2` (feature-build
 - **#5:** sync zwraca `conflict` bez maila; mail wysyła webhook przy `isFirstDelivery`, tylko dla `checkout.session.completed` i aktywnej przychodzącej subskrypcji (odchylenie od sugestii `subscription.created` — tam status bywa `incomplete`). CLI wiąże od najstarszej, bez maili.
 - **#6–#7:** strona `dziekujemy`: `checkRateLimit` po IP (20/h) po walidacji formatu, przed Stripe; `unavailable` i przekroczony limit → wariant `CheckoutUnavailable` „odśwież za chwilę” (3 klucze × 4 locale). Link „odśwież” to `<a href="?session_id=…">`, bo trasy nie ma w `routing.pathnames` (P3 #33).
 - **Zmienione istniejące testy** (sprzeczne z poprawką, uzasadnione w raportach builderów): `premium.test.ts` (realistyczny okres `past_due`), `subscription-sync.test.ts` (konflikt bez maila), `route.test.ts` (mail o konflikcie w webhooku), `_actions.test.ts` (`retrieve` z `expand`).
+
+## Poprawki po re-review fazy 3 (2026-11-01)
+
+Commity `e6aab21` (feature-builder-web-data: R1, R3, R4) i `ed2ffcc` (feature-builder-web-fullstack: R2, R9). Gate: tsc OK, jest 164 suite'y / 1812 testów, lint 0 błędów.
+
+- **R1:** nowy `src/lib/database-host.ts` (`isLocalDatabaseUrl`, bez zależności — importuje go też `drop.ts`). Webhook: podpis → `!STRIPE_LIVE_MODE && !isLocalDatabaseUrl` → 200 bez sync i bez `stripe_events`. CLI `db:sync-subscriptions` przy tej kombinacji kończy się `exit 1` przed `subscriptions.list`. Martwa gałąź `wrong_mode` usunięta; porównanie `livemode` zostało jako tania druga linia obrony. Bez flagi override — staging z kluczami testowymi i zdalną bazą testową wymagałby świadomego override w `env.ts`. Uboczna naprawa: `drop.ts` uznaje teraz `[::1]` i `LOCALHOST` za lokalne (stary `LOCAL_HOSTS.has('::1')` nie łapał IPv6 z nawiasami).
+- **R3:** `supersedesPastDue` — opłacona nowa subskrypcja wypiera zapisaną `past_due` innej subskrypcji (zapis + `console.warn`). Nieopłacona nowa (`incomplete`) nie wypiera. Późniejsze `deleted` starej → `conflict` z `isIncomingActive: false`, wiersz nowej bez zmian.
+- **R4:** mail „opłacono” tylko przy `synced` z `isPremiumActive`.
+- **R2:** decyzja orkiestratora — timeout **lokalny** w stronie `dziekujemy` (`Promise.race`, 1500 ms), nie globalny `commandTimeout` w `redis.ts`: globalny timeout zmieniałby zachowanie `GETDEL` w `add-business/draft-store.ts` (komenda wykonana po stronie Redisa, a wołający widzi porażkę → utracony szkic). Każdy błąd limitu → `console.error` bez IP i fail-open do Stripe.
+- **R9:** `switch` po `verification.status` z jawną gałęzią `paid`, bez `default`.
+- **Otwarte (P3):** po zakupie „ratunkowym” stara subskrypcja może odzyskać płatność (`past_due` → `active`) — founder płaci za dwie, a ślad jest tylko w logu `conflict`. Klient Redisa nadal bez globalnego timeoutu (osobna decyzja z ryzykiem dla `GETDEL`).
 
 ## Re-review fazy 3 po poprawkach (2026-11-01)
 

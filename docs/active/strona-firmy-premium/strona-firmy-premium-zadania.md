@@ -432,10 +432,12 @@ Raport: [review-faza-3.md](review-faza-3.md). Werdykt: ⚠️ kontynuuj z zastrz
 
 Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po poprawkach P2”. Werdykt: ⚠️ kontynuuj z zastrzeżeniami (0 × P1, 3 × P2, 14 × P3). P2 #1, #2, #4–#7 z pierwszego review zamknięte; #3 częściowo (→ R1).
 
-- [ ] 🟠 [important] **R1 `api/stripe/webhook/route.ts:108`, `src/db/sync-subscriptions.ts:53,67`**: klucz testowy + produkcyjna baza nadal zapisuje testowe subskrypcje (lokalny test checkoutu z `.env` na produkcję). Bramka wzorem `assertDropAllowed`/`LOCAL_HOSTS` z `src/db/drop.ts`: `!STRIPE_LIVE_MODE` i host bazy nielokalny → webhook 200 bez sync, CLI odmawia startu. Usunąć martwy filtr `wrong_mode`.
-- [ ] 🟠 [important] **R2 `premium/dziekujemy/page.tsx:34-42`, `src/lib/redis.ts:5-8`**: awaria Redisa → strona błędu płacącemu. `try/catch` z logiem (fail-open albo `CheckoutUnavailable`) + `commandTimeout` ~1–2 s w ioredis. Test „`checkRateLimit` rzuca”.
-- [ ] 🟠 [important] **R3 `src/lib/subscription-sync.ts:156-164`**: nowy zakup w karencji `past_due` starej subskrypcji → `conflict`, opłacona subskrypcja nie zapisana do odnowienia, mail „zwróć”. Przychodząca `active`/`trialing` wygrywa z zapisaną `past_due`. Test.
-- [ ] 🟡 [nit] R4–R17: mail „opłacono” tylko przy `isPremiumActive`, `line_items.has_more`, exhaustiveness w `dziekujemy`, 2 testy z osłabioną/kruchą asercją, brakujące testy (`past_due`→`active`, `trialing`, wiele pozycji, `incomplete_expired`), log konfliktu w CLI, timeouty Postgresa, `NOT NULL` bez default. Szczegóły w raporcie.
+✅ R1–R3 (oraz R4, R9) naprawione 2026-11-01 (commity `e6aab21`, `ed2ffcc`). Pozostałe P3 otwarte.
+
+- [x] 🟠 [important] **R1 `api/stripe/webhook/route.ts:108`, `src/db/sync-subscriptions.ts:53,67`**: klucz testowy + produkcyjna baza nadal zapisuje testowe subskrypcje (lokalny test checkoutu z `.env` na produkcję). Bramka wzorem `assertDropAllowed`/`LOCAL_HOSTS` z `src/db/drop.ts`: `!STRIPE_LIVE_MODE` i host bazy nielokalny → webhook 200 bez sync, CLI odmawia startu. Usunąć martwy filtr `wrong_mode`.
+- [x] 🟠 [important] **R2 `premium/dziekujemy/page.tsx:34-42`, `src/lib/redis.ts:5-8`**: awaria Redisa → strona błędu płacącemu. `try/catch` z logiem (fail-open albo `CheckoutUnavailable`) + `commandTimeout` ~1–2 s w ioredis. Test „`checkRateLimit` rzuca”.
+- [x] 🟠 [important] **R3 `src/lib/subscription-sync.ts:156-164`**: nowy zakup w karencji `past_due` starej subskrypcji → `conflict`, opłacona subskrypcja nie zapisana do odnowienia, mail „zwróć”. Przychodząca `active`/`trialing` wygrywa z zapisaną `past_due`. Test.
+- [ ] 🟡 [nit] R5–R17 (R4, R9 zrobione): `line_items.has_more`, 2 testy z osłabioną/kruchą asercją, brakujące testy (`past_due`→`active`, `trialing`, wiele pozycji, `incomplete_expired`), log konfliktu w CLI, timeouty Postgresa, `NOT NULL` bez default. Szczegóły w raporcie.
 
 ---
 
@@ -443,10 +445,14 @@ Raport: [review-faza-3.md](review-faza-3.md), sekcja „Re-review fazy 3 po popr
 
 - [ ] `Operator:` **przed merge na master**: 5 zmiennych `STRIPE_*` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `STRIPE_PORTAL_LOGIN_URL`) w Vercel (Production + Preview) i lokalnym `.env` — są wymagane w `env.ts`, bez nich build i dev server nie wstaną
 - [ ] `Operator:` lokalny test checkoutu wymaga `NEXT_PUBLIC_SITE_URL=http://localhost:3000` (`success_url` budowany z tej zmiennej, inaczej powrót na produkcję)
+- [ ] `Operator:` lokalny test checkoutu (`stripe listen`, `sk_test_`) wymaga `DATABASE_URL` na localhost (docker-compose) — przy zdalnej bazie webhook odpowiada 200 i nic nie zapisuje, a `db:sync-subscriptions` odmawia startu
+- [ ] Do rozważenia: staging z kluczami testowymi i zdalną bazą testową wymagałby flagi override w `env.ts` (dziś zablokowany przez R1)
+- [ ] `Operator:` przeglądać logi `conflict` webhooka (np. stara subskrypcja odzyskała płatność po zakupie „ratunkowym” → podwójna opłata, bez maila)
+- [ ] Do rozważenia: globalny timeout klienta Redis — ryzyko dla `GETDEL` w `add-business/draft-store.ts`
 - [ ] `Operator:` po każdym `db:reset`: `npm run db:sync-subscriptions`
 - [ ] `Operator:` `drizzle-kit push` dla fazy 3 obejmuje kolumnę `service_subscriptions.current_period_start timestamptz NOT NULL` (tabela jeszcze nie istnieje na bazie, więc bez wartości domyślnej)
 - [ ] `Operator:` Customer Portal w Stripe — przy zmianie planu dopuścić tylko ceny `STRIPE_PRICE_MONTHLY` i `STRIPE_PRICE_YEARLY` (inna cena kończy premium z końcem opłaconego okresu)
-- [ ] `Operator:` Preview z testowymi kluczami Stripe NIE może wskazywać na produkcyjny `DATABASE_URL` — sprawdzenie `livemode` łapie tylko niezgodność trybu klucza i zdarzenia
+- [x] ~~`Operator:` Preview z testowymi kluczami Stripe NIE może wskazywać na produkcyjny `DATABASE_URL`~~ — wymuszone w kodzie (R1)
 - [ ] Do rozważenia: awaria Redisa na stronie `dziekujemy` kończy się stroną błędu (jak akcje w `_actions.ts`); ewentualny łagodny fallback to osobna decyzja
 - [ ] `Operator:` w teście ręcznym U9 sprawdzić wariant „odśwież za chwilę” na stronie `dziekujemy` (razem z P3 #33)
 - [ ] Do rozważenia: slugi zaczynające się od `api` (np. `apiary-x`) nie dostaną aliasu `/<slug>` — matcher middleware je pomija; profil `/firma/<slug>` działa
