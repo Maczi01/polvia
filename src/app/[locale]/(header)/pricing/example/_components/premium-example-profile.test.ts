@@ -58,4 +58,12 @@ describe('getPremiumExampleProfile', () => {
             profile.premium.ratings.every(rating => rating.url.startsWith('https://example.com/')),
         ).toBe(true);
     });
+
+    it.each(locales)('%s: okruszki linkuja tylko strone glowna, nie mape z filtrem', locale => {
+        const { breadcrumbs } = getPremiumExampleProfile(locale, 'gallery');
+        const hrefs = breadcrumbs.flatMap(crumb => (crumb.href ? [crumb.href] : []));
+
+        expect(breadcrumbs).toHaveLength(4);
+        expect(hrefs).toEqual([locale === 'pl' ? '/' : `/${locale}`]);
+    });
 });

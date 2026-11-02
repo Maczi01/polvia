@@ -1,3 +1,4 @@
+import type { ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
 import type { ServiceProfile, ServiceProfileLocation } from '@/lib/service-profile-queries';
 import type { SimilarServiceRow } from '@/lib/similar-services';
 
@@ -6,6 +7,7 @@ import type { PremiumContent } from './service-profile-types';
 import { toProfileView, toServiceImagePath } from './to-profile-view';
 
 const FREE: ProfileViewKind = { kind: 'free' };
+const NO_CRUMBS: ProfileBreadcrumb[] = [];
 
 function location(overrides: Partial<ServiceProfileLocation> = {}): ServiceProfileLocation {
     return {
@@ -72,7 +74,7 @@ describe('toServiceImagePath', () => {
 
 describe('toProfileView', () => {
     it('mapuje logo i jezyki obslugi, a lokalizacje przekazuje z nazwami z bazy', () => {
-        const view = toProfileView(profile(), similar, 'pl', FREE);
+        const view = toProfileView(profile(), similar, 'pl', FREE, NO_CRUMBS);
 
         expect(view.logo).toBe('/services/remont.png');
         expect(view.languages).toEqual(['pl', 'uk']);
@@ -95,11 +97,17 @@ describe('toProfileView', () => {
             ratings: [],
         };
 
-        const view = toProfileView(profile(), similar, 'pl', {
-            kind: 'premium',
-            template: 'professional',
-            content,
-        });
+        const view = toProfileView(
+            profile(),
+            similar,
+            'pl',
+            {
+                kind: 'premium',
+                template: 'professional',
+                content,
+            },
+            NO_CRUMBS,
+        );
 
         expect(view.premium).toBe(content);
     });
@@ -107,11 +115,11 @@ describe('toProfileView', () => {
     it('widok free ma premium null, nawet gdy w bazie jest zapisana tresc', () => {
         const stored = profile({ premium: { template: 'gallery' } });
 
-        expect(toProfileView(stored, similar, 'pl', FREE).premium).toBeNull();
+        expect(toProfileView(stored, similar, 'pl', FREE, NO_CRUMBS).premium).toBeNull();
     });
 
     it('wpis bez obrazka ma logo null', () => {
-        expect(toProfileView(profile({ image: null }), [], 'pl', FREE).logo).toBeNull();
+        expect(toProfileView(profile({ image: null }), [], 'pl', FREE, NO_CRUMBS).logo).toBeNull();
     });
 
     it('mapHref wskazuje pin glownej lokalizacji na mapie', () => {
@@ -126,13 +134,16 @@ describe('toProfileView', () => {
             [],
             'uk',
             FREE,
+            NO_CRUMBS,
         );
 
         expect(view.mapHref).toEqual({ pathname: '/map', query: { place: 'centrala' } });
     });
 
     it('wpis online ma mapHref null', () => {
-        expect(toProfileView(profile({ coverage: 'online' }), [], 'pl', FREE).mapHref).toBeNull();
+        expect(
+            toProfileView(profile({ coverage: 'online' }), [], 'pl', FREE, NO_CRUMBS).mapHref,
+        ).toBeNull();
     });
 
     it('lokalizacja bez wspolrzednych ma mapHref null', () => {
@@ -141,16 +152,28 @@ describe('toProfileView', () => {
             [],
             'pl',
             FREE,
+            NO_CRUMBS,
         );
 
         expect(view.mapHref).toBeNull();
     });
 
     it('podobne firmy linkuja do /firma/[slug] z params', () => {
-        const [first] = toProfileView(profile(), similar, 'pl', FREE).similarServices;
+        const [first] = toProfileView(profile(), similar, 'pl', FREE, NO_CRUMBS).similarServices;
 
         expect(first.href).toEqual({ pathname: '/firma/[slug]', params: { slug: 'liga-remontu' } });
         expect(first.logo).toBeNull();
         expect(first.name).toBe('Liga Remontu');
+    });
+
+    it('okruszki ze strony trafiaja do widoku bez zmian', () => {
+        const breadcrumbs: ProfileBreadcrumb[] = [
+            { label: 'Polvia', href: '/' },
+            { label: 'Mistrz Remontu', href: '/firma/mistrz-remontu' },
+        ];
+
+        expect(toProfileView(profile(), [], 'pl', FREE, breadcrumbs).breadcrumbs).toEqual(
+            breadcrumbs,
+        );
     });
 });

@@ -48,6 +48,7 @@ function view(premium: PremiumContent | null): ServiceProfileView {
         mapHref: null,
         similarServices: [],
         premium,
+        breadcrumbs: [],
     };
 }
 

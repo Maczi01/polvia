@@ -11,6 +11,8 @@ type ExamplePriceItem = { name: string; price: string; note?: string };
 type ExampleFaqItem = { question: string; answer: string };
 
 export type PremiumExampleTexts = {
+    /** Kategoria w okruszkach (tekst bez linku — mapa nie zna fikcyjnej firmy). */
+    breadcrumbCategory: string;
     description: string;
     tags: string[];
     coverAlt: string;
@@ -21,6 +23,7 @@ export type PremiumExampleTexts = {
 
 export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
     pl: {
+        breadcrumbCategory: 'Finansowe',
         description:
             'Prowadzimy księgowość jednoosobowych działalności i małych spółek. Rozliczamy podatki, ZUS i kadry, a dokumenty możesz przesłać zdjęciem z telefonu.\n\nObsługujemy klientów po polsku, ukraińsku, rosyjsku i angielsku — w biurze w Warszawie albo w pełni zdalnie.',
         tags: ['Księgowość JDG', 'Pełna księgowość', 'Kadry i płace', 'Rozliczenia PIT', 'ZUS'],
@@ -57,6 +60,7 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         ],
     },
     uk: {
+        breadcrumbCategory: 'Фінансові',
         description:
             'Ведемо бухгалтерію ФОП та малих компаній. Розраховуємо податки, ZUS і кадри, а документи можна надіслати фото з телефона.\n\nОбслуговуємо клієнтів польською, українською, російською та англійською — в офісі у Варшаві або повністю дистанційно.',
         tags: ['Бухгалтерія JDG', 'Повна бухгалтерія', 'Кадри і зарплати', 'Декларації PIT', 'ZUS'],
@@ -93,6 +97,7 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         ],
     },
     en: {
+        breadcrumbCategory: 'Financial',
         description:
             'We keep the books for sole traders and small companies. We handle taxes, social security (ZUS) and payroll, and you can send documents as a photo from your phone.\n\nWe serve clients in Polish, Ukrainian, Russian and English — at our Warsaw office or fully remotely.',
         tags: ['Sole trader accounting', 'Full accounting', 'Payroll', 'PIT returns', 'ZUS'],
@@ -133,6 +138,7 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         ],
     },
     ru: {
+        breadcrumbCategory: 'Финансовые',
         description:
             'Ведём бухгалтерию ИП и небольших компаний. Рассчитываем налоги, ZUS и кадры, а документы можно отправить фото с телефона.\n\nОбслуживаем клиентов на польском, украинском, русском и английском — в офисе в Варшаве или полностью удалённо.',
         tags: [

@@ -52,4 +52,19 @@ describe('TemplateGallery', () => {
             screen.queryByRole('region', { name: 'Opinie w innych serwisach' }),
         ).not.toBeInTheDocument();
     });
+
+    it('okruszki nad nazwa: strona glowna, kategoria, miasto i biezaca firma', () => {
+        renderWithIntl(<TemplateGallery profile={premiumServiceFixture} />);
+
+        const nav = screen.getByRole('navigation', { name: 'Ścieżka nawigacji' });
+        expect(within(nav).getByRole('link', { name: 'Remonty' })).toHaveAttribute(
+            'href',
+            '/mapa/remonty',
+        );
+        expect(within(nav).getByRole('link', { name: 'Warszawa' })).toHaveAttribute(
+            'href',
+            '/mapa/remonty/warszawa',
+        );
+        expect(within(nav).getByText('Mistrz Remontu')).toHaveAttribute('aria-current', 'page');
+    });
 });

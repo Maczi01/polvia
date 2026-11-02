@@ -1,3 +1,4 @@
+import { buildProfileBreadcrumbs, type ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
 import type { OpeningHours } from '@/lib/weekdays';
 
 import type {
@@ -22,6 +23,21 @@ const WEEKDAY_HOURS: OpeningHours = {
     friday: { open: '08:00', close: '16:00' },
     saturday: { open: '09:00', close: '13:00' },
 };
+
+/** Okruszki fikstury w `pl` — te same reguly co na stronie (`buildProfileBreadcrumbs`). */
+function makeBreadcrumbs(
+    profile: Pick<ServiceProfileView, 'category' | 'name' | 'slug'>,
+    categoryLabel: string,
+    city: string | null,
+): ProfileBreadcrumb[] {
+    return buildProfileBreadcrumbs({
+        locale: 'pl',
+        siteName: 'Polvia',
+        categoryLabel,
+        city,
+        ...profile,
+    });
+}
 
 export function makeLocation(overrides: Partial<ProfileLocation> = {}): ProfileLocation {
     return {
@@ -112,6 +128,11 @@ export const localServiceFixture: ServiceProfileView = {
     mapHref: { pathname: '/map', query: { place: 'mistrz-remontu' } },
     similarServices: SIMILAR_SERVICES,
     premium: null,
+    breadcrumbs: makeBreadcrumbs(
+        { category: 'renovation', name: 'Mistrz Remontu', slug: 'mistrz-remontu' },
+        'Remonty',
+        'Warszawa',
+    ),
 };
 
 export const onlineServiceFixture: ServiceProfileView = {
@@ -149,6 +170,11 @@ export const onlineServiceFixture: ServiceProfileView = {
         category: 'financial',
     })),
     premium: null,
+    breadcrumbs: makeBreadcrumbs(
+        { category: 'financial', name: 'Księgowość Online Taxovia', slug: 'taxovia-online' },
+        'Finansowe',
+        null,
+    ),
 };
 
 export const noLogoServiceFixture: ServiceProfileView = {
@@ -164,6 +190,11 @@ export const noLogoServiceFixture: ServiceProfileView = {
     verified: false,
     locations: [makeLocation({ socials: null, webpage: null, email: null })],
     similarServices: [],
+    breadcrumbs: makeBreadcrumbs(
+        { category: 'gastronomy', name: 'Smaki Domu — pierogi i wareniki', slug: 'smaki-domu' },
+        'Gastronomia',
+        'Warszawa',
+    ),
 };
 
 const REMONT_PHOTOS: ProfileImage[] = [1, 2, 3, 4, 5].map(index => ({
@@ -245,6 +276,15 @@ export const premiumProfessionalFixture: PremiumProfileView = {
     coverage: 'hybrid',
     languages: ['pl', 'uk', 'ru', 'en'],
     tags: ['Karta pobytu', 'Prawo pracy', 'Obywatelstwo'],
+    breadcrumbs: makeBreadcrumbs(
+        {
+            category: 'law',
+            name: 'Kancelaria Adwokacka Nowak i Wspólnicy',
+            slug: 'kancelaria-nowak',
+        },
+        'Prawne',
+        'Warszawa',
+    ),
     locations: [
         makeLocation({
             street: 'ul. Marszałkowska 84/92 lok. 108',

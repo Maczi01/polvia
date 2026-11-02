@@ -966,10 +966,25 @@
       "saturday": "Субота",
       "sunday": "Неділя"
     },
+    "breadcrumbs": "Навігаційний ланцюжок",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Адреса, телефон, години роботи та контакти в каталозі Polvia.",
       "descriptionOnline": "{name} — {category}, обслуговування онлайн. Контакти та інформація про компанію в каталозі Polvia.",
-      "descriptionGeneric": "{name} — {category}. Контакти та інформація про компанію в каталозі Polvia."
+      "descriptionGeneric": "{name} — {category}. Контакти та інформація про компанію в каталозі Polvia.",
+      "titleCategory": {
+        "uk": "{category} українською",
+        "ru": "{category} російською",
+        "be": "{category} білоруською"
+      },
+      "languageNames": {
+        "uk": "українською",
+        "ru": "російською",
+        "en": "англійською",
+        "be": "білоруською"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Обслуговування {languages}. Адреса, телефон, години роботи та контакти в каталозі Polvia.",
+      "descriptionOnlineLanguages": "{name} — {category}, обслуговування онлайн {languages}. Контакти та інформація про компанію в каталозі Polvia.",
+      "descriptionGenericLanguages": "{name} — {category}. Обслуговування {languages}. Контакти та інформація про компанію в каталозі Polvia."
     },
     "example": {
       "metaTitle": "Приклад преміум-сторінки компанії",

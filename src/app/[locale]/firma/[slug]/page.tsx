@@ -6,8 +6,11 @@ import { cache, type ComponentType, type ReactElement } from 'react';
 import { type Locale, toLocale } from '@/i18n/config';
 import { getCategoryMessageKey } from '@/lib/categories';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
+import { toServiceLanguages } from '@/lib/languages';
 import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 import type { PremiumTemplate } from '@/lib/premium-templates';
+import { buildBreadcrumbJsonLd, buildProfileBreadcrumbs } from '@/lib/service-profile-breadcrumbs';
+import { buildLanguageMetaTexts } from '@/lib/service-profile-languages';
 import {
     buildProfileCanonicalUrl,
     buildProfileJsonLd,
@@ -128,12 +131,22 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const city = getHeaderCity(profile);
     const viewKind = resolveProfileView(profile, locale);
     const categoryLabel = tCategories(getCategoryMessageKey(profile.category));
+    const languageTexts = buildLanguageMetaTexts(
+        t,
+        locale,
+        toServiceLanguages(profile.languages),
+        categoryLabel,
+    );
     // Klucz z zasiegu: wpis `local` bez adresu nie moze dostac opisu „obsluga online”.
-    const fallbackDescription = t(selectFallbackDescriptionKey(profile.coverage, city), {
-        name: profile.name,
-        category: categoryLabel,
-        city: city ?? '',
-    });
+    const fallbackDescription = t(
+        selectFallbackDescriptionKey(profile.coverage, city, languageTexts.hasDescribedLanguages),
+        {
+            name: profile.name,
+            category: categoryLabel,
+            city: city ?? '',
+            ...languageTexts.descriptionValues,
+        },
+    );
 
     return buildProfileMetadata({
         baseUrl: env.NEXT_PUBLIC_SITE_URL,
@@ -141,6 +154,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         slug,
         name: profile.name,
         categoryLabel,
+        categoryWithLanguage: languageTexts.categoryWithLanguage,
         city,
         siteName: serviceNameFromCapitalLetter,
         description: profile.description,
@@ -175,7 +189,17 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
               locale,
           )
         : [];
-    const view = toProfileView(profile, similarServices, locale, viewKind);
+    const tCategories = await getTranslations({ locale, namespace: 'MapPage.Categories' });
+    const breadcrumbs = buildProfileBreadcrumbs({
+        locale,
+        siteName: serviceNameFromCapitalLetter,
+        category: profile.category,
+        categoryLabel: tCategories(getCategoryMessageKey(profile.category)),
+        city: getHeaderCity(profile),
+        name: profile.name,
+        slug: profile.slug,
+    });
+    const view = toProfileView(profile, similarServices, locale, viewKind, breadcrumbs);
     const mainLocation = getMainLocation(view.locations);
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
@@ -190,6 +214,8 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
         coverage: view.coverage,
         location: mainLocation,
         sameAs: toSameAs(mainLocation?.socials ?? null),
+        category: view.category,
+        languages: view.languages,
     });
 
     return (
@@ -197,6 +223,12 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: serializeJsonLd(buildBreadcrumbJsonLd(view.breadcrumbs, baseUrl)),
+                }}
             />
             <ProfileView view={view} viewKind={viewKind} />
         </>

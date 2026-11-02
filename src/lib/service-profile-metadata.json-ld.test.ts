@@ -29,6 +29,8 @@ describe('buildProfileJsonLd', () => {
         url: 'https://polvia.pl/firma/mistrz-remontu',
         imageUrl: 'https://polvia.pl/services/logo.png',
         sameAs: ['https://facebook.com/mistrz'],
+        category: 'others',
+        languages: [],
     };
 
     it('wpis lokalny to LocalBusiness z PostalAddress, geo i godzinami', () => {
@@ -103,6 +105,107 @@ describe('buildProfileJsonLd', () => {
         expect(jsonLd).not.toHaveProperty('sameAs');
         expect(jsonLd).not.toHaveProperty('email');
         expect(jsonLd).not.toHaveProperty('openingHoursSpecification');
+    });
+});
+
+describe('buildProfileJsonLd: typ z kategorii i jezyki', () => {
+    const common = {
+        name: 'Twój Lekarz',
+        description: null,
+        url: 'https://polvia.pl/firma/twoj-lekarz',
+        imageUrl: null,
+        sameAs: [],
+        languages: [],
+    };
+
+    it.each([
+        ['health', 'MedicalBusiness'],
+        ['law', 'LegalService'],
+        ['gastronomy', 'FoodEstablishment'],
+        ['grocery', 'GroceryStore'],
+        ['mechanics', 'AutomotiveBusiness'],
+        ['education', 'LocalBusiness'],
+    ])('wpis lokalny z kategoria %s to %s z adresem', (category, type) => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category,
+            coverage: 'local',
+            location: location(),
+        });
+
+        expect(jsonLd['@type']).toBe(type);
+        expect(jsonLd).toHaveProperty('address');
+    });
+
+    it.each(['others', 'help_support'])('kubel %s to LocalBusiness', category => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category,
+            coverage: 'hybrid',
+            location: location(),
+        });
+
+        expect(jsonLd['@type']).toBe('LocalBusiness');
+    });
+
+    it('lokalny bez lokalizacji dostaje typ z kategorii, bez adresu', () => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category: 'law',
+            coverage: 'local',
+            location: null,
+        });
+
+        expect(jsonLd['@type']).toBe('LegalService');
+        expect(jsonLd).not.toHaveProperty('address');
+    });
+
+    it('online zostaje Organization bez adresu niezaleznie od kategorii', () => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category: 'health',
+            coverage: 'online',
+            location: location(),
+        });
+
+        expect(jsonLd['@type']).toBe('Organization');
+        expect(jsonLd).not.toHaveProperty('address');
+        expect(jsonLd).not.toHaveProperty('geo');
+    });
+
+    it('knowsLanguage z kodami BCP 47 jezykow obslugi', () => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category: 'health',
+            coverage: 'local',
+            location: location(),
+            languages: ['pl', 'uk', 'be'],
+        });
+
+        expect(jsonLd.knowsLanguage).toEqual(['pl', 'uk', 'be']);
+    });
+
+    it('pusta lista jezykow pomija knowsLanguage', () => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category: 'health',
+            coverage: 'local',
+            location: location(),
+        });
+
+        expect(jsonLd).not.toHaveProperty('knowsLanguage');
+    });
+
+    it('bez priceRange i aggregateRating', () => {
+        const jsonLd = buildProfileJsonLd({
+            ...common,
+            category: 'financial',
+            coverage: 'hybrid',
+            location: location(),
+        });
+
+        expect(jsonLd).not.toHaveProperty('priceRange');
+        expect(jsonLd).not.toHaveProperty('aggregateRating');
     });
 });
 

@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileActions } from '../profile-actions/profile-actions';
 import { ProfileBadges } from '../profile-badges/profile-badges';
+import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
@@ -61,6 +62,7 @@ function ProfessionalHeader({
         <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
             <div className="h-1 bg-gradient-to-r from-slate-900 via-slate-700 to-brand" aria-hidden="true" />
             <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 md:py-12 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:px-8">
+                <ProfileBreadcrumbs items={profile.breadcrumbs} className="lg:col-span-2" />
                 <div className="flex items-start gap-4 md:gap-6">
                     <ProfileLogo
                         name={profile.name}

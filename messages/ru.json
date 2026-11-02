@@ -966,10 +966,25 @@
       "saturday": "Суббота",
       "sunday": "Воскресенье"
     },
+    "breadcrumbs": "Навигационная цепочка",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Адрес, телефон, часы работы и контакты в каталоге Polvia.",
       "descriptionOnline": "{name} — {category}, обслуживание онлайн. Контакты и информация о компании в каталоге Polvia.",
-      "descriptionGeneric": "{name} — {category}. Контакты и информация о компании в каталоге Polvia."
+      "descriptionGeneric": "{name} — {category}. Контакты и информация о компании в каталоге Polvia.",
+      "titleCategory": {
+        "uk": "{category} на украинском",
+        "ru": "{category} на русском",
+        "be": "{category} на белорусском"
+      },
+      "languageNames": {
+        "uk": "украинском",
+        "ru": "русском",
+        "en": "английском",
+        "be": "белорусском"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Обслуживание на {languages} {languageCount, plural, one {языке} other {языках}}. Адрес, телефон, часы работы и контакты в каталоге Polvia.",
+      "descriptionOnlineLanguages": "{name} — {category}, обслуживание онлайн на {languages} {languageCount, plural, one {языке} other {языках}}. Контакты и информация о компании в каталоге Polvia.",
+      "descriptionGenericLanguages": "{name} — {category}. Обслуживание на {languages} {languageCount, plural, one {языке} other {языках}}. Контакты и информация о компании в каталоге Polvia."
     },
     "example": {
       "metaTitle": "Пример премиум-страницы компании",

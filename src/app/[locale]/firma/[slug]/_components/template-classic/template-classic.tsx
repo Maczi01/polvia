@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileActions } from '../profile-actions/profile-actions';
 import { ProfileBadges } from '../profile-badges/profile-badges';
+import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
@@ -146,6 +147,10 @@ export function TemplateClassic({ profile }: TemplateClassicProps): ReactElement
     return (
         <article className="bg-gray-50 pb-12 dark:bg-gray-900">
             <div className="mx-auto max-w-6xl sm:px-6 sm:pt-6 lg:px-8">
+                <ProfileBreadcrumbs
+                    items={profile.breadcrumbs}
+                    className="px-4 py-3 sm:mb-4 sm:p-0"
+                />
                 <ClassicHeader {...sectionProps} />
                 <ClassicDetails {...sectionProps} />
             </div>

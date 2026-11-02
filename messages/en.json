@@ -966,10 +966,25 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
+    "breadcrumbs": "Breadcrumb",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
       "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory.",
-      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory."
+      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory.",
+      "titleCategory": {
+        "uk": "{category} in Ukrainian",
+        "ru": "{category} in Russian",
+        "be": "{category} in Belarusian"
+      },
+      "languageNames": {
+        "uk": "Ukrainian",
+        "ru": "Russian",
+        "en": "English",
+        "be": "Belarusian"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Service in {languages}. Address, phone, opening hours and contact details in the Polvia directory.",
+      "descriptionOnlineLanguages": "{name} — {category}, online service in {languages}. Contact details and business information in the Polvia directory.",
+      "descriptionGenericLanguages": "{name} — {category}. Service in {languages}. Contact details and business information in the Polvia directory."
     },
     "example": {
       "metaTitle": "Example premium business page",

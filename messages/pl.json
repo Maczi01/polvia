@@ -966,10 +966,25 @@
       "saturday": "Sobota",
       "sunday": "Niedziela"
     },
+    "breadcrumbs": "Ścieżka nawigacji",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
       "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
-      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia."
+      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia.",
+      "titleCategory": {
+        "uk": "{category} po ukraińsku",
+        "ru": "{category} po rosyjsku",
+        "be": "{category} po białorusku"
+      },
+      "languageNames": {
+        "uk": "ukraińsku",
+        "ru": "rosyjsku",
+        "en": "angielsku",
+        "be": "białorusku"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Obsługa po {languages}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
+      "descriptionOnlineLanguages": "{name} — {category}, obsługa online po {languages}. Kontakt i informacje o firmie w katalogu Polvia.",
+      "descriptionGenericLanguages": "{name} — {category}. Obsługa po {languages}. Kontakt i informacje o firmie w katalogu Polvia."
     },
     "example": {
       "metaTitle": "Przykładowa strona firmy premium",
