@@ -8,6 +8,12 @@ import {
     PREMIUM_PRICE_LIST_MAX,
     PREMIUM_TEMPLATES,
 } from '../lib/premium-templates';
+import {
+    PREMIUM_RATING_LABEL_MAX_LENGTH,
+    PREMIUM_RATING_MAX,
+    PREMIUM_RATING_SOURCES,
+    PREMIUM_RATINGS_MAX,
+} from '../lib/premium-ratings';
 
 /**
  * Tresc premium wpisu: blok `premium` w `data/services/<plik>.json` i ten sam ksztalt
@@ -34,6 +40,7 @@ const MAX_PRICE_NOTE_LENGTH = 200;
 const MAX_QUESTION_LENGTH = 200;
 const MAX_ANSWER_LENGTH = 2000;
 const MAX_IMAGE_FILE_LENGTH = 255;
+const MAX_RATING_URL_LENGTH = 500;
 
 /**
  * Sama nazwa pliku z `public/services/<slug-uslugi>/`: bez `/`, bez `..`, z rozszerzeniem
@@ -89,6 +96,59 @@ const faqItemSchema = z
     })
     .strict();
 
+/** Tylko `https:` — link wychodzi z naszej strony z `target="_blank"`. */
+function isHttpsUrl(value: string): boolean {
+    try {
+        return new URL(value).protocol === 'https:';
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Ocena firmy z innego serwisu, wpisana recznie (z linkiem do zrodla). `label` to nazwa
+ * serwisu spoza listy — wymagana dla `other`, zabroniona dla znanych serwisow, zeby wpis
+ * nie mogl podpisac sie cudza marka.
+ *
+ * Tych ocen NIE wolno wystawiac w JSON-LD jako `aggregateRating` (zasady Google
+ * dotyczace danych strukturalnych recenzji: oceny z innych serwisow i wybrane przez sama
+ * firme nie kwalifikuja sie do rich results).
+ */
+const ratingSchema = z
+    .object({
+        source: z.enum(PREMIUM_RATING_SOURCES),
+        label: z.string().trim().min(1).max(PREMIUM_RATING_LABEL_MAX_LENGTH).optional(),
+        rating: z.number().min(0).max(PREMIUM_RATING_MAX),
+        count: z.number().int().nonnegative(),
+        url: z
+            .string()
+            .trim()
+            .max(MAX_RATING_URL_LENGTH)
+            .refine(isHttpsUrl, 'Adres zrodla oceny: pelny link https://'),
+    })
+    .strict()
+    .superRefine((item, context) => {
+        if (item.source === 'other' && item.label === undefined) {
+            context.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Zrodlo "other" wymaga nazwy serwisu w "label"',
+                path: ['label'],
+            });
+        }
+        if (item.source !== 'other' && item.label !== undefined) {
+            context.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: 'Pole "label" tylko dla zrodla "other" — znane serwisy maja stala nazwe',
+                path: ['label'],
+            });
+        }
+    });
+
+/** Klucz plakietki: jeden wpis na serwis (dla `other` — na nazwe serwisu). */
+function ratingKey(item: z.infer<typeof ratingSchema>): string {
+    return item.source === 'other' ? `other:${item.label ?? ''}` : item.source;
+}
+
 /**
  * Druga i kolejne wystapienia tej samej wartosci jako blad na sciezce duplikatu. Duplikat
  * diff zlewa w „Bez zmian”, a w widoku daje powtorzony klucz Reacta.
@@ -127,6 +187,10 @@ export const premiumContentSchema = z
             .array(faqItemSchema)
             .max(PREMIUM_FAQ_MAX, `FAQ: najwyzej ${PREMIUM_FAQ_MAX} pytan`)
             .default([]),
+        ratings: z
+            .array(ratingSchema)
+            .max(PREMIUM_RATINGS_MAX, `Oceny: najwyzej ${PREMIUM_RATINGS_MAX} serwisow`)
+            .default([]),
         /**
          * Premium reczne (przelew): ostatni dzien premium, `RRRR-MM-DD`, wlacznie, w strefie
          * Europe/Warsaw. Brak = bez premium recznego (sama tresc niczego nie wlacza).
@@ -144,6 +208,11 @@ export const premiumContentSchema = z
             content.gallery.map(item => item.file),
             index => ['gallery', index, 'file'],
         );
+        reportDuplicates(context, content.ratings.map(ratingKey), index => [
+            'ratings',
+            index,
+            'source',
+        ]);
         for (const locale of locales) {
             reportDuplicates(
                 context,
@@ -162,6 +231,7 @@ export type PremiumContentData = z.infer<typeof premiumContentSchema>;
 export type PremiumGalleryItem = z.infer<typeof galleryItemSchema>;
 export type PremiumPriceListItem = z.infer<typeof priceListItemSchema>;
 export type PremiumFaqItem = z.infer<typeof faqItemSchema>;
+export type PremiumRatingItem = z.infer<typeof ratingSchema>;
 export type PremiumContentLocale = keyof PremiumGalleryItem['alt'];
 
 /** Pliki obrazow tresci w kolejnosci: cover, potem galeria. */

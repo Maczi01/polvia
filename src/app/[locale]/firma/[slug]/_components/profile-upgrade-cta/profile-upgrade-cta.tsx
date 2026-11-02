@@ -5,7 +5,7 @@ import type { ReactElement } from 'react';
 import { Link } from '@/i18n/navigation';
 import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 import { premiumContactQuery } from '@/lib/premium-contact';
-import { PREMIUM_GALLERY_MAX } from '@/lib/premium-templates';
+import { PREMIUM_GALLERY_MAX, PREMIUM_TEMPLATES } from '@/lib/premium-templates';
 import { cn } from '@/lib/utilities';
 
 import { UpgradeCta } from '../upgrade-cta/upgrade-cta';
@@ -17,7 +17,31 @@ type ProfileUpgradeCtaProps = {
     className?: string;
 };
 
-const BENEFIT_KEYS = ['benefitPhotos', 'benefitPrices', 'benefitNoCompetitors'] as const;
+/** Kolejnosc: najpierw to, co przynosi klientow (pozycja), potem wyglad strony, na koncu wyroznik. */
+const BENEFIT_KEYS = [
+    'benefitHigherPosition',
+    'benefitPhotos',
+    'benefitTemplates',
+    'benefitPrices',
+    'benefitRatings',
+    'benefitNoCompetitors',
+] as const;
+
+const BENEFIT_VALUES = { max: PREMIUM_GALLERY_MAX, count: PREMIUM_TEMPLATES.length };
+
+/** Przykladowa strona premium z fikcyjna firma (`/cennik/przyklad`) — pokazuje korzysci w praktyce. */
+function ExamplePageLink(): ReactElement {
+    const t = useTranslations('ServiceProfile.upgrade');
+    return (
+        <Link
+            href="/pricing/example"
+            className="mt-4 inline-flex items-center gap-1.5 rounded text-sm font-semibold text-brand underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:text-pink-300"
+        >
+            {t('exampleLink')}
+            <ArrowRight size={14} aria-hidden="true" />
+        </Link>
+    );
+}
 
 /**
  * Platnosci online wylaczone: zamiast Checkout link do `/kontakt` z tematem premium i slugiem
@@ -87,10 +111,11 @@ export function ProfileUpgradeCta({
                         <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-brand text-white">
                             <Check size={12} strokeWidth={3} aria-hidden="true" />
                         </span>
-                        {t(key, { max: PREMIUM_GALLERY_MAX })}
+                        {t(key, BENEFIT_VALUES)}
                     </li>
                 ))}
             </ul>
+            <ExamplePageLink />
             {purchase.kind === 'checkout' ? (
                 <UpgradeCta serviceId={serviceId} action={purchase.action} className="mt-6" />
             ) : (

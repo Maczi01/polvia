@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 import {
@@ -47,5 +47,19 @@ describe('TemplateProfessional', () => {
         expect(screen.queryByRole('region', { name: 'Cennik usług' })).not.toBeInTheDocument();
         expect(screen.queryByRole('region', { name: 'Najczęstsze pytania' })).not.toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
+    });
+    it('pokazuje oceny z innych serwisow tylko, gdy tresc premium je ma', () => {
+        const { unmount } = renderWithIntl(
+            <TemplateProfessional profile={premiumProfessionalFixture} />,
+        );
+
+        const ratings = screen.getByRole('region', { name: 'Opinie w innych serwisach' });
+        expect(within(ratings).getByRole('link', { name: /^Google: / })).toBeInTheDocument();
+        unmount();
+
+        renderWithIntl(<TemplateProfessional profile={premiumEmptyFixture} />);
+        expect(
+            screen.queryByRole('region', { name: 'Opinie w innych serwisach' }),
+        ).not.toBeInTheDocument();
     });
 });

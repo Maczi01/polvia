@@ -27,6 +27,7 @@ import type {
     PremiumFaqItem,
     PremiumGalleryItem,
     PremiumPriceListItem,
+    PremiumRatingItem,
 } from './premium-content-schema';
 
 export const categoryEnum = pgEnum('category', CATEGORY_VALUES);
@@ -158,6 +159,8 @@ export const serviceProfilesTable = pgTable('service_profiles', {
     gallery: jsonb('gallery').$type<PremiumGalleryItem[]>().notNull().default([]),
     priceList: jsonb('price_list').$type<PremiumPriceListItem[]>().notNull().default([]),
     faq: jsonb('faq').$type<PremiumFaqItem[]>().notNull().default([]),
+    /** Oceny z innych serwisow, wpisane recznie (`premium.ratings`). Nie trafiaja do JSON-LD. */
+    ratings: jsonb('ratings').$type<PremiumRatingItem[]>().notNull().default([]),
     manualPremiumUntil: timestamp('manual_premium_until', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),

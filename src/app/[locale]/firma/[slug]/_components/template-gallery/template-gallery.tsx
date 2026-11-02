@@ -13,6 +13,7 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
+import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
 
 /** Sekcje na cieplym tle, bez ramek — zdjecia maja grac pierwsze skrzypce. */
@@ -131,6 +132,7 @@ function GalleryDetails({
                 <ProfileFaq items={premium.faq} className={SECTION} titleClassName={TITLE} />
             </div>
             <div className="flex flex-col gap-6">
+                <ProfileRatings ratings={premium.ratings} className={SECTION} />
                 <ProfileContact
                     location={mainLocation}
                     showActions={false}

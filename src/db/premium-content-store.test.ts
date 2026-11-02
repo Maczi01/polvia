@@ -73,13 +73,14 @@ describe('withServiceSlug', () => {
 
 /** Wiersz, jaki zapisuje `buildSavePremiumContentQuery` (te same kolumny co odczyt). */
 function storedRow(content: PremiumContentData): StoredPremiumContent {
-    const { template, coverImage, gallery, priceList, faq } = content;
+    const { template, coverImage, gallery, priceList, faq, ratings } = content;
     return {
         template,
         coverImage,
         gallery,
         priceList,
         faq,
+        ratings,
         manualPremiumUntil: manualPremiumUntilOf(content),
     };
 }

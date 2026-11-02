@@ -870,6 +870,11 @@
     },
     "priceList": "Cennik usług",
     "faq": "Najczęstsze pytania",
+    "ratings": {
+      "title": "Opinie w innych serwisach",
+      "count": "{count, plural, one {# opinia} few {# opinie} many {# opinii} other {# opinii}}",
+      "label": "{source}: {rating} na 5, {count, plural, one {# opinia} few {# opinie} many {# opinii} other {# opinii}} (otwiera się w nowej karcie)"
+    },
     "gallery": "Galeria",
     "galleryOpen": "Powiększ zdjęcie {index} z {total}: {alt}",
     "galleryDialog": "Podgląd zdjęcia",
@@ -882,11 +887,15 @@
       "eyebrow": "Dla właściciela",
       "title": "To Twoja firma?",
       "description": "Zamień ten profil w stronę firmową, którą chętnie podlinkujesz w bio i na wizytówce.",
+      "benefitHigherPosition": "Wyższa pozycja na liście wyników i na mapie",
       "benefitPhotos": "Zdjęcie w nagłówku i galeria do {max} zdjęć",
+      "benefitTemplates": "Wybór jednego z {count} szablonów strony",
       "benefitPrices": "Cennik usług i odpowiedzi na częste pytania",
+      "benefitRatings": "Oceny z Google Maps i Booksy na Twojej stronie",
       "benefitNoCompetitors": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
       "cta": "To moja firma — ulepsz stronę",
-      "contactNote": "Napisz do nas — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy."
+      "contactNote": "Napisz do nas — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy.",
+      "exampleLink": "Zobacz przykładową stronę"
     },
     "checkout": {
       "legend": "Okres rozliczenia",
@@ -961,6 +970,20 @@
       "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
       "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
       "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia."
+    },
+    "example": {
+      "metaTitle": "Przykładowa strona firmy premium",
+      "metaDescription": "Zobacz, jak wygląda strona firmy w planie Profesjonalnym: zdjęcia, cennik, najczęstsze pytania, oceny klientów i 3 szablony do wyboru.",
+      "eyebrow": "Przykładowa strona premium",
+      "title": "Tak może wyglądać strona Twojej firmy",
+      "description": "Firma, dane kontaktowe i opinie na tej stronie są fikcyjne. Przełącz szablon, żeby zobaczyć inne układy.",
+      "switcherLabel": "Szablon strony",
+      "templates": {
+        "gallery": "Galeria",
+        "professional": "Profesjonalny",
+        "classic": "Klasyczny"
+      },
+      "cta": "Chcę taką stronę"
     }
   }
 }

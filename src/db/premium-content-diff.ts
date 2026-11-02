@@ -3,7 +3,7 @@ import type { PreviousPremiumContent } from './upsert-premium-content';
 
 /**
  * Czytelny diff tresci premium dla `db:premium --dry-run`: co sie zmieni w bazie.
- * Pozycje list porownywane po kluczu (plik zdjecia, polska nazwa/pytanie), wiec
+ * Pozycje list porownywane po kluczu (plik zdjecia, polska nazwa/pytanie, serwis oceny), wiec
  * poprawka tlumaczenia to `~`, a nie para `-`/`+`.
  */
 
@@ -47,6 +47,7 @@ function summary(content: PremiumContentData): string[] {
         `  galeria: ${content.gallery.length} zdjec`,
         `  cennik: ${content.priceList.length} pozycji`,
         `  FAQ: ${content.faq.length} pytan`,
+        `  oceny: ${content.ratings.length} serwisow`,
     ];
 }
 
@@ -78,6 +79,11 @@ function diffContent(previous: PremiumContentData, next: PremiumContentData): st
             next.priceList,
         ),
         ...diffList({ label: 'FAQ', keyOf: item => item.q.pl }, previous.faq, next.faq),
+        ...diffList(
+            { label: 'oceny', keyOf: item => item.label ?? item.source },
+            previous.ratings,
+            next.ratings,
+        ),
     ];
 }
 

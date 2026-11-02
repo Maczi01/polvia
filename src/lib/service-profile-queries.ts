@@ -225,6 +225,7 @@ function getServiceRow(slug: string, locale: string) {
                 gallery: serviceProfilesTable.gallery,
                 priceList: serviceProfilesTable.priceList,
                 faq: serviceProfilesTable.faq,
+                ratings: serviceProfilesTable.ratings,
             },
             subscription: subscriptionColumns,
             manualPremiumUntil: manualPremiumUntilColumn,

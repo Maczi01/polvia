@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
 
 import { premiumEmptyFixture, premiumServiceFixture } from '../profile-fixtures';
@@ -39,5 +39,17 @@ describe('TemplateGallery', () => {
         expect(screen.queryByRole('region', { name: 'Najczęstsze pytania' })).not.toBeInTheDocument();
         expect(screen.queryByRole('region', { name: 'Godziny otwarcia' })).not.toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
+    });
+    it('pokazuje oceny z innych serwisow tylko, gdy tresc premium je ma', () => {
+        const { unmount } = renderWithIntl(<TemplateGallery profile={premiumServiceFixture} />);
+
+        const ratings = screen.getByRole('region', { name: 'Opinie w innych serwisach' });
+        expect(within(ratings).getByRole('link', { name: /^Google: / })).toBeInTheDocument();
+        unmount();
+
+        renderWithIntl(<TemplateGallery profile={premiumEmptyFixture} />);
+        expect(
+            screen.queryByRole('region', { name: 'Opinie w innych serwisach' }),
+        ).not.toBeInTheDocument();
     });
 });

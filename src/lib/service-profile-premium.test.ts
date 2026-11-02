@@ -46,7 +46,41 @@ describe('localizePremiumContent', () => {
             gallery: [{ src: '/services/salon-roza/salon-1.webp', alt: 'Інтерʼєр салону' }],
             priceList: [{ name: 'Стрижка', price: 'від 80 зл' }],
             faq: [{ question: 'Чи потрібно записуватися?', answer: 'Так, телефоном.' }],
+            ratings: [],
         });
+    });
+
+    it('oceny: nazwa znanego serwisu ze stalej, serwisu "other" z label', () => {
+        const parsed = premiumContentSchema.parse({
+            ...content,
+            ratings: [
+                { source: 'booksy', rating: 4.9, count: 210, url: 'https://booksy.com/x' },
+                {
+                    source: 'other',
+                    label: 'Oferteo',
+                    rating: 4,
+                    count: 3,
+                    url: 'https://oferteo.pl/x',
+                },
+            ],
+        });
+
+        const localized = localizePremiumContent(parsed, {
+            serviceSlug: 'salon-roza',
+            locale: 'pl',
+            coverAlt: 'Salon Roza',
+        });
+
+        expect(localized.ratings).toEqual([
+            {
+                source: 'booksy',
+                name: 'Booksy',
+                rating: 4.9,
+                count: 210,
+                url: 'https://booksy.com/x',
+            },
+            { source: 'other', name: 'Oferteo', rating: 4, count: 3, url: 'https://oferteo.pl/x' },
+        ]);
     });
 
     it('przenosi notatke cennika tylko, gdy jest w danych', () => {
