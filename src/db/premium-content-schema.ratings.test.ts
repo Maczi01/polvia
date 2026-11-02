@@ -19,6 +19,7 @@ describe('premiumContentSchema — oceny z innych serwisow', () => {
         const ratings = [
             GOOGLE,
             { source: 'booksy', rating: 5, count: 0, url: 'https://booksy.com/pl-pl/1_salon' },
+            { source: 'fixly', rating: 4.9, count: 42, url: 'https://fixly.pl/profil/jan' },
             { source: 'other', label: 'Oferteo', rating: 0, count: 7, url: 'https://oferteo.pl/x' },
         ];
 

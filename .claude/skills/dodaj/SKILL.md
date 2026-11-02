@@ -233,7 +233,7 @@ Po kolei:
    zadnym jezyku.
 
    **`ratings` (opcjonalne) — oceny z innych serwisow, wpisywane recznie.** `source`:
-   `google` | `booksy` | `facebook` | `znanylekarz` | `other` (`other` wymaga `label` z nazwa
+   `google` | `booksy` | `facebook` | `znanylekarz` | `fixly` | `other` (`other` wymaga `label` z nazwa
    serwisu; przy znanych serwisach `label` jest zabronione). `rating` 0–5 (np. `4.8`), `count`
    liczba opinii (calkowita, ≥ 0), `url` tylko `https://` — link do profilu firmy w tym
    serwisie. Jeden wpis na serwis, najwyzej `PREMIUM_RATINGS_MAX` (6). Wartosci przepisz z

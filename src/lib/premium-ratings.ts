@@ -15,6 +15,7 @@ export const PREMIUM_RATING_SOURCES = [
     'booksy',
     'facebook',
     'znanylekarz',
+    'fixly',
     'other',
 ] as const;
 
@@ -26,6 +27,7 @@ export const PREMIUM_RATING_SOURCE_NAMES: Record<Exclude<PremiumRatingSource, 'o
     booksy: 'Booksy',
     facebook: 'Facebook',
     znanylekarz: 'ZnanyLekarz',
+    fixly: 'Fixly',
 };
 
 /** Skala ocen we wszystkich obslugiwanych serwisach. */
