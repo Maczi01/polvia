@@ -977,10 +977,70 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
+    "breadcrumbs": "Breadcrumb",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
       "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory.",
-      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory."
+      "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory.",
+      "titlePhrase": {
+        "uk": {
+          "grocery": "Ukrainian grocery store",
+          "gastronomy": "Ukrainian cuisine",
+          "transport": "Ukrainian transport company",
+          "financial": "Ukrainian accounting & finance",
+          "renovation": "Ukrainian renovation company",
+          "law": "Ukrainian lawyer",
+          "beauty": "Ukrainian beauty salon",
+          "health": "Ukrainian doctor",
+          "mechanics": "Ukrainian car mechanic",
+          "real_estate": "Ukrainian real estate agency",
+          "education": "Ukrainian courses & schools",
+          "it": "Ukrainian IT company",
+          "others": "Ukrainian business",
+          "help_support": "help & support for Ukrainians"
+        },
+        "ru": {
+          "grocery": "Russian-speaking grocery store",
+          "gastronomy": "Russian-speaking eatery",
+          "transport": "Russian-speaking transport company",
+          "financial": "Russian-speaking accounting & finance",
+          "renovation": "Russian-speaking renovation company",
+          "law": "Russian-speaking lawyer",
+          "beauty": "Russian-speaking beauty salon",
+          "health": "Russian-speaking doctor",
+          "mechanics": "Russian-speaking car mechanic",
+          "real_estate": "Russian-speaking real estate agency",
+          "education": "Russian-speaking courses & schools",
+          "it": "Russian-speaking IT company",
+          "others": "Russian-speaking business",
+          "help_support": "help & support in Russian"
+        },
+        "be": {
+          "grocery": "Belarusian grocery store",
+          "gastronomy": "Belarusian cuisine",
+          "transport": "Belarusian transport company",
+          "financial": "Belarusian accounting & finance",
+          "renovation": "Belarusian renovation company",
+          "law": "Belarusian lawyer",
+          "beauty": "Belarusian beauty salon",
+          "health": "Belarusian doctor",
+          "mechanics": "Belarusian car mechanic",
+          "real_estate": "Belarusian real estate agency",
+          "education": "Belarusian courses & schools",
+          "it": "Belarusian IT company",
+          "others": "Belarusian business",
+          "help_support": "help & support for Belarusians"
+        }
+      },
+      "languageNames": {
+        "uk": "Ukrainian",
+        "ru": "Russian",
+        "en": "English",
+        "be": "Belarusian"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Service in {languages}. Address, phone, opening hours and contact details in the Polvia directory.",
+      "descriptionOnlineLanguages": "{name} — {category}, online service in {languages}. Contact details and business information in the Polvia directory.",
+      "descriptionGenericLanguages": "{name} — {category}. Service in {languages}. Contact details and business information in the Polvia directory."
     },
     "example": {
       "metaTitle": "Example premium business page",

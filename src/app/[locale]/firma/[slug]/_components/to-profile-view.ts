@@ -1,6 +1,7 @@
 import type { Locale } from '@/i18n/config';
 import { toServiceLanguages } from '@/lib/languages';
 import { buildServiceUrl } from '@/lib/map-url-builder';
+import type { ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
 import type { ServiceProfile } from '@/lib/service-profile-queries';
 import type { SimilarServiceRow } from '@/lib/similar-services';
 
@@ -38,13 +39,15 @@ function toSimilarService(row: SimilarServiceRow): SimilarService {
 
 /**
  * Wynik zapytan profilu -> kontrakt widoku. Tresc premium bierze z decyzji widoku
- * (`selectProfileView`), wiec widok free dostaje `premium: null`.
+ * (`selectProfileView`), wiec widok free dostaje `premium: null`. Okruszki sklada strona
+ * (`buildProfileBreadcrumbs`), bo potrzebuja przetlumaczonej kategorii.
  */
 export function toProfileView(
     profile: ServiceProfile,
     similarServices: readonly SimilarServiceRow[],
     locale: Locale,
     viewKind: ProfileViewKind,
+    breadcrumbs: readonly ProfileBreadcrumb[],
 ): ServiceProfileView {
     return {
         serviceId: profile.id,
@@ -61,5 +64,6 @@ export function toProfileView(
         mapHref: toMapHref(profile, locale),
         similarServices: similarServices.map(toSimilarService),
         premium: viewKind.kind === 'premium' ? viewKind.content : null,
+        breadcrumbs: [...breadcrumbs],
     };
 }

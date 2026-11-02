@@ -62,4 +62,22 @@ describe('TemplateProfessional', () => {
             screen.queryByRole('region', { name: 'Opinie w innych serwisach' }),
         ).not.toBeInTheDocument();
     });
+
+    it('okruszki nad nazwa: kategoria i miasto prowadza do mapy z filtrem', () => {
+        renderWithIntl(<TemplateProfessional profile={premiumProfessionalFixture} />);
+
+        const nav = screen.getByRole('navigation', { name: 'Ścieżka nawigacji' });
+        expect(within(nav).getByRole('link', { name: 'Prawne' })).toHaveAttribute(
+            'href',
+            '/mapa/prawne',
+        );
+        expect(within(nav).getByRole('link', { name: 'Warszawa' })).toHaveAttribute(
+            'href',
+            '/mapa/prawne/warszawa',
+        );
+        expect(within(nav).getByText(premiumProfessionalFixture.name)).toHaveAttribute(
+            'aria-current',
+            'page',
+        );
+    });
 });

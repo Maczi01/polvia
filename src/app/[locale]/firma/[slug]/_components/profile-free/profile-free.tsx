@@ -5,6 +5,7 @@ import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileBadges } from '../profile-badges/profile-badges';
+import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { getHeaderCity, getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
@@ -65,6 +66,7 @@ export function ProfileFree({ profile, purchase }: ProfileFreeProps): ReactEleme
     return (
         <article className="bg-gray-50 dark:bg-gray-900">
             <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-10 lg:px-8">
+                <ProfileBreadcrumbs items={profile.breadcrumbs} className="mb-4" />
                 <ProfileFreeHeader profile={profile} />
 
                 <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:grid-rows-[auto_1fr]">

@@ -977,10 +977,70 @@
       "saturday": "Sobota",
       "sunday": "Niedziela"
     },
+    "breadcrumbs": "Ścieżka nawigacji",
     "meta": {
       "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
       "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
-      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia."
+      "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia.",
+      "titlePhrase": {
+        "uk": {
+          "grocery": "ukraiński sklep spożywczy",
+          "gastronomy": "ukraińska kuchnia",
+          "transport": "ukraiński przewoźnik",
+          "financial": "ukraińska księgowość i finanse",
+          "renovation": "ukraińska firma remontowa",
+          "law": "ukraiński prawnik",
+          "beauty": "ukraiński salon urody",
+          "health": "ukraiński lekarz",
+          "mechanics": "ukraiński mechanik samochodowy",
+          "real_estate": "ukraińskie biuro nieruchomości",
+          "education": "ukraińskie kursy i szkoły",
+          "it": "ukraińska firma IT",
+          "others": "ukraińska firma",
+          "help_support": "pomoc i wsparcie dla Ukraińców"
+        },
+        "ru": {
+          "grocery": "rosyjskojęzyczny sklep spożywczy",
+          "gastronomy": "rosyjskojęzyczny lokal gastronomiczny",
+          "transport": "rosyjskojęzyczny przewoźnik",
+          "financial": "rosyjskojęzyczna księgowość i finanse",
+          "renovation": "rosyjskojęzyczna firma remontowa",
+          "law": "rosyjskojęzyczny prawnik",
+          "beauty": "rosyjskojęzyczny salon urody",
+          "health": "rosyjskojęzyczny lekarz",
+          "mechanics": "rosyjskojęzyczny mechanik samochodowy",
+          "real_estate": "rosyjskojęzyczne biuro nieruchomości",
+          "education": "rosyjskojęzyczne kursy i szkoły",
+          "it": "rosyjskojęzyczna firma IT",
+          "others": "rosyjskojęzyczna firma",
+          "help_support": "pomoc i wsparcie po rosyjsku"
+        },
+        "be": {
+          "grocery": "białoruski sklep spożywczy",
+          "gastronomy": "białoruska kuchnia",
+          "transport": "białoruski przewoźnik",
+          "financial": "białoruska księgowość i finanse",
+          "renovation": "białoruska firma remontowa",
+          "law": "białoruski prawnik",
+          "beauty": "białoruski salon urody",
+          "health": "białoruski lekarz",
+          "mechanics": "białoruski mechanik samochodowy",
+          "real_estate": "białoruskie biuro nieruchomości",
+          "education": "białoruskie kursy i szkoły",
+          "it": "białoruska firma IT",
+          "others": "białoruska firma",
+          "help_support": "pomoc i wsparcie dla Białorusinów"
+        }
+      },
+      "languageNames": {
+        "uk": "ukraińsku",
+        "ru": "rosyjsku",
+        "en": "angielsku",
+        "be": "białorusku"
+      },
+      "descriptionLocalLanguages": "{name} — {category}, {city}. Obsługa po {languages}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
+      "descriptionOnlineLanguages": "{name} — {category}, obsługa online po {languages}. Kontakt i informacje o firmie w katalogu Polvia.",
+      "descriptionGenericLanguages": "{name} — {category}. Obsługa po {languages}. Kontakt i informacje o firmie w katalogu Polvia."
     },
     "example": {
       "metaTitle": "Przykładowa strona firmy premium",

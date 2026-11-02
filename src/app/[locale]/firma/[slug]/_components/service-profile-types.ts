@@ -3,6 +3,7 @@ import type { ComponentProps } from 'react';
 import type { Link } from '@/i18n/navigation';
 import type { Coverage } from '@/lib/coverage';
 import type { ServiceLanguage } from '@/lib/languages';
+import type { ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
 import type { LocalizedPremiumContent } from '@/lib/service-profile-premium';
 import type { ServiceProfileLocation } from '@/lib/service-profile-queries';
 
@@ -65,6 +66,11 @@ export type ServiceProfileView = {
     mapHref: ProfileHref | null;
     similarServices: SimilarService[];
     premium: PremiumContent | null;
+    /**
+     * Okruszki nad nazwa firmy (`buildProfileBreadcrumbs`) — te same pozycje trafiaja do
+     * JSON-LD `BreadcrumbList`. Pusta lista: bez okruszkow.
+     */
+    breadcrumbs: ProfileBreadcrumb[];
 };
 
 /** Profil z trescia premium — jedyne wejscie szablonow premium (strona zaweza `view.premium`). */

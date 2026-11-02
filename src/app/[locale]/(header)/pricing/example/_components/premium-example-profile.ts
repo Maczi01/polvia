@@ -1,6 +1,8 @@
 import type { PremiumProfileView } from '@/app/[locale]/firma/[slug]/_components/service-profile-types';
 import type { Locale } from '@/i18n/config';
+import { serviceNameFromCapitalLetter } from '@/lib/consts';
 import { PREMIUM_TEMPLATES, type PremiumTemplate } from '@/lib/premium-templates';
+import { buildHomePath, type ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
 
 import { PREMIUM_EXAMPLE_TEXTS } from './premium-example-content';
 
@@ -44,6 +46,22 @@ const EXAMPLE_HOURS = {
     friday: { open: '09:00', close: '15:00' },
 };
 
+const EXAMPLE_NAME = 'Kolumna — biuro rachunkowe';
+const EXAMPLE_CITY = 'Warszawa';
+
+/**
+ * Okruszki fikcyjnej firmy: link tylko do strony glownej. Kategoria i miasto bez linkow —
+ * mapa z filtrem sugerowalaby, ze firma jest w katalogu. Bez JSON-LD (strona `noindex`).
+ */
+function buildExampleBreadcrumbs(locale: Locale, categoryLabel: string): ProfileBreadcrumb[] {
+    return [
+        { label: serviceNameFromCapitalLetter, href: buildHomePath(locale) },
+        { label: categoryLabel, href: null },
+        { label: EXAMPLE_CITY, href: null },
+        { label: EXAMPLE_NAME, href: null },
+    ];
+}
+
 /** Fikcyjna firma w danym locale, w kontrakcie szablonow premium. */
 export function getPremiumExampleProfile(
     locale: Locale,
@@ -54,7 +72,7 @@ export function getPremiumExampleProfile(
     return {
         serviceId: '00000000-0000-4000-8000-000000000000',
         slug: 'przyklad',
-        name: 'Kolumna — biuro rachunkowe',
+        name: EXAMPLE_NAME,
         description: texts.description,
         logo: null,
         category: 'financial',
@@ -65,7 +83,7 @@ export function getPremiumExampleProfile(
         locations: [
             {
                 id: 'example-main',
-                city: 'Warszawa',
+                city: EXAMPLE_CITY,
                 street: 'ul. Przykładowa 1',
                 postcode: '00-000',
                 voivodeship: 'mazowieckie',
@@ -83,6 +101,7 @@ export function getPremiumExampleProfile(
         ],
         mapHref: null,
         similarServices: [],
+        breadcrumbs: buildExampleBreadcrumbs(locale, texts.breadcrumbCategory),
         premium: {
             template,
             coverImage: {

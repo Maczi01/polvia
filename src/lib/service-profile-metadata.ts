@@ -2,8 +2,18 @@ import type { Metadata } from 'next';
 
 import { defaultLocale, type Locale, locales } from '@/i18n/config';
 import type { Coverage } from '@/lib/coverage';
+import type { ServiceLanguage } from '@/lib/languages';
+import { getLocalBusinessSchemaType } from '@/lib/schema-org-business-types';
 import { buildServiceProfilePath } from '@/lib/service-profile-path';
+import { buildProfileTitle, type ProfileTitleInput } from '@/lib/service-profile-title';
+import { truncateAtWord } from '@/lib/truncate-at-word';
 import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
+
+export {
+    buildProfileTitle,
+    PROFILE_TITLE_MAX_LENGTH,
+    type ProfileTitleInput,
+} from '@/lib/service-profile-title';
 
 /**
  * Metadane SEO profilu firmy `/firma/<slug>`: adresy kanoniczne i hreflang, opis meta
@@ -12,11 +22,6 @@ import { type OpeningHours, WEEKDAY_KEYS } from '@/lib/weekdays';
 
 /** Dlugosc opisu meta, ktora Google zwykle pokazuje bez obciecia. */
 export const META_DESCRIPTION_MAX_LENGTH = 160;
-
-/** Dlugosc tytulu, ktora Google zwykle pokazuje bez obciecia. */
-export const PROFILE_TITLE_MAX_LENGTH = 60;
-
-const ELLIPSIS = '…';
 
 /** Kraj wszystkich wpisow katalogu (adresy z polskich wojewodztw). */
 const ADDRESS_COUNTRY = 'PL';
@@ -39,43 +44,6 @@ export function buildProfileLanguageAlternates(
     return alternates;
 }
 
-export type ProfileTitleInput = {
-    name: string;
-    categoryLabel: string;
-    /** `null` dla wpisu bez punktu obslugi — tytul jest wtedy bez miasta. */
-    city: string | null;
-    siteName: string;
-};
-
-/**
- * Tekst obciety na granicy slowa z wielokropkiem; biale znaki zwiniete do spacji.
- * Pojedyncze slowo dluzsze niz limit jest ciete twardo.
- */
-function truncateAtWord(text: string, maxLength: number): string {
-    const normalized = text.replace(/\s+/g, ' ').trim();
-    if (normalized.length <= maxLength) return normalized;
-
-    const room = normalized.slice(0, maxLength - ELLIPSIS.length);
-    const lastSpace = room.lastIndexOf(' ');
-    const cut = lastSpace > 0 ? room.slice(0, lastSpace) : room;
-    return `${cut.replace(/[\s,.;:!?—–-]+$/, '')}${ELLIPSIS}`;
-}
-
-/**
- * `<nazwa> — <kategoria>, <miasto> | <serwis>`; bez miasta: `<nazwa> — <kategoria> | <serwis>`.
- * Tytul dluzszy niz `PROFILE_TITLE_MAX_LENGTH` traci koniec czesci opisowej (na granicy
- * slowa, z wielokropkiem) — sufiks ` | <serwis>` zostaje zawsze.
- */
-export function buildProfileTitle({ name, categoryLabel, city, siteName }: ProfileTitleInput): string {
-    const place = city?.trim() ? `, ${city.trim()}` : '';
-    const suffix = ` | ${siteName}`;
-    const head = truncateAtWord(
-        `${name} — ${categoryLabel}${place}`,
-        PROFILE_TITLE_MAX_LENGTH - suffix.length,
-    );
-    return `${head}${suffix}`;
-}
-
 /**
  * Opis meta: biale znaki zwiniete do spacji, a dluzszy tekst obciety na granicy slowa
  * z wielokropkiem. Pojedyncze slowo dluzsze niz limit jest ciete twardo.
@@ -87,20 +55,38 @@ export function truncateMetaDescription(
     return truncateAtWord(text, maxLength);
 }
 
-/** Klucz opisu zastepczego w `ServiceProfile.meta`. */
-export type FallbackDescriptionKey = 'descriptionLocal' | 'descriptionOnline' | 'descriptionGeneric';
+type FallbackDescriptionBaseKey = 'descriptionLocal' | 'descriptionOnline' | 'descriptionGeneric';
+
+/**
+ * Klucz opisu zastepczego w `ServiceProfile.meta`. Wariant `…Languages` ma dodatkowe zdanie
+ * o jezykach obslugi (parametry `languages` i `languageCount`).
+ */
+export type FallbackDescriptionKey =
+    | FallbackDescriptionBaseKey
+    | `${FallbackDescriptionBaseKey}Languages`;
+
+function selectFallbackDescriptionBaseKey(
+    coverage: Coverage,
+    city: string | null,
+): FallbackDescriptionBaseKey {
+    if (city?.trim()) return 'descriptionLocal';
+    return coverage === 'local' ? 'descriptionGeneric' : 'descriptionOnline';
+}
 
 /**
  * Opis zastepczy zgodny z zasiegiem: z miastem `descriptionLocal`; bez miasta wpis
  * `online`/`hybrid` (obsluguje zdalnie) dostaje `descriptionOnline`, a `local` bez adresu —
  * neutralny `descriptionGeneric`, bo „obsluga online” bylaby nieprawda.
+ * Firma z jezykami obslugi poza polskim (`selectDescribedLanguages`) dostaje wariant
+ * `…Languages` tego samego klucza.
  */
 export function selectFallbackDescriptionKey(
     coverage: Coverage,
     city: string | null,
+    hasDescribedLanguages: boolean = false,
 ): FallbackDescriptionKey {
-    if (city?.trim()) return 'descriptionLocal';
-    return coverage === 'local' ? 'descriptionGeneric' : 'descriptionOnline';
+    const key = selectFallbackDescriptionBaseKey(coverage, city);
+    return hasDescribedLanguages ? `${key}Languages` : key;
 }
 
 /** Absolutny adres sciezki z `public/` albo `null`, gdy sciezki nie ma. */
@@ -188,10 +174,14 @@ export type ProfileJsonLdInput = {
     location: JsonLdLocation | null;
     /** Profile w mediach spolecznosciowych. */
     sameAs: string[];
+    /** Klucz kategorii (`@/lib/categories`) — wyznacza podtyp `LocalBusiness`. */
+    category: string;
+    /** Jezyki obslugi; kody `languages.ts` sa juz kodami BCP 47 (`knowsLanguage`). */
+    languages: readonly ServiceLanguage[];
 };
 
 type JsonLdValue = string | number | JsonLdObject | JsonLdValue[];
-type JsonLdObject = { [key: string]: JsonLdValue };
+export type JsonLdObject = { [key: string]: JsonLdValue };
 
 /** Pola bez wartosci (`null`, pusty tekst, pusta lista) nie trafiaja do JSON-LD. */
 function compact(entries: Record<string, JsonLdValue | null | undefined>): JsonLdObject {
@@ -241,9 +231,13 @@ function buildOpeningHoursSpecification(openingHours: OpeningHours): JsonLdObjec
 }
 
 /**
- * JSON-LD profilu: typ wynika z zasiegu, nie z obecnosci lokalizacji. `LocalBusiness`
- * dla wpisu z punktem obslugi (`local`, `hybrid`) — bez lokalizacji w danych po prostu
- * bez adresu, wspolrzednych i godzin. `Organization` tylko dla wpisu `online`.
+ * JSON-LD profilu: typ wynika z zasiegu, nie z obecnosci lokalizacji. Wpis z punktem
+ * obslugi (`local`, `hybrid`) dostaje podtyp `LocalBusiness` z kategorii
+ * (`CATEGORY_SCHEMA_TYPES`) — bez lokalizacji w danych po prostu bez adresu, wspolrzednych
+ * i godzin. `Organization` tylko dla wpisu `online`: podtypy `LocalBusiness` zakladaja
+ * fizyczny adres, ktorego taki wpis nie ma.
+ * Bez `priceRange`: ceny w cenniku premium to wolny tekst („od 250 zł/mies.”), wiec
+ * przedzial bylby zgadywaniem.
  */
 export function buildProfileJsonLd(input: ProfileJsonLdInput): JsonLdObject {
     const { location } = input;
@@ -256,17 +250,19 @@ export function buildProfileJsonLd(input: ProfileJsonLdInput): JsonLdObject {
         telephone: location?.phoneNumber,
         email: location?.email,
         sameAs: input.sameAs,
+        knowsLanguage: [...input.languages],
     };
 
     if (input.coverage === 'online') {
         return compact({ ...base, '@type': 'Organization' });
     }
 
-    if (!location) return compact({ ...base, '@type': 'LocalBusiness' });
+    const type = getLocalBusinessSchemaType(input.category);
+    if (!location) return compact({ ...base, '@type': type });
 
     return compact({
         ...base,
-        '@type': 'LocalBusiness',
+        '@type': type,
         address: buildPostalAddress(location),
         geo: buildGeo(location),
         openingHoursSpecification: buildOpeningHoursSpecification(location.openingHours),

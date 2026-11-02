@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileActions } from '../profile-actions/profile-actions';
 import { ProfileBadges } from '../profile-badges/profile-badges';
+import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
@@ -69,6 +70,7 @@ function GalleryHero({
                 className="absolute inset-0 -z-10 bg-gradient-to-t from-black/90 via-black/45 to-black/10"
             />
             <div className="mx-auto w-full max-w-7xl px-4 pb-8 sm:px-6 md:pb-14 lg:px-8">
+                <ProfileBreadcrumbs items={profile.breadcrumbs} tone="inverted" className="mb-6" />
                 <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end md:gap-6">
                         <ProfileLogo
