@@ -116,8 +116,7 @@
     "language": "Wybierz język"
   },
   "ContactForm": {
-    "title": "Napisz!",
-    "info": "Chcesz by Twoje usługi były widoczne na mapie? Pozostaw kontakt do siebie. Masz inne pytania, wątpliwości? Pisz śmiało.",
+    "info": "Masz pytanie, sugestię albo uwagę do wpisu w katalogu? Napisz śmiało — odpowiemy na podany adres e-mail.",
     "yourEmail": "Email",
     "yourEmailPlaceholder": "Wpisz swój adres e-mail tutaj...",
     "topic": "Temat",
@@ -133,6 +132,13 @@
     "premiumTopic": "Premium",
     "premiumMessage": "Dzień dobry, chcę włączyć stronę premium dla firmy polvia.pl/firma/{slug}. Proszę o dane do przelewu.",
     "premiumMessageNoService": "Dzień dobry, chcę włączyć stronę premium dla mojej firmy: (nazwa firmy). Proszę o dane do przelewu."
+  },
+  "ContactPage": {
+    "title": "Jak możemy pomóc?",
+    "subtitle": "Dodaj firmę do katalogu albo napisz do nas — wybierz, czego potrzebujesz.",
+    "tabsLabel": "Czego potrzebujesz?",
+    "tabBusiness": "Mam firmę",
+    "tabQuestion": "Mam pytanie"
   },
   "MapCard": {
     "nowOpen": "Teraz otwarte",
@@ -625,9 +631,14 @@
   },
   "addBusiness": {
     "cta": {
-      "heading": "Masz firmę?",
+      "heading": "Dodaj firmę do katalogu",
       "description": "Wklej link do strony swojej firmy, a AI przygotuje wpis do katalogu, który sprawdzisz przed wysłaniem.",
-      "button": "Dodaj firmę z AI"
+      "button": "Dodaj firmę z AI",
+      "freeTitle": "Wpis bezpłatny",
+      "premiumTitle": "Strona Premium",
+      "premiumDescription": "Pełna podstrona firmy ze zdjęciami, cennikiem i krótkim adresem — wyróżnia Cię na tle konkurencji.",
+      "premiumButton": "Zobacz Premium",
+      "premiumNote": "Premium włączysz na profilu firmy, gdy będzie już w katalogu."
     },
     "page": {
       "metaTitle": "Dodaj firmę do katalogu z pomocą AI | Polvia",

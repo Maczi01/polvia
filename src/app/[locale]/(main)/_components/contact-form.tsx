@@ -107,8 +107,8 @@ export const ContactForm = ({ prefill = null }: ContactFormProps) => {
 
     if (submitStatus?.success) {
         return (
-            <div className="flex min-h-[60vh] items-center justify-center p-4">
-                <div className="w-full max-w-md space-y-6 rounded-2xl bg-white/80 p-8 text-center shadow-2xl dark:bg-gray-800/90">
+            <div className="flex justify-center py-8">
+                <div className="w-full max-w-md space-y-6 text-center">
                     <Check className="mx-auto mb-4 size-12 text-green-600 dark:text-green-400" />
                     <h2 className="text-2xl font-semibold text-green-600 dark:text-green-400">{t('thanks')}</h2>
                     <p className="text-gray-700 dark:text-gray-300">{t('success')}</p>
@@ -133,13 +133,10 @@ export const ContactForm = ({ prefill = null }: ContactFormProps) => {
     }
 
     return (
-        <div className="mx-auto w-full max-w-3xl rounded-xl bg-white/70 p-6 shadow-2xl ring-1 ring-gray-100 backdrop-blur dark:bg-gray-800/90 dark:ring-gray-700 sm:p-8 md:p-12">
-            <div className="mb-10 text-center">
-                <h1 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-                    {t('title')}
-                </h1>
-                <p className="mx-auto max-w-2xl text-gray-600 dark:text-gray-300">{t('info')}</p>
-            </div>
+        <div className="w-full">
+            <p className="mx-auto mb-8 max-w-2xl text-center text-gray-600 dark:text-gray-300">
+                {t('info')}
+            </p>
 
             {submitStatus?.success === false && (
                 <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-300">
@@ -272,79 +269,3 @@ export const ContactForm = ({ prefill = null }: ContactFormProps) => {
         </div>
     );
 };
-
-// <FormItem>
-//     <div className="mb-2 flex justify-between">
-//         <FormLabel className="font-medium text-gray-700">
-//             {t('yourEmail')}
-//         </FormLabel>
-//         <span
-//             className={`text-xs ${getCounterColor(charCounts.email, maxLengths.email)}`}
-//         >
-//                                             {charCounts.email}/{maxLengths.email}
-//                                         </span>
-//     </div>
-//     <FormControl>
-//         <Input
-//             className={`w-full rounded-md border ${
-//                 form.formState.errors.email
-//                     ? 'border-red-300'
-//                     : 'border-gray-200'
-//             } px-4 py-3 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none`}
-//             placeholder={t('yourEmailPlaceholder')}
-//             {...field}
-//         />
-//     </FormControl>
-//     <FormMessage className="mt-1 text-sm text-red-600" />
-// </FormItem>
-
-// <FormItem>
-//     <div className="mb-2 flex justify-between">
-//         <FormLabel className="font-medium text-gray-700">
-//             {t('message')}
-//         </FormLabel>
-//         <span
-//             className={`text-xs ${getCounterColor(charCounts.message, maxLengths.message)}`}
-//         >
-//                                             {charCounts.message}/{maxLengths.message}
-//                                         </span>
-//     </div>
-//     <FormControl>
-//         <Textarea
-//             className={`w-full rounded-md border ${
-//                 form.formState.errors.message
-//                     ? 'border-red-300'
-//                     : 'border-gray-200'
-//             } px-4 py-3 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none`}
-//             rows={2}
-//             placeholder={t('messagePlaceholder')}
-//             {...field}
-//         />
-//     </FormControl>
-//     <FormMessage className="mt-1 text-sm text-red-600" />
-// </FormItem>
-
-// <FormItem>
-//     <div className="mb-2 flex justify-between">
-//         <FormLabel className="font-medium text-gray-700">
-//             {t('topic')}
-//         </FormLabel>
-//         <span
-//             className={`text-xs ${getCounterColor(charCounts.topic, maxLengths.topic)}`}
-//         >
-//                                             {charCounts.topic}/{maxLengths.topic}
-//                                         </span>
-//     </div>
-//     <FormControl>
-//         <Input
-//             className={`w-full rounded-md border ${
-//                 form.formState.errors.topic
-//                     ? 'border-red-300'
-//                     : 'border-gray-200'
-//             } px-4 py-3 focus:border-2 focus:border-gray-600 focus:ring-0 focus-visible:outline-none`}
-//             placeholder={t('topicPlaceholder')}
-//             {...field}
-//         />
-//     </FormControl>
-//     <FormMessage className="mt-1 text-sm text-red-600" />
-// </FormItem>
