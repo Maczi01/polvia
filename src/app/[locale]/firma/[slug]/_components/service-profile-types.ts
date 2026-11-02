@@ -38,7 +38,12 @@ export type SimilarService = {
  */
 export type PremiumContent = LocalizedPremiumContent;
 
-export type { FaqItem, PriceListItem, ProfileImage } from '@/lib/service-profile-premium';
+export type {
+    FaqItem,
+    PriceListItem,
+    ProfileImage,
+    ProfileRating,
+} from '@/lib/service-profile-premium';
 
 export type ServiceProfileView = {
     /** `services.id` — wejscie checkoutu premium (`upgrade-cta`); serwer sprawdza je ponownie. */

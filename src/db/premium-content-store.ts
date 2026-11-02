@@ -25,7 +25,7 @@ type SavePremiumContentQuery = PgInsertWithout<
 /** Zapisany wiersz tresci w kolumnach, ktore czyta `findContent`. */
 export type StoredPremiumContent = Pick<
     InferSelectModel<typeof serviceProfilesTable>,
-    'template' | 'coverImage' | 'gallery' | 'priceList' | 'faq' | 'manualPremiumUntil'
+    'template' | 'coverImage' | 'gallery' | 'priceList' | 'faq' | 'ratings' | 'manualPremiumUntil'
 >;
 
 /** Wylaczny koniec premium recznego z bloku albo `null`, gdy blok nie ma `activeUntil`. */
@@ -48,6 +48,7 @@ export function buildSavePremiumContentQuery(
         gallery: content.gallery,
         priceList: content.priceList,
         faq: content.faq,
+        ratings: content.ratings,
         manualPremiumUntil: manualPremiumUntilOf(content),
     };
 
@@ -103,6 +104,7 @@ export function createPremiumContentStore(db: PostgresJsDatabase): PremiumConten
                     gallery: serviceProfilesTable.gallery,
                     priceList: serviceProfilesTable.priceList,
                     faq: serviceProfilesTable.faq,
+                    ratings: serviceProfilesTable.ratings,
                     manualPremiumUntil: serviceProfilesTable.manualPremiumUntil,
                 })
                 .from(serviceProfilesTable)

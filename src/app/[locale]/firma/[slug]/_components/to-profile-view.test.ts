@@ -92,6 +92,7 @@ describe('toProfileView', () => {
             gallery: [],
             priceList: [],
             faq: [{ question: 'Czy dojezdzacie?', answer: 'Tak.' }],
+            ratings: [],
         };
 
         const view = toProfileView(profile(), similar, 'pl', {

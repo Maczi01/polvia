@@ -2,8 +2,10 @@ import {
     type PremiumContentData,
     type PremiumContentLocale,
     premiumContentSchema,
+    type PremiumRatingItem,
 } from '@/db/premium-content-schema';
 import { toLocale } from '@/i18n/config';
+import { PREMIUM_RATING_SOURCE_NAMES, type PremiumRatingSource } from '@/lib/premium-ratings';
 
 /**
  * Projekcja tresci premium na widok profilu: wybor locale, sciezki zdjec pod `next/image`.
@@ -19,6 +21,15 @@ export type PriceListItem = { name: string; price: string; note?: string };
 
 export type FaqItem = { question: string; answer: string };
 
+/** Plakietka oceny z innego serwisu; `name` to nazwa serwisu do wyswietlenia. */
+export type ProfileRating = {
+    source: PremiumRatingSource;
+    name: string;
+    rating: number;
+    count: number;
+    url: string;
+};
+
 /** Tresc premium w jednym locale — kontrakt szablonow premium (`PremiumContent`). */
 export type LocalizedPremiumContent = {
     template: PremiumContentData['template'];
@@ -26,11 +37,19 @@ export type LocalizedPremiumContent = {
     gallery: ProfileImage[];
     priceList: PriceListItem[];
     faq: FaqItem[];
+    ratings: ProfileRating[];
 };
 
 /** Sciezka obrazka premium dla `next/image` (`public/services/<slug>/<plik>`). */
 export function premiumImagePath(serviceSlug: string, file: string): string {
     return `/services/${serviceSlug}/${file}`;
+}
+
+/** Nazwa serwisu: stala dla znanych, z `label` dla `other` (schemat wymusza `label`). */
+export function toProfileRating(item: PremiumRatingItem): ProfileRating {
+    const name =
+        item.source === 'other' ? (item.label ?? '') : PREMIUM_RATING_SOURCE_NAMES[item.source];
+    return { source: item.source, name, rating: item.rating, count: item.count, url: item.url };
 }
 
 type LocalizeOptions = {
@@ -60,6 +79,7 @@ export function localizePremiumContent(
             ...(item.note === undefined ? {} : { note: item.note[locale] }),
         })),
         faq: content.faq.map(item => ({ question: item.q[locale], answer: item.a[locale] })),
+        ratings: content.ratings.map(toProfileRating),
     };
 }
 

@@ -13,6 +13,7 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
+import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
 
 const SECTION = 'rounded-2xl shadow-sm';
@@ -114,6 +115,7 @@ function ClassicDetails({ profile, mainLocation, showNavigate }: ClassicSectionP
                 <ProfileFaq items={premium.faq} className={SECTION} />
             </div>
             <div className="flex flex-col gap-6">
+                <ProfileRatings ratings={premium.ratings} className={SECTION} />
                 <ProfileContact
                     location={mainLocation}
                     showActions={false}

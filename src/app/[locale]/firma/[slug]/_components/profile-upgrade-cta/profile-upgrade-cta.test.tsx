@@ -18,10 +18,17 @@ jest.mock('@/i18n/navigation', () => ({
         children,
         ...rest
     }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
-        href: MockHref;
+        href: MockHref | string;
         children: ReactNode;
     }): ReactElement => (
-        <a href={`${href.pathname}?${new URLSearchParams(href.query).toString()}`} {...rest}>
+        <a
+            href={
+                typeof href === 'string'
+                    ? href
+                    : `${href.pathname}?${new URLSearchParams(href.query).toString()}`
+            }
+            {...rest}
+        >
             {children}
         </a>
     ),
@@ -50,8 +57,33 @@ describe('ProfileUpgradeCta', () => {
         );
 
         const section = screen.getByRole('region', { name: 'To Twoja firma?' });
-        expect(within(section).getAllByRole('listitem')).toHaveLength(3);
-        expect(within(section).getByText(/galeria do 15 zdjęć/)).toBeInTheDocument();
+        expect(
+            within(section)
+                .getAllByRole('listitem')
+                .map(item => item.textContent),
+        ).toEqual([
+            'Wyższa pozycja na liście wyników i na mapie',
+            'Zdjęcie w nagłówku i galeria do 15 zdjęć',
+            'Wybór jednego z 3 szablonów strony',
+            'Cennik usług i odpowiedzi na częste pytania',
+            'Oceny z Google Maps i Booksy na Twojej stronie',
+            'Bez sekcji „Podobne firmy” — nie polecamy konkurencji',
+        ]);
+    });
+
+    it.each([
+        ['ze Stripe', CHECKOUT],
+        ['bez Stripe', CONTACT],
+    ])('%s: link do przykladowej strony premium; przechodzi jest-axe', async (_, purchase) => {
+        const { container } = renderWithIntl(
+            <ProfileUpgradeCta serviceId={SERVICE_ID} slug={SLUG} purchase={purchase} />,
+        );
+
+        const section = screen.getByRole('region', { name: 'To Twoja firma?' });
+        expect(
+            within(section).getByRole('link', { name: 'Zobacz przykładową stronę' }),
+        ).toHaveAttribute('href', '/pricing/example');
+        expect(await axe(container)).toHaveNoViolations();
     });
 
     it('bez Stripe: link do kontaktu z tematem premium i slugiem firmy, bez formularza platnosci', async () => {

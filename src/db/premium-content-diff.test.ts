@@ -82,4 +82,27 @@ describe('describePremiumChanges', () => {
     it('nieczytelna tresc w bazie: ostrzezenie o nadpisaniu', () => {
         expect(describePremiumChanges({ kind: 'invalid' }, CONTENT)[0]).toContain('nadpisana');
     });
+
+    it('oceny: dodany serwis i zmieniona liczba opinii po nazwie serwisu', () => {
+        const google = {
+            source: 'google' as const,
+            rating: 4.8,
+            count: 120,
+            url: 'https://g.co/x',
+        };
+        const previous = { ...CONTENT, ratings: [google] };
+        const next = {
+            ...CONTENT,
+            ratings: [
+                { ...google, count: 125 },
+                { source: 'booksy' as const, rating: 5, count: 40, url: 'https://booksy.com/x' },
+            ],
+        };
+
+        expect(describePremiumChanges({ kind: 'valid', content: previous }, next)).toEqual([
+            'Zmiany wzgledem bazy:',
+            '  ~ oceny: google',
+            '  + oceny: booksy',
+        ]);
+    });
 });

@@ -42,6 +42,14 @@ export const routing = defineRouting({
             ru: '/pricing',
             uk: '/pricing',
         },
+        // Przykladowa strona premium z fikcyjna firma (noindex, poza sitemapa). Pierwszy
+        // segment jest juz zarezerwowany (`cennik`/`pricing`), wiec nie koliduje z aliasem `/<slug>`.
+        '/pricing/example': {
+            en: '/pricing/example',
+            pl: '/cennik/przyklad',
+            ru: '/pricing/example',
+            uk: '/pricing/example',
+        },
         '/add-business': {
             en: '/add-business',
             pl: '/dodaj-firme',

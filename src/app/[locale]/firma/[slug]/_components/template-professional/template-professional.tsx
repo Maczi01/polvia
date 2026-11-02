@@ -13,6 +13,7 @@ import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
+import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
 
 /** Cienkie ramki, mniej zaokraglen, szeryfowe naglowki — powaga kancelarii. */
@@ -129,6 +130,11 @@ function ProfessionalAside({
 }: ProfessionalSectionProps): ReactElement {
     return (
         <div className="flex flex-col gap-6 lg:sticky lg:top-6 lg:self-start">
+            <ProfileRatings
+                ratings={profile.premium.ratings}
+                className={ASIDE_SECTION}
+                titleClassName={ASIDE_TITLE}
+            />
             <ProfileContact
                 location={mainLocation}
                 showActions={false}

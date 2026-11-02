@@ -27,6 +27,7 @@ function premiumContent(overrides: Partial<PremiumContent> = {}): PremiumContent
         gallery: [],
         priceList: [{ name: 'Malowanie', price: '30 zl/m2' }],
         faq: [],
+        ratings: [],
         ...overrides,
     };
 }
@@ -224,6 +225,7 @@ describe('toPremiumProfileView', () => {
             gallery: [],
             priceList: [],
             faq: [],
+            ratings: [],
         });
         expect(result.name).toBe('Mistrz Remontu');
     });

@@ -185,7 +185,7 @@ Plik `data/services/<slug>.json` zostaje w repo jako slad tego, co poszlo do baz
 
 ## Wpis premium
 
-Tresc strony premium (szablon, cover, galeria, cennik, FAQ) to blok `premium` w **tym samym**
+Tresc strony premium (szablon, cover, galeria, cennik, FAQ, oceny) to blok `premium` w **tym samym**
 pliku `data/services/<plik>.json`, co wpis. Model jest concierge (R17): firma nie ma panelu,
 founder publikuje tresc za nia. Wpis musi juz istniec w bazie (`db:add`). Tresc przetrwa
 `db:reset` (seed czyta bloki `premium`) i zostaje w bazie po wygasnieciu subskrypcji.
@@ -218,7 +218,11 @@ Po kolei:
      "coverImage": "cover.jpg",
      "gallery": [{ "file": "wnetrze.jpg", "alt": { "pl": "…", "uk": "…", "en": "…", "ru": "…" } }],
      "priceList": [{ "name": { "pl": "…", … }, "price": { "pl": "od 80 zl", … }, "note": { … } }],
-     "faq": [{ "q": { "pl": "…", … }, "a": { "pl": "…", … } }]
+     "faq": [{ "q": { "pl": "…", … }, "a": { "pl": "…", … } }],
+     "ratings": [
+       { "source": "google", "rating": 4.8, "count": 126, "url": "https://maps.app.goo.gl/…" },
+       { "source": "other", "label": "Oferteo", "rating": 5, "count": 12, "url": "https://…" }
+     ]
    }
    ```
 
@@ -227,6 +231,15 @@ Po kolei:
    Limity: cennik najwyzej `PREMIUM_PRICE_LIST_MAX` (30) pozycji, FAQ najwyzej
    `PREMIUM_FAQ_MAX` (20) pytan. Nazwy w cenniku i pytania FAQ nie moga sie powtarzac w
    zadnym jezyku.
+
+   **`ratings` (opcjonalne) — oceny z innych serwisow, wpisywane recznie.** `source`:
+   `google` | `booksy` | `facebook` | `znanylekarz` | `other` (`other` wymaga `label` z nazwa
+   serwisu; przy znanych serwisach `label` jest zabronione). `rating` 0–5 (np. `4.8`), `count`
+   liczba opinii (calkowita, ≥ 0), `url` tylko `https://` — link do profilu firmy w tym
+   serwisie. Jeden wpis na serwis, najwyzej `PREMIUM_RATINGS_MAX` (6). Wartosci przepisz z
+   profilu firmy w dniu publikacji (albo od firmy) — nie zaokraglaj w gore i nie wymyslaj.
+   Oceny nie odswiezaja sie same: przy przedluzeniu premium zaktualizuj je tym samym
+   `db:premium`. Nie trafiaja do JSON-LD (`aggregateRating`) — to celowe.
 4. **Dry run i STOP:**
 
    ```bash

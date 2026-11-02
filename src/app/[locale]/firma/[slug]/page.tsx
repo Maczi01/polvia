@@ -179,6 +179,9 @@ export default async function ServiceProfilePage({ params }: PageProps): Promise
     const mainLocation = getMainLocation(view.locations);
     const baseUrl = env.NEXT_PUBLIC_SITE_URL;
 
+    // Bez `aggregateRating` z `premium.ratings`: zasady Google dla danych strukturalnych
+    // recenzji wykluczaja oceny zebrane w innych serwisach i wybrane przez sama firme
+    // (self-serving reviews) — taki znacznik grozi reczna kara w Search Console.
     const jsonLd = buildProfileJsonLd({
         name: view.name,
         description: view.description,

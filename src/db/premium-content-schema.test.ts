@@ -40,6 +40,7 @@ describe('premiumContentSchema', () => {
             gallery: [],
             priceList: [],
             faq: [],
+            ratings: [],
         });
     });
 

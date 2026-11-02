@@ -62,6 +62,7 @@ const EMPTY_PREMIUM_CONTENT: PremiumContent = {
     gallery: [],
     priceList: [],
     faq: [],
+    ratings: [],
 };
 
 /** Wejscie szablonu premium; bez opublikowanej tresci szablon dostaje dane free i pusta tresc. */

@@ -211,6 +211,22 @@ const PREMIUM_CONTENT: PremiumContent = {
             answer: 'Na każdą pracę dajemy pisemną gwarancję na 24 miesiące.',
         },
     ],
+    ratings: [
+        {
+            source: 'google',
+            name: 'Google',
+            rating: 4.8,
+            count: 126,
+            url: 'https://example.com/opinie/google',
+        },
+        {
+            source: 'facebook',
+            name: 'Facebook',
+            rating: 4.9,
+            count: 1,
+            url: 'https://example.com/opinie/facebook',
+        },
+    ],
 };
 
 export const premiumServiceFixture: PremiumProfileView = {
@@ -268,6 +284,15 @@ export const premiumProfessionalFixture: PremiumProfileView = {
                 answer: 'Tak, prowadzimy skargi do WSA i skargi kasacyjne do NSA.',
             },
         ],
+        ratings: [
+            {
+                source: 'google',
+                name: 'Google',
+                rating: 4.7,
+                count: 58,
+                url: 'https://example.com/opinie/google',
+            },
+        ],
     },
 };
 
@@ -281,5 +306,6 @@ export const premiumEmptyFixture: PremiumProfileView = {
         gallery: [],
         priceList: [],
         faq: [],
+        ratings: [],
     },
 };
