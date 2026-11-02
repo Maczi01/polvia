@@ -1,6 +1,7 @@
 import { createTranslator } from 'next-intl';
 
-import type { Locale } from '@/i18n/config';
+import { type Locale, locales } from '@/i18n/config';
+import { CATEGORY_VALUES } from '@/lib/categories';
 import type { ServiceLanguage } from '@/lib/languages';
 
 import en from '../../messages/en.json';
@@ -12,19 +13,21 @@ import {
     formatLanguageList,
     selectDescribedLanguages,
     selectTitleLanguage,
-    toTitleCategory,
+    type TitleLanguage,
 } from './service-profile-languages';
 
 /** Typ `pl` dla wszystkich locale: klucze tlumaczen musza byc identyczne. */
 const MESSAGES: Record<Locale, typeof pl> = { pl, en, ru, uk };
 
-function metaTexts(locale: Locale, languages: ServiceLanguage[], categoryLabel: string) {
+const TITLE_LANGUAGES: readonly TitleLanguage[] = ['uk', 'ru', 'be'];
+
+function metaTexts(locale: Locale, languages: ServiceLanguage[], category: string) {
     const t = createTranslator({
         locale,
         messages: MESSAGES[locale],
         namespace: 'ServiceProfile.meta',
     });
-    return buildLanguageMetaTexts(t, locale, languages, categoryLabel);
+    return buildLanguageMetaTexts(t, locale, languages, category);
 }
 
 describe('selectTitleLanguage', () => {
@@ -45,25 +48,9 @@ describe('selectTitleLanguage', () => {
     });
 
     it('firma tylko po polsku (i angielsku) nie ma frazy w zadnym locale', () => {
-        for (const locale of ['pl', 'en', 'ru', 'uk'] as const) {
+        for (const locale of locales) {
             expect(selectTitleLanguage(locale, ['pl', 'en'])).toBeNull();
         }
-    });
-});
-
-describe('toTitleCategory', () => {
-    it('pl, uk, ru: pierwsza litera mala', () => {
-        expect(toTitleCategory('Gastronomia', 'pl')).toBe('gastronomia');
-        expect(toTitleCategory("Здоров'я", 'uk')).toBe("здоров'я");
-        expect(toTitleCategory('Красота', 'ru')).toBe('красота');
-    });
-
-    it('en zostawia etykiete bez zmian', () => {
-        expect(toTitleCategory('Real Estate', 'en')).toBe('Real Estate');
-    });
-
-    it('skrotowiec na poczatku zostaje wielka litera', () => {
-        expect(toTitleCategory('IT i komputery', 'pl')).toBe('IT i komputery');
     });
 });
 
@@ -86,29 +73,62 @@ describe('formatLanguageList', () => {
     });
 });
 
+describe('titlePhrase: komplet tlumaczen', () => {
+    it.each(locales)('%s: kazda kategoria x jezyk frazy ma niepusta fraze', locale => {
+        const phrases = MESSAGES[locale].ServiceProfile.meta.titlePhrase;
+
+        for (const language of TITLE_LANGUAGES) {
+            expect(Object.keys(phrases[language]).sort()).toEqual([...CATEGORY_VALUES].sort());
+            for (const category of CATEGORY_VALUES) {
+                expect(phrases[language][category].trim()).not.toBe('');
+            }
+        }
+    });
+
+    it('frazy jezyka ru mowia o jezyku obslugi, nie o rosyjskiej firmie', () => {
+        const nationality: Record<Locale, RegExp> = {
+            pl: /(^|\s)rosyjsk(i|a|ie)(\s|$)/,
+            uk: /(^|\s)російськ(ий|а|е|і)(\s|$)/,
+            ru: /(^|\s)русск(ий|ая|ое|ие)(\s|$)/,
+            en: /(^|\s)Russian\s/,
+        };
+
+        for (const locale of locales) {
+            const phrases = Object.values(MESSAGES[locale].ServiceProfile.meta.titlePhrase.ru);
+            for (const phrase of phrases) {
+                expect(phrase).not.toMatch(nationality[locale]);
+            }
+        }
+    });
+});
+
 describe('buildLanguageMetaTexts', () => {
     it.each([
-        ['pl', 'Gastronomia', 'gastronomia po ukraińsku'],
-        ['en', 'Gastronomy', 'Gastronomy in Ukrainian'],
-        ['uk', 'Гастрономія', 'гастрономія українською'],
-        ['ru', 'Гастрономия', 'гастрономия на русском'],
-    ] as const)('%s: kategoria z fraza jezykowa', (locale, label, expected) => {
-        expect(metaTexts(locale, ['pl', 'uk', 'ru'], label).categoryWithLanguage).toBe(expected);
+        ['pl', 'ukraiński sklep spożywczy'],
+        ['en', 'Ukrainian grocery store'],
+        ['uk', 'український продуктовий магазин'],
+        ['ru', 'русскоязычный продуктовый магазин'],
+    ] as const)('%s: fraza w jezyku wybranym dla locale', (locale, expected) => {
+        expect(metaTexts(locale, ['pl', 'uk', 'ru'], 'grocery').titlePhrase).toBe(expected);
+    });
+
+    it('nieznana kategoria z bazy dostaje fraze "others"', () => {
+        expect(metaTexts('pl', ['uk'], 'unknown').titlePhrase).toBe('ukraińska firma');
     });
 
     it('firma bez jezyka frazy: brak frazy i brak listy jezykow', () => {
-        const texts = metaTexts('pl', ['pl'], 'Remonty');
+        const texts = metaTexts('pl', ['pl'], 'renovation');
 
-        expect(texts.categoryWithLanguage).toBeNull();
+        expect(texts.titlePhrase).toBeNull();
         expect(texts.hasDescribedLanguages).toBe(false);
     });
 
     it('lista jezykow do opisu w formie gramatycznej locale', () => {
-        expect(metaTexts('pl', ['pl', 'uk', 'ru'], 'Remonty').descriptionValues).toEqual({
+        expect(metaTexts('pl', ['pl', 'uk', 'ru'], 'renovation').descriptionValues).toEqual({
             languages: 'ukraińsku i rosyjsku',
             languageCount: 2,
         });
-        expect(metaTexts('uk', ['uk', 'en'], 'Ремонт').descriptionValues.languages).toBe(
+        expect(metaTexts('uk', ['uk', 'en'], 'renovation').descriptionValues.languages).toBe(
             'українською і англійською',
         );
     });

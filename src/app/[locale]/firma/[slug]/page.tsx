@@ -135,7 +135,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         t,
         locale,
         toServiceLanguages(profile.languages),
-        categoryLabel,
+        profile.category,
     );
     // Klucz z zasiegu: wpis `local` bez adresu nie moze dostac opisu „obsluga online”.
     const fallbackDescription = t(
@@ -154,7 +154,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         slug,
         name: profile.name,
         categoryLabel,
-        categoryWithLanguage: languageTexts.categoryWithLanguage,
+        titlePhrase: languageTexts.titlePhrase,
         city,
         siteName: serviceNameFromCapitalLetter,
         description: profile.description,

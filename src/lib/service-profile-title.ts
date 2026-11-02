@@ -16,11 +16,11 @@ export type ProfileTitleInput = {
     city: string | null;
     siteName: string;
     /**
-     * Kategoria z fraza o jezyku obslugi w locale strony („gastronomia po ukraińsku”),
-     * zastepuje `categoryLabel`. Brak (`null`/pominiete) — firma nie obsluguje zadnego
+     * Fraza o jezyku obslugi w locale strony („ukraiński sklep spożywczy”), zastepuje
+     * `categoryLabel`. Brak (`null`/pominiete) — firma nie obsluguje zadnego
      * z jezykow frazy (`selectTitleLanguage`).
      */
-    categoryWithLanguage?: string | null;
+    titlePhrase?: string | null;
 };
 
 /**
@@ -31,12 +31,12 @@ export type ProfileTitleInput = {
  */
 function buildHeadWithLanguage(
     name: string,
-    categoryWithLanguage: string,
+    titlePhrase: string,
     city: string | null,
     headRoom: number,
 ): string {
     const cleanName = name.replace(/\s+/g, ' ').trim();
-    const withoutCity = ` — ${categoryWithLanguage}`;
+    const withoutCity = ` — ${titlePhrase}`;
     const withCity = city?.trim() ? `${withoutCity}, ${city.trim()}` : withoutCity;
     if (cleanName.length + withCity.length <= headRoom) return `${cleanName}${withCity}`;
 
@@ -55,7 +55,7 @@ function buildHeadWithLanguage(
  * Sufiks ` | <serwis>` zostaje zawsze.
  *
  * Bez frazy jezykowej za dlugi tytul traci koniec (na granicy slowa, z wielokropkiem) —
- * jak przed wprowadzeniem frazy. Z fraza obcinanie chroni fraze („lekarz po ukraińsku”
+ * jak przed wprowadzeniem frazy. Z fraza obcinanie chroni fraze („ukraiński lekarz”
  * to rdzen intencji wyszukiwania): `buildHeadWithLanguage`.
  */
 export function buildProfileTitle({
@@ -63,15 +63,15 @@ export function buildProfileTitle({
     categoryLabel,
     city,
     siteName,
-    categoryWithLanguage,
+    titlePhrase,
 }: ProfileTitleInput): string {
     const suffix = ` | ${siteName}`;
     const headRoom = PROFILE_TITLE_MAX_LENGTH - suffix.length;
 
-    if (!categoryWithLanguage) {
+    if (!titlePhrase) {
         const place = city?.trim() ? `, ${city.trim()}` : '';
         return `${truncateAtWord(`${name} — ${categoryLabel}${place}`, headRoom)}${suffix}`;
     }
 
-    return `${buildHeadWithLanguage(name, categoryWithLanguage, city, headRoom)}${suffix}`;
+    return `${buildHeadWithLanguage(name, titlePhrase, city, headRoom)}${suffix}`;
 }

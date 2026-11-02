@@ -1,4 +1,5 @@
 import type { Locale } from '@/i18n/config';
+import { type Category, isCategory } from '@/lib/categories';
 import { SERVICE_LANGUAGES, type ServiceLanguage } from '@/lib/languages';
 
 /**
@@ -6,7 +7,7 @@ import { SERVICE_LANGUAGES, type ServiceLanguage } from '@/lib/languages';
  * Czyste funkcje — slowa w danym locale daja tlumaczenia `ServiceProfile.meta`.
  */
 
-/** Jezyki, ktore moga trafic do tytulu — rdzen intencji „<usluga> po ukrainsku”. */
+/** Jezyki, ktore moga trafic do tytulu — rdzen intencji („ukraiński lekarz Warszawa”). */
 export type TitleLanguage = Extract<ServiceLanguage, 'uk' | 'ru' | 'be'>;
 
 /**
@@ -30,23 +31,6 @@ export function selectTitleLanguage(
 ): TitleLanguage | null {
     const priority: readonly TitleLanguage[] = TITLE_LANGUAGE_PRIORITY[locale];
     return priority.find(language => languages.includes(language)) ?? null;
-}
-
-/**
- * Locale, w ktorych kategoria w srodku frazy jest pisana mala litera („gastronomia po
- * ukrainsku”). Angielski zostawia wielka litere jak w etykiecie.
- */
-const LOWERCASE_CATEGORY_LOCALES: ReadonlySet<Locale> = new Set<Locale>(['pl', 'uk', 'ru']);
-
-/**
- * Etykieta kategorii do frazy w tytule: w pl/uk/ru pierwsza litera mala, chyba ze etykieta
- * zaczyna sie od skrotowca („IT i komputery” zostaje bez zmian).
- */
-export function toTitleCategory(label: string, locale: Locale): string {
-    if (!LOWERCASE_CATEGORY_LOCALES.has(locale)) return label;
-    const [first = '', second = ''] = label;
-    if (second === '' || second !== second.toLocaleLowerCase(locale)) return label;
-    return `${first.toLocaleLowerCase(locale)}${label.slice(first.length)}`;
 }
 
 /** Jezyk obslugi wymieniany w opisie — polski jest w katalogu firm w Polsce oczywisty. */
@@ -75,34 +59,39 @@ export function formatLanguageList(words: readonly string[], locale: Locale): st
  * `createTranslator` (testy).
  */
 export type MetaTranslate = (
-    key: `titleCategory.${TitleLanguage}` | `languageNames.${DescribedLanguage}`,
+    key: `titlePhrase.${TitleLanguage}.${Category}` | `languageNames.${DescribedLanguage}`,
     values?: Record<string, string | number>,
 ) => string;
 
 export type LanguageMetaTexts = {
-    /** Kategoria z fraza jezykowa do tytulu albo `null` (brak jezyka frazy w danym locale). */
-    categoryWithLanguage: string | null;
+    /**
+     * Fraza do tytulu: przymiotnik jezyka/narodowosci uzgodniony z rzeczownikiem kategorii
+     * („ukraiński sklep spożywczy”), albo `null` (brak jezyka frazy w danym locale).
+     */
+    titlePhrase: string | null;
     /** Parametry wariantu `…Languages` opisu zastepczego. */
     descriptionValues: { languages: string; languageCount: number };
     hasDescribedLanguages: boolean;
 };
 
-/** Teksty o jezyku obslugi do tytulu i opisu zastepczego profilu w danym locale. */
+/**
+ * Teksty o jezyku obslugi do tytulu i opisu zastepczego profilu w danym locale.
+ * Fraza tytulu to gotowy tekst per jezyk i kategoria (`titlePhrase.<jezyk>.<kategoria>`):
+ * rodzaj i liczba przymiotnika zaleza od rzeczownika, wiec nie da sie ich skleic z etykiety.
+ * Nieznana kategoria z bazy dostaje fraze `others`.
+ */
 export function buildLanguageMetaTexts(
     t: MetaTranslate,
     locale: Locale,
     languages: readonly ServiceLanguage[],
-    categoryLabel: string,
+    category: string,
 ): LanguageMetaTexts {
+    const categoryKey: Category = isCategory(category) ? category : 'others';
     const titleLanguage = selectTitleLanguage(locale, languages);
     const described = selectDescribedLanguages(languages);
 
     return {
-        categoryWithLanguage: titleLanguage
-            ? t(`titleCategory.${titleLanguage}`, {
-                  category: toTitleCategory(categoryLabel, locale),
-              })
-            : null,
+        titlePhrase: titleLanguage ? t(`titlePhrase.${titleLanguage}.${categoryKey}`) : null,
         descriptionValues: {
             languages: formatLanguageList(
                 described.map(language => t(`languageNames.${language}`)),

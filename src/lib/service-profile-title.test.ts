@@ -16,66 +16,166 @@ const MESSAGES: Record<Locale, typeof pl> = { pl, en, ru, uk };
 type TitleCase = {
     locale: Locale;
     name: string;
-    categoryLabel: string;
+    category: string;
     city: string | null;
     languages: ServiceLanguage[];
 };
 
 /** Tytul jak w `generateMetadata`: fraza z prawdziwych tlumaczen danego locale. */
-function title({ locale, name, categoryLabel, city, languages }: TitleCase): string {
+function title({ locale, name, category, city, languages }: TitleCase): string {
     const t = createTranslator({
         locale,
         messages: MESSAGES[locale],
         namespace: 'ServiceProfile.meta',
     });
-    const { categoryWithLanguage } = buildLanguageMetaTexts(t, locale, languages, categoryLabel);
+    const { titlePhrase } = buildLanguageMetaTexts(t, locale, languages, category);
     return buildProfileTitle({
         name,
-        categoryLabel,
+        categoryLabel: 'Etykieta',
         city,
         siteName: 'Polvia',
-        categoryWithLanguage,
+        titlePhrase,
     });
 }
 
 describe('buildProfileTitle z jezykiem obslugi', () => {
     it.each([
-        ['pl', 'Gastronomia', 'Multi Cook — gastronomia po ukraińsku, Warszawa | Polvia'],
-        ['en', 'Gastronomy', 'Multi Cook — Gastronomy in Ukrainian, Warszawa | Polvia'],
-        ['uk', 'Гастрономія', 'Multi Cook — гастрономія українською, Warszawa | Polvia'],
-        ['ru', 'Гастрономия', 'Multi Cook — гастрономия на русском, Warszawa | Polvia'],
-    ] as const)('%s: fraza w jezyku locale', (locale, categoryLabel, expected) => {
+        ['pl', 'Multi Cook — ukraiński sklep spożywczy, Warszawa | Polvia'],
+        ['en', 'Multi Cook — Ukrainian grocery store, Warszawa | Polvia'],
+    ] as const)('%s: przymiotnik przed rzeczownikiem, z miastem', (locale, expected) => {
         expect(
             title({
                 locale,
                 name: 'Multi Cook',
-                categoryLabel,
+                category: 'grocery',
                 city: 'Warszawa',
                 languages: ['pl', 'uk', 'ru'],
             }),
         ).toBe(expected);
     });
 
-    it('ru bez rosyjskiego: fraza o ukrainskim', () => {
+    it.each([
+        ['uk', ['pl', 'uk', 'ru'], 'Multi Cook — український продуктовий магазин | Polvia'],
+        ['ru', ['pl', 'uk', 'ru'], 'Multi Cook — русскоязычный продуктовый магазин | Polvia'],
+        ['ru', ['pl', 'uk'], 'Multi Cook — украинский продуктовый магазин | Polvia'],
+    ] as const)('%s %p: fraza w jezyku wybranym dla locale', (locale, languages, expected) => {
         expect(
             title({
-                locale: 'ru',
-                name: 'Twój Lekarz',
-                categoryLabel: 'Здоровье',
-                city: 'Warszawa',
-                languages: ['pl', 'uk'],
+                locale,
+                name: 'Multi Cook',
+                category: 'grocery',
+                city: null,
+                languages: [...languages],
             }),
-        ).toBe('Twój Lekarz — здоровье на украинском, Warszawa | Polvia');
+        ).toBe(expected);
     });
 
-    it('bez jezykow wschodnioslowianskich: tytul bez frazy, kategoria bez zmian', () => {
-        expect(
+    describe('rodzaj i liczba przymiotnika (m, f, n, lm.)', () => {
+        const CATEGORIES = ['health', 'gastronomy', 'real_estate', 'education'] as const;
+
+        it.each([
+            [
+                'pl',
+                'uk',
+                [
+                    'ukraiński lekarz',
+                    'ukraińska kuchnia',
+                    'ukraińskie biuro nieruchomości',
+                    'ukraińskie kursy i szkoły',
+                ],
+            ],
+            [
+                'pl',
+                'ru',
+                [
+                    'rosyjskojęzyczny lekarz',
+                    'rosyjskojęzyczny lokal gastronomiczny',
+                    'rosyjskojęzyczne biuro nieruchomości',
+                    'rosyjskojęzyczne kursy i szkoły',
+                ],
+            ],
+            [
+                'pl',
+                'be',
+                [
+                    'białoruski lekarz',
+                    'białoruska kuchnia',
+                    'białoruskie biuro nieruchomości',
+                    'białoruskie kursy i szkoły',
+                ],
+            ],
+            [
+                'uk',
+                'uk',
+                [
+                    'український лікар',
+                    'українська кухня',
+                    'українське агентство нерухомості',
+                    'українські курси та школи',
+                ],
+            ],
+            [
+                'ru',
+                'uk',
+                [
+                    'украинский врач',
+                    'украинская кухня',
+                    'украинское агентство недвижимости',
+                    'украинские курсы и школы',
+                ],
+            ],
+            [
+                'ru',
+                'ru',
+                [
+                    'русскоязычный врач',
+                    'русскоязычное заведение общепита',
+                    'русскоязычное агентство недвижимости',
+                    'русскоязычные курсы и школы',
+                ],
+            ],
+            [
+                'en',
+                'be',
+                [
+                    'Belarusian doctor',
+                    'Belarusian cuisine',
+                    'Belarusian real estate agency',
+                    'Belarusian courses & schools',
+                ],
+            ],
+        ] as const)('%s, jezyk %s', (locale, language, phrases) => {
+            CATEGORIES.forEach((category, index) => {
+                expect(
+                    title({ locale, name: 'X', category, city: null, languages: ['pl', language] }),
+                ).toBe(`X — ${phrases[index]} | Polvia`);
+            });
+        });
+    });
+
+    it('kubel help_support: bez przymiotnika narodowosci', () => {
+        const help = (language: ServiceLanguage): string =>
             title({
                 locale: 'pl',
+                name: 'X',
+                category: 'help_support',
+                city: null,
+                languages: [language],
+            });
+
+        expect(help('uk')).toBe('X — pomoc i wsparcie dla Ukraińców | Polvia');
+        expect(help('ru')).toBe('X — pomoc i wsparcie po rosyjsku | Polvia');
+        expect(help('be')).toBe('X — pomoc i wsparcie dla Białorusinów | Polvia');
+    });
+
+    it('bez jezykow wschodnioslowianskich: tytul jak dawniej, z etykieta kategorii', () => {
+        expect(
+            buildProfileTitle({
                 name: 'Mistrz Remontu',
                 categoryLabel: 'Remonty',
                 city: 'Warszawa',
-                languages: ['pl', 'en'],
+                siteName: 'Polvia',
+                titlePhrase: null,
             }),
         ).toBe('Mistrz Remontu — Remonty, Warszawa | Polvia');
     });
@@ -86,69 +186,57 @@ describe('buildProfileTitle z jezykiem obslugi', () => {
                 title({
                     locale,
                     name: 'Taxovia',
-                    categoryLabel: 'X',
+                    category: 'financial',
                     city: null,
                     languages: ['pl'],
                 }),
-            ).toBe('Taxovia — X | Polvia');
+            ).toBe('Taxovia — Etykieta | Polvia');
         }
-    });
-
-    it('skrotowiec w kategorii zostaje wielka litera', () => {
-        expect(
-            title({
-                locale: 'pl',
-                name: 'Serwis',
-                categoryLabel: 'IT i komputery',
-                city: null,
-                languages: ['uk'],
-            }),
-        ).toBe('Serwis — IT i komputery po ukraińsku | Polvia');
     });
 
     it('dluga nazwa: skraca sie nazwa (nie ponizej minimum), fraza, miasto i sufiks zostaja', () => {
         const result = title({
             locale: 'pl',
             name: 'Kancelaria Adwokacka Nowak i Wspólnicy',
-            categoryLabel: 'Prawne',
+            category: 'law',
             city: 'Łódź',
             languages: ['pl', 'uk'],
         });
 
         expect(result.length).toBeLessThanOrEqual(PROFILE_TITLE_MAX_LENGTH);
-        expect(result).toBe('Kancelaria Adwokacka… — prawne po ukraińsku, Łódź | Polvia');
+        expect(result).toBe('Kancelaria Adwokacka… — ukraiński prawnik, Łódź | Polvia');
     });
 
     it('nazwa zmiescilaby sie tylko ponizej minimum: znika miasto, fraza zostaje', () => {
         const result = title({
             locale: 'pl',
-            name: 'Lviv Croissants',
-            categoryLabel: 'Gastronomia',
+            name: 'Twój Lekarz w Warszawie',
+            category: 'health',
             city: 'Warszawa',
             languages: ['pl', 'uk'],
         });
 
-        expect(result).toBe('Lviv Croissants — gastronomia po ukraińsku | Polvia');
+        expect(result).toBe('Twój Lekarz w Warszawie — ukraiński lekarz | Polvia');
     });
 
     it('bardzo dluga nazwa bez miejsca na miasto: nazwa skrocona, fraza i sufiks zostaja', () => {
         const result = title({
             locale: 'pl',
             name: 'Kancelaria Adwokacka Adwokat Jan Kowalski i Wspolnicy',
-            categoryLabel: 'Prawne',
+            category: 'law',
             city: 'Warszawa',
             languages: ['pl', 'uk'],
         });
 
         expect(result.length).toBeLessThanOrEqual(PROFILE_TITLE_MAX_LENGTH);
-        expect(result).toBe('Kancelaria Adwokacka… — prawne po ukraińsku | Polvia');
+        expect(result).toBe('Kancelaria Adwokacka Adwokat… — ukraiński prawnik | Polvia');
     });
 
     it('fraza zbyt dluga na nazwe: nazwa nie krotsza niz minimum, koniec obciety', () => {
         const result = buildProfileTitle({
             name: 'Centrum Medyczne Zdrowa Rodzina',
             categoryLabel: 'Pomoc i wsparcie',
-            categoryWithLanguage: 'pomoc i wsparcie po białorusku i jeszcze dluzej',
+            titlePhrase: 'pomoc i wsparcie po białorusku i jeszcze dluzej',
             city: 'Warszawa',
             siteName: 'Polvia',
         });
