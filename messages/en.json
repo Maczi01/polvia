@@ -116,8 +116,7 @@
     "language": "Select language"
   },
   "ContactForm": {
-    "title": "Contact us!",
-    "info": "Please fill in the form below and we will add your business to the map. Other questions, queries? Feel free to contact",
+    "info": "Have a question, a suggestion or a note about a directory listing? Write to us — we will reply to the email address you provide.",
     "yourEmail": "Email",
     "yourEmailPlaceholder": "Type your email here...",
     "topic": "Topic",
@@ -133,6 +132,13 @@
     "premiumTopic": "Premium",
     "premiumMessage": "Hello, I would like to activate the premium page for polvia.pl/firma/{slug}. Please send me the bank transfer details.",
     "premiumMessageNoService": "Hello, I would like to activate the premium page for my business: (business name). Please send me the bank transfer details."
+  },
+  "ContactPage": {
+    "title": "How can we help?",
+    "subtitle": "Add your business to the directory or send us a message — choose what you need.",
+    "tabsLabel": "What do you need?",
+    "tabBusiness": "I run a business",
+    "tabQuestion": "I have a question"
   },
   "MapCard": {
     "nowOpen": "Now open",
@@ -625,9 +631,14 @@
   },
   "addBusiness": {
     "cta": {
-      "heading": "Run a business?",
+      "heading": "Add your business to the directory",
       "description": "Paste a link to your business website and AI will draft your directory listing for you to review before sending.",
-      "button": "Add your business with AI"
+      "button": "Add your business with AI",
+      "freeTitle": "Free listing",
+      "premiumTitle": "Premium page",
+      "premiumDescription": "A full business page with photos, a price list and a short address — it sets you apart from the competition.",
+      "premiumButton": "See Premium",
+      "premiumNote": "You can enable Premium on your business profile once it is in the directory."
     },
     "page": {
       "metaTitle": "Add your business to the directory with AI | Polvia",
