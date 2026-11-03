@@ -62,13 +62,24 @@ describe('AddBusinessCta', () => {
         const premium = screen.getByRole('article', {
             name: messages.addBusiness.cta.premiumTitle,
         });
-        expect(within(premium).getByText('9 zł/miesiąc')).toBeInTheDocument();
+        expect(within(premium).getByText('19 zł/miesiąc')).toBeInTheDocument();
         expect(
             within(premium).getByText(messages.Pricing.plans.essentials.features.shortUrl),
         ).toBeInTheDocument();
         expect(
             within(premium).getByRole('link', { name: messages.addBusiness.cta.premiumButton }),
         ).toHaveAttribute('href', '/pricing');
+    });
+
+    it('strona Premium ma podglad prowadzacy do przykladowej strony', () => {
+        renderCta();
+
+        const premium = screen.getByRole('article', {
+            name: messages.addBusiness.cta.premiumTitle,
+        });
+        expect(
+            within(premium).getByRole('link', { name: messages.addBusiness.cta.premiumExample }),
+        ).toHaveAttribute('href', '/pricing/example');
     });
 
     it('nie ma naruszen dostepnosci', async () => {

@@ -42,7 +42,7 @@ function switcher(): HTMLElement {
 }
 
 describe('PremiumExample', () => {
-    it('oznacza przyklad, ma CTA zakupu i renderuje wybrany szablon; przechodzi jest-axe', async () => {
+    it('plywajaca karta oznacza przyklad, ma CTA zakupu i renderuje wybrany szablon; przechodzi jest-axe', async () => {
         const { container } = renderWithIntl(
             <PremiumExample
                 profile={getPremiumExampleProfile('pl', 'professional')}
@@ -50,9 +50,11 @@ describe('PremiumExample', () => {
             />,
         );
 
-        const banner = screen.getByRole('region', {
+        const banner = screen.getByRole('complementary', {
             name: 'Tak może wyglądać strona Twojej firmy',
         });
+        // Zwijana karta (details) otwarta na starcie: informacja o fikcyjnej firmie widoczna od razu.
+        expect(banner.querySelector('details')).toHaveAttribute('open');
         expect(within(banner).getByText(/są fikcyjne/)).toBeInTheDocument();
         expect(within(banner).getByRole('link', { name: 'Chcę taką stronę' })).toHaveAttribute(
             'href',

@@ -8,8 +8,9 @@ import { PREMIUM_EXAMPLE_TEXTS } from './premium-example-content';
 
 /**
  * Fikcyjna firma przykladowej strony premium — niezalezna od bazy, nie trafia na mape,
- * do wynikow ani do sitemapy. Zdjecia to ilustracje z bloga (`public/images/blog/`):
- * nie sa logotypami ani zdjeciami zadnej firmy z katalogu. Kontakt nie trafia do nikogo:
+ * do wynikow ani do sitemapy. Zdjecia to stockowe fotografie biura na licencji CC0
+ * (`public/images/premium-example/`, zrodla w `README.md` obok): nie sa logotypami ani
+ * zdjeciami zadnej firmy z katalogu. Kontakt nie trafia do nikogo:
  * numer `+48 000…` nie istnieje, a `example.com` jest domena zarezerwowana (RFC 2606).
  */
 
@@ -30,12 +31,12 @@ export function parseExampleTemplate(value: string | string[] | undefined): Prem
     return typeof value === 'string' && isPremiumTemplate(value) ? value : DEFAULT_EXAMPLE_TEMPLATE;
 }
 
-const BLOG_IMAGES = '/images/blog';
+const EXAMPLE_IMAGES = '/images/premium-example';
 
 const GALLERY_FILES = [
-    `${BLOG_IMAGES}/ukraincy-pkb-polski/cover.png`,
-    `${BLOG_IMAGES}/mapa-ukrainskich-firm-w-polsce/cover.png`,
-    `${BLOG_IMAGES}/branze-ukrainskich-firm-w-polsce/cover.png`,
+    `${EXAMPLE_IMAGES}/folders.webp`,
+    `${EXAMPLE_IMAGES}/notes.webp`,
+    `${EXAMPLE_IMAGES}/calculator.webp`,
 ] as const;
 
 const EXAMPLE_HOURS = {
@@ -105,7 +106,7 @@ export function getPremiumExampleProfile(
         premium: {
             template,
             coverImage: {
-                src: `${BLOG_IMAGES}/ukrainskie-firmy-w-polsce/cover.jpg`,
+                src: `${EXAMPLE_IMAGES}/office.webp`,
                 alt: texts.coverAlt,
             },
             gallery: GALLERY_FILES.map((src, index) => ({ src, alt: texts.galleryAlts[index] })),

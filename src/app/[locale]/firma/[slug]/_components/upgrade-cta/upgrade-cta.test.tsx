@@ -23,8 +23,8 @@ describe('UpgradeCta', () => {
         const { container } = renderCta(action);
 
         expect(screen.getByRole('group', { name: 'Okres rozliczenia' })).toBeInTheDocument();
-        expect(screen.getByRole('radio', { name: /Miesięcznie.*9 zł/ })).toBeChecked();
-        expect(screen.getByRole('radio', { name: /Rocznie.*49 zł/ })).not.toBeChecked();
+        expect(screen.getByRole('radio', { name: /Miesięcznie.*19 zł/ })).toBeChecked();
+        expect(screen.getByRole('radio', { name: /Rocznie.*99 zł/ })).not.toBeChecked();
         expect(await axe(container)).toHaveNoViolations();
     });
 
