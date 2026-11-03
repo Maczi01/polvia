@@ -38,11 +38,12 @@ describe('getPremiumExampleProfile', () => {
         expect(profile.premium.gallery.every(image => image.alt.trim() !== '')).toBe(true);
     });
 
-    it('zdjecia tylko z ilustracji bloga, nie z katalogu firm (public/services)', () => {
+    it('zdjecia tylko ze stockowych zdjec przykladu, nie z katalogu firm (public/services)', () => {
         const { premium } = getPremiumExampleProfile('pl', 'gallery');
         const sources = [premium.coverImage?.src, ...premium.gallery.map(image => image.src)];
 
-        expect(sources.every(src => src?.startsWith('/images/blog/'))).toBe(true);
+        expect(sources.every(src => src?.startsWith('/images/premium-example/'))).toBe(true);
+        expect(sources.some(src => src?.includes('/services/'))).toBe(false);
     });
 
     it('kontakt i linki ocen nie prowadza do nikogo prawdziwego', () => {

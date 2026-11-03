@@ -27,11 +27,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'Prowadzimy księgowość jednoosobowych działalności i małych spółek. Rozliczamy podatki, ZUS i kadry, a dokumenty możesz przesłać zdjęciem z telefonu.\n\nObsługujemy klientów po polsku, ukraińsku, rosyjsku i angielsku — w biurze w Warszawie albo w pełni zdalnie.',
         tags: ['Księgowość JDG', 'Pełna księgowość', 'Kadry i płace', 'Rozliczenia PIT', 'ZUS'],
-        coverAlt: 'Biuro w centrum Warszawy',
+        coverAlt: 'Jasne biuro z biurkiem i komputerem',
         galleryAlts: [
-            'Ilustracja: finanse małej firmy',
-            'Ilustracja: klienci z całej Polski',
-            'Ilustracja: branże, które obsługujemy',
+            'Kolorowe teczki na dokumenty',
+            'Księgowy robi notatki przy laptopie',
+            'Biurko z kalkulatorem i notatnikiem',
         ],
         priceList: [
             {
@@ -64,11 +64,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'Ведемо бухгалтерію ФОП та малих компаній. Розраховуємо податки, ZUS і кадри, а документи можна надіслати фото з телефона.\n\nОбслуговуємо клієнтів польською, українською, російською та англійською — в офісі у Варшаві або повністю дистанційно.',
         tags: ['Бухгалтерія JDG', 'Повна бухгалтерія', 'Кадри і зарплати', 'Декларації PIT', 'ZUS'],
-        coverAlt: 'Офіс у центрі Варшави',
+        coverAlt: 'Світлий офіс зі столом і комп’ютером',
         galleryAlts: [
-            'Ілюстрація: фінанси малої компанії',
-            'Ілюстрація: клієнти з усієї Польщі',
-            'Ілюстрація: галузі, які ми обслуговуємо',
+            'Кольорові папки для документів',
+            'Бухгалтер робить нотатки біля ноутбука',
+            'Стіл із калькулятором і блокнотом',
         ],
         priceList: [
             {
@@ -101,11 +101,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'We keep the books for sole traders and small companies. We handle taxes, social security (ZUS) and payroll, and you can send documents as a photo from your phone.\n\nWe serve clients in Polish, Ukrainian, Russian and English — at our Warsaw office or fully remotely.',
         tags: ['Sole trader accounting', 'Full accounting', 'Payroll', 'PIT returns', 'ZUS'],
-        coverAlt: 'Office in central Warsaw',
+        coverAlt: 'Bright office with a desk and a computer',
         galleryAlts: [
-            'Illustration: small business finances',
-            'Illustration: clients from all over Poland',
-            'Illustration: industries we serve',
+            'Colourful document folders',
+            'Accountant taking notes next to a laptop',
+            'Desk with a calculator and a notepad',
         ],
         priceList: [
             {
@@ -148,11 +148,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
             'Декларации PIT',
             'ZUS',
         ],
-        coverAlt: 'Офис в центре Варшавы',
+        coverAlt: 'Светлый офис со столом и компьютером',
         galleryAlts: [
-            'Иллюстрация: финансы небольшой компании',
-            'Иллюстрация: клиенты со всей Польши',
-            'Иллюстрация: отрасли, которые мы обслуживаем',
+            'Цветные папки для документов',
+            'Бухгалтер делает заметки у ноутбука',
+            'Стол с калькулятором и блокнотом',
         ],
         priceList: [
             {

@@ -120,22 +120,22 @@ describe('PricingPlans', () => {
         const monthly = screen.getByRole('button', { name: pl.Pricing.monthly });
         const yearly = screen.getByRole('button', { name: pl.Pricing.yearly });
 
-        expect(within(card).getByText('9 zł')).toBeInTheDocument();
+        expect(within(card).getByText('19 zł')).toBeInTheDocument();
         expect(within(card).getByText('/miesiąc')).toBeInTheDocument();
         expect(monthly).toHaveAttribute('aria-pressed', 'true');
         expect(yearly).toHaveAttribute('aria-pressed', 'false');
 
         fireEvent.click(yearly);
 
-        expect(within(card).getByText('49 zł')).toBeInTheDocument();
+        expect(within(card).getByText('99 zł')).toBeInTheDocument();
         expect(within(card).getByText('/rok')).toBeInTheDocument();
-        expect(within(card).queryByText('9 zł')).not.toBeInTheDocument();
+        expect(within(card).queryByText('19 zł')).not.toBeInTheDocument();
         expect(yearly).toHaveAttribute('aria-pressed', 'true');
         expect(monthly).toHaveAttribute('aria-pressed', 'false');
 
         fireEvent.click(monthly);
 
-        expect(within(card).getByText('9 zł')).toBeInTheDocument();
+        expect(within(card).getByText('19 zł')).toBeInTheDocument();
     });
 
     it.each([

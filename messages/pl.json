@@ -552,7 +552,7 @@
     "recommended": "Polecany",
     "billingLegend": "Okres rozliczenia",
     "monthly": "Miesięcznie",
-    "yearly": "Rocznie (oszczędź 54%)",
+    "yearly": "Rocznie (oszczędź 56%)",
     "questions": "Pytania?",
     "contactSales": "Skontaktuj się z nami",
     "manageSubscriptionPrompt": "Masz już stronę premium?",
@@ -585,8 +585,8 @@
         "title": "Profesjonalny",
         "subtitle": "Dla rosnących firm",
         "price": {
-          "monthly": "9 zł",
-          "yearly": "49 zł"
+          "monthly": "19 zł",
+          "yearly": "99 zł"
         },
         "per": {
           "monthly": "/miesiąc",
@@ -637,6 +637,7 @@
       "freeTitle": "Wpis bezpłatny",
       "premiumTitle": "Strona Premium",
       "premiumDescription": "Pełna podstrona firmy ze zdjęciami, cennikiem i krótkim adresem — wyróżnia Cię na tle konkurencji.",
+      "premiumExample": "Zobacz przykładową stronę Premium",
       "premiumButton": "Zobacz Premium",
       "premiumNote": "Premium włączysz na profilu firmy, gdy będzie już w katalogu."
     },

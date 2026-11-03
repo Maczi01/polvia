@@ -1,10 +1,14 @@
-import { Check, Sparkles, Star } from 'lucide-react';
+import { ArrowRight, Check, Sparkles, Star } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import type { JSX, ReactNode } from 'react';
 
 import { buttonVariants } from '@/components/ui/button/button';
 import { Link } from '@/i18n/navigation';
 import { cn } from '@/lib/utilities';
+
+/** Ta sama okladka co na przykladowej stronie (`/cennik/przyklad`). */
+const PREMIUM_EXAMPLE_COVER = '/images/premium-example/office.webp';
 
 /** Korzysci bierzemy z cennika (`Pricing.plans.*`), zeby obie strony mowily to samo. */
 const FREE_FEATURE_KEYS = [
@@ -47,6 +51,8 @@ type PlanCardProps = {
     description: string;
     features: string[];
     action: ReactNode;
+    /** Podglad nad naglowkiem karty (Premium: przykladowa strona). */
+    media?: ReactNode;
     className?: string;
 };
 
@@ -59,6 +65,7 @@ function PlanCard(props: PlanCardProps): JSX.Element {
                 props.className,
             )}
         >
+            {props.media}
             <header className="space-y-1">
                 <h3
                     id={props.headingId}
@@ -72,6 +79,31 @@ function PlanCard(props: PlanCardProps): JSX.Element {
             <FeatureList items={props.features} />
             <div className="mt-auto pt-2">{props.action}</div>
         </article>
+    );
+}
+
+/**
+ * Okladka przykladowej strony premium jako klikalny podglad. Zdjecie dekoracyjne (`alt=""`),
+ * nazwe linku daje etykieta na zdjeciu.
+ */
+function PremiumExamplePreview({ label }: { label: string }): JSX.Element {
+    return (
+        <Link
+            href="/pricing/example"
+            className="group relative block aspect-[16/9] overflow-hidden rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+        >
+            <Image
+                src={PREMIUM_EXAMPLE_COVER}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 400px, 100vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/75 to-transparent px-3 pb-2 pt-8 text-sm font-semibold text-white">
+                {label}
+                <ArrowRight aria-hidden="true" className="size-4 shrink-0" />
+            </span>
+        </Link>
     );
 }
 
@@ -121,6 +153,7 @@ export function AddBusinessCta(): JSX.Element {
                     price={`${tPricing('plans.essentials.price.monthly')}${tPricing('plans.essentials.per.monthly')}`}
                     description={t('premiumDescription')}
                     features={PREMIUM_FEATURE_KEYS.map(key => tPricing(key))}
+                    media={<PremiumExamplePreview label={t('premiumExample')} />}
                     className="border-gray-200 dark:border-gray-700"
                     action={
                         <Link
