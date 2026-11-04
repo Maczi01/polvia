@@ -248,3 +248,92 @@ describe('buildProfileTitle z jezykiem obslugi', () => {
         expect(result).toContain('…');
     });
 });
+
+describe('buildProfileTitle z kilkoma miastami', () => {
+    type MultiCityCase = {
+        locale: Locale;
+        name: string;
+        category: string;
+        languages: ServiceLanguage[];
+        otherCities: number;
+    };
+
+    /** Jak w `generateMetadata`: „<miasto glowne> i N inne miasta” z tlumaczen danego locale. */
+    function multiCityTitle({ locale, name, category, languages, otherCities }: MultiCityCase): string {
+        const t = createTranslator({
+            locale,
+            messages: MESSAGES[locale],
+            namespace: 'ServiceProfile.meta',
+        });
+        const { titlePhrase } = buildLanguageMetaTexts(t, locale, languages, category);
+        return buildProfileTitle({
+            name,
+            categoryLabel: 'Etykieta',
+            city: 'Poznań',
+            cityWithOthers: t('titleCityWithOthers', { city: 'Poznań', count: otherCities }),
+            siteName: 'Polvia',
+            titlePhrase,
+        });
+    }
+
+    it.each([
+        ['pl', 1, 'Sklep — Etykieta, Poznań i 1 inne miasto | Polvia'],
+        ['pl', 4, 'Sklep — Etykieta, Poznań i 4 inne miasta | Polvia'],
+        ['pl', 5, 'Sklep — Etykieta, Poznań i 5 innych miast | Polvia'],
+        ['en', 1, 'Sklep — Etykieta, Poznań and 1 other city | Polvia'],
+        ['en', 4, 'Sklep — Etykieta, Poznań and 4 other cities | Polvia'],
+        ['ru', 1, 'Sklep — Etykieta, Poznań и ещё 1 город | Polvia'],
+        ['ru', 4, 'Sklep — Etykieta, Poznań и ещё 4 города | Polvia'],
+        ['ru', 5, 'Sklep — Etykieta, Poznań и ещё 5 городов | Polvia'],
+        ['uk', 1, 'Sklep — Etykieta, Poznań та ще 1 місто | Polvia'],
+        ['uk', 4, 'Sklep — Etykieta, Poznań та ще 4 міста | Polvia'],
+        ['uk', 5, 'Sklep — Etykieta, Poznań та ще 5 міст | Polvia'],
+    ] as const)('%s, %i innych: odmiana liczby miast', (locale, otherCities, expected) => {
+        expect(
+            multiCityTitle({
+                locale,
+                name: 'Sklep',
+                category: 'grocery',
+                languages: ['pl'],
+                otherCities,
+            }),
+        ).toBe(expected);
+    });
+
+    it('z fraza jezykowa, gdy sie miesci: fraza i miasta', () => {
+        expect(
+            multiCityTitle({
+                locale: 'pl',
+                name: 'Ola',
+                category: 'health',
+                languages: ['pl', 'uk'],
+                otherCities: 2,
+            }),
+        ).toBe('Ola — ukraiński lekarz, Poznań i 2 inne miasta | Polvia');
+    });
+
+    it('za dlugo z miastami: tytul jak dla jednego miasta (zwykle reguly skracania)', () => {
+        const result = multiCityTitle({
+            locale: 'pl',
+            name: 'Slowianoczka',
+            category: 'grocery',
+            languages: ['pl', 'uk', 'ru'],
+            otherCities: 4,
+        });
+
+        expect(result.length).toBeLessThanOrEqual(PROFILE_TITLE_MAX_LENGTH);
+        expect(result).toBe('Slowianoczka — ukraiński sklep spożywczy, Poznań | Polvia');
+    });
+
+    it('bez miast dodatkowych (null) tytul bez zmian', () => {
+        expect(
+            buildProfileTitle({
+                name: 'Mistrz Remontu',
+                categoryLabel: 'Remonty',
+                city: 'Warszawa',
+                cityWithOthers: null,
+                siteName: 'Polvia',
+            }),
+        ).toBe('Mistrz Remontu — Remonty, Warszawa | Polvia');
+    });
+});

@@ -9,13 +9,15 @@ import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
-import { getHeaderCity, getMainLocation } from '../profile-helpers';
+import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
+import { hasMultipleLocations } from '../profile-location-groups';
+import { useHeaderPlace } from '../use-header-place';
 
 const SECTION = 'rounded-2xl shadow-sm';
 const GALLERY_PREVIEW = 6;
@@ -55,7 +57,7 @@ function ClassicBanner({ coverImage }: { coverImage: ProfileImage | null }): Rea
 
 /** Wizytowka: baner, logo nachodzace na baner, nazwa, odznaki i akcje na srodku. */
 function ClassicHeader({ profile, mainLocation, showNavigate }: ClassicSectionProps): ReactElement {
-    const city = getHeaderCity(profile);
+    const city = useHeaderPlace(profile);
 
     return (
         <header className="overflow-hidden bg-white shadow-sm dark:bg-gray-800 sm:rounded-3xl">
@@ -124,7 +126,11 @@ function ClassicDetails({ profile, mainLocation, showNavigate }: ClassicSectionP
                     className={SECTION}
                 />
                 {mainLocation && (
-                    <ProfileHours openingHours={mainLocation.openingHours} className={SECTION} />
+                    <ProfileHours
+                        openingHours={mainLocation.openingHours}
+                        isMainLocationOnly={hasMultipleLocations(profile)}
+                        className={SECTION}
+                    />
                 )}
                 <ProfileLocations profile={profile} className={SECTION} />
             </div>

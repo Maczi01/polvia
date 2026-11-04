@@ -874,6 +874,11 @@
     "locations": "Адреси",
     "mainLocation": "Головний офіс",
     "showOnMap": "Показати на мапі",
+    "hoursMainLocation": "Години роботи — головний офіс",
+    "locationCount": "{count, plural, one {# адреса} few {# адреси} many {# адрес} other {# адреси}}",
+    "headerMoreCities": "{cities} та ще {count, plural, one {# місто} few {# міста} many {# міст} other {# міста}}",
+    "showMoreLocations": "Показати ще {count, plural, one {# адресу} few {# адреси} many {# адрес} other {# адреси}}",
+    "noCityGroup": "Інші адреси",
     "onlineOnly": "Компанія обслуговує клієнтів лише дистанційно, без офісу.",
     "languages": "Мови обслуговування",
     "coverage": {
@@ -983,6 +988,7 @@
       "descriptionLocal": "{name} — {category}, {city}. Адреса, телефон, години роботи та контакти в каталозі Polvia.",
       "descriptionOnline": "{name} — {category}, обслуговування онлайн. Контакти та інформація про компанію в каталозі Polvia.",
       "descriptionGeneric": "{name} — {category}. Контакти та інформація про компанію в каталозі Polvia.",
+      "titleCityWithOthers": "{city} та ще {count, plural, one {# місто} few {# міста} many {# міст} other {# міста}}",
       "titlePhrase": {
         "uk": {
           "grocery": "український продуктовий магазин",

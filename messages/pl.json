@@ -874,6 +874,11 @@
     "locations": "Lokalizacje",
     "mainLocation": "Siedziba główna",
     "showOnMap": "Pokaż na mapie",
+    "hoursMainLocation": "Godziny otwarcia — siedziba główna",
+    "locationCount": "{count, plural, one {# lokalizacja} few {# lokalizacje} many {# lokalizacji} other {# lokalizacji}}",
+    "headerMoreCities": "{cities} i {count, plural, one {# inne} few {# inne} many {# innych} other {# innych}}",
+    "showMoreLocations": "Pokaż pozostałe {count, plural, one {# lokalizację} few {# lokalizacje} many {# lokalizacji} other {# lokalizacji}}",
+    "noCityGroup": "Pozostałe adresy",
     "onlineOnly": "Firma obsługuje klientów wyłącznie zdalnie, bez punktu stacjonarnego.",
     "languages": "Obsługa w językach",
     "coverage": {
@@ -983,6 +988,7 @@
       "descriptionLocal": "{name} — {category}, {city}. Adres, telefon, godziny otwarcia i kontakt w katalogu Polvia.",
       "descriptionOnline": "{name} — {category}, obsługa online. Kontakt i informacje o firmie w katalogu Polvia.",
       "descriptionGeneric": "{name} — {category}. Kontakt i informacje o firmie w katalogu Polvia.",
+      "titleCityWithOthers": "{city} i {count, plural, one {# inne miasto} few {# inne miasta} many {# innych miast} other {# innych miast}}",
       "titlePhrase": {
         "uk": {
           "grocery": "ukraiński sklep spożywczy",

@@ -67,4 +67,14 @@ describe('TemplateGallery', () => {
         );
         expect(within(nav).getByText('Mistrz Remontu')).toHaveAttribute('aria-current', 'page');
     });
+
+    it('kilka adresow: pod nazwa miasta z liczba lokalizacji, godziny siedziby glownej', () => {
+        renderWithIntl(<TemplateGallery profile={premiumServiceFixture} />);
+
+        const header = screen.getByRole('banner');
+        expect(within(header).getByText('Warszawa, Piaseczno · 2 lokalizacje')).toBeInTheDocument();
+        expect(
+            screen.getByRole('region', { name: 'Godziny otwarcia — siedziba główna' }),
+        ).toBeInTheDocument();
+    });
 });

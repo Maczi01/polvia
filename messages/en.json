@@ -874,6 +874,11 @@
     "locations": "Locations",
     "mainLocation": "Main office",
     "showOnMap": "Show on map",
+    "hoursMainLocation": "Opening hours — main office",
+    "locationCount": "{count, plural, one {# location} other {# locations}}",
+    "headerMoreCities": "{cities} and {count} more",
+    "showMoreLocations": "Show {count, plural, one {# more location} other {# more locations}}",
+    "noCityGroup": "Other addresses",
     "onlineOnly": "This business serves clients remotely only, with no physical location.",
     "languages": "Languages spoken",
     "coverage": {
@@ -983,6 +988,7 @@
       "descriptionLocal": "{name} — {category}, {city}. Address, phone, opening hours and contact details in the Polvia directory.",
       "descriptionOnline": "{name} — {category}, online service. Contact details and business information in the Polvia directory.",
       "descriptionGeneric": "{name} — {category}. Contact details and business information in the Polvia directory.",
+      "titleCityWithOthers": "{city} and {count, plural, one {# other city} other {# other cities}}",
       "titlePhrase": {
         "uk": {
           "grocery": "Ukrainian grocery store",

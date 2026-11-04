@@ -9,13 +9,15 @@ import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
-import { getHeaderCity, getMainLocation } from '../profile-helpers';
+import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
+import { hasMultipleLocations } from '../profile-location-groups';
+import { useHeaderPlace } from '../use-header-place';
 
 /** Cienkie ramki, mniej zaokraglen, szeryfowe naglowki — powaga kancelarii. */
 const SECTION =
@@ -56,7 +58,7 @@ function ProfessionalHeader({
     mainLocation,
     showNavigate,
 }: ProfessionalSectionProps): ReactElement {
-    const city = getHeaderCity(profile);
+    const city = useHeaderPlace(profile);
 
     return (
         <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
@@ -147,6 +149,7 @@ function ProfessionalAside({
             {mainLocation && (
                 <ProfileHours
                     openingHours={mainLocation.openingHours}
+                    isMainLocationOnly={hasMultipleLocations(profile)}
                     className={ASIDE_SECTION}
                     titleClassName={ASIDE_TITLE}
                 />

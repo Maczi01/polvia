@@ -9,13 +9,15 @@ import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
 import { ProfileFaq } from '../profile-faq/profile-faq';
 import { ProfileGallery } from '../profile-gallery/profile-gallery';
-import { getHeaderCity, getMainLocation } from '../profile-helpers';
+import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
+import { hasMultipleLocations } from '../profile-location-groups';
+import { useHeaderPlace } from '../use-header-place';
 
 /** Sekcje na cieplym tle, bez ramek — zdjecia maja grac pierwsze skrzypce. */
 const SECTION = 'rounded-3xl border-0 bg-stone-100/70 dark:bg-stone-900/60 md:p-8';
@@ -60,7 +62,7 @@ function GalleryHero({
     mainLocation,
     showNavigate,
 }: GallerySectionProps): ReactElement {
-    const city = getHeaderCity(profile);
+    const city = useHeaderPlace(profile);
 
     return (
         <header className="relative isolate flex min-h-[420px] items-end overflow-hidden md:min-h-[560px]">
@@ -142,7 +144,11 @@ function GalleryDetails({
                     className={SECTION}
                 />
                 {mainLocation && (
-                    <ProfileHours openingHours={mainLocation.openingHours} className={SECTION} />
+                    <ProfileHours
+                        openingHours={mainLocation.openingHours}
+                        isMainLocationOnly={hasMultipleLocations(profile)}
+                        className={SECTION}
+                    />
                 )}
                 <ProfileLocations profile={profile} className={SECTION} />
             </div>
