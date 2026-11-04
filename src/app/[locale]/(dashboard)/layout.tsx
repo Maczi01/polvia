@@ -1,13 +1,19 @@
-import { ReactNode } from 'react';
-import { Link } from '@/i18n/navigation';
 import { LayoutDashboard, List, Plus } from 'lucide-react';
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { ReactNode } from 'react';
+
+import { Link } from '@/i18n/navigation';
+import { hasDashboardAccess } from '@/lib/dashboard-access';
 
 export const metadata: Metadata = {
     robots: { index: false, follow: false },
 };
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+    // Druga linia za middleware: render panelu bez poprawnych danych nie powinien nastapic nigdy.
+    if (!(await hasDashboardAccess())) notFound();
+
     return (
         <div className="flex h-screen bg-background">
             <aside className="flex w-64 flex-col border-r bg-muted/10">

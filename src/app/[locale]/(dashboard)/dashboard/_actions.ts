@@ -16,6 +16,8 @@ import path from 'node:path';
 import slugify from 'slugify';
 import sharp from 'sharp';
 
+import { assertDashboardAccess, hasDashboardAccess } from '@/lib/dashboard-access';
+
 import {
     parseRawServiceData,
     serviceSchema,
@@ -35,7 +37,12 @@ export type ActionResult = {
     errors?: Record<string, string[]>;
 };
 
+// Kazda eksportowana funkcja tego pliku to publiczny endpoint POST (patrz `dashboard-access.ts`),
+// wlacznie z odczytami — bez guarda zwracalyby dane kontaktowe wszystkich wpisow.
+const ACCESS_DENIED: ActionResult = { success: false, message: 'Brak uprawnien' };
+
 export async function getServicesForDashboard() {
+    await assertDashboardAccess();
     const services = await db
         .select({
             id: servicesTable.id,
@@ -62,6 +69,7 @@ export async function getServicesForDashboard() {
 export type DashboardService = Awaited<ReturnType<typeof getServicesForDashboard>>[number];
 
 export async function getTags() {
+    await assertDashboardAccess();
     const rows = await db
         .select({
             id: tagsTable.id,
@@ -127,6 +135,7 @@ export type ServiceEditData = {
 };
 
 export async function getServiceById(id: string): Promise<ServiceEditData | null> {
+    await assertDashboardAccess();
     const [service] = await db
         .select()
         .from(servicesTable)
@@ -333,6 +342,7 @@ function buildTranslations(data: ServiceFormData, serviceId: string) {
 }
 
 export async function createTag(names: Record<string, string>): Promise<{ success: boolean; tag?: Tag; error?: string }> {
+    if (!(await hasDashboardAccess())) return { success: false, error: ACCESS_DENIED.message };
     const entries = Object.entries(names).filter(([, v]) => v.trim());
     if (entries.length === 0) {
         return { success: false, error: 'At least one tag name is required' };
@@ -362,6 +372,7 @@ export async function createTag(names: Record<string, string>): Promise<{ succes
 }
 
 export async function createService(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+    if (!(await hasDashboardAccess())) return ACCESS_DENIED;
     const imageFile = formData.get('image') as File | null;
     const imageError = validateImage(imageFile);
     if (imageError) return imageError;
@@ -434,6 +445,7 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
 }
 
 export async function updateService(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+    if (!(await hasDashboardAccess())) return ACCESS_DENIED;
     const serviceId = formData.get('serviceId') as string;
     const existingImage = formData.get('existingImage') as string;
 
@@ -519,6 +531,7 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
 }
 
 export async function deleteService(serviceId: string): Promise<ActionResult> {
+    if (!(await hasDashboardAccess())) return ACCESS_DENIED;
     try {
         await db.delete(servicesTable).where(eq(servicesTable.id, serviceId));
         revalidatePath('/dashboard');

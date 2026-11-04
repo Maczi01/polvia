@@ -39,6 +39,10 @@ export const env = createEnv({
         STRIPE_PRICE_YEARLY: z.string().startsWith('price_').optional(),
         // No-code login link do Customer Portal (Stripe Dashboard → Customer portal).
         STRIPE_PORTAL_LOGIN_URL: z.string().url().optional(),
+        // Panel `/dashboard` (HTTP Basic Auth, `src/lib/dashboard-auth.ts`). Bez ktorejkolwiek
+        // panel jest WYLACZONY (404) — fail-closed. Haslo ASCII, min. 32 znaki: `openssl rand -hex 32`.
+        DASHBOARD_USER: NonEmpty.optional(),
+        DASHBOARD_PASSWORD: z.string().min(32).optional(),
     },
     client: {
         NEXT_PUBLIC_SITE_URL: NonEmpty,
@@ -61,6 +65,8 @@ export const env = createEnv({
         STRIPE_PRICE_MONTHLY: process.env.STRIPE_PRICE_MONTHLY,
         STRIPE_PRICE_YEARLY: process.env.STRIPE_PRICE_YEARLY,
         STRIPE_PORTAL_LOGIN_URL: process.env.STRIPE_PORTAL_LOGIN_URL,
+        DASHBOARD_USER: process.env.DASHBOARD_USER,
+        DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD,
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     },
 });
