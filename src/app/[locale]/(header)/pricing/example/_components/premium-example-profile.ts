@@ -8,9 +8,9 @@ import { PREMIUM_EXAMPLE_TEXTS } from './premium-example-content';
 
 /**
  * Fikcyjna firma przykladowej strony premium — niezalezna od bazy, nie trafia na mape,
- * do wynikow ani do sitemapy. Zdjecia to stockowe fotografie biura na licencji CC0
- * (`public/images/premium-example/`, zrodla w `README.md` obok): nie sa logotypami ani
- * zdjeciami zadnej firmy z katalogu. Kontakt nie trafia do nikogo:
+ * do wynikow ani do sitemapy. Logo i zdjecia leza w `public/images/premium-example/`: logo
+ * narysowane dla tej strony, zdjecia ze stocku (Unsplash) — nie sa logotypami ani zdjeciami
+ * zadnej firmy z katalogu. Kontakt nie trafia do nikogo:
  * numer `+48 000…` nie istnieje, a `example.com` jest domena zarezerwowana (RFC 2606).
  */
 
@@ -31,12 +31,38 @@ export function parseExampleTemplate(value: string | string[] | undefined): Prem
     return typeof value === 'string' && isPremiumTemplate(value) ? value : DEFAULT_EXAMPLE_TEMPLATE;
 }
 
-const EXAMPLE_IMAGES = '/images/premium-example';
+/** Katalog obrazkow fikcyjnej firmy w `public/` — nie `public/services` (katalog firm). */
+export const EXAMPLE_IMAGES_DIR = '/images/premium-example';
 
-const GALLERY_FILES = [
-    `${EXAMPLE_IMAGES}/folders.webp`,
-    `${EXAMPLE_IMAGES}/notes.webp`,
-    `${EXAMPLE_IMAGES}/calculator.webp`,
+/** Wlasny projekt (SVG) — `ProfileLogo` podaje sciezke wprost do `next/image`. */
+const EXAMPLE_LOGO = `${EXAMPLE_IMAGES_DIR}/kolumna-logo.svg`;
+
+/*
+ * Zdjecia z Unsplash na Unsplash License (bez Unsplash+; licencja nie wymaga atrybucji —
+ * zrodla dla porzadku). Pobrane z `images.unsplash.com/photo-<id>?w=1600&q=75&fm=jpg&fit=crop`
+ * (okladka: w=1920&h=1080&q=70; stanowisko-pracy: q=70, zeby zmiescic sie w ~350 KB).
+ * - biuro-open-space.jpg — Adolfo Félix,
+ *   https://unsplash.com/photos/office-workspace-with-white-desks-PG8NyM_Mcts
+ * - ksiegowa-przy-biurku.jpg — Vitaly Gariev,
+ *   https://unsplash.com/photos/woman-working-with-documents-at-office-desk-Vvn0OD0IxBM
+ * - konsultacja-z-klientem.jpg — Vitaly Gariev,
+ *   https://unsplash.com/photos/business-people-signing-a-contract-at-a-table-iPheGw7_UaI
+ * - spotkanie-zespolu.jpg — Vitaly Gariev,
+ *   https://unsplash.com/photos/business-professionals-collaborating-around-a-conference-table-y7xUr3aDLXc
+ * - kalkulator-i-raporty.jpg — Cht Gsml,
+ *   https://unsplash.com/photos/desk-with-calculator-charts-and-pencil-dspKrJYp644
+ * - stanowisko-pracy.jpg — Li Zhang,
+ *   https://unsplash.com/photos/a-modern-and-bright-home-office-space-zWWhupBREII
+ */
+const COVER_PHOTO = `${EXAMPLE_IMAGES_DIR}/biuro-open-space.jpg`;
+
+/** Kolejnosc zgodna z `galleryAlts` w `premium-example-content.ts`. */
+const GALLERY_PHOTOS = [
+    `${EXAMPLE_IMAGES_DIR}/ksiegowa-przy-biurku.jpg`,
+    `${EXAMPLE_IMAGES_DIR}/konsultacja-z-klientem.jpg`,
+    `${EXAMPLE_IMAGES_DIR}/spotkanie-zespolu.jpg`,
+    `${EXAMPLE_IMAGES_DIR}/kalkulator-i-raporty.jpg`,
+    `${EXAMPLE_IMAGES_DIR}/stanowisko-pracy.jpg`,
 ] as const;
 
 const EXAMPLE_HOURS = {
@@ -75,7 +101,7 @@ export function getPremiumExampleProfile(
         slug: 'przyklad',
         name: EXAMPLE_NAME,
         description: texts.description,
-        logo: `${EXAMPLE_IMAGES}/kolumna-logo.svg`,
+        logo: EXAMPLE_LOGO,
         category: 'financial',
         coverage: 'hybrid',
         languages: ['pl', 'uk', 'ru', 'en'],
@@ -105,11 +131,8 @@ export function getPremiumExampleProfile(
         breadcrumbs: buildExampleBreadcrumbs(locale, texts.breadcrumbCategory),
         premium: {
             template,
-            coverImage: {
-                src: `${EXAMPLE_IMAGES}/office.webp`,
-                alt: texts.coverAlt,
-            },
-            gallery: GALLERY_FILES.map((src, index) => ({ src, alt: texts.galleryAlts[index] })),
+            coverImage: { src: COVER_PHOTO, alt: texts.coverAlt },
+            gallery: GALLERY_PHOTOS.map((src, index) => ({ src, alt: texts.galleryAlts[index] })),
             priceList: texts.priceList,
             faq: texts.faq,
             // Wartosci demonstracyjne; linki na domene zarezerwowana, nie do prawdziwych profili.
