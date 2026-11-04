@@ -578,7 +578,8 @@
           "3": "Opis działalności",
           "4": "Tagi",
           "5": "Pełna widoczność dla tysięcy użytkowników",
-          "6": "Logo firmy"
+          "6": "Logo firmy",
+          "7": "Podstawowa strona firmy w Polvia z opisem, adresem, godzinami i kontaktem"
         }
       },
       "essentials": {
@@ -598,25 +599,12 @@
         "contactInstruction": "Napisz do nas z nazwą swojej firmy — po opłaceniu przelewu aktywujemy stronę premium w 1 dzień roboczy. Firmy nie ma w katalogu? Najpierw dodaj ją za darmo.",
         "features": {
           "basics": "Wszystko z planu Podstawowego",
-          "templates": "Wybór szablonu strony firmy",
+          "templates": "Rozbudowana strona firmy według wybranego wzoru — jeden z 3 szablonów, dużo więcej szczegółów",
           "coverGallery": "Zdjęcie w nagłówku i galeria zdjęć",
           "priceListFaq": "Cennik usług i odpowiedzi na częste pytania",
           "noSimilar": "Bez sekcji „Podobne firmy” — nie polecamy konkurencji",
           "shortUrl": "Krótki adres polvia.pl/twoja-firma",
           "higherPosition": "Wyższa pozycja na liście wyników i w kategorii"
-        }
-      },
-      "team": {
-        "title": "Przedsiębiorstwo",
-        "subtitle": "Dla dużych firm i sieci",
-        "price": "Wycena indywidualna",
-        "cta": "Skontaktuj się z nami",
-        "features": {
-          "0": "Wszystko z planu Profesjonalnego",
-          "1": "Priorytetowe pozycjonowanie",
-          "2": "Obecność w newsletterze",
-          "3": "Priorytetowe wsparcie techniczne",
-          "4": "Partnerskie możliwości współpracy"
         }
       }
     }

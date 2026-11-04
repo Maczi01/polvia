@@ -78,11 +78,11 @@ describe('PricingPlans', () => {
     });
 
     it.each([
-        ['pl', '/dodaj-firme', '/mapa', '/kontakt'],
-        ['en', '/en/add-business', '/en/map', '/en/contact'],
-        ['ru', '/ru/add-business', '/ru/map', '/ru/contact'],
-        ['uk', '/uk/add-business', '/uk/map', '/uk/contact'],
-    ] as const)('CTA planow w %s prowadza do istniejacych tras', (locale, free, map, contact) => {
+        ['pl', '/dodaj-firme', '/mapa'],
+        ['en', '/en/add-business', '/en/map'],
+        ['ru', '/ru/add-business', '/ru/map'],
+        ['uk', '/uk/add-business', '/uk/map'],
+    ] as const)('CTA planow w %s prowadza do istniejacych tras', (locale, free, map) => {
         renderPlans(locale);
         const plans = MESSAGES[locale].Pricing.plans;
 
@@ -91,10 +91,30 @@ describe('PricingPlans', () => {
             'href',
             map,
         );
-        expect(screen.getByRole('link', { name: plans.team.cta })).toHaveAttribute(
-            'href',
-            contact,
+    });
+
+    it('sa tylko dwa plany: darmowy i Profesjonalny, bez wyceny indywidualnej', () => {
+        renderPlans();
+
+        expect(screen.getAllByRole('article')).toHaveLength(2);
+        expect(screen.getByRole('article', { name: pl.Pricing.plans.free.title })).toBeInTheDocument();
+        expect(essentialsCard()).toBeInTheDocument();
+        expect(screen.queryByText('Wycena indywidualna')).not.toBeInTheDocument();
+        for (const messages of Object.values(MESSAGES)) {
+            expect(Object.keys(messages.Pricing.plans)).toEqual(['free', 'essentials']);
+        }
+    });
+
+    it('darmowy plan obiecuje podstawowa strone firmy, Profesjonalny rozbudowana wg szablonu', () => {
+        renderPlans();
+        const free = screen.getByRole('article', { name: pl.Pricing.plans.free.title });
+
+        expect(within(free).getByText(pl.Pricing.plans.free.features['7'])).toHaveTextContent(
+            /Podstawowa strona firmy/,
         );
+        expect(
+            within(essentialsCard()).getByText(pl.Pricing.plans.essentials.features.templates),
+        ).toHaveTextContent(/według wybranego wzoru/);
     });
 
     it('CTA Profesjonalnego opisuje instrukcja „znajdz firme i kliknij Ulepsz”', () => {
