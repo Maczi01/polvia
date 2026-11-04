@@ -10,12 +10,12 @@ import { premiumContactQuery } from '@/lib/premium-contact';
 import { DEFAULT_PREMIUM_INTERVAL } from '@/lib/premium-plan';
 import { cn } from '@/lib/utilities';
 
-type PlanId = 'free' | 'essentials' | 'team';
+type PlanId = 'free' | 'essentials';
 
-type PlanHref = '/add-business' | '/map' | '/contact';
+type PlanHref = '/add-business' | '/map';
 
-/** Kolejnosc cech planu darmowego: najpierw widocznosc, potem dane wpisu. */
-const FREE_FEATURE_KEYS = ['5', '0', '1', '2', '3', '4', '6'] as const;
+/** Kolejnosc cech planu darmowego: najpierw widocznosc, potem strona firmy i dane wpisu. */
+const FREE_FEATURE_KEYS = ['5', '0', '7', '1', '2', '3', '4', '6'] as const;
 
 /** Tylko to, co dostarcza premium (R7–R12) — bez obietnic, ktorych produkt nie spelnia. */
 export const ESSENTIALS_FEATURE_KEYS = [
@@ -28,14 +28,10 @@ export const ESSENTIALS_FEATURE_KEYS = [
     'higherPosition',
 ] as const;
 
-const TEAM_FEATURE_KEYS = ['0', '1', '2', '3', '4'] as const;
-
 type PlanConfig = {
     id: PlanId;
     href: PlanHref;
     featureKeys: readonly string[];
-    /** Plan bez cennika (kontakt) nie zalezy od okresu rozliczenia. */
-    hasPeriodPrice: boolean;
     isRecommended: boolean;
 };
 
@@ -44,22 +40,13 @@ const PLANS: readonly PlanConfig[] = [
         id: 'free',
         href: '/add-business',
         featureKeys: FREE_FEATURE_KEYS,
-        hasPeriodPrice: true,
         isRecommended: false,
     },
     {
         id: 'essentials',
         href: '/map',
         featureKeys: ESSENTIALS_FEATURE_KEYS,
-        hasPeriodPrice: true,
         isRecommended: true,
-    },
-    {
-        id: 'team',
-        href: '/contact',
-        featureKeys: TEAM_FEATURE_KEYS,
-        hasPeriodPrice: false,
-        isRecommended: false,
     },
 ];
 
@@ -101,7 +88,7 @@ export function PricingPlans({ heading, purchase }: PricingPlansProps): ReactEle
                 </div>
             </header>
 
-            <div className="my-1 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div className="mx-auto my-1 grid max-w-4xl grid-cols-1 gap-6 md:grid-cols-2">
                 {PLANS.map(plan => (
                     <PriceCard
                         key={plan.id}
@@ -182,13 +169,11 @@ function PriceCard({ plan, interval, purchase }: PriceCardProps): ReactElement {
                     </h2>
                     <div className="mt-4 flex items-baseline gap-2">
                         <span className="font-sans text-5xl font-extrabold text-[#26364d] dark:text-white">
-                            {plan.hasPeriodPrice ? t(key(`price.${interval}`)) : t(key('price'))}
+                            {t(key(`price.${interval}`))}
                         </span>
-                        {plan.hasPeriodPrice && (
-                            <span className="font-sans text-lg text-gray-500 dark:text-gray-400">
-                                {t(key(`per.${interval}`))}
-                            </span>
-                        )}
+                        <span className="font-sans text-lg text-gray-500 dark:text-gray-400">
+                            {t(key(`per.${interval}`))}
+                        </span>
                     </div>
                     <p className="mt-2 font-sans text-sm text-gray-500 dark:text-gray-400">
                         {t(key('subtitle'))}

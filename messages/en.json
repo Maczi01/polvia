@@ -578,7 +578,8 @@
           "3": "Bussiness description",
           "4": "Tags",
           "5": "Full visibility for thousands of users",
-          "6": "Company's logo"
+          "6": "Company's logo",
+          "7": "A basic business page on Polvia with description, address, opening hours and contact details"
         }
       },
       "essentials": {
@@ -598,25 +599,12 @@
         "contactInstruction": "Write to us with your business name — once the bank transfer is paid, we activate your premium page within 1 business day. Not in the directory yet? Add your business for free first.",
         "features": {
           "basics": "Everything from the Free plan",
-          "templates": "Choice of a page template",
+          "templates": "A detailed business page in the design you choose — one of 3 templates, with far more details",
           "coverGallery": "Header photo and photo gallery",
           "priceListFaq": "Service price list and answers to frequent questions",
           "noSimilar": "No “Similar businesses” section — we do not promote competitors",
           "shortUrl": "Short address polvia.pl/your-business",
           "higherPosition": "Higher position in the results and in your category"
-        }
-      },
-      "team": {
-        "title": "Team",
-        "subtitle": "Monthly billing",
-        "price": "Custom pricing",
-        "cta": "Contact us",
-        "features": {
-          "0": "Everything from the Professional plan",
-          "1": "Priority positioning",
-          "2": "Newsletter presence",
-          "3": "Priority technical support",
-          "4": "Partner cooperation opportunities"
         }
       }
     }
