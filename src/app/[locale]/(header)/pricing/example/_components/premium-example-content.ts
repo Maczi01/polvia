@@ -16,8 +16,7 @@ export type PremiumExampleTexts = {
     description: string;
     tags: string[];
     coverAlt: string;
-    /** Kolejnosc jak `GALLERY_PHOTOS` w `premium-example-profile.ts`. */
-    galleryAlts: [string, string, string, string, string];
+    galleryAlts: [string, string, string];
     priceList: ExamplePriceItem[];
     faq: ExampleFaqItem[];
 };
@@ -28,13 +27,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'Prowadzimy księgowość jednoosobowych działalności i małych spółek. Rozliczamy podatki, ZUS i kadry, a dokumenty możesz przesłać zdjęciem z telefonu.\n\nObsługujemy klientów po polsku, ukraińsku, rosyjsku i angielsku — w biurze w Warszawie albo w pełni zdalnie.',
         tags: ['Księgowość JDG', 'Pełna księgowość', 'Kadry i płace', 'Rozliczenia PIT', 'ZUS'],
-        coverAlt: 'Jasne biuro typu open space z biurkami i fotelami',
+        coverAlt: 'Jasne biuro z biurkiem i komputerem',
         galleryAlts: [
-            'Księgowa przegląda dokumenty przy biurku z laptopem',
-            'Konsultacja z klientem przy stole i podpisywanie umowy',
-            'Spotkanie zespołu nad wykresami finansowymi',
-            'Kalkulator, wykresy i ołówek na biurku',
-            'Stanowisko pracy z biurkiem i regałem na segregatory',
+            'Kolorowe teczki na dokumenty',
+            'Księgowy robi notatki przy laptopie',
+            'Biurko z kalkulatorem i notatnikiem',
         ],
         priceList: [
             {
@@ -67,13 +64,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'Ведемо бухгалтерію ФОП та малих компаній. Розраховуємо податки, ZUS і кадри, а документи можна надіслати фото з телефона.\n\nОбслуговуємо клієнтів польською, українською, російською та англійською — в офісі у Варшаві або повністю дистанційно.',
         tags: ['Бухгалтерія JDG', 'Повна бухгалтерія', 'Кадри і зарплати', 'Декларації PIT', 'ZUS'],
-        coverAlt: 'Світлий офіс open space зі столами та кріслами',
+        coverAlt: 'Світлий офіс зі столом і комп’ютером',
         galleryAlts: [
-            'Бухгалтерка переглядає документи за столом із ноутбуком',
-            'Консультація з клієнтом за столом і підписання договору',
-            'Зустріч команди над фінансовими графіками',
-            'Калькулятор, графіки й олівець на столі',
-            'Робоче місце зі столом і стелажем для документів',
+            'Кольорові папки для документів',
+            'Бухгалтер робить нотатки біля ноутбука',
+            'Стіл із калькулятором і блокнотом',
         ],
         priceList: [
             {
@@ -106,13 +101,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
         description:
             'We keep the books for sole traders and small companies. We handle taxes, social security (ZUS) and payroll, and you can send documents as a photo from your phone.\n\nWe serve clients in Polish, Ukrainian, Russian and English — at our Warsaw office or fully remotely.',
         tags: ['Sole trader accounting', 'Full accounting', 'Payroll', 'PIT returns', 'ZUS'],
-        coverAlt: 'Bright open-plan office with desks and chairs',
+        coverAlt: 'Bright office with a desk and a computer',
         galleryAlts: [
-            'Accountant reviewing documents at a desk with a laptop',
-            'Client consultation at a table and signing an agreement',
-            'Team meeting over financial charts',
-            'Calculator, charts and a pencil on a desk',
-            'Workstation with a desk and a shelf for files',
+            'Colourful document folders',
+            'Accountant taking notes next to a laptop',
+            'Desk with a calculator and a notepad',
         ],
         priceList: [
             {
@@ -155,13 +148,11 @@ export const PREMIUM_EXAMPLE_TEXTS: Record<Locale, PremiumExampleTexts> = {
             'Декларации PIT',
             'ZUS',
         ],
-        coverAlt: 'Светлый офис open space со столами и креслами',
+        coverAlt: 'Светлый офис со столом и компьютером',
         galleryAlts: [
-            'Бухгалтер просматривает документы за столом с ноутбуком',
-            'Консультация с клиентом за столом и подписание договора',
-            'Встреча команды над финансовыми графиками',
-            'Калькулятор, графики и карандаш на столе',
-            'Рабочее место со столом и стеллажом для документов',
+            'Цветные папки для документов',
+            'Бухгалтер делает заметки у ноутбука',
+            'Стол с калькулятором и блокнотом',
         ],
         priceList: [
             {

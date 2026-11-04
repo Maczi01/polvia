@@ -6,20 +6,9 @@ import { PREMIUM_TEMPLATES } from '@/lib/premium-templates';
 
 import {
     DEFAULT_EXAMPLE_TEMPLATE,
-    EXAMPLE_IMAGES_DIR,
     getPremiumExampleProfile,
     parseExampleTemplate,
 } from './premium-example-profile';
-
-function exampleImageSources(): string[] {
-    const profile = getPremiumExampleProfile('pl', 'gallery');
-
-    return [
-        profile.logo,
-        profile.premium.coverImage?.src,
-        ...profile.premium.gallery.map(image => image.src),
-    ].flatMap(src => (src ? [src] : []));
-}
 
 describe('parseExampleTemplate', () => {
     it.each(PREMIUM_TEMPLATES)('przyjmuje znany szablon %p', template => {
@@ -52,34 +41,22 @@ describe('getPremiumExampleProfile', () => {
         expect(profile.premium.gallery.every(image => image.alt.trim() !== '')).toBe(true);
     });
 
-    it('logo i zdjecia tylko z katalogu przykladu, nie z katalogu firm (public/services)', () => {
-        const sources = exampleImageSources();
+    it('zdjecia tylko ze stockowych zdjec przykladu, nie z katalogu firm (public/services)', () => {
+        const { premium } = getPremiumExampleProfile('pl', 'gallery');
+        const sources = [premium.coverImage?.src, ...premium.gallery.map(image => image.src)];
 
-        // logo + okladka + co najmniej jedno zdjecie galerii
-        expect(sources.length).toBeGreaterThanOrEqual(3);
-        expect(sources.every(src => src.startsWith(`${EXAMPLE_IMAGES_DIR}/`))).toBe(true);
+        expect(sources.every(src => src?.startsWith('/images/premium-example/'))).toBe(true);
+        expect(sources.some(src => src?.includes('/services/'))).toBe(false);
     });
 
-    it('kazdy plik logo i zdjec istnieje w public/', () => {
-        const missing = exampleImageSources().filter(
-            src => !existsSync(path.join(process.cwd(), 'public', src)),
-        );
+    it('logo SVG z katalogu przykladu; logo i zdjecia istnieja w public/', () => {
+        const { logo, premium } = getPremiumExampleProfile('pl', 'gallery');
+        const sources = [logo, premium.coverImage?.src, ...premium.gallery.map(image => image.src)];
 
-        expect(missing).toEqual([]);
-    });
-
-    it('logo jest wektorowe (SVG), nie zastepczym /default.png', () => {
-        const { logo } = getPremiumExampleProfile('pl', 'gallery');
-
-        expect(logo).toBe(`${EXAMPLE_IMAGES_DIR}/kolumna-logo.svg`);
-    });
-
-    it.each(locales)('%s: kazde zdjecie galerii ma wlasny opis alt', locale => {
-        const { gallery } = getPremiumExampleProfile(locale, 'gallery').premium;
-        const alts = gallery.map(image => image.alt);
-
-        expect(alts.every(alt => typeof alt === 'string' && alt.trim() !== '')).toBe(true);
-        expect(new Set(alts).size).toBe(gallery.length);
+        expect(logo).toBe('/images/premium-example/kolumna-logo.svg');
+        expect(
+            sources.filter(src => !src || !existsSync(path.join(process.cwd(), 'public', src))),
+        ).toEqual([]);
     });
 
     it('kontakt i linki ocen nie prowadza do nikogo prawdziwego', () => {

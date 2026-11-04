@@ -552,7 +552,7 @@
     "recommended": "Recommended",
     "billingLegend": "Billing period",
     "monthly": "Monthly",
-    "yearly": "Annual (save 54%)",
+    "yearly": "Annual (save 56%)",
     "questions": "Questions?",
     "contactSales": "Contact sales",
     "manageSubscriptionPrompt": "Already have a premium page?",
@@ -585,8 +585,8 @@
         "title": "Essentials",
         "subtitle": "For growing businesses",
         "price": {
-          "monthly": "PLN 9",
-          "yearly": "PLN 49"
+          "monthly": "PLN 19",
+          "yearly": "PLN 99"
         },
         "per": {
           "monthly": "/month",
@@ -637,6 +637,7 @@
       "freeTitle": "Free listing",
       "premiumTitle": "Premium page",
       "premiumDescription": "A full business page with photos, a price list and a short address — it sets you apart from the competition.",
+      "premiumExample": "See an example Premium page",
       "premiumButton": "See Premium",
       "premiumNote": "You can enable Premium on your business profile once it is in the directory."
     },
