@@ -3,6 +3,7 @@ import type { Locale } from '@/i18n/config';
 import { serviceNameFromCapitalLetter } from '@/lib/consts';
 import { PREMIUM_TEMPLATES, type PremiumTemplate } from '@/lib/premium-templates';
 import { buildHomePath, type ProfileBreadcrumb } from '@/lib/service-profile-breadcrumbs';
+import type { Socials } from '@/types';
 
 import { PREMIUM_EXAMPLE_TEXTS } from './premium-example-content';
 
@@ -76,6 +77,22 @@ const EXAMPLE_HOURS = {
 const EXAMPLE_NAME = 'Kolumna — biuro rachunkowe';
 const EXAMPLE_CITY = 'Warszawa';
 
+/** Numer `+48 000…` nie istnieje — tez dla WhatsAppa (`wa.me`). */
+const EXAMPLE_PHONE = '+48 000 000 000';
+
+/** Plac Defilad w Warszawie (plac publiczny). */
+const EXAMPLE_COORDINATES: Readonly<{ lat: number; lng: number }> = { lat: 52.2316, lng: 21.0067 };
+
+/**
+ * Telegram jako link do nieistniejacego numeru, nie nazwa uzytkownika, ktora ktos moglby zajac.
+ * Ikony sieci na domene zarezerwowana, jak linki ocen.
+ */
+const EXAMPLE_SOCIALS: Socials = {
+    facebook: 'https://example.com/facebook',
+    instagram: 'https://example.com/instagram',
+    telegram: 'https://t.me/+48000000000',
+};
+
 /**
  * Okruszki fikcyjnej firmy: link tylko do strony glownej. Kategoria i miasto bez linkow —
  * mapa z filtrem sugerowalaby, ze firma jest w katalogu. Bez JSON-LD (strona `noindex`).
@@ -114,14 +131,15 @@ export function getPremiumExampleProfile(
                 street: 'ul. Przykładowa 1',
                 postcode: '00-000',
                 voivodeship: 'mazowieckie',
-                // Bez wspolrzednych: przycisk „Nawiguj” prowadzilby pod prawdziwy adres.
-                latitude: null,
-                longitude: null,
-                phoneNumber: '+48 000 000 000',
+                // Plac Defilad — plac publiczny, nie firma: mapa i „Nawiguj” maja co pokazac,
+                // a nie prowadza pod adres zadnej prawdziwej firmy.
+                latitude: EXAMPLE_COORDINATES.lat,
+                longitude: EXAMPLE_COORDINATES.lng,
+                phoneNumber: EXAMPLE_PHONE,
                 email: 'biuro@example.com',
                 webpage: 'https://example.com',
-                socials: null,
-                whatsappNumber: null,
+                socials: EXAMPLE_SOCIALS,
+                whatsappNumber: EXAMPLE_PHONE,
                 openingHours: EXAMPLE_HOURS,
                 isMainLocation: true,
             },

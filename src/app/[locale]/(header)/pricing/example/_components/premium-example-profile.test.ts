@@ -1,6 +1,10 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
+import {
+    getActionHrefs,
+    getSocialLinks,
+} from '@/app/[locale]/firma/[slug]/_components/profile-helpers';
 import { locales } from '@/i18n/config';
 import { PREMIUM_TEMPLATES } from '@/lib/premium-templates';
 
@@ -89,11 +93,37 @@ describe('getPremiumExampleProfile', () => {
         expect(location?.email).toMatch(/@example\.com$/);
         expect(location?.webpage).toBe('https://example.com');
         expect(location?.phoneNumber).toMatch(/^\+48 000/);
-        expect(location?.latitude).toBeNull();
         expect(profile.mapHref).toBeNull();
         expect(
             profile.premium.ratings.every(rating => rating.url.startsWith('https://example.com/')),
         ).toBe(true);
+    });
+
+    it('przyciski naglowka: wszystkie akcje, tylko nieistniejacy numer i Plac Defilad', () => {
+        const [location] = getPremiumExampleProfile('pl', 'gallery').locations;
+        if (!location) throw new Error('Brak lokalizacji przykladu');
+
+        expect(getActionHrefs(location, true)).toEqual({
+            call: 'tel:+48 000 000 000',
+            whatsapp: 'https://wa.me/48000000000',
+            telegram: 'https://t.me/+48000000000',
+            navigate: 'https://www.google.com/maps/dir/?api=1&destination=52.2316,21.0067',
+        });
+    });
+
+    it('ikony sieci spolecznosciowych tylko na domene zarezerwowana', () => {
+        const [location] = getPremiumExampleProfile('pl', 'gallery').locations;
+        const links = getSocialLinks(location?.socials ?? null);
+
+        expect(links.map(link => link.key)).toEqual(['facebook', 'instagram']);
+        expect(links.every(link => link.href.startsWith('https://example.com/'))).toBe(true);
+    });
+
+    it('wspolrzedne wskazuja Plac Defilad w Warszawie (plac publiczny, nie firme)', () => {
+        const [location] = getPremiumExampleProfile('pl', 'gallery').locations;
+
+        expect(location?.latitude).toBeCloseTo(52.2316, 3);
+        expect(location?.longitude).toBeCloseTo(21.0067, 3);
     });
 
     it.each(locales)('%s: okruszki linkuja tylko strone glowna, nie mape z filtrem', locale => {

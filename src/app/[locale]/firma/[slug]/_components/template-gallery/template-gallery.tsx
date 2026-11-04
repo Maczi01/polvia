@@ -13,6 +13,7 @@ import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
+import { ProfileMap } from '../profile-map/profile-map';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
@@ -179,6 +180,7 @@ export function TemplateGallery({ profile }: TemplateGalleryProps): ReactElement
                     titleClassName={TITLE}
                 />
                 <GalleryDetails {...sectionProps} />
+                <ProfileMap profile={profile} className={SECTION} titleClassName={TITLE} />
             </div>
         </article>
     );

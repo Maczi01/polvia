@@ -2,6 +2,8 @@ import { MapPin } from 'lucide-react';
 import Image from 'next/image';
 import type { ReactElement } from 'react';
 
+import { cn } from '@/lib/utilities';
+
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileActions } from '../profile-actions/profile-actions';
 import { ProfileBadges } from '../profile-badges/profile-badges';
@@ -13,6 +15,7 @@ import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
+import { ProfileMap } from '../profile-map/profile-map';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
@@ -159,6 +162,7 @@ export function TemplateClassic({ profile }: TemplateClassicProps): ReactElement
                 />
                 <ClassicHeader {...sectionProps} />
                 <ClassicDetails {...sectionProps} />
+                <ProfileMap profile={profile} className={cn('mx-4 mt-6 sm:mx-0', SECTION)} />
             </div>
         </article>
     );

@@ -15,7 +15,9 @@ describe('TemplateClassic', () => {
     it('renderuje nazwe jako h1, cover i 6 miniatur galerii; przechodzi jest-axe', async () => {
         const { container } = renderWithIntl(<TemplateClassic profile={premiumServiceFixture} />);
 
-        expect(screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('heading', { level: 1, name: 'Mistrz Remontu' }),
+        ).toBeInTheDocument();
         expect(screen.getByRole('img', { name: 'Narzędzia ekipy remontowej' })).toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: /^Powiększ zdjęcie/ })).toHaveLength(6);
         expect(screen.getByRole('region', { name: 'Cennik usług' })).toBeInTheDocument();
@@ -38,7 +40,9 @@ describe('TemplateClassic', () => {
     it('bez cover, galerii i lokalizacji nie renderuje pustych sekcji', async () => {
         const { container } = renderWithIntl(<TemplateClassic profile={premiumEmptyFixture} />);
 
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(premiumEmptyFixture.name);
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+            premiumEmptyFixture.name,
+        );
         expect(screen.queryByRole('region', { name: 'Galeria' })).not.toBeInTheDocument();
         expect(screen.queryByRole('region', { name: 'Cennik usług' })).not.toBeInTheDocument();
         expect(screen.queryByRole('region', { name: /Adres|Lokalizacje/ })).not.toBeInTheDocument();
@@ -80,5 +84,15 @@ describe('TemplateClassic', () => {
         expect(
             screen.getByRole('region', { name: 'Godziny otwarcia — siedziba główna' }),
         ).toBeInTheDocument();
+    });
+
+    it('mapa dojazdu to ostatnia sekcja tresci; wpis online jej nie ma', () => {
+        const { unmount } = renderWithIntl(<TemplateClassic profile={premiumServiceFixture} />);
+
+        expect(screen.getAllByRole('region').at(-1)).toHaveAccessibleName('Jak do nas trafić');
+        unmount();
+
+        renderWithIntl(<TemplateClassic profile={premiumEmptyFixture} />);
+        expect(screen.queryByRole('region', { name: 'Jak do nas trafić' })).not.toBeInTheDocument();
     });
 });

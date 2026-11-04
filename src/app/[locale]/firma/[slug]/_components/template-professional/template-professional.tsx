@@ -2,6 +2,8 @@ import { MapPin } from 'lucide-react';
 import Image from 'next/image';
 import type { ReactElement } from 'react';
 
+import { cn } from '@/lib/utilities';
+
 import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileActions } from '../profile-actions/profile-actions';
 import { ProfileBadges } from '../profile-badges/profile-badges';
@@ -13,6 +15,7 @@ import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
+import { ProfileMap } from '../profile-map/profile-map';
 import { ProfilePriceList } from '../profile-price-list/profile-price-list';
 import { ProfileRatings } from '../profile-ratings/profile-ratings';
 import type { PremiumProfileView, ProfileImage, ProfileLocation } from '../service-profile-types';
@@ -182,6 +185,11 @@ export function TemplateProfessional({ profile }: TemplateProfessionalProps): Re
             <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 md:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8 lg:px-8">
                 <ProfessionalMain profile={profile} />
                 <ProfessionalAside {...sectionProps} />
+                <ProfileMap
+                    profile={profile}
+                    className={cn(SECTION, 'lg:col-span-2')}
+                    titleClassName={TITLE}
+                />
             </div>
         </article>
     );

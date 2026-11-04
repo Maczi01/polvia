@@ -17,7 +17,9 @@ jest.mock('@/i18n/navigation', () => ({
 
 describe('TemplateProfessional', () => {
     it('renderuje nazwe jako h1 i stawia cennik przed opisem firmy; przechodzi jest-axe', async () => {
-        const { container } = renderWithIntl(<TemplateProfessional profile={premiumProfessionalFixture} />);
+        const { container } = renderWithIntl(
+            <TemplateProfessional profile={premiumProfessionalFixture} />,
+        );
 
         expect(
             screen.getByRole('heading', { level: 1, name: premiumProfessionalFixture.name }),
@@ -25,7 +27,11 @@ describe('TemplateProfessional', () => {
         const sectionHeadings = screen
             .getAllByRole('heading', { level: 2 })
             .map(heading => heading.textContent);
-        expect(sectionHeadings.slice(0, 3)).toEqual(['Cennik usług', 'Najczęstsze pytania', 'O firmie']);
+        expect(sectionHeadings.slice(0, 3)).toEqual([
+            'Cennik usług',
+            'Najczęstsze pytania',
+            'O firmie',
+        ]);
         expect(await axe(container)).toHaveNoViolations();
     });
 
@@ -40,12 +46,18 @@ describe('TemplateProfessional', () => {
     });
 
     it('bez tresci premium i lokalizacji nie renderuje pustych sekcji', async () => {
-        const { container } = renderWithIntl(<TemplateProfessional profile={premiumEmptyFixture} />);
+        const { container } = renderWithIntl(
+            <TemplateProfessional profile={premiumEmptyFixture} />,
+        );
 
-        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(premiumEmptyFixture.name);
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+            premiumEmptyFixture.name,
+        );
         expect(screen.queryByRole('region', { name: 'Galeria' })).not.toBeInTheDocument();
         expect(screen.queryByRole('region', { name: 'Cennik usług' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('region', { name: 'Najczęstsze pytania' })).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('region', { name: 'Najczęstsze pytania' }),
+        ).not.toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
     });
     it('pokazuje oceny z innych serwisow tylko, gdy tresc premium je ma', () => {
@@ -89,5 +101,17 @@ describe('TemplateProfessional', () => {
         expect(
             screen.getByRole('region', { name: 'Godziny otwarcia — siedziba główna' }),
         ).toBeInTheDocument();
+    });
+
+    it('mapa dojazdu to ostatnia sekcja tresci; wpis online jej nie ma', () => {
+        const { unmount } = renderWithIntl(
+            <TemplateProfessional profile={premiumProfessionalFixture} />,
+        );
+
+        expect(screen.getAllByRole('region').at(-1)).toHaveAccessibleName('Jak do nas trafić');
+        unmount();
+
+        renderWithIntl(<TemplateProfessional profile={premiumEmptyFixture} />);
+        expect(screen.queryByRole('region', { name: 'Jak do nas trafić' })).not.toBeInTheDocument();
     });
 });
