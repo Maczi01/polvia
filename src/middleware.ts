@@ -1,6 +1,12 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+    DASHBOARD_AUTH_CHALLENGE,
+    isAuthorizedDashboardRequest,
+    isDashboardPathname,
+    resolveDashboardCredentials,
+} from '@/lib/dashboard-auth';
 import { parseMapSlug } from '@/lib/map-slug-parser';
 import { parseMapPathname } from '@/lib/map-pathname';
 import { localizedMapBasePath } from '@/lib/map-url-builder';
@@ -30,8 +36,33 @@ const intlMiddleware = createMiddleware({
  */
 const isStripeEnabled = resolveStripeConfig(env) !== null;
 
+/** `null` = panel wylaczony (brak `DASHBOARD_USER`/`DASHBOARD_PASSWORD`) — 404 dla `/dashboard/**`. */
+const dashboardCredentials = resolveDashboardCredentials(env);
+
 function notFoundRewrite(request: NextRequest): NextResponse {
     return NextResponse.rewrite(new URL(SERVICE_PROFILE_NOT_FOUND_PATH, request.url));
+}
+
+/**
+ * Panel `/dashboard/**` (wszystkie locale): HTTP Basic Auth. `null` = sciezka spoza panelu
+ * albo poprawne dane — zadanie idzie dalej. Bez konfiguracji panel nie istnieje (404).
+ * To pierwsza linia; akcje i layout panelu sprawdzaja dostep same (`dashboard-access.ts`).
+ */
+function handleDashboard(request: NextRequest): NextResponse | null {
+    if (!isDashboardPathname(request.nextUrl.pathname)) return null;
+    if (!dashboardCredentials) return notFoundRewrite(request);
+
+    const authorization = request.headers.get('authorization');
+    if (isAuthorizedDashboardRequest(authorization, dashboardCredentials)) return null;
+
+    return new NextResponse('Authentication required', {
+        status: 401,
+        headers: {
+            'WWW-Authenticate': DASHBOARD_AUTH_CHALLENGE,
+            'Cache-Control': 'no-store',
+            'X-Robots-Tag': 'noindex, nofollow',
+        },
+    });
 }
 
 /**
@@ -106,6 +137,7 @@ async function handleRootAlias(request: NextRequest): Promise<NextResponse | nul
 
 /**
  * Kolejnosc galezi:
+ * 0. bramka panelu `/dashboard/**` (401 bez poprawnych danych, 404 bez konfiguracji),
  * 1. walidacja slugu mapy (307 na baze mapy),
  * 2. profil `/firma/<slug>` (404 dla nieistniejacego; bez Stripe 404 takze dla
  *    `/firma/<slug>/premium/dziekujemy`),
@@ -118,6 +150,9 @@ async function handleRootAlias(request: NextRequest): Promise<NextResponse | nul
  */
 export default async function middleware(request: NextRequest): Promise<NextResponse> {
     const { pathname } = request.nextUrl;
+
+    const dashboardResponse = handleDashboard(request);
+    if (dashboardResponse) return dashboardResponse;
 
     // Walidacja slugu mapy MUSI byc tutaj, nie w page.tsx.
     //
