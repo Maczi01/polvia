@@ -247,3 +247,20 @@ describe('serviceSchema — jezyki obslugi', () => {
         expect(result.data.languages).toEqual(['pl']);
     });
 });
+
+describe('serviceSchema — firma zweryfikowana', () => {
+    it('zaznaczony checkbox (wartosc "on") daje verified = true', () => {
+        const result = parse({ verified: 'on' });
+        expect(result.success && result.data.verified).toBe(true);
+    });
+
+    it('niezaznaczony checkbox (pole nieobecne w FormData) daje verified = false', () => {
+        const result = parse();
+        expect(result.success && result.data.verified).toBe(false);
+    });
+
+    it('wartosc inna niz "on" nie oznacza firmy jako zweryfikowanej', () => {
+        const result = parse({ verified: 'false' });
+        expect(result.success && result.data.verified).toBe(false);
+    });
+});

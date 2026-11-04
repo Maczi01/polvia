@@ -276,6 +276,22 @@ export function ServiceForm({ tags: initialTags, mode, initialData }: ServiceFor
                     </div>
                 </div>
 
+                <div className="space-y-1">
+                    <label className="flex cursor-pointer items-center gap-2">
+                        <input
+                            type="checkbox"
+                            name="verified"
+                            defaultChecked={d?.verified ?? false}
+                            aria-describedby="verified-hint"
+                            className="size-4 rounded border-gray-300"
+                        />
+                        <span className="text-sm font-medium">Verified company</span>
+                    </label>
+                    <p id="verified-hint" className="text-sm text-gray-500 dark:text-gray-400">
+                        Shows the &quot;verified&quot; badge on the company profile and listing card.
+                    </p>
+                </div>
+
                 <div className="space-y-3">
                     <Label>Tags</Label>
                     {allTags.length > 0 && (

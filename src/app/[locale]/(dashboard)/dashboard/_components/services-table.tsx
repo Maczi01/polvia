@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button/button';
 import { Input } from '@/components/ui/input/input';
 import { Badge } from '@/components/ui/badge/badge';
-import { Trash2, ExternalLink, Search, Pencil } from 'lucide-react';
+import { BadgeCheck, Trash2, ExternalLink, Search, Pencil } from 'lucide-react';
 import { type DashboardService, deleteService } from '../_actions';
 import { filterDashboardServices } from './filter-dashboard-services';
 import { mapCategoryToBadgeColor } from '@/lib/consts';
@@ -56,6 +56,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                 <th className="px-4 py-3 text-left font-medium">Category</th>
                                 <th className="px-4 py-3 text-left font-medium">Coverage</th>
                                 <th className="px-4 py-3 text-left font-medium">Status</th>
+                                <th className="px-4 py-3 text-left font-medium">Verified</th>
                                 <th className="px-4 py-3 text-left font-medium">City</th>
                                 <th className="px-4 py-3 text-left font-medium">Voivodeship</th>
                                 <th className="px-4 py-3 text-left font-medium">Phone</th>
@@ -67,7 +68,7 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                         <tbody>
                             {filtered.length === 0 ? (
                                 <tr>
-                                    <td colSpan={11} className="px-4 py-8 text-center text-muted-foreground">
+                                    <td colSpan={12} className="px-4 py-8 text-center text-muted-foreground">
                                         {services.length === 0 ? 'No services yet. Add your first one!' : 'No services match your search.'}
                                     </td>
                                 </tr>
@@ -86,6 +87,13 @@ export function ServicesTable({ services }: { services: DashboardService[] }) {
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[service.status] || ''}`}>
                                                 {service.status}
                                             </span>
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {service.verified ? (
+                                                <BadgeCheck className="size-4 text-green" aria-label="Verified" />
+                                            ) : (
+                                                <span className="text-muted-foreground">-</span>
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 text-muted-foreground">{service.city || '-'}</td>
                                         <td className="px-4 py-3 text-muted-foreground">{service.voivodeship || '-'}</td>
