@@ -35,6 +35,19 @@ describe('ProfileHours', () => {
         expect(await axe(container)).toHaveNoViolations();
     });
 
+    it('firma z kilkoma adresami: tytul mowi, ze godziny dotycza siedziby glownej', () => {
+        renderWithIntl(
+            <ProfileHours
+                openingHours={{ monday: { open: '08:00', close: '18:00' } }}
+                isMainLocationOnly
+            />,
+        );
+
+        expect(
+            screen.getByRole('region', { name: 'Godziny otwarcia — siedziba główna' }),
+        ).toBeInTheDocument();
+    });
+
     it('bez godzin nie renderuje sekcji', () => {
         renderWithIntl(<ProfileHours openingHours={{}} />);
 

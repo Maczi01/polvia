@@ -7,13 +7,15 @@ import { ProfileAbout } from '../profile-about/profile-about';
 import { ProfileBadges } from '../profile-badges/profile-badges';
 import { ProfileBreadcrumbs } from '../profile-breadcrumbs/profile-breadcrumbs';
 import { ProfileContact } from '../profile-contact/profile-contact';
-import { getHeaderCity, getMainLocation } from '../profile-helpers';
+import { getMainLocation } from '../profile-helpers';
 import { ProfileHours } from '../profile-hours/profile-hours';
 import { ProfileLocations } from '../profile-locations/profile-locations';
 import { ProfileLogo } from '../profile-logo/profile-logo';
 import { ProfileUpgradeCta } from '../profile-upgrade-cta/profile-upgrade-cta';
 import type { ServiceProfileView } from '../service-profile-types';
 import { SimilarServices } from '../similar-services/similar-services';
+import { hasMultipleLocations } from '../profile-location-groups';
+import { useHeaderPlace } from '../use-header-place';
 
 type ProfileFreeProps = {
     profile: ServiceProfileView;
@@ -23,7 +25,7 @@ type ProfileFreeProps = {
 
 /** Naglowek wizytowki: logo, odznaki, nazwa i miasto. */
 function ProfileFreeHeader({ profile }: { profile: ServiceProfileView }): ReactElement {
-    const city = getHeaderCity(profile);
+    const city = useHeaderPlace(profile);
 
     return (
         <header className="flex flex-col gap-5 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:flex-row sm:items-center md:gap-7 md:p-8">
@@ -83,7 +85,12 @@ export function ProfileFree({ profile, purchase }: ProfileFreeProps): ReactEleme
                             tags={profile.tags}
                         />
                         <ProfileLocations profile={profile} />
-                        {mainLocation && <ProfileHours openingHours={mainLocation.openingHours} />}
+                        {mainLocation && (
+                            <ProfileHours
+                                openingHours={mainLocation.openingHours}
+                                isMainLocationOnly={hasMultipleLocations(profile)}
+                            />
+                        )}
                     </div>
                     <ProfileUpgradeCta
                         serviceId={profile.serviceId}

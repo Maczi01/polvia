@@ -873,6 +873,11 @@
     "locations": "Адреса",
     "mainLocation": "Главный офис",
     "showOnMap": "Показать на карте",
+    "hoursMainLocation": "Часы работы — главный офис",
+    "locationCount": "{count, plural, one {# адрес} few {# адреса} many {# адресов} other {# адреса}}",
+    "headerMoreCities": "{cities} и ещё {count, plural, one {# город} few {# города} many {# городов} other {# города}}",
+    "showMoreLocations": "Показать ещё {count, plural, one {# адрес} few {# адреса} many {# адресов} other {# адреса}}",
+    "noCityGroup": "Другие адреса",
     "onlineOnly": "Компания обслуживает клиентов только дистанционно, без офиса.",
     "languages": "Языки обслуживания",
     "coverage": {
@@ -982,6 +987,7 @@
       "descriptionLocal": "{name} — {category}, {city}. Адрес, телефон, часы работы и контакты в каталоге Polvia.",
       "descriptionOnline": "{name} — {category}, обслуживание онлайн. Контакты и информация о компании в каталоге Polvia.",
       "descriptionGeneric": "{name} — {category}. Контакты и информация о компании в каталоге Polvia.",
+      "titleCityWithOthers": "{city} и ещё {count, plural, one {# город} few {# города} many {# городов} other {# города}}",
       "titlePhrase": {
         "uk": {
           "grocery": "украинский продуктовый магазин",

@@ -349,3 +349,56 @@ export const premiumEmptyFixture: PremiumProfileView = {
         ratings: [],
     },
 };
+
+/** Sklep z 8 punktami w 5 miastach (jak Slowianoczka); kolejnosc celowo wymieszana. */
+type ChainRow = [
+    id: string,
+    city: string,
+    street: string,
+    postcode: string,
+    voivodeship: ProfileLocation['voivodeship'],
+];
+
+const CHAIN_ROWS: ChainRow[] = [
+    ['loc-byd-1', 'Bydgoszcz', 'ul. Gdańska 12', '85-005', 'kujawsko-pomorskie'],
+    ['loc-poz-main', 'Poznań', 'ul. Półwiejska 4', '61-888', 'wielkopolskie'],
+    ['loc-wro', 'Wrocław', 'ul. Legnicka 58', '54-204', 'dolnoslaskie'],
+    ['loc-poz-2', 'Poznań', 'os. Piastowskie 101', '61-163', 'wielkopolskie'],
+    ['loc-szc', 'Szczecin', 'al. Wojska Polskiego 30', '70-475', 'zachodniopomorskie'],
+    ['loc-byd-2', 'Bydgoszcz', 'ul. Fordońska 141', '85-739', 'kujawsko-pomorskie'],
+    ['loc-cho', 'Chojnice', 'ul. Kościerska 9', '89-600', 'pomorskie'],
+    ['loc-poz-3', 'Poznań', 'ul. Głogowska 92', '60-263', 'wielkopolskie'],
+];
+
+const CHAIN_MAIN_ID = 'loc-poz-main';
+
+const CHAIN_LOCATIONS: ProfileLocation[] = CHAIN_ROWS.map(
+    ([id, city, street, postcode, voivodeship], index) =>
+        makeLocation({
+            id,
+            city,
+            street,
+            postcode,
+            voivodeship,
+            phoneNumber: `+48 600 100 ${String(index).padStart(3, '0')}`,
+            isMainLocation: id === CHAIN_MAIN_ID,
+        }),
+);
+
+export const chainServiceFixture: ServiceProfileView = {
+    ...localServiceFixture,
+    serviceId: '9a7e5c31-2b4d-4f86-a1c9-3e5d7f9b2a04',
+    slug: 'slowianski-sklep',
+    name: 'Słowiański Sklep',
+    description: 'Ukraińskie i polskie produkty spożywcze w ośmiu sklepach w pięciu miastach.',
+    logo: null,
+    category: 'grocery',
+    locations: CHAIN_LOCATIONS,
+    mapHref: { pathname: '/map', query: { place: 'slowianski-sklep' } },
+    similarServices: [],
+    breadcrumbs: makeBreadcrumbs(
+        { category: 'grocery', name: 'Słowiański Sklep', slug: 'slowianski-sklep' },
+        'Sklepy spożywcze',
+        'Poznań',
+    ),
+};

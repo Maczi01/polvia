@@ -38,6 +38,16 @@ describe('ProfileRatings', () => {
         expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     });
 
+    it('gwiazdki oddaja ulamek oceny: 4,8 to cztery pelne i piata w 80%', () => {
+        renderWithIntl(<ProfileRatings ratings={RATINGS.slice(0, 1)} />);
+
+        const link = screen.getByRole('link', { name: /^Google/ });
+        const widths = within(link)
+            .getAllByTestId('rating-star-fill')
+            .map(fill => fill.style.width);
+        expect(widths).toEqual(['100%', '100%', '100%', '100%', '80%']);
+    });
+
     it('bez ocen nie renderuje sekcji', () => {
         const { container } = renderWithIntl(<ProfileRatings ratings={[]} />);
 

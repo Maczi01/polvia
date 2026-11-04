@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 
 import {
+    chainServiceFixture,
     localServiceFixture,
     noLogoServiceFixture,
     onlineServiceFixture,
@@ -43,5 +44,13 @@ export const NoLogoDesktop: Story = { args: { profile: noLogoServiceFixture } };
 
 export const NoLogoMobile: Story = {
     args: { profile: noLogoServiceFixture },
+    parameters: mobileViewport,
+};
+
+/** 8 punktow w 5 miastach: podsumowanie pod nazwa, grupy miast i zwiniete adresy. */
+export const ManyLocationsDesktop: Story = { args: { profile: chainServiceFixture } };
+
+export const ManyLocationsMobile: Story = {
+    args: { profile: chainServiceFixture },
     parameters: mobileViewport,
 };

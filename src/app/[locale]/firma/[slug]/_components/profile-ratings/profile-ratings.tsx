@@ -7,6 +7,7 @@ import { cn } from '@/lib/utilities';
 
 import { ProfileSection } from '../profile-section/profile-section';
 import type { ProfileRating } from '../service-profile-types';
+import { getStarFillPercent } from './rating-star-fill';
 
 type ProfileRatingsProps = {
     ratings: readonly ProfileRating[];
@@ -16,22 +17,27 @@ type ProfileRatingsProps = {
 
 const STAR_POSITIONS = Array.from({ length: PREMIUM_RATING_MAX }, (_, index) => index + 1);
 
-/** Gwiazdki tylko wizualnie — wartosc niesie dostepna nazwa linku. */
+/**
+ * Gwiazdki tylko wizualnie — wartosc niesie dostepna nazwa linku. Czesciowa gwiazdka to
+ * szara z nalozona zolta, przycieta do procentu wypelnienia.
+ */
 function RatingStars({ rating }: { rating: number }): ReactElement {
-    const filled = Math.round(rating);
-
     return (
         <span aria-hidden="true" className="flex items-center gap-0.5">
             {STAR_POSITIONS.map(position => (
-                <Star
-                    key={position}
-                    size={14}
-                    className={cn(
-                        position <= filled
-                            ? 'fill-amber-400 text-amber-400'
-                            : 'fill-gray-200 text-gray-200 dark:fill-gray-600 dark:text-gray-600',
-                    )}
-                />
+                <span key={position} className="relative inline-flex">
+                    <Star
+                        size={14}
+                        className="fill-gray-200 text-gray-200 dark:fill-gray-600 dark:text-gray-600"
+                    />
+                    <span
+                        data-testid="rating-star-fill"
+                        className="absolute inset-y-0 left-0 overflow-hidden"
+                        style={{ width: `${getStarFillPercent(rating, position)}%` }}
+                    >
+                        <Star size={14} className="fill-amber-400 text-amber-400" />
+                    </span>
+                </span>
             ))}
         </span>
     );

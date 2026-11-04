@@ -8,6 +8,8 @@ import { ProfileSection } from '../profile-section/profile-section';
 
 type ProfileHoursProps = {
     openingHours: OpeningHours;
+    /** Firma ma kilka adresow — tytul mowi, ze godziny dotycza siedziby glownej. */
+    isMainLocationOnly?: boolean;
     className?: string;
     titleClassName?: string;
 };
@@ -18,6 +20,7 @@ type ProfileHoursProps = {
  */
 export function ProfileHours({
     openingHours,
+    isMainLocationOnly = false,
     className,
     titleClassName,
 }: ProfileHoursProps): ReactElement | null {
@@ -28,7 +31,7 @@ export function ProfileHours({
     return (
         <ProfileSection
             id="hours"
-            title={t('hours')}
+            title={isMainLocationOnly ? t('hoursMainLocation') : t('hours')}
             className={className}
             titleClassName={titleClassName}
         >

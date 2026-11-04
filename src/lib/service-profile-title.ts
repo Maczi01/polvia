@@ -14,6 +14,12 @@ export type ProfileTitleInput = {
     categoryLabel: string;
     /** `null` dla wpisu bez punktu obslugi — tytul jest wtedy bez miasta. */
     city: string | null;
+    /**
+     * Miasto glowne z liczba pozostalych w locale strony („Poznań i 4 inne miasta”), gdy firma
+     * ma punkty w kilku miastach. Zastepuje `city` tylko wtedy, gdy tytul miesci sie w limicie
+     * bez skracania; inaczej obowiazuja zwykle reguly z samym `city`.
+     */
+    cityWithOthers?: string | null;
     siteName: string;
     /**
      * Fraza o jezyku obslugi w locale strony („ukraiński sklep spożywczy”), zastepuje
@@ -62,11 +68,20 @@ export function buildProfileTitle({
     name,
     categoryLabel,
     city,
+    cityWithOthers,
     siteName,
     titlePhrase,
 }: ProfileTitleInput): string {
     const suffix = ` | ${siteName}`;
     const headRoom = PROFILE_TITLE_MAX_LENGTH - suffix.length;
+
+    const places = cityWithOthers?.trim();
+    if (places) {
+        const head = titlePhrase
+            ? `${name.replace(/\s+/g, ' ').trim()} — ${titlePhrase}, ${places}`
+            : `${name} — ${categoryLabel}, ${places}`;
+        if (head.length <= headRoom) return `${head}${suffix}`;
+    }
 
     if (!titlePhrase) {
         const place = city?.trim() ? `, ${city.trim()}` : '';

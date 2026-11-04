@@ -31,6 +31,7 @@ import { env } from '../../../../../env';
 import { startPremiumCheckout } from './_actions';
 import { getHeaderCity, getMainLocation, toSameAs } from './_components/profile-helpers';
 import { ProfileFree } from './_components/profile-free/profile-free';
+import { getLocationSummary } from './_components/profile-location-groups';
 import {
     type ProfileViewKind,
     selectOgCoverPath,
@@ -129,6 +130,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const tCategories = await getTranslations({ locale, namespace: 'MapPage.Categories' });
 
     const city = getHeaderCity(profile);
+    const { cities } = getLocationSummary(profile);
+    // Kilka miast: „Poznań i 4 inne miasta” w tytule (gdy sie miesci); opis i okruszki — miasto glowne.
+    const cityWithOthers =
+        cities.length > 1
+            ? t('titleCityWithOthers', { city: cities[0], count: cities.length - 1 })
+            : null;
     const viewKind = resolveProfileView(profile, locale);
     const categoryLabel = tCategories(getCategoryMessageKey(profile.category));
     const languageTexts = buildLanguageMetaTexts(
@@ -156,6 +163,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         categoryLabel,
         titlePhrase: languageTexts.titlePhrase,
         city,
+        cityWithOthers,
         siteName: serviceNameFromCapitalLetter,
         description: profile.description,
         fallbackDescription,

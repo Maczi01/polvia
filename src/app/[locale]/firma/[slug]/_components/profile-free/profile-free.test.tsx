@@ -4,6 +4,7 @@ import { axe, toHaveNoViolations } from 'jest-axe';
 import type { PremiumPurchase } from '@/lib/premium-checkout-fields';
 
 import {
+    chainServiceFixture,
     localServiceFixture,
     noLogoServiceFixture,
     onlineServiceFixture,
@@ -41,7 +42,9 @@ describe('ProfileFree', () => {
         expect(screen.getByRole('region', { name: 'Kontakt' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'WhatsApp' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Telegram' })).toBeInTheDocument();
-        expect(screen.getByRole('region', { name: 'Godziny otwarcia' })).toBeInTheDocument();
+        expect(
+            screen.getByRole('region', { name: 'Godziny otwarcia — siedziba główna' }),
+        ).toBeInTheDocument();
         expect(screen.getByRole('region', { name: 'Lokalizacje' })).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Pokaż na mapie' })).toBeInTheDocument();
         const about = screen.getByRole('region', { name: 'O firmie' });
@@ -104,5 +107,21 @@ describe('ProfileFree', () => {
             '/mapa/remonty/warszawa',
         );
         expect(within(nav).getByText('Mistrz Remontu')).toHaveAttribute('aria-current', 'page');
+    });
+
+    it('naglowek firmy z kilkoma miastami: miasta i liczba lokalizacji pod nazwa', () => {
+        renderWithIntl(<ProfileFree profile={chainServiceFixture} purchase={purchase} />);
+
+        const header = screen.getByRole('banner');
+        expect(
+            within(header).getByText('Poznań, Bydgoszcz, Chojnice i 2 inne · 8 lokalizacji'),
+        ).toBeInTheDocument();
+    });
+
+    it('jeden adres: pod nazwa samo miasto, godziny bez dopisku o siedzibie', () => {
+        renderWithIntl(<ProfileFree profile={noLogoServiceFixture} purchase={purchase} />);
+
+        expect(within(screen.getByRole('banner')).getByText('Warszawa')).toBeInTheDocument();
+        expect(screen.getByRole('region', { name: 'Godziny otwarcia' })).toBeInTheDocument();
     });
 });
