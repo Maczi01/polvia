@@ -3,7 +3,7 @@
     "category": "help_support",
     "coverage": "online",
     "status": "active",
-    "verified": false,
+    "verified": true,
     "image": "workup.png",
     "languages": ["uk", "ru", "en", "pl"],
 

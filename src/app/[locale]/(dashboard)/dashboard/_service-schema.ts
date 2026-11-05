@@ -40,6 +40,7 @@ export const serviceSchema = z
         webpage: optionalText(255),
         nip: optionalText(10),
         languages: z.array(z.enum(SERVICE_LANGUAGES)).default(['pl']),
+        verified: z.boolean().default(false),
         whatsappNumber: optionalText(20),
         socials: z
             .object({
@@ -134,6 +135,8 @@ export function parseRawServiceData(formData: FormData) {
         webpage: text(formData, 'webpage'),
         nip: text(formData, 'nip'),
         languages: formData.getAll('languages').filter(isText),
+        // Niezaznaczony checkbox nie trafia do FormData wcale; zaznaczony wysyla `on`.
+        verified: formData.get('verified') === 'on',
         whatsappNumber: text(formData, 'whatsappNumber'),
         socials: {
             instagram: text(formData, 'socials.instagram'),

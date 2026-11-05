@@ -3,7 +3,7 @@
     "category": "transport",
     "coverage": "online",
     "status": "active",
-    "verified": false,
+    "verified": true,
     "image": "help24.png",
     "languages": ["pl", "uk"],
 

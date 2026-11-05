@@ -3,7 +3,7 @@
     "category": "financial",
     "coverage": "hybrid",
     "status": "active",
-    "verified": false,
+    "verified": true,
     "image": "smar-poland.png",
     "languages": ["pl", "ru", "en"],
 

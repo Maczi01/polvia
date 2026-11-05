@@ -50,6 +50,7 @@ export async function getServicesForDashboard() {
             category: servicesTable.category,
             coverage: servicesTable.coverage,
             status: servicesTable.status,
+            verified: servicesTable.verified,
             createdAt: servicesTable.createdAt,
             slug: serviceLocationsTable.slug,
             webpage: serviceLocationsTable.webpage,
@@ -101,6 +102,7 @@ export type ServiceEditData = {
     nip: string;
     image: string;
     languages: string[];
+    verified: boolean;
     whatsappNumber: string;
     socials: {
         instagram?: string;
@@ -177,6 +179,7 @@ export async function getServiceById(id: string): Promise<ServiceEditData | null
         nip: location?.nip ?? '',
         image: service.image ?? '',
         languages: service.languages ?? ['pl'],
+        verified: service.verified,
         whatsappNumber: location?.whatsappNumber ?? '',
         socials,
         city: location?.city ?? '',
@@ -398,6 +401,7 @@ export async function createService(_prev: ActionResult, formData: FormData): Pr
                 status: data.status,
                 image: imageFilename,
                 languages: data.languages,
+                verified: data.verified,
             })
             .returning({ id: servicesTable.id });
 
@@ -478,6 +482,7 @@ export async function updateService(_prev: ActionResult, formData: FormData): Pr
                 status: data.status,
                 image: imageFilename,
                 languages: data.languages,
+                verified: data.verified,
                 updatedAt: new Date(),
             })
             .where(eq(servicesTable.id, serviceId));
