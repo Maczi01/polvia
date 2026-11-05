@@ -168,6 +168,7 @@ async function mainSeed() {
         socials?: any,
         nip?: string,
         whatsappNumber?: string,
+        verified?: boolean,
     }) {
         const [service] = await db.insert(servicesTable).values({
             name: data.name,
@@ -176,6 +177,7 @@ async function mainSeed() {
             coverage: data.coverage ?? 'local',
             image: data.image,
             languages: data.languages || ['pl', 'uk', 'en', 'ru'],
+            verified: data.verified ?? false,
             status: 'active'
         }).returning();
 
@@ -3549,6 +3551,7 @@ async function mainSeed() {
         slug: 'it-deweloper',
         category: 'it',
         coverage: 'online',
+        verified: true,
         plDesc: 'Web studio pełnego cyklu z Białegostoku. Tworzenie stron internetowych, sklepów online, portali korporacyjnych i serwisów informacyjnych dla klientów w Polsce, Europie i na świecie. SEO, integracje z księgowością i ekosystemem Google, hosting, bezpieczeństwo i rozwiązania AI.',
         ukDesc: 'Веб-студія повного циклу з Білостока. Розробка сайтів, інтернет-магазинів, корпоративних порталів і новинних проєктів для клієнтів у Польщі, Європі та світі. SEO, інтеграції з бухгалтерією та екосистемою Google, хостинг, безпека та AI-рішення.',
         enDesc: 'Full-cycle web studio based in Białystok. Websites, online stores, corporate portals and news projects for clients in Poland, Europe and worldwide. SEO, accounting and Google ecosystem integrations, hosting, security and AI solutions.',
