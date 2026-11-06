@@ -1,0 +1,48 @@
+{
+    "name": "Neolease",
+    "category": "financial",
+    "coverage": "hybrid",
+    "status": "active",
+    "verified": false,
+    "image": "neolease.png",
+    "languages": ["pl", "uk"],
+
+    "translations": {
+        "pl": {
+            "description": "Firma leasingowa z Warszawy finansująca samochody osobowe i dostawcze, pojazdy ciężarowe oraz maszyny i urządzenia. W ofercie leasing operacyjny i finansowy, wynajem długoterminowy z pakietem serwisowym oraz leasing konsumencki dla osób prywatnych. Wnioski rozpatruje indywidualnie — obsługuje mikrofirmy, jednoosobowe działalności, start-upy bez historii kredytowej oraz firmy z wpisami w KRD i BIK, w tym przedsiębiorstwa z kapitałem ukraińskim i floty taxi. Umowę podpiszesz w biurze na Służewcu albo zdalnie, podpisem kwalifikowanym lub przez portal Autenti. Obsługa po polsku i ukraińsku."
+        },
+        "uk": {
+            "description": "Лізингова компанія з Варшави, яка фінансує легкові та вантажні автомобілі, вантажівки, а також машини й обладнання. У пропозиції — операційний і фінансовий лізинг, довгострокова оренда із сервісним пакетом та споживчий лізинг для приватних осіб. Заявки розглядають індивідуально: обслуговують мікропідприємства, ФОПів, стартапи без кредитної історії та фірми із записами в KRD і BIK, зокрема компанії з українським капіталом і таксопарки. Договір можна підписати в офісі в районі Служевець або дистанційно. Обслуговування польською та українською."
+        },
+        "en": {
+            "description": "Leasing company based in Warsaw, financing passenger cars, vans, trucks, machinery and equipment. The offer covers operating and finance leases, long-term rental with a maintenance package, and consumer leasing for private individuals. Applications are assessed case by case: the company serves micro-businesses, sole traders, start-ups with no credit record and firms listed in KRD and BIK, including businesses with Ukrainian capital and taxi fleets. Contracts are signed at the Służewiec office or remotely, via the Autenti portal. Service in Polish and Ukrainian."
+        },
+        "ru": {
+            "description": "Лизинговая компания из Варшавы, финансирующая легковые и грузовые автомобили, грузовики, а также машины и оборудование. В предложении — операционный и финансовый лизинг, долгосрочная аренда с сервисным пакетом и потребительский лизинг для частных лиц. Заявки рассматривают индивидуально: обслуживают микропредприятия, ИП, стартапы без кредитной истории и фирмы с записями в KRD и BIK, в том числе компании с украинским капиталом и таксопарки. Договор подписывают в офисе в районе Служевец либо дистанционно. Обслуживание на польском и украинском."
+        }
+    },
+
+    "tags": [
+        { "pl": "Leasing samochodowy", "uk": "Автолізинг", "en": "Car leasing", "ru": "Автолизинг" },
+        { "pl": "Leasing maszyn", "uk": "Лізинг обладнання", "en": "Equipment leasing", "ru": "Лизинг оборудования" },
+        { "pl": "Wynajem długoterminowy", "uk": "Довгострокова оренда", "en": "Long-term rental", "ru": "Долгосрочная аренда" },
+        { "pl": "Leasing konsumencki", "uk": "Споживчий лізинг", "en": "Consumer leasing", "ru": "Потребительский лизинг" },
+        { "pl": "Cudzoziemcy", "uk": "Іноземці", "en": "Foreigners", "ru": "Иностранцы" }
+    ],
+
+    "locations": [
+        {
+            "city": "Warszawa",
+            "street": "ul. Cybernetyki 19B",
+            "voivodeship": "mazowieckie",
+            "postcode": "02-677",
+            "latitude": 52.1754854,
+            "longitude": 20.9884066,
+            "phoneNumber": "+48 789 881 718",
+            "email": "kontakt@neolease.pl",
+            "webpage": "https://neolease.pl",
+            "nip": "6751779458",
+            "isMainLocation": true
+        }
+    ]
+}
