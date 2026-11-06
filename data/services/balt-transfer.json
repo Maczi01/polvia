@@ -1,0 +1,45 @@
+{
+    "name": "BALT TRANSFER",
+    "category": "transport",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "balttransfer.png",
+    "languages": ["ru"],
+
+    "translations": {
+        "pl": {
+            "description": "BALT TRANSFER organizuje indywidualne przejazdy samochodem między Kaliningradem a miastami Europy, przede wszystkim Gdańskiem, Warszawą, Wilnem i Kownem. Odbiera pasażerów z lotniska Gdańsk (GDN), dworca Gdańsk Główny, hotelu albo uzgodnionego adresu; na trasie do Warszawy dowozi także na lotniska Chopina (WAW) i Modlin (WMI). Trasę, godzinę podstawienia, liczbę pasażerów (do 6) i bagaż ustala się przed wyjazdem przez WhatsApp, Telegram lub formularz. Płatność gotówką lub bezgotówkowo. Obsługa po rosyjsku."
+        },
+        "uk": {
+            "description": "BALT TRANSFER організовує індивідуальні поїздки автомобілем між Калінінградом і містами Європи — насамперед Гданськом, Варшавою, Вільнюсом і Каунасом. Забирають пасажирів з аеропорту Гданська (GDN), вокзалу Gdańsk Główny, готелю чи з погодженої адреси; на маршруті до Варшави довозять також до аеропортів Шопена (WAW) і Модлін (WMI). Маршрут, час подачі, кількість пасажирів (до 6) і багаж погоджують заздалегідь через WhatsApp, Telegram або форму на сайті. Оплата готівкою або безготівково. Спілкування російською."
+        },
+        "en": {
+            "description": "BALT TRANSFER runs private car transfers between Kaliningrad and European cities, mainly Gdańsk, Warsaw, Vilnius and Kaunas. Passengers are picked up at Gdańsk Airport (GDN), Gdańsk Główny railway station, a hotel or an agreed address; on the Warsaw route they also drive to Chopin (WAW) and Modlin (WMI) airports. Route, pick-up time, number of passengers (up to 6) and luggage are agreed before the trip via WhatsApp, Telegram or the booking form. Payment in cash or by card or transfer. Service in Russian."
+        },
+        "ru": {
+            "description": "BALT TRANSFER организует индивидуальные поездки на автомобиле между Калининградом и городами Европы — прежде всего Гданьском, Варшавой, Вильнюсом и Каунасом. Встречают в аэропорту Гданьска (GDN), у вокзала Gdańsk Główny, в отеле или по согласованному адресу; по маршруту на Варшаву довозят также до аэропортов Шопена (WAW) и Модлин (WMI). Маршрут, время подачи, число пассажиров (до 6) и багаж согласовывают заранее через WhatsApp, Telegram или форму на сайте. Оплата наличными или безналичным расчётом."
+        }
+    },
+
+    "tags": [
+        { "pl": "Przewóz osób", "uk": "Пасажирські перевезення", "en": "Passenger transport", "ru": "Пассажирские перевозки" },
+        { "pl": "Transfer lotniskowy", "uk": "Трансфер з аеропорту", "en": "Airport transfer", "ru": "Трансфер из аэропорта" },
+        { "pl": "Międzynarodowy", "uk": "Міжнародний", "en": "International", "ru": "Международный" },
+        { "pl": "Kaliningrad", "uk": "Калінінград", "en": "Kaliningrad", "ru": "Калининград" }
+    ],
+
+    "locations": [
+        {
+            "city": "Kaliningrad",
+            "phoneNumber": "+48 506 454 808",
+            "whatsappNumber": "+79521124444",
+            "email": "sz198416@yahoo.com",
+            "webpage": "https://balttransfer.ru",
+            "socials": {
+                "telegram": "https://t.me/zwzs444"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

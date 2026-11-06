@@ -1,0 +1,53 @@
+{
+    "name": "YUDEY — Legal and Accounting Support",
+    "category": "financial",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": null,
+    "languages": [
+        "pl"
+    ],
+    "translations": {
+        "pl": {
+            "description": "YUDEY oferuje wsparcie prawne i księgowe dla firm oraz osób prywatnych w Polsce. Firma świadczy konsultacje, pomoc w prowadzeniu działalności oraz przygotowanie dokumentów. Usługi dostępne są w Warszawie, Lubinie oraz online. Kontakt możliwy przez e-mail office@yudey.pl."
+        },
+        "uk": {
+            "description": "YUDEY надає юридичну та бухгалтерську підтримку компаніям і приватним особам у Польщі. Пропонує консультації, допомогу у веденні бізнесу та підготовку документів. Послуги доступні у Варшаві, Любіні та онлайн. Зв'язатися можна електронною поштою office@yudey.pl."
+        },
+        "en": {
+            "description": "YUDEY offers legal and accounting support for businesses and private individuals in Poland. The firm provides consultations, help with running a business and document preparation. Services are available in Warsaw, Lubin and online. Contact is possible by email at office@yudey.pl."
+        },
+        "ru": {
+            "description": "YUDEY оказывает юридическую и бухгалтерскую поддержку компаниям и частным лицам в Польше. Предлагает консультации, помощь в ведении бизнеса и подготовку документов. Услуги доступны в Варшаве, Любине и онлайн. Связаться можно по электронной почте office@yudey.pl."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Wsparcie prawne dla firm",
+            "uk": "Юридична підтримка для бізнесу",
+            "en": "Legal support for businesses",
+            "ru": "Юридическая поддержка для бизнеса"
+        },
+        {
+            "pl": "Wsparcie księgowe",
+            "uk": "Бухгалтерська підтримка",
+            "en": "Accounting support",
+            "ru": "Бухгалтерская поддержка"
+        },
+        {
+            "pl": "Przygotowanie dokumentów",
+            "uk": "Підготовка документів",
+            "en": "Document preparation",
+            "ru": "Подготовка документов"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Warszawa",
+            "email": "office@yudey.pl",
+            "webpage": "https://yudey.pl/",
+            "isMainLocation": true
+        }
+    ]
+}

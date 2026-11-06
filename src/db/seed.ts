@@ -980,7 +980,7 @@ async function mainSeed() {
         webpage: 'https://progressholding.pl/',
         socials: { facebook: 'https://www.facebook.com/progressholding/' },
         locations: [
-            { city: 'Warszawa', street: 'ul. Szańcowa 44', voivodeship: 'mazowieckie', latitude: 52.2295, longitude: 21.0115, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 603 232 418', email: 'office@progressholding.pl' }
+            { city: 'Warszawa', street: 'ul. Szańcowa 44', voivodeship: 'mazowieckie', postcode: '01-458', latitude: 52.2379, longitude: 20.9331, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 603 232 418', email: 'office@progressholding.pl' }
         ]
     });
 
@@ -2102,7 +2102,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/sicxc5mb',
         locations: [
-            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true, email: 'exdima@op.pl' },
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, email: 'exdima@op.pl' },
         ],
     });
 
@@ -2121,7 +2121,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/2byjmok5',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'roman.bordug74@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, email: 'roman.bordug74@gmail.com' },
         ],
     });
 
@@ -2140,7 +2140,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/3pQiWRTb',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2158,7 +2158,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/korzhak',
         locations: [
-            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2176,7 +2176,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/7zvBYJNR',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, email: 'pinkel2020@interia.pl' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, email: 'pinkel2020@interia.pl' },
         ],
     });
 
@@ -2194,7 +2194,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/dmytro-andriutsa-wijgeqase',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2230,7 +2230,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/oleh-nychyporuk-hyrhvpl_h',
         locations: [
-            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: 54.352, longitude: 18.6466, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2248,7 +2248,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/volodymyr-handzyuk-dwptzh9dz',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2266,7 +2266,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/kyxceoip',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2285,7 +2285,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/GYwmqLQk',
         locations: [
-            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2303,7 +2303,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/pJdy0tFO',
         locations: [
-            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2321,7 +2321,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/volodymyr-yurkevych-1y_04tsya',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2339,7 +2339,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/flreagps',
         locations: [
-            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2357,7 +2357,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/lkefsznq',
         locations: [
-            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2375,7 +2375,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/zs42ouw6',
         locations: [
-            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: 50.0647, longitude: 19.945, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Kraków', street: null, voivodeship: 'malopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2394,7 +2394,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://www.facebook.com/m2remontofficial',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie',phoneNumber: '+380 95 615 8777', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie',phoneNumber: '+380 95 615 8777', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2412,7 +2412,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/0ku3bpls',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2430,7 +2430,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/ytw1l97n',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2448,7 +2448,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/frmglsru',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2466,7 +2466,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/lnl6z68f',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2485,7 +2485,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/m1m5tfjm',
         locations: [
-            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2503,7 +2503,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/mo4i13va',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2521,7 +2521,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/blbzyyaz',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2539,7 +2539,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://fixly.pl/profil/zdqa3sik',
         locations: [
-            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: 52.4064, longitude: 16.9252, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Poznań', street: null, voivodeship: 'wielkopolskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2558,7 +2558,7 @@ async function mainSeed() {
         webpage: 'https://art-home-wro.blogspot.com/',
         socials: { facebook: 'https://www.facebook.com/Art.Home.Wro' },
         locations: [
-            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2578,7 +2578,7 @@ async function mainSeed() {
         whatsappNumber: '+48796515066',
         socials: { facebook: 'https://www.facebook.com/igorvonsovic' },
         locations: [
-            { city: 'Wrocław', phoneNumber: '+48796515066', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', phoneNumber: '+48796515066', street: 'ul. Obrońców Poczty Gdańskiej', voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2596,7 +2596,7 @@ async function mainSeed() {
         languages: ['pl', 'uk', 'ru'],
         whatsappNumber: '+48 512 123 579',
         locations: [
-            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: 51.1079, longitude: 17.0385, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 512 123 579' },
+            { city: 'Wrocław', street: null, voivodeship: 'dolnoslaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 512 123 579' },
         ],
     });
 
@@ -2614,7 +2614,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         whatsappNumber: '+48 575 877 119',
         locations: [
-            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: 54.352, longitude: 18.6466, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 877 119', email: 'fop_rad@ukr.net' },
+            { city: 'Gdańsk', street: null, voivodeship: 'pomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 877 119', email: 'fop_rad@ukr.net' },
         ],
     });
 
@@ -2633,7 +2633,7 @@ async function mainSeed() {
         webpage: 'https://remont-m2.com/',
         socials: { facebook: 'https://www.facebook.com/m2remontofficial' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2654,7 +2654,7 @@ async function mainSeed() {
         whatsappNumber: '+48666668946',
         socials: { instagram: 'https://www.instagram.com/ligaremontu/' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 666 668 946' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 666 668 946' },
         ],
     });
 
@@ -2671,7 +2671,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 213 933', email: 'alvaresandcompany@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 213 933', email: 'alvaresandcompany@gmail.com' },
         ],
     });
 
@@ -2690,7 +2690,7 @@ async function mainSeed() {
         whatsappNumber: '+48697142801',
         socials: { instagram: 'https://www.instagram.com/imperium_dvm_group/', facebook: 'https://www.facebook.com/p/Imperium-DVM-GROUP-100049169688092/' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 697 142 801', email: 'imperium.dvm@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 697 142 801', email: 'imperium.dvm@gmail.com' },
         ],
     });
 
@@ -2708,7 +2708,7 @@ async function mainSeed() {
         whatsappNumber: '+48 577 594 361',
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 577 594 361' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 577 594 361' },
         ],
     });
 
@@ -2726,7 +2726,7 @@ async function mainSeed() {
         whatsappNumber: '+48 886 167 024',
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 167 024' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 167 024' },
         ],
     });
 
@@ -2744,7 +2744,7 @@ async function mainSeed() {
         whatsappNumber: '+48 575 364 202',
         languages: ['pl', 'uk', 'ru'],
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 364 202' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 364 202' },
         ],
     });
 
@@ -2761,7 +2761,7 @@ async function mainSeed() {
         tags: ['tiles', 'flooring', 'drywall', 'painting', 'finishing', 'repair'],
         languages: ['pl', 'uk', 'ru'],
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 780 002 838' , email: 'zamyslaualiaksei@gmail.com' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 780 002 838' , email: 'zamyslaualiaksei@gmail.com' },
         ],
     });
 
@@ -2780,7 +2780,7 @@ async function mainSeed() {
         whatsappNumber: '+48 886 969 813',
         socials: { facebook: 'https://www.facebook.com/people/Ремонт-Варшава-і-околиці/61557386745645/', telegram: 'https://t.me/warszawa_remont' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 969 813' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 969 813' },
         ],
     });
 
@@ -2797,7 +2797,7 @@ async function mainSeed() {
         tags: ['painting', 'tiles', 'finishing', 'repair'],
         languages: ['pl', 'uk', 'ru'],
         locations: [
-            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 443 237' },
+            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 575 443 237' },
         ],
     });
 
@@ -2814,7 +2814,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: 51.7592, longitude: 19.456, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 796 713 544' },
+            { city: 'Łódź', street: null, voivodeship: 'lodzkie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 796 713 544' },
         ],
     });
 
@@ -2831,7 +2831,7 @@ async function mainSeed() {
         tags: ['tiles', 'flooring', 'painting', 'drywall', 'finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 125 309' },
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 886 125 309' },
         ],
     });
 
@@ -2849,7 +2849,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         socials: { instagram: 'https://instagram.com/remontiago' },
         locations: [
-            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 570 182 180' },
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 570 182 180' },
         ],
     });
 
@@ -2867,7 +2867,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://kopapolska.pl/',
         locations: [
-            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: 50.2649, longitude: 19.0238, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 727 803 272' },
+            { city: 'Katowice', street: null, voivodeship: 'slaskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 727 803 272' },
         ],
     });
 
@@ -2886,7 +2886,7 @@ async function mainSeed() {
         tags: ['finishing', 'painting', 'repair'],
         languages: ['pl', 'uk', 'ru'],
         locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 210 928' },
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 881 210 928' },
         ],
     });
 
@@ -2903,7 +2903,7 @@ async function mainSeed() {
         tags: ['finishing', 'painting', 'tiles', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 534 690 296' },
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 534 690 296' },
         ],
     });
 
@@ -2920,7 +2920,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2937,7 +2937,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 793 464 671' },
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 793 464 671' },
         ],
     });
 
@@ -2954,7 +2954,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: 53.4285, longitude: 14.5528, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 601 654 288' },
+            { city: 'Szczecin', street: null, voivodeship: 'zachodniopomorskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 601 654 288' },
         ],
     });
 
@@ -2973,7 +2973,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -2990,7 +2990,7 @@ async function mainSeed() {
         tags: ['finishing', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -3007,7 +3007,7 @@ async function mainSeed() {
         tags: ['finishing', 'painting', 'tiles', 'flooring', 'repair'],
         languages: ['pl', 'uk'],
         locations: [
-            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: 51.2465, longitude: 22.5684, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Lublin', street: null, voivodeship: 'lubelskie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -3076,6 +3076,7 @@ async function mainSeed() {
         name: 'Tax Safe',
         slug: 'tax-safe',
         category: 'financial',
+        coverage: 'online',
         ukName: 'Tax Safe', enName: 'Tax Safe', ruName: 'Tax Safe',
         plDesc: 'Ogólnopolska sieć biur rachunkowych z ponad 25-letnim doświadczeniem. Ponad 40 oddziałów w Polsce. Oferuje usługi księgowe dedykowane klientom z Ukrainy – prowadzenie firmy, rozliczenia podatkowe i doradztwo.',
         ukDesc: 'Загальнопольська мережа бухгалтерських бюро з понад 25-річним досвідом. Понад 40 відділень у Польщі. Пропонує бухгалтерські послуги для клієнтів з України – ведення фірми, податкові розрахунки та консультації.',
@@ -3087,7 +3088,7 @@ async function mainSeed() {
         webpage: 'https://taxsafe.pl/',
         socials: { facebook: 'https://www.facebook.com/taxsafepl/' },
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 692 102 000', email: 'serwis@taxsafe.pl' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 692 102 000', email: 'serwis@taxsafe.pl' },
         ],
     });
 
@@ -3185,7 +3186,7 @@ async function mainSeed() {
         socials: { facebook: 'https://www.facebook.com/profile.php?id=100077966179786', instagram: 'https://www.instagram.com/it_mustbe_law/', linkedin: 'https://www.linkedin.com/in/marzena-jakowenko/' },
         webpage: 'https://mj-legal.pl/',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 530 705 565', email: 'office@mj-legal.pl' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 530 705 565', email: 'office@mj-legal.pl' },
         ],
     });
 
@@ -3214,6 +3215,7 @@ async function mainSeed() {
         name: 'Biznes.gov.pl – Portal dla Ukraińców',
         slug: 'biznes-gov-pl-ukraina',
         category: 'help_support',
+        coverage: 'online',
         ukName: 'Biznes.gov.pl – Портал для українців', enName: 'Biznes.gov.pl – Portal for Ukrainians', ruName: 'Biznes.gov.pl – Портал для украинцев',
         plDesc: 'Rządowy portal Ministerstwa Rozwoju i Technologii z informacjami dla Ukraińców o zakładaniu i prowadzeniu działalności gospodarczej w Polsce, uzyskaniu numeru PESEL oraz zatrudnieniu. Dostępny w języku ukraińskim.',
         ukDesc: 'Урядовий портал Міністерства розвитку і технологій з інформацією для українців про відкриття та ведення бізнесу в Польщі, отримання номера PESEL та працевлаштування. Доступний українською мовою.',
@@ -3223,7 +3225,7 @@ async function mainSeed() {
         languages: ['pl', 'uk'],
         webpage: 'https://www.biznes.gov.pl/pl/ukraina',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -3232,6 +3234,7 @@ async function mainSeed() {
         name: 'KIDP – Krajowa Izba Doradców Podatkowych',
         slug: 'kidp-wyszukaj-doradce',
         category: 'financial',
+        coverage: 'online',
         ukName: 'KIDP – Національна палата податкових консультантів', enName: 'KIDP – National Chamber of Tax Advisors', ruName: 'KIDP – Национальная палата налоговых консультантов',
         plDesc: 'Oficjalna wyszukiwarka Krajowej Izby Doradców Podatkowych pozwalająca znaleźć certyfikowanego doradcę podatkowego w całej Polsce. Weryfikacja uprawnień, szkolenia i mediacja.',
         ukDesc: 'Офіційна пошукова система Національної палати податкових консультантів, що дозволяє знайти сертифікованого податкового консультанта по всій Польщі. Перевірка кваліфікації, навчання та медіація.',
@@ -3241,7 +3244,7 @@ async function mainSeed() {
         languages: ['pl'],
         webpage: 'https://kidp.pl/wyszukaj-doradce-podatkowego',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -3249,6 +3252,8 @@ async function mainSeed() {
     await seedService({
         name: 'Finexpert',
         slug: 'finexpert',
+        // Jedyne biuro jest we Wroclawiu (finexp.pl/en/contacts) — wczesniej wpis stal
+        // pod zastepczym adresem w centrum Warszawy.
         category: 'financial',
         ukName: 'Finexpert', enName: 'Finexpert – Finance Expert', ruName: 'Finexpert',
         plDesc: 'Biuro rachunkowe specjalizujące się w uruchamianiu i prowadzeniu biznesu w Polsce dla przedsiębiorców z Ukrainy. Rejestracja firm, księgowość i doradztwo biznesowe.',
@@ -3260,7 +3265,7 @@ async function mainSeed() {
         languages: ['pl', 'uk', 'ru', 'en'],
         webpage: 'https://finexp.pl/ua/',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true },
+            { city: 'Wrocław', street: 'ul. Kuźnicza 10', voivodeship: 'dolnoslaskie', postcode: '50-138', latitude: 51.111, longitude: 17.034, openingHours: standardShopHours, isMainLocation: true },
         ],
     });
 
@@ -3377,7 +3382,7 @@ async function mainSeed() {
         socials: { facebook: 'https://www.facebook.com/romaniuk.partners', youtube: 'https://www.youtube.com/channel/UCruwnI6GUCNBmT_vzMNKTHw' },
         webpage: 'https://r-partners.pl/uk/orhanizatsiya-vedennya-bukhhalterskoho-obliku-v-polshchi/',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 731 775 959', email: 'm.romaniuk@r-partners.pl' },
+            { city: 'Warszawa', street: 'ul. Korytnicka 46/52', voivodeship: 'mazowieckie', postcode: '04-109', latitude: 52.2432, longitude: 21.0917, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 731 775 959', email: 'm.romaniuk@r-partners.pl' },
         ],
     });
 
@@ -3446,7 +3451,7 @@ async function mainSeed() {
         name: 'ARK Biuro Rachunkowe',
         slug: 'ark-biuro-rachunkowe',
         category: 'financial',
-        coverage: 'hybrid',
+        coverage: 'online',
         ukName: 'ARK Бухгалтерія', enName: 'ARK Accounting Office', ruName: 'ARK Бухгалтерия',
         plDesc: 'Biuro rachunkowe oferujące obsługę online w całej Polsce. Księgowość JDG i spółek, rejestracja firm, odzyskiwanie księgowości, kadry i płace, profil zaufany oraz pomoc w relokacji biznesu do Polski. Obsługa w języku rosyjskim, polskim i angielskim.',
         ukDesc: 'Бухгалтерське бюро, що пропонує онлайн-обслуговування по всій Польщі. Бухгалтерія ФОП та компаній, реєстрація фірм, відновлення бухгалтерії, кадри та зарплати, довірений профіль та допомога у релокації бізнесу до Польщі. Обслуговування російською, польською та англійською мовами.',
@@ -3458,7 +3463,7 @@ async function mainSeed() {
         socials: { instagram: 'https://www.instagram.com/ark_biuro_rachunkowe/', facebook: 'https://www.facebook.com/ARK.Biuro.Rachunkowe', youtube: 'https://www.youtube.com/@ARK_Biuro_Rachunkowe' },
         webpage: 'https://biuro-ark.pl/',
         locations: [
-            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: 52.2297, longitude: 21.0122, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 451 100 945' },
+            { city: 'Warszawa', street: null, voivodeship: 'mazowieckie', latitude: null, longitude: null, openingHours: standardShopHours, isMainLocation: true, phoneNumber: '+48 451 100 945' },
         ],
     });
 

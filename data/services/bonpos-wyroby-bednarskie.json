@@ -1,0 +1,96 @@
+{
+    "name": "Bonpos – wyroby bednarskie",
+    "category": "grocery",
+    "coverage": "online",
+    "status": "active",
+    "verified": false,
+    "image": "bonpos-wyroby-bednarskie.png",
+    "languages": [
+        "pl",
+        "uk",
+        "ru",
+        "en"
+    ],
+    "translations": {
+        "pl": {
+            "description": "Bonpos to oficjalny sklep internetowy oferujący szeroki wybór wyrobów bednarskich, takich jak dębowe beczki, pojemniki, akcesoria do sauny oraz drewniane akcesoria kuchenne. Firma działa online, dostarczając produkty klientom w Polsce. Siedziba firmy znajduje się w Pradze, a obsługa klienta dostępna jest po polsku, ukraińsku, rosyjsku i angielsku."
+        },
+        "uk": {
+            "description": "Bonpos — офіційний інтернет-магазин, що пропонує широкий вибір виробів з дуба, таких як дубові бочки, контейнери, аксесуари для сауни та дерев'яні кухонні аксесуари. Компанія працює онлайн, доставляючи товари клієнтам у Польщі. Штаб-квартира знаходиться в Празі, обслуговування клієнтів польською, українською, російською та англійською мовами."
+        },
+        "en": {
+            "description": "Bonpos is an official online store offering a wide range of cooperage products including oak barrels, containers, sauna accessories, and wooden kitchen accessories. The company operates online, delivering products to customers in Poland. Its headquarters are located in Prague, with customer service available in Polish, Ukrainian, Russian and English."
+        },
+        "ru": {
+            "description": "Bonpos — официальный интернет-магазин, предлагающий широкий ассортимент изделий из дуба, таких как дубовые бочки, контейнеры, аксессуары для сауны и деревянные кухонные принадлежности. Компания работает онлайн, доставляя товары клиентам в Польше. Штаб-квартира находится в Праге, обслуживание клиентов на польском, украинском, русском и английском языках."
+        }
+    },
+    "tags": [
+        {
+            "pl": "Dębowe beczki",
+            "uk": "Дубові бочки",
+            "en": "Oak barrels",
+            "ru": "Дубовые бочки"
+        },
+        {
+            "pl": "Pojemniki dębowe",
+            "uk": "Дубові контейнери",
+            "en": "Oak containers",
+            "ru": "Дубовые контейнеры"
+        },
+        {
+            "pl": "Akcesoria do sauny",
+            "uk": "Аксесуари для сауни",
+            "en": "Sauna accessories",
+            "ru": "Аксессуары для сауны"
+        },
+        {
+            "pl": "Akcesoria kuchenne drewniane",
+            "uk": "Дерев'яні кухонні аксесуари",
+            "en": "Wooden kitchen accessories",
+            "ru": "Деревянные кухонные аксессуары"
+        },
+        {
+            "pl": "Doniczki ogrodowe",
+            "uk": "Горщики для саду",
+            "en": "Garden pots",
+            "ru": "Садовые горшки"
+        }
+    ],
+    "locations": [
+        {
+            "city": "Praha",
+            "street": "Milady Horákové 116/109, Hradčany",
+            "postcode": "160 00",
+            "openingHours": {
+                "monday": {
+                    "open": "09:00",
+                    "close": "18:00"
+                },
+                "tuesday": {
+                    "open": "09:00",
+                    "close": "18:00"
+                },
+                "wednesday": {
+                    "open": "09:00",
+                    "close": "18:00"
+                },
+                "thursday": {
+                    "open": "09:00",
+                    "close": "18:00"
+                },
+                "friday": {
+                    "open": "09:00",
+                    "close": "18:00"
+                }
+            },
+            "phoneNumber": "+420 608 244 752",
+            "email": "info@bonpos.pl",
+            "webpage": "https://bonpos.pl",
+            "socials": {
+                "instagram": "https://www.instagram.com/bonpos.pl"
+            },
+            "isMainLocation": true
+        }
+    ]
+}

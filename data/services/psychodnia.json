@@ -5,20 +5,20 @@
     "status": "active",
     "verified": false,
     "image": "psychodnia.png",
-    "languages": ["pl"],
+    "languages": ["pl", "uk"],
 
     "translations": {
         "pl": {
-            "description": "Lecznica weterynaryjna na warszawskich Bielanach, przy ul. Heroldów. Zajmuje się profilaktyką, chorobami wewnętrznymi, chirurgią (także laparoskopową) i ortopedią zwierząt. Prowadzi rehabilitację z bieżnią wodną i terapią INDIBA, a na miejscu ma laboratorium, USG, RTG (także stomatologiczne) i echo serca. Przyjmuje od poniedziałku do piątku w godzinach 9:00–21:00 i w soboty 10:00–15:00. Strona lecznicy ma wersję ukraińską."
+            "description": "Lecznica weterynaryjna na warszawskich Bielanach, przy ul. Heroldów. Zajmuje się profilaktyką, chorobami wewnętrznymi, chirurgią (także laparoskopową) i ortopedią zwierząt. Prowadzi rehabilitację z bieżnią wodną i terapią INDIBA, a na miejscu ma laboratorium, USG, RTG (także stomatologiczne) i echo serca. Przyjmuje od poniedziałku do piątku w godzinach 9:00–21:00 i w soboty 10:00–15:00. Strona lecznicy ma wersję ukraińską. Obsługa po polsku i ukraińsku."
         },
         "uk": {
-            "description": "Ветеринарна лікарня на варшавських Бєлянах, на вулиці Heroldów. Профілактика, внутрішні хвороби, хірургія (зокрема лапароскопічна) та ортопедія тварин. Реабілітація з водною доріжкою та терапією INDIBA; на місці лабораторія, УЗД, рентген (також стоматологічний) і ехокардіографія. Працює з понеділка по п'ятницю з 9:00 до 21:00 і в суботу з 10:00 до 15:00. Сайт має українську версію; мову обслуговування варто уточнити телефоном."
+            "description": "Ветеринарна лікарня на варшавських Бєлянах, на вулиці Heroldów. Профілактика, внутрішні хвороби, хірургія (зокрема лапароскопічна) та ортопедія тварин. Реабілітація з водною доріжкою та терапією INDIBA; на місці лабораторія, УЗД, рентген (також стоматологічний) і ехокардіографія. Працює з понеділка по п'ятницю з 9:00 до 21:00 і в суботу з 10:00 до 15:00. Сайт має українську версію. Обслуговування польською та українською."
         },
         "en": {
-            "description": "Veterinary hospital on Heroldów Street in Warsaw's Bielany district. It covers preventive care, internal medicine, surgery (including laparoscopy) and orthopaedics for animals, and offers rehabilitation with an underwater treadmill and INDIBA therapy. On site: laboratory, ultrasound, X-ray (including dental) and echocardiography. Open Monday to Friday 9:00–21:00 and Saturday 10:00–15:00. The website has a Ukrainian version."
+            "description": "Veterinary hospital on Heroldów Street in Warsaw's Bielany district. It covers preventive care, internal medicine, surgery (including laparoscopy) and orthopaedics for animals, and offers rehabilitation with an underwater treadmill and INDIBA therapy. On site: laboratory, ultrasound, X-ray (including dental) and echocardiography. Open Monday to Friday 9:00–21:00 and Saturday 10:00–15:00. The website has a Ukrainian version. Service in Polish and Ukrainian."
         },
         "ru": {
-            "description": "Ветеринарная лечебница на варшавских Белянах, на улице Heroldów. Профилактика, внутренние болезни, хирургия (в том числе лапароскопическая) и ортопедия животных. Реабилитация с водной дорожкой и терапией INDIBA; на месте лаборатория, УЗИ, рентген (в том числе стоматологический) и эхокардиография. Работает с понедельника по пятницу с 9:00 до 21:00 и в субботу с 10:00 до 15:00. У сайта есть украинская версия; язык обслуживания стоит уточнить по телефону."
+            "description": "Ветеринарная лечебница на варшавских Белянах, на улице Heroldów. Профилактика, внутренние болезни, хирургия (в том числе лапароскопическая) и ортопедия животных. Реабилитация с водной дорожкой и терапией INDIBA; на месте лаборатория, УЗИ, рентген (в том числе стоматологический) и эхокардиография. Работает с понедельника по пятницу с 9:00 до 21:00 и в субботу с 10:00 до 15:00. У сайта есть украинская версия. Обслуживание на польском и украинском."
         }
     },
 
