@@ -1,82 +1,11 @@
-import OpenAI from 'openai';
-import { eq, isNull } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import {
     serviceLocationsTable,
     servicesTable,
-    servicesTagsTable,
     servicesTranslationsTable,
-    tagsTranslationsTable,
 } from '../db/schema';
 import { db } from '../db';
-import { CATEGORY_CONTEXTS, isCategory } from '../lib/category-contexts';
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-
-// Mapa mieszka w `src/lib/category-contexts.ts` — ten sam tekst musi opisywac
-// kategorie po stronie dokumentu i po stronie zapytania w /api/services.
-
-async function generateEmbedding(text: string): Promise<number[]> {
-    const response = await openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: text,
-    });
-    return response.data[0].embedding;
-}
-
-function buildSearchableText(
-    service: { name: string; category: string },
-    location: { city: string | null; street: string | null; voivodeship: string | null },
-    translations: { languageCode: string; name: string | null; description: string | null }[],
-    tags: { languageCode: string; name: string }[],
-): string {
-    const parts: string[] = [
-        `Service: ${service.name}`,
-        `Category: ${service.category}`,
-    ];
-
-    // `service.category` przychodzi z bazy jako `string`, wiec przed indeksowaniem
-    // mapy musi przejsc przez straznika — inaczej literowka w kolumnie cicho dawalaby
-    // dokument bez kontekstu kategorii.
-    if (isCategory(service.category)) {
-        parts.push(`Context: ${CATEGORY_CONTEXTS[service.category]}`);
-    }
-
-    if (location.city) parts.push(`City: ${location.city}`);
-    if (location.voivodeship) parts.push(`Voivodeship: ${location.voivodeship}`);
-    if (location.street) parts.push(`Address: ${location.street}`);
-
-    // Group translations by language so multi-lang content is clearly separated
-    const byLang = new Map<string, { names: string[]; descriptions: string[] }>();
-    for (const t of translations) {
-        if (!byLang.has(t.languageCode)) {
-            byLang.set(t.languageCode, { names: [], descriptions: [] });
-        }
-        const entry = byLang.get(t.languageCode)!;
-        if (t.name && t.name !== service.name) entry.names.push(t.name);
-        if (t.description) entry.descriptions.push(t.description);
-    }
-
-    for (const [lang, { names, descriptions }] of byLang) {
-        if (names.length > 0) parts.push(`Name [${lang}]: ${names.join(', ')}`);
-        if (descriptions.length > 0) parts.push(`Description [${lang}]: ${descriptions.join('. ')}`);
-    }
-
-    // Group tags by language
-    const tagsByLang = new Map<string, string[]>();
-    for (const t of tags) {
-        if (!tagsByLang.has(t.languageCode)) tagsByLang.set(t.languageCode, []);
-        tagsByLang.get(t.languageCode)!.push(t.name);
-    }
-
-    for (const [lang, tagNames] of tagsByLang) {
-        const unique = [...new Set(tagNames)];
-        if (unique.length > 0) parts.push(`Tags [${lang}]: ${unique.join(', ')}`);
-    }
-
-    return parts.join('. ');
-}
+import { buildSearchableText, findServiceTagTexts, generateEmbedding } from './service-embedding';
 
 async function main() {
     const forceRegenerate = process.argv.includes('--force');
@@ -137,14 +66,7 @@ async function main() {
             }
 
             // Fetch tags for this service (all languages)
-            const tagsData = await db
-                .select({
-                    name: tagsTranslationsTable.name,
-                    languageCode: tagsTranslationsTable.languageCode,
-                })
-                .from(servicesTagsTable)
-                .innerJoin(tagsTranslationsTable, eq(servicesTagsTable.tagId, tagsTranslationsTable.tagId))
-                .where(eq(servicesTagsTable.serviceId, service.id));
+            const tagsData = await findServiceTagTexts(service.id);
 
             const text = buildSearchableText(service, location, translations, tagsData);
 

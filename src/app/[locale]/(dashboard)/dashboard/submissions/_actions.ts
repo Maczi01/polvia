@@ -4,6 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { hasDashboardAccess } from '@/lib/dashboard-access';
+import {
+    isSubmissionPublishingEnabled,
+    publishServiceSubmission,
+    type PublishedSubmission,
+    type PublishErrorCode,
+} from '@/lib/publish-submission';
 import { deleteServiceSubmission, setServiceSubmissionStatus } from '@/lib/service-submissions';
 import { SUBMISSION_STATUSES, type SubmissionStatus } from '@/lib/submission-status';
 
@@ -16,6 +22,13 @@ export type UpdateSubmissionStatusResult =
 export type DeleteSubmissionResult =
     | { data: { id: string }; error?: undefined }
     | { data?: undefined; error: { code: ActionErrorCode; message: string } };
+
+export type PublishSubmissionResult =
+    | { data: PublishedSubmission; error?: undefined }
+    | {
+          data?: undefined;
+          error: { code: ActionErrorCode | PublishErrorCode | 'LOCAL_ONLY'; message: string };
+      };
 
 const idSchema = z.string().uuid();
 
@@ -49,6 +62,31 @@ export async function updateSubmissionStatus(
 
     revalidatePath('/[locale]/dashboard/submissions', 'layout');
     return { data: { status: input.data.status } };
+}
+
+/** Zapisuje wpis na bazie i pliki w repo, wiec poza `next dev` odmawia nawet z dostepem. */
+export async function publishSubmission(id: string): Promise<PublishSubmissionResult> {
+    if (!(await hasDashboardAccess())) return failure('FORBIDDEN', 'Access denied');
+    if (!isSubmissionPublishingEnabled()) {
+        return { error: { code: 'LOCAL_ONLY', message: 'Publishing works only in local next dev.' } };
+    }
+
+    const input = idSchema.safeParse(id);
+    if (!input.success) return failure('BAD_INPUT', 'Invalid submission');
+
+    try {
+        const result = await publishServiceSubmission(input.data);
+        if (!result.ok) return { error: { code: result.code, message: result.message } };
+
+        revalidatePath('/[locale]/dashboard/submissions', 'layout');
+        return { data: result.data };
+    } catch (error) {
+        console.error('submission publish failed', {
+            id: input.data,
+            reason: error instanceof Error ? error.name : 'unknown',
+        });
+        return failure('SAVE_FAILED', 'Could not publish the submission. Try again.');
+    }
 }
 
 /** Trwale usuwa zgloszenie: regulamin ogranicza czas przechowywania danych zglaszajacego. */

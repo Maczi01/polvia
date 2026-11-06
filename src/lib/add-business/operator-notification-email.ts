@@ -3,7 +3,8 @@ import 'server-only';
 import { line, type SubmissionEmailInput } from '@/lib/add-business/submission-email-format';
 import { getOperatorInbox, type MailMessage, toHeaderText } from '@/lib/mailer';
 
-import { env } from '../../../env';
+/** Panel dziala lokalnie (`next dev`); na produkcji jest wylaczony i dalby 404. */
+const LOCAL_DASHBOARD_URL = 'http://localhost:3000';
 
 /**
  * Krotkie powiadomienie o zgloszeniu zapisanym w bazie: sygnal i link do panelu, bez
@@ -29,7 +30,7 @@ export function buildOperatorNotificationEmail(
             line('Miasto', location?.city),
             line('Logo', logo === null ? null : 'tak'),
             '',
-            `Szczegóły: ${env.NEXT_PUBLIC_SITE_URL}/dashboard/submissions/${submissionId}`,
+            `Szczegóły (panel lokalny): ${LOCAL_DASHBOARD_URL}/dashboard/submissions/${submissionId}`,
         ].join('\n'),
     };
 }
