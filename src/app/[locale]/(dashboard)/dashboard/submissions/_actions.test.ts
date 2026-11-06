@@ -2,14 +2,19 @@
  * @jest-environment node
  */
 import { hasDashboardAccess } from '@/lib/dashboard-access';
+import { isSubmissionPublishingEnabled, publishServiceSubmission } from '@/lib/publish-submission';
 import { deleteServiceSubmission, setServiceSubmissionStatus } from '@/lib/service-submissions';
 
-import { deleteSubmission, updateSubmissionStatus } from './_actions';
+import { deleteSubmission, publishSubmission, updateSubmissionStatus } from './_actions';
 
 const ID = '5f0c3c2e-8d7b-4a52-9d55-3f1a2b3c4d5e';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('@/lib/dashboard-access', () => ({ hasDashboardAccess: jest.fn() }));
+jest.mock('@/lib/publish-submission', () => ({
+    isSubmissionPublishingEnabled: jest.fn(),
+    publishServiceSubmission: jest.fn(),
+}));
 jest.mock('@/lib/service-submissions', () => ({
     deleteServiceSubmission: jest.fn(),
     setServiceSubmissionStatus: jest.fn(),
@@ -18,17 +23,77 @@ jest.mock('@/lib/service-submissions', () => ({
 const mockAccess = jest.mocked(hasDashboardAccess);
 const mockSetStatus = jest.mocked(setServiceSubmissionStatus);
 const mockDelete = jest.mocked(deleteServiceSubmission);
+const mockPublishingEnabled = jest.mocked(isSubmissionPublishingEnabled);
+const mockPublish = jest.mocked(publishServiceSubmission);
 
 beforeEach(() => {
     jest.clearAllMocks();
     mockAccess.mockResolvedValue(true);
     mockSetStatus.mockResolvedValue(true);
     mockDelete.mockResolvedValue(true);
+    mockPublishingEnabled.mockReturnValue(true);
     jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
 afterEach(() => {
     jest.restoreAllMocks();
+});
+
+describe('publishSubmission', () => {
+    const PUBLISHED = {
+        serviceSlug: 'kancelaria-nowak',
+        files: ['data/services/kancelaria-nowak.json'],
+        isSearchIndexed: true,
+    };
+
+    it('publikuje i zwraca wynik', async () => {
+        mockPublish.mockResolvedValue({ ok: true, data: PUBLISHED });
+
+        await expect(publishSubmission(ID)).resolves.toEqual({ data: PUBLISHED });
+        expect(mockPublish).toHaveBeenCalledWith(ID);
+    });
+
+    it('bez dostepu odmawia przed publikacja', async () => {
+        mockAccess.mockResolvedValue(false);
+
+        const result = await publishSubmission(ID);
+
+        expect(result.error?.code).toBe('FORBIDDEN');
+        expect(mockPublish).not.toHaveBeenCalled();
+    });
+
+    it('poza next dev odmawia mimo dostepu', async () => {
+        mockPublishingEnabled.mockReturnValue(false);
+
+        const result = await publishSubmission(ID);
+
+        expect(result.error?.code).toBe('LOCAL_ONLY');
+        expect(mockPublish).not.toHaveBeenCalled();
+    });
+
+    it('id spoza UUID daje BAD_INPUT', async () => {
+        const result = await publishSubmission('nie-uuid');
+
+        expect(result.error?.code).toBe('BAD_INPUT');
+        expect(mockPublish).not.toHaveBeenCalled();
+    });
+
+    it('przekazuje kod i powod odmowy', async () => {
+        mockPublish.mockResolvedValue({ ok: false, code: 'DUPLICATE_NAME', message: 'Duplikat' });
+
+        await expect(publishSubmission(ID)).resolves.toEqual({
+            error: { code: 'DUPLICATE_NAME', message: 'Duplikat' },
+        });
+    });
+
+    it('nieoczekiwany blad daje SAVE_FAILED bez surowego komunikatu', async () => {
+        mockPublish.mockRejectedValue(new Error('connection refused 10.0.0.1'));
+
+        const result = await publishSubmission(ID);
+
+        expect(result.error?.code).toBe('SAVE_FAILED');
+        expect(result.error?.message).not.toContain('10.0.0.1');
+    });
 });
 
 describe('deleteSubmission', () => {

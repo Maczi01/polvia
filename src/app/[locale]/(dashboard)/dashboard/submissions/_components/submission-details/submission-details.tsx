@@ -113,7 +113,7 @@ export function SubmissionDetails({ submission }: { submission: ServiceSubmissio
                 </dl>
             </Section>
 
-            <Section title="Publish">
+            <Section title="Publish manually">
                 <ol className="list-decimal space-y-1 pl-5 text-sm">
                     <li>
                         Save the JSON as <code>data/services/{slug}.json</code>

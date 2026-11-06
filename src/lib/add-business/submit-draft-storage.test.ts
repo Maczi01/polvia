@@ -20,7 +20,6 @@ import { submitDraft } from './submit-draft';
  */
 
 const SUBMISSION_ID = '11111111-2222-4333-8444-555555555555';
-const SITE_URL = 'https://polvia.test';
 
 const mockRedis = createFakeRedis();
 
@@ -86,7 +85,9 @@ describe('submitDraft — zapis zgloszenia', () => {
         expect(notification.replyTo).toBe(OWNER_EMAIL);
         expect(notification.attachments).toBeUndefined();
         expect(notification.text).toContain('Kancelaria Nowak');
-        expect(notification.text).toContain(`${SITE_URL}/dashboard/submissions/${SUBMISSION_ID}`);
+        expect(notification.text).toContain(
+            `http://localhost:3000/dashboard/submissions/${SUBMISSION_ID}`,
+        );
         expect(h.sendMail.mock.calls[1][0].to).toBe(OWNER_EMAIL);
     });
 
