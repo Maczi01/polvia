@@ -16,6 +16,7 @@ import {
 } from '@/lib/add-business/draft-store';
 import { consumeSubmitLimit, peekSubmitLimit } from '@/lib/add-business/limits';
 import { type LogoErrorCode, processLogoUpload } from '@/lib/add-business/logo';
+import { buildOperatorNotificationEmail } from '@/lib/add-business/operator-notification-email';
 import { OWNER_EDIT_ERRORS, parseOwnerEdits } from '@/lib/add-business/owner-edits-schema';
 import type { ManualPin } from '@/lib/add-business/owner-pin-schema';
 import { buildPreview, toPin } from '@/lib/add-business/preview';
@@ -23,6 +24,7 @@ import {
     buildOperatorEmail,
     buildOwnerConfirmationEmail,
     type BuiltServiceEntry,
+    type SubmissionEmailInput,
 } from '@/lib/add-business/submission-emails';
 import {
     actionFailure,
@@ -30,25 +32,30 @@ import {
     type FieldErrorKey,
     type SubmitDraftResult,
 } from '@/lib/add-business/types';
-import type { MailMessage, SendMailResult } from '@/lib/mailer';
+import type { MailMessage, SendMailErrorCode, SendMailResult } from '@/lib/mailer';
+import type { SaveSubmissionResult } from '@/lib/service-submissions';
 
 /**
- * Orkiestrator kroku 2: edycje wlasciciela + szkic z Redisa → plik wpisu → maile (R13, R15).
+ * Orkiestrator kroku 2: edycje wlasciciela + szkic z Redisa → plik wpisu → zapis zgloszenia
+ * do panelu → maile (R13, R15). Zgloszenie to poczekalnia (`service_submissions`), nie wpis
+ * katalogu: publikacja zostaje reczna przez `db:add`.
  *
  * Kategoria, zasieg, tagi i opisy pochodza wylacznie ze szkicu (R9) — `buildServiceJson`
  * nie czyta ich z formularza. Szkic jest jednorazowy, wiec wszystko, co moze sie nie udac
  * z winy danych albo uslug (walidacja, logo, geokodowanie, pobranie logo ze strony), dzieje
  * sie PRZED `consumeDraft`: porazka nie pali szkicu i wlasciciel moze poprawic i wyslac
- * ponownie. Po `consumeDraft` zostaje czysta budowa JSON-a i maile, ktore nie rzucaja.
+ * ponownie. Po `consumeDraft` zostaje czysta budowa JSON-a, zapis i maile, ktore nie rzucaja.
+ * Zgloszenie nie moze przepasc: zapis zawiodl = pelny mail z JSON-em i logo, mail tez = log.
  *
  * Budzet czasu (`maxDuration = 60` strony). Przed `consumeDraft`: geokodowanie (blokada
  * Nominatim do 1,1 s + fetch 8 s) rownolegle z kandydatem logo (safe-fetch 8 s) ≈ 9 s,
- * plus Redis i sharp ≈ 1 s. Po `consumeDraft` maile sa sekwencyjne, a `SMTP_TIMEOUT_MS`
- * (10 s) dotyczy kazdej fazy osobno: zawieszenie w jednej fazie = 10 s, najgorszy przypadek
- * (kazda faza tuz pod limitem) = 3 × 10 s = 30 s na mail. Mail operatora konczy sie zatem
- * najpozniej po ~40 s — zawsze sukcesem albo `SEND_FAILED` z `logLostSubmission`, nigdy
- * ubiciem funkcji. Teoretyczny sufit z potwierdzeniem (~70 s) przekracza 60 s, ale ubicie
- * w trakcie potwierdzenia nie gubi zgloszenia: mail operatora juz wyszedl.
+ * plus Redis i sharp ≈ 1 s. Po `consumeDraft` zapis ma limit `SUBMISSION_SAVE_TIMEOUT_MS`
+ * (5 s), a maile sa sekwencyjne: `SMTP_TIMEOUT_MS` (10 s) dotyczy kazdej fazy osobno, wiec
+ * zawieszenie w jednej fazie = 10 s, najgorszy przypadek (kazda faza tuz pod limitem) =
+ * 3 × 10 s = 30 s na mail. Mail operatora konczy sie zatem najpozniej po ~45 s — zawsze
+ * sukcesem albo `SEND_FAILED` z `logLostSubmission`, nigdy ubiciem funkcji. Teoretyczny sufit
+ * z potwierdzeniem (~75 s) przekracza 60 s, ale ubicie w trakcie potwierdzenia nie gubi
+ * zgloszenia: jest juz w bazie albo w mailu operatora.
  */
 
 export interface SubmitDraftDeps {
@@ -56,6 +63,8 @@ export interface SubmitDraftDeps {
     /** `processLogoCandidate` — pobiera obcy obrazek, wiec wstrzykiwany. Porazka = `null`. */
     fetchLogoCandidate: (url: string) => Promise<Buffer | null>;
     sendMail: (message: MailMessage) => Promise<SendMailResult>;
+    /** `saveServiceSubmission` — nie rzuca, porazka = `{ ok: false }`. */
+    saveSubmission: (input: SubmissionEmailInput) => Promise<SaveSubmissionResult>;
 }
 
 export interface SubmitRequest {
@@ -149,6 +158,30 @@ function logLostSubmission(
     });
 }
 
+type DeliveryResult = { ok: true } | { ok: false; code: SendMailErrorCode };
+
+/** Zapis do panelu + powiadomienie, a gdy zapis zawiedzie: pelny mail do operatora. */
+async function deliverToOperator(
+    mail: SubmissionEmailInput,
+    deps: SubmitDraftDeps,
+): Promise<DeliveryResult> {
+    const { entry, logo, manualPin } = mail;
+    const saved = await deps.saveSubmission(mail);
+    if (saved.ok) {
+        // Powiadomienie to tylko sygnal: zgloszenie juz czeka w panelu.
+        const notified = await deps.sendMail(buildOperatorNotificationEmail(mail, saved.id));
+        if (!notified.ok) {
+            console.warn('add-business operator notification not sent', { slug: entry.slug });
+        }
+        return { ok: true };
+    }
+
+    const operator = await deps.sendMail(buildOperatorEmail(mail));
+    if (operator.ok) return { ok: true };
+    logLostSubmission(entry, { hasLogo: logo !== null, manualPin });
+    return { ok: false, code: operator.code };
+}
+
 function sentResult(
     stored: StoredDraft,
     edits: Edits,
@@ -212,11 +245,8 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     if (!entry.ok) return actionFailure(entry.code);
 
     const mail = { entry, stored, submitterEmail, notes, logo, manualPin };
-    const operator = await deps.sendMail(buildOperatorEmail(mail));
-    if (!operator.ok) {
-        logLostSubmission(entry, { hasLogo: logo !== null, manualPin });
-        return actionFailure(operator.code);
-    }
+    const delivered = await deliverToOperator(mail, deps);
+    if (!delivered.ok) return actionFailure(delivered.code);
 
     // Potwierdzenie to uprzejmosc: zgloszenie juz dotarlo, wiec porazka idzie tylko do logu.
     const confirmation = await deps.sendMail(buildOwnerConfirmationEmail(mail));

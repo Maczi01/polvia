@@ -1,5 +1,6 @@
 import {
     boolean,
+    customType,
     doublePrecision,
     index,
     integer,
@@ -16,11 +17,13 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
+import type { ServiceJson } from '../lib/add-business/build-service-json';
 import { CATEGORY_VALUES } from '../lib/categories';
 import { COVERAGE_VALUES } from '../lib/coverage';
 import { SUBSCRIPTION_STATUSES } from '../lib/premium';
 import { PREMIUM_TEMPLATES } from '../lib/premium-templates';
 import { SERVICE_STATUS_VALUES } from '../lib/service-status';
+import { SUBMISSION_STATUSES } from '../lib/submission-status';
 import { VOIVODESHIP_VALUES } from '../lib/voivodeships';
 import type { OpeningHours } from '../lib/weekdays';
 import type {
@@ -44,6 +47,11 @@ export const profileTemplateEnum = pgEnum('profile_template', PREMIUM_TEMPLATES)
 
 /** Status subskrypcji Stripe. Wartosci: `SUBSCRIPTION_STATUSES` w `src/lib/premium.ts`. */
 export const subscriptionStatusEnum = pgEnum('subscription_status', SUBSCRIPTION_STATUSES);
+
+/** Status zgloszenia firmy w panelu. Wartosci: `src/lib/submission-status.ts`. */
+export const submissionStatusEnum = pgEnum('submission_status', SUBMISSION_STATUSES);
+
+const bytea = customType<{ data: Buffer }>({ dataType: () => 'bytea' });
 
 export const servicesTable = pgTable('services', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -298,6 +306,32 @@ export const newsletterTable = pgTable('newsletter_subscribers', {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
     isActive: boolean('is_active').default(true),
     source: varchar('source', { length: 50 }).default('banner'),
+});
+
+/**
+ * Zgloszenia z formularza „Dodaj firme" czekajace na reczna publikacje przez `db:add`.
+ * Bez relacji do `services`: to poczekalnia, wpis powstaje dopiero z pliku w `data/services/`.
+ * Logo w bazie, bo system plikow Vercela jest efemeryczny; po `sharp` to PNG do 512 px.
+ * `submitter_email` i `notes` to dane osobowe zglaszajacego — tylko dla panelu.
+ */
+export const serviceSubmissionsTable = pgTable('service_submissions', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    status: submissionStatusEnum('status').notNull().default('new'),
+    name: varchar('name', { length: 255 }).notNull(),
+    slug: varchar('slug', { length: 255 }).notNull(),
+    entry: jsonb('entry').$type<ServiceJson>().notNull(),
+    unconfirmed: text('unconfirmed').array().notNull(),
+    changedByOwner: text('changed_by_owner').array().notNull(),
+    missingCoordinates: boolean('missing_coordinates').notNull(),
+    manualPin: boolean('manual_pin').notNull(),
+    submitterEmail: varchar('submitter_email', { length: 255 }).notNull(),
+    notes: text('notes'),
+    locale: varchar('locale', { length: 5 }).notNull(),
+    source: varchar('source', { length: 20 }).notNull(),
+    sourceUrl: text('source_url'),
+    logo: bytea('logo'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
 
 export type { Coverage } from '../lib/coverage';

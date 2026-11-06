@@ -61,6 +61,8 @@ export const routing = defineRouting({
         '/dashboard': '/dashboard',
         '/dashboard/services': '/dashboard/services',
         '/dashboard/services/new': '/dashboard/services/new',
+        '/dashboard/submissions': '/dashboard/submissions',
+        '/dashboard/submissions/[id]': '/dashboard/submissions/[id]',
     },
 });
 
