@@ -71,17 +71,21 @@ export interface Harness {
     sendMail: jest.Mock;
     geocode: jest.Mock;
     fetchLogoCandidate: jest.Mock;
+    saveSubmission: jest.Mock;
 }
 
 export function harness(): Harness {
     const sendMail = jest.fn().mockResolvedValue({ ok: true });
     const geocode = jest.fn().mockResolvedValue(GEOCODED);
     const fetchLogoCandidate = jest.fn().mockResolvedValue(LOGO_PNG);
+    // Domyslnie zapis zawodzi, czyli sciezka pelnego maila; testy zapisu nadpisuja wynik.
+    const saveSubmission = jest.fn().mockResolvedValue({ ok: false });
     return {
-        deps: { sendMail, geocode, fetchLogoCandidate },
+        deps: { sendMail, geocode, fetchLogoCandidate, saveSubmission },
         sendMail,
         geocode,
         fetchLogoCandidate,
+        saveSubmission,
     };
 }
 

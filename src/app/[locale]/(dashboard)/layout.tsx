@@ -1,4 +1,4 @@
-import { LayoutDashboard, List, Plus } from 'lucide-react';
+import { Inbox, LayoutDashboard, List, Plus } from 'lucide-react';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ReactNode } from 'react';
@@ -44,6 +44,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
                     >
                         <Plus className="size-4" />
                         Add Service
+                    </Link>
+                    <Link
+                        href="/dashboard/submissions"
+                        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                        <Inbox className="size-4" />
+                        Submissions
                     </Link>
                 </nav>
             </aside>

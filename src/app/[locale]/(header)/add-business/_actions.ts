@@ -19,6 +19,7 @@ import type {
 import { sendMail } from '@/lib/mailer';
 import { findServiceByDomain } from '@/lib/queries';
 import { getClientIp } from '@/lib/rate-limit';
+import { saveServiceSubmission } from '@/lib/service-submissions';
 
 import { env } from '../../../../../env';
 
@@ -28,8 +29,8 @@ import { env } from '../../../../../env';
  * (`src/lib/add-business/*`), testowanych z falszywymi zaleznosciami.
  *
  * Kazda akcja to publiczny endpoint POST: brak auth jest zamierzony (formularz publiczny),
- * a koszt ogranicza Redis (D7) w orkiestratorach. Bez `revalidatePath`: nic nie zmienia sie
- * w bazie (R14) — szkic zyje w Redisie, zgloszenie idzie mailem.
+ * a koszt ogranicza Redis (D7) w orkiestratorach. Bez `revalidatePath`: katalog sie nie zmienia
+ * (R14) — szkic zyje w Redisie, zgloszenie trafia do poczekalni panelu (`service_submissions`).
  *
  * `maxDuration = 60` ustawia strona (U9); akcja dziedziczy konfiguracje segmentu.
  */
@@ -79,6 +80,7 @@ export async function submitDraftAction(
             geocode: geocodeAddress,
             fetchLogoCandidate: url => processLogoCandidate(url),
             sendMail,
+            saveSubmission: saveServiceSubmission,
         },
     );
 }

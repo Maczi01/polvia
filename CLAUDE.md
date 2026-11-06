@@ -128,6 +128,10 @@ Profil: `/firma/<slug>` (`src/app/[locale]/firma/[slug]/`), krótki alias `polvi
 - **Oceny z innych serwisów** (`premium.ratings` → kolumna `service_profiles.ratings`, stałe w `src/lib/premium-ratings.ts`): wpisywane ręcznie, sekcja `ProfileRatings` we wszystkich trzech szablonach. **Nigdy nie do JSON-LD jako `aggregateRating`.** Automatyczne pobieranie z Google Places API jest świadomie pominięte: warunki Google Maps Platform dla EEA (Places API EEA Permitted Uses) nie obejmują pokazywania ocen cudzych firm w katalogu, a `rating`/`userRatingCount` nie wolno cache'ować.
 - **Przykładowa strona premium:** `/cennik/przyklad` (`/pricing/example` w en/ru/uk), fikcyjna firma z `pricing/example/_components/premium-example-profile.ts`, przełącznik `?szablon=gallery|professional|classic`. `noindex`, poza sitemapą i bazą. Zdjęcia tylko z `public/images/blog/` — pliki `public/services/remont*.png` są logotypami prawdziwych wpisów z seeda.
 
+### Zgloszenia firm w panelu
+
+Formularz „Dodaj firme” zapisuje zgloszenie w `service_submissions` (`src/lib/service-submissions.ts`), a operator dostaje krotkie powiadomienie z linkiem do `/dashboard/submissions`. To poczekalnia, nie katalog: publikacja zostaje reczna przez `db:add`, a zrodlem prawdy wpisu jest plik w `data/services/`. Nieudany zapis = dawny pelny mail z JSON-em i logo, wiec zgloszenie nie przepada. Tabela trzyma dane osobowe zglaszajacego (`submitter_email`, `notes`): kazdy odczyt w panelu idzie za `hasDashboardAccess`, a `/json` i `/logo` to route handlery pod `/dashboard`, bo przegladarka wysyla Basic Auth tylko w tej przestrzeni.
+
 ### Mutacje
 - **Server Action** (`_actions.ts` z `'use server'`) — mutacja z UI tego repo. Zawsze: walidacja Zod + sprawdzenie uprawnień + `revalidatePath` po zapisie.
 - **Route handler** (`src/app/api/**/route.ts`) — endpoint dla zewnętrznych konsumentów. Zawsze: walidacja Zod + rate limiting (wzorzec: `src/app/api/submit-contact-query/route.ts`).
