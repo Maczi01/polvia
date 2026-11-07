@@ -682,6 +682,7 @@
       "submitterEmailHint": "We will send the confirmation there. We do not publish it.",
       "notes": "Notes (optional)",
       "notesHint": "E.g. a different category or another branch in another city.",
+      "privacyNotice": "We use your email and notes only to handle this submission and delete them within 6 months after it is reviewed. The website content or business description is sent to OpenAI, including outside the EEA. More in our <link>privacy policy</link>.",
       "requiredMark": "(required)"
     },
     "hours": {

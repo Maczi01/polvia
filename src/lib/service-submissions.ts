@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { desc, eq, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, lt, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { db } from '@/db';
@@ -25,6 +25,14 @@ import type { SubmissionStatus } from '@/lib/submission-status';
 export const SUBMISSION_SAVE_TIMEOUT_MS = 5000;
 
 const LIST_LIMIT = 200;
+
+/**
+ * Termin z polityki prywatnosci: najwyzej 6 miesiecy od rozpatrzenia. 180 dni plus doba do
+ * kolejnego przebiegu crona to 181 dni, czyli nie wiecej niz najkrotsze 6 miesiecy w kalendarzu.
+ */
+export const SUBMISSION_RETENTION_DAYS = 180;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const idSchema = z.string().uuid();
 
@@ -159,4 +167,22 @@ export async function deleteServiceSubmission(id: string): Promise<boolean> {
         .where(eq(serviceSubmissionsTable.id, id))
         .returning({ id: serviceSubmissionsTable.id });
     return rows.length > 0;
+}
+
+/**
+ * Usuwa rozpatrzone zgloszenia po terminie. `updatedAt` to data rozpatrzenia, bo zmienia ja tylko
+ * zmiana statusu. Zgloszen `new` nie rusza: termin liczy sie dopiero od rozpatrzenia.
+ */
+export async function deleteExpiredServiceSubmissions(now = new Date()): Promise<number> {
+    const cutoff = new Date(now.getTime() - SUBMISSION_RETENTION_DAYS * DAY_MS);
+    const rows = await db
+        .delete(serviceSubmissionsTable)
+        .where(
+            and(
+                inArray(serviceSubmissionsTable.status, ['added', 'rejected']),
+                lt(serviceSubmissionsTable.updatedAt, cutoff),
+            ),
+        )
+        .returning({ id: serviceSubmissionsTable.id });
+    return rows.length;
 }

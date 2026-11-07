@@ -43,6 +43,9 @@ export const env = createEnv({
         // panel jest WYLACZONY (404) — fail-closed. Haslo ASCII, min. 32 znaki: `openssl rand -hex 32`.
         DASHBOARD_USER: NonEmpty.optional(),
         DASHBOARD_PASSWORD: z.string().min(32).optional(),
+        // Autoryzacja crona usuwajacego stare zgloszenia (Vercel wysyla ja w Authorization).
+        // Bez niej cron niczego nie usuwa. Losowy, min. 32 znaki: `openssl rand -hex 32`.
+        CRON_SECRET: z.string().min(32).optional(),
     },
     client: {
         NEXT_PUBLIC_SITE_URL: NonEmpty,
@@ -67,6 +70,7 @@ export const env = createEnv({
         STRIPE_PORTAL_LOGIN_URL: process.env.STRIPE_PORTAL_LOGIN_URL,
         DASHBOARD_USER: process.env.DASHBOARD_USER,
         DASHBOARD_PASSWORD: process.env.DASHBOARD_PASSWORD,
+        CRON_SECRET: process.env.CRON_SECRET,
         NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     },
 });

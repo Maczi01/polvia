@@ -27,6 +27,15 @@ describe('<DraftEditor />', () => {
         ).toBeInTheDocument();
     });
 
+    it('informuje o danych i linkuje polityke w nowej karcie, zeby nie stracic formularza', async () => {
+        await renderEditor();
+
+        expect(screen.getByText(/przekazujemy do OpenAI, także poza EOG/)).toBeInTheDocument();
+        const link = screen.getByRole('link', { name: 'polityce prywatności' });
+        expect(link).toHaveAttribute('href', '/terms');
+        expect(link).toHaveAttribute('target', '_blank');
+    });
+
     it('blad e-maila jest podpiety przez aria-describedby', async () => {
         await renderEditor({ fieldErrors: { submitterEmail: 'addBusiness.errors.invalidEmail' } });
 

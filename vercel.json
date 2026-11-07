@@ -1,1 +1,5 @@
-{  "crons": [    {      "path": "/api/synchronize-click-counter",      "schedule": "00 8 * * *"    }  ]}
+{  "crons": [    {      "path": "/api/synchronize-click-counter",      "schedule": "00 8 * * *"    },
+    {
+      "path": "/api/purge-service-submissions",
+      "schedule": "30 3 * * *"
+    }  ]}
