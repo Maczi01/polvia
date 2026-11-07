@@ -1,9 +1,13 @@
 /**
  * @jest-environment node
  */
+import type { SQL } from 'drizzle-orm';
+import { PgDialect } from 'drizzle-orm/pg-core';
+
 import type { SubmissionEmailInput } from '@/lib/add-business/submission-email-format';
 
 import {
+    deleteExpiredServiceSubmissions,
     deleteServiceSubmission,
     getServiceSubmission,
     getServiceSubmissionLogo,
@@ -189,5 +193,33 @@ describe('setServiceSubmissionStatus', () => {
     it('nieistniejace zgloszenie daje false', async () => {
         mockUpdateRows([]);
         await expect(setServiceSubmissionStatus(ID, 'rejected')).resolves.toBe(false);
+    });
+});
+
+describe('deleteExpiredServiceSubmissions', () => {
+    const NOW = new Date('2026-11-06T12:00:00.000Z');
+
+    function mockDeleteCapturingWhere(rows: { id: string }[]): jest.Mock<unknown, [SQL]> {
+        const where = jest.fn<unknown, [SQL]>(() => ({
+            returning: jest.fn().mockResolvedValue(rows),
+        }));
+        mockDb.delete.mockReturnValue({ where });
+        return where;
+    }
+
+    it('usuwa tylko rozpatrzone zgloszenia starsze niz 180 dni i podaje ich liczbe', async () => {
+        const where = mockDeleteCapturingWhere([{ id: ID }, { id: 'drugi' }]);
+
+        await expect(deleteExpiredServiceSubmissions(NOW)).resolves.toBe(2);
+
+        const { sql, params } = new PgDialect().sqlToQuery(where.mock.calls[0][0]);
+        expect(sql).toContain('"status" in');
+        expect(sql).toContain('"updated_at" <');
+        expect(params).toEqual(['added', 'rejected', '2026-05-10T12:00:00.000Z']);
+    });
+
+    it('nic po terminie daje 0', async () => {
+        mockDeleteCapturingWhere([]);
+        await expect(deleteExpiredServiceSubmissions(NOW)).resolves.toBe(0);
     });
 });

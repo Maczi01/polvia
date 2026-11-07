@@ -2,7 +2,7 @@
 title: Terms
 summary: Regulamin.
 author: 'Polvia'
-publishedAt: '2025-06-01'
+publishedAt: '2026-11-07'
 ---
 
 # POLITYKA PRYWATNOŚCI SERWISU POLVIA
@@ -13,9 +13,9 @@ publishedAt: '2025-06-01'
 
 **Administrator** - podmiot prowadzący serwis [polvia](https://www.polvia.pl),
 
-**Serwis** - strona internetowa [polvia](https://www.polvia.pl), służąca do prezentacji firm działających w Polsce, z funkcjonalnością dodawania wpisów o firmach poprzez e-mail oraz zapisu do newslettera.
+**Serwis** - strona internetowa [polvia](https://www.polvia.pl), służąca do prezentacji firm działających w Polsce, z funkcjonalnością zgłaszania wpisów o firmach poprzez formularz oraz zapisu do newslettera.
 
-**Użytkownik** - każda osoba fizyczna, prawna lub jednostka organizacyjna, która odwiedza Serwis, korzysta z formularza zapisu do newslettera lub przesyła e-mailem dane dotyczące firmy do zamieszczenia w Serwisie.
+**Użytkownik** - każda osoba fizyczna, prawna lub jednostka organizacyjna, która odwiedza Serwis, korzysta z formularza zapisu do newslettera, zgłasza firmę przez formularz dodawania firmy lub przesyła e-mailem dane dotyczące firmy do zamieszczenia w Serwisie.
 
 **Dane osobowe** - wszelkie informacje dotyczące zidentyfikowanej lub możliwej do zidentyfikowania osoby fizycznej, przetwarzane w Serwisie (w szczególności: imię, adres e-mail, numer telefonu, i inne - jeżeli zostaną przekazane).
 
@@ -43,7 +43,13 @@ Zapisując się do newslettera, Użytkownik wyraża zgodę na przesyłanie infor
 
 **Dodawanie wpisów o firmach**
 
-W celu dodania lub modyfikacji danych firmy Użytkownik wysyła e-mail na adres [polvia.services@gmail.com](mailto:polvia.services@gmail.com), podając odpowiednie informacje ("formularz zgłoszeniowy" oparty o e-mail). Administrator weryfikuje przesłane informacje (tj. czy firma istnieje, czy dane są kompletne) i decyduje o publikacji.
+W celu dodania firmy Użytkownik korzysta z formularza dodawania firmy: podaje adres strony firmy albo jej opis, sprawdza przygotowany szkic wpisu oraz podaje swój adres e-mail i ewentualne uwagi. W celu zmiany danych opublikowanego wpisu Użytkownik wysyła e-mail na adres [polvia.services@gmail.com](mailto:polvia.services@gmail.com).
+
+Szkic wpisu jest przechowywany tymczasowo, maksymalnie przez 2 godziny. Do jego przygotowania treść strony firmy lub podany opis są przekazywane do OpenAI, a adres firmy do usługi OpenStreetMap Nominatim, która ustala współrzędne.
+
+Wysłane zgłoszenie (dane firmy, logo, jeśli jest dostępne, adres e-mail zgłaszającego i uwagi) jest zapisywane w bazie danych Serwisu i dostępne dla Administratora w panelu chronionym hasłem. Gdy zapis się nie powiedzie, zgłoszenie jest przekazywane Administratorowi e-mailem. Zgłaszający otrzymuje potwierdzenie na podany adres e-mail.
+
+Administrator weryfikuje przesłane informacje (tj. czy firma istnieje, czy dane są kompletne) i decyduje o publikacji. Wysłanie zgłoszenia nie oznacza publikacji wpisu.
 
 **Analizy statystyczne (Google Analytics) / pliki cookies**
 
@@ -55,10 +61,11 @@ Pełną listę wykorzystywanych plików cookies i cel ich stosowania znajdziesz 
 
 **Podmioty przetwarzające dane na zlecenie Administratora**
 
-- Dostawcy usług hostingowych (np. serwer)
+- Dostawcy usług hostingowych i bazy danych (np. serwer)
 - Dostawcy narzędzi do wysyłki newslettera (obecnie ConvertKit / Kit)
 - Dostawcy narzędzi analitycznych (np. Google)
 - Dostawcy usług e-mail (np. Gmail, Outlook, inne)
+- Dostawcy usług używanych przy przygotowaniu szkicu wpisu (OpenAI, OpenStreetMap Nominatim)
 
 **Adresaci, którym dane mogą zostać przekazane z mocy prawa**
 
@@ -93,7 +100,7 @@ Opublikowane informacje o firmie przechowywane są przez cały okres funkcjonowa
 
 **Dane kontaktowe zgłaszającego wpis**
 
-Przechowywane maksymalnie 6 miesięcy od dnia rozpatrzenia zgłoszenia (opublikowanie lub odrzucenie wpisu), chyba że zgłaszający wyraził odrębną zgodę na dłuższy okres.
+Zgłoszenie zapisane w bazie danych, wraz z adresem e-mail i uwagami zgłaszającego, przechowywane jest maksymalnie 6 miesięcy od dnia rozpatrzenia zgłoszenia (opublikowanie lub odrzucenie wpisu), chyba że zgłaszający wyraził odrębną zgodę na dłuższy okres. Po upływie tego okresu zgłoszenie jest usuwane automatycznie.
 
 **Logi systemowe i dane analityczne**
 
@@ -125,12 +132,19 @@ Dane dotyczące firm (nazwa, adres, telefon, e-mail firmowy, strona WWW) udostę
 
 ## 8. Przekazywanie danych poza Europejski Obszar Gospodarczy (EOG)
 
-Administrator nie zamierza przekazywać danych osobowych Użytkowników do państw trzecich (poza EOG).
+Baza danych Serwisu znajduje się w Unii Europejskiej. Część usług, z których korzysta Serwis, działa jednak poza EOG, głównie w Stanach Zjednoczonych, dlatego dane osobowe Użytkowników mogą być tam przekazywane. Dotyczy to następujących dostawców:
 
-W przypadku, gdyby część usługi (np. serwer, platforma mailingowa) była świadczona przez podmiot spoza EOG, Administrator dopilnuje, aby:
+- Vercel i Upstash: hosting Serwisu oraz pamięć tymczasowa, w tym szkice wpisów,
+- OpenAI: przygotowanie szkicu wpisu,
+- OpenStreetMap Nominatim: ustalanie współrzędnych adresu,
+- Kit (ConvertKit): wysyłka newslettera,
+- Google: poczta e-mail (Gmail) i analityka (Google Analytics),
+- Microsoft Clarity: analityka,
+- Mapbox: wyświetlanie map.
 
-1. przekazywanie odbywało się wyłącznie do państwa, dla którego Komisja Europejska wydała decyzję o wystarczającym stopniu ochrony, lub
-2. podmiot świadczący usługę podpisał standardowe klauzule umowne lub stosował inne środki zapewniające odpowiedni poziom ochrony (np. Privacy Shield, jeśli dotyczy).
+Przekazanie odbywa się na podstawie decyzji Komisji Europejskiej stwierdzającej odpowiedni stopień ochrony (w przypadku USA: EU-US Data Privacy Framework, jeśli dostawca jest nim objęty) albo standardowych klauzul umownych przyjętych przez Komisję Europejską.
+
+Informacje o zastosowanych zabezpieczeniach i ich kopię można uzyskać pod adresem [polvia.services@gmail.com](mailto:polvia.services@gmail.com).
 
 ## 9. Bezpieczeństwo danych
 
@@ -190,7 +204,7 @@ Dalsze korzystanie z Serwisu po upływie 14 dni od daty powiadomienia o zmianie 
 
 ## 12. Postanowienia końcowe
 
-Niniejsza Polityka Prywatności wchodzi w życie z dniem 01.06.2025 i obowiązuje do odwołania lub wprowadzenia kolejnej wersji.
+Niniejsza Polityka Prywatności wchodzi w życie z dniem 07.11.2026 i obowiązuje do odwołania lub wprowadzenia kolejnej wersji. Poprzednia wersja obowiązywała od 01.06.2025.
 
 W sprawach nieuregulowanych niniejszą Polityką mają zastosowanie przepisy:
 

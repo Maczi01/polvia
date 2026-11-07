@@ -682,6 +682,7 @@
       "submitterEmailHint": "Wyślemy na niego potwierdzenie zgłoszenia. Nie publikujemy go.",
       "notes": "Uwagi (opcjonalnie)",
       "notesHint": "Np. inna kategoria albo kolejny punkt w innym mieście.",
+      "privacyNotice": "Adres e-mail i uwagi wykorzystamy tylko do obsługi zgłoszenia i usuniemy je najpóźniej 6 miesięcy po jego rozpatrzeniu. Treść strony lub opis firmy przekazujemy do OpenAI, także poza EOG. Więcej w <link>polityce prywatności</link>.",
       "requiredMark": "(wymagane)"
     },
     "hours": {

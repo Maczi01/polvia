@@ -2,7 +2,7 @@
 title: Terms
 summary: Privacy policy.
 author: 'Polvia'
-publishedAt: '2025-05-18'
+publishedAt: '2026-11-07'
 ---
 
 # PRIVACY POLICY OF POLVIA SERVICE
@@ -13,9 +13,9 @@ publishedAt: '2025-05-18'
 
 **Administrator** - the entity operating the [polvia](https://www.polvia.pl) service, i.e. Polvia, email: [polvia.services@gmail.com](mailto:polvia.services@gmail.com).
 
-**Service** - the website [polvia](https://www.polvia.pl), serving to present businesses operating in Poland, with functionality for adding business entries via email and newsletter subscription.
+**Service** - the website [polvia](https://www.polvia.pl), serving to present businesses operating in Poland, with functionality for submitting business entries via a form and newsletter subscription.
 
-**User** - any natural person, legal entity or organizational unit that visits the Service, uses the newsletter subscription form or sends by email data about a business to be included in the Service.
+**User** - any natural person, legal entity or organizational unit that visits the Service, uses the newsletter subscription form, submits a business through the add-business form or sends by email data about a business to be included in the Service.
 
 **Personal data** - any information relating to an identified or identifiable natural person, processed in the Service (in particular: name, surname, email address, postal address, phone number, company name, tax identification numbers if provided).
 
@@ -43,7 +43,13 @@ By subscribing to the newsletter, the User consents to receiving commercial info
 
 **Adding business entries**
 
-To add or modify business data, the User sends an email to [polvia.services@gmail.com](mailto:polvia.services@gmail.com) with relevant information (email-based "submission form"). The Administrator verifies the submitted information (whether the business exists, whether data is complete) and decides on publication.
+To add a business, the User uses the add-business form: provides the business website address or a description, reviews the prepared draft entry, and provides their email address and any notes. To change the data of a published entry, the User sends an email to [polvia.services@gmail.com](mailto:polvia.services@gmail.com).
+
+The draft entry is stored temporarily, for a maximum of 2 hours. To prepare it, the website content or the provided description is sent to OpenAI, and the business address is sent to the OpenStreetMap Nominatim service, which determines the coordinates.
+
+A submitted entry (business data, logo if available, the submitter's email address and notes) is saved in the Service's database and is available to the Administrator in a password-protected panel. If saving fails, the submission is forwarded to the Administrator by email. The submitter receives a confirmation at the provided email address.
+
+The Administrator verifies the submitted information (whether the business exists, whether data is complete) and decides on publication. Submitting an entry does not mean it will be published.
 
 The legal basis for processing business data is Article 6(1)(b) GDPR (service performance) and (f) GDPR (legitimate interest - maintaining an information database). When the submitter provides their contact details, the legal basis for processing personal data is either Article 6(1)(b) (e.g. for verification purposes) or (a) (if the submitter has given separate consent for further processing).
 
@@ -57,10 +63,11 @@ The full list of cookies used and their purposes can be found in the Cookies Pol
 
 **Entities processing data on behalf of the Administrator**
 
-- Hosting service providers (e.g. server)
+- Hosting and database service providers (e.g. server)
 - Newsletter delivery tools (e.g. Mailchimp, Sendinblue or other platform)
 - Analytical tools providers (e.g. Google)
 - Email service providers (e.g. Gmail, Outlook)
+- Providers of services used to prepare draft entries (OpenAI, OpenStreetMap Nominatim)
 
 **Recipients who may receive data by law**
 
@@ -95,7 +102,7 @@ Published business information is stored for the entire operation period of the 
 
 **Submitter contact details**
 
-Stored for maximum 6 months from entry acceptance/rejection, unless separate consent is given for longer retention.
+A submission saved in the database, including the submitter's email address and notes, is stored for maximum 6 months from entry acceptance/rejection, unless separate consent is given for longer retention. After this period the submission is deleted automatically.
 
 **System logs and analytical data**
 
@@ -127,12 +134,19 @@ Business data (name, address, phone, email, website) is publicly available upon 
 
 ## 8. Data Transfers Outside EEA
 
-The Administrator does not intend to transfer personal data outside the European Economic Area (EEA).
+The Service database is located in the European Union. However, some of the services used by the Service operate outside the EEA, mainly in the United States, so Users' personal data may be transferred there. This applies to the following providers:
 
-If part of the service (e.g. server, mailing platform) is provided from outside EEA, the Administrator ensures either:
+- Vercel and Upstash: hosting of the Service and temporary storage, including entry drafts,
+- OpenAI: preparation of the entry draft,
+- OpenStreetMap Nominatim: determining address coordinates,
+- Kit (ConvertKit): newsletter delivery,
+- Google: email (Gmail) and analytics (Google Analytics),
+- Microsoft Clarity: analytics,
+- Mapbox: displaying maps.
 
-1. Transfer only to countries with adequacy decision by European Commission, or
-2. The provider signs standard contractual clauses or implements other adequate safeguards (e.g. Privacy Shield if applicable).
+Transfers are based on a European Commission adequacy decision (for the USA: the EU-US Data Privacy Framework, where the provider is covered by it) or on standard contractual clauses adopted by the European Commission.
+
+Information about the safeguards applied and a copy of them can be obtained at [polvia.services@gmail.com](mailto:polvia.services@gmail.com).
 
 ## 9. Data Security
 
@@ -192,7 +206,7 @@ Continued use of the Service after 14 days from change notification means accept
 
 ## 12. Final Provisions
 
-This Privacy Policy enters into force on 01.06.2025 and remains valid until revoked or replaced.
+This Privacy Policy enters into force on 07.11.2026 and remains valid until revoked or replaced. The previous version applied from 01.06.2025.
 
 For matters not regulated herein, the following apply:
 

@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import type { ChangeEvent, JSX } from 'react';
 
+import { Link } from '@/i18n/navigation';
 import { LOGO_ACCEPTED_TYPES, NOTES_MAX_LENGTH } from '@/lib/add-business/form-limits';
 import type { FieldErrors } from '@/lib/add-business/types';
 
@@ -48,6 +49,21 @@ export function SubmissionFields({ errors, onLogoChange }: SubmissionFieldsProps
                 maxLength={NOTES_MAX_LENGTH}
                 error={errors.notes}
             />
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+                {t.rich('fields.privacyNotice', {
+                    link: chunks => (
+                        // Nowa karta: formularz trzyma stan tylko w pamieci przegladarki.
+                        <Link
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline hover:text-gray-900 dark:hover:text-gray-100"
+                        >
+                            {chunks}
+                        </Link>
+                    ),
+                })}
+            </p>
         </>
     );
 }
