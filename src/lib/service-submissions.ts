@@ -60,7 +60,7 @@ async function withSaveTimeout<T>(operation: Promise<T>): Promise<T> {
 export async function saveServiceSubmission(
     input: SubmissionEmailInput,
 ): Promise<SaveSubmissionResult> {
-    const { entry, stored, submitterEmail, notes, logo, manualPin } = input;
+    const { entry, stored, submitterEmail, notes, premiumInfoConsent, logo, manualPin } = input;
     try {
         const [row] = await withSaveTimeout(
             db
@@ -75,6 +75,7 @@ export async function saveServiceSubmission(
                     manualPin,
                     submitterEmail,
                     notes,
+                    premiumInfoConsent,
                     locale: stored.locale,
                     source: stored.source,
                     sourceUrl: stored.sourceUrl,
@@ -107,6 +108,7 @@ const submissionColumns = {
     manualPin: serviceSubmissionsTable.manualPin,
     submitterEmail: serviceSubmissionsTable.submitterEmail,
     notes: serviceSubmissionsTable.notes,
+    premiumInfoConsent: serviceSubmissionsTable.premiumInfoConsent,
     locale: serviceSubmissionsTable.locale,
     source: serviceSubmissionsTable.source,
     sourceUrl: serviceSubmissionsTable.sourceUrl,

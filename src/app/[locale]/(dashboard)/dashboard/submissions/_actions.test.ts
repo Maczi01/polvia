@@ -2,21 +2,34 @@
  * @jest-environment node
  */
 import { hasDashboardAccess } from '@/lib/dashboard-access';
+import { sendMail } from '@/lib/mailer';
 import { isSubmissionPublishingEnabled, publishServiceSubmission } from '@/lib/publish-submission';
-import { deleteServiceSubmission, setServiceSubmissionStatus } from '@/lib/service-submissions';
+import {
+    deleteServiceSubmission,
+    getServiceSubmission,
+    type ServiceSubmission,
+    setServiceSubmissionStatus,
+} from '@/lib/service-submissions';
 
-import { deleteSubmission, publishSubmission, updateSubmissionStatus } from './_actions';
+import {
+    deleteSubmission,
+    publishSubmission,
+    sendSubmissionReply,
+    updateSubmissionStatus,
+} from './_actions';
 
 const ID = '5f0c3c2e-8d7b-4a52-9d55-3f1a2b3c4d5e';
 
 jest.mock('next/cache', () => ({ revalidatePath: jest.fn() }));
 jest.mock('@/lib/dashboard-access', () => ({ hasDashboardAccess: jest.fn() }));
+jest.mock('@/lib/mailer', () => ({ sendMail: jest.fn() }));
 jest.mock('@/lib/publish-submission', () => ({
     isSubmissionPublishingEnabled: jest.fn(),
     publishServiceSubmission: jest.fn(),
 }));
 jest.mock('@/lib/service-submissions', () => ({
     deleteServiceSubmission: jest.fn(),
+    getServiceSubmission: jest.fn(),
     setServiceSubmissionStatus: jest.fn(),
 }));
 
@@ -174,5 +187,86 @@ describe('updateSubmissionStatus', () => {
 
         expect(result.error?.code).toBe('SAVE_FAILED');
         expect(result.error?.message).not.toContain('10.0.0.1');
+    });
+});
+
+describe('sendSubmissionReply', () => {
+    const SUBJECT = 'Firma jest w katalogu';
+    const TEXT = 'Wpis: https://www.polvia.pl/firma/nowak';
+    const OWNER = 'wlasciciel@nowak.pl';
+    const mockGet = jest.mocked(getServiceSubmission);
+    const mockSend = jest.mocked(sendMail);
+
+    function submission(status: ServiceSubmission['status']): ServiceSubmission {
+        return { id: ID, status, submitterEmail: OWNER } as ServiceSubmission;
+    }
+
+    beforeEach(() => {
+        mockGet.mockResolvedValue(submission('added'));
+        mockSend.mockResolvedValue({ ok: true });
+    });
+
+    it('wysyla edytowana tresc na adres zglaszajacego z bazy', async () => {
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result).toEqual({ data: { id: ID } });
+        expect(mockSend).toHaveBeenCalledWith({ to: OWNER, subject: SUBJECT, text: TEXT });
+    });
+
+    it('bez dostepu odmawia, zanim czegokolwiek dotknie', async () => {
+        mockAccess.mockResolvedValue(false);
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('FORBIDDEN');
+        expect(mockGet).not.toHaveBeenCalled();
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it.each([
+        ['zle id', 'nie-uuid', SUBJECT, TEXT],
+        ['pusty temat', ID, '   ', TEXT],
+        ['pusta tresc', ID, SUBJECT, '   '],
+        ['nieuzupelniony link', ID, SUBJECT, 'Wpis: [LINK]'],
+        ['za dlugi temat', ID, 'a'.repeat(201), TEXT],
+    ])('%s daje BAD_INPUT bez wysylki', async (_name, id, subject, text) => {
+        const result = await sendSubmissionReply(id, subject, text);
+
+        expect(result.error?.code).toBe('BAD_INPUT');
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it('nieistniejace zgloszenie daje NOT_FOUND', async () => {
+        mockGet.mockResolvedValue(null);
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('NOT_FOUND');
+    });
+
+    it.each(['new', 'rejected'] as const)('status %s nie pozwala wyslac', async status => {
+        mockGet.mockResolvedValue(submission(status));
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('NOT_PUBLISHED');
+        expect(mockSend).not.toHaveBeenCalled();
+    });
+
+    it('nieudana wysylka daje SEND_FAILED', async () => {
+        mockSend.mockResolvedValue({ ok: false, code: 'SEND_FAILED' });
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('SEND_FAILED');
+    });
+
+    it('blad bazy daje SEND_FAILED bez adresu w logu', async () => {
+        mockGet.mockRejectedValue(new Error(`params: ${OWNER}`));
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('SEND_FAILED');
+        expect(JSON.stringify(jest.mocked(console.error).mock.calls)).not.toContain(OWNER);
     });
 });

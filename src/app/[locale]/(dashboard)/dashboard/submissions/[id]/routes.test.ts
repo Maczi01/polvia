@@ -36,6 +36,7 @@ const SUBMISSION: ServiceSubmission = {
     manualPin: false,
     submitterEmail: 'wlasciciel@nowak.pl',
     notes: null,
+    premiumInfoConsent: false,
     locale: 'pl',
     source: 'owner',
     sourceUrl: null,

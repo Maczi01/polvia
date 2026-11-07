@@ -77,6 +77,7 @@ function edits(overrides: Partial<OwnerEdits> = {}): OwnerEdits {
         pin: null,
         submitterEmail: 'ola@ola.pl',
         notes: null,
+        premiumInfoConsent: false,
         ...overrides,
     };
 }

@@ -682,7 +682,8 @@
       "submitterEmailHint": "We will send the confirmation there. We do not publish it.",
       "notes": "Notes (optional)",
       "notesHint": "E.g. a different category or another branch in another city.",
-      "privacyNotice": "We use your email and notes only to handle this submission and delete them within 6 months after it is reviewed. The website content or business description is sent to OpenAI, including outside the EEA. More in our <link>privacy policy</link>.",
+      "premiumConsent": "I want to receive one email with information about the paid Polvia premium page. Consent is voluntary and does not affect the review of this submission. You can withdraw it at any time by writing to polvia.services@gmail.com.",
+      "privacyNotice": "We use your email and notes to handle this submission, and your email also to send the premium page information if you tick the consent box. We delete them within 6 months after the submission is reviewed. The website content or business description is sent to OpenAI, including outside the EEA. More in our <link>privacy policy</link>.",
       "requiredMark": "(required)"
     },
     "hours": {
@@ -808,6 +809,11 @@
       "wrongSocialService": "This link leads to a different service than this field.",
       "invalidPhone": "This does not look like a phone number. Use digits, e.g. +48 500 600 700.",
       "pinOutsidePoland": "The pin must be in Poland."
+    },
+    "publishedEmail": {
+      "premium": "You agreed in the form to receive information about the premium page, so we are including it here. Your listing can be upgraded to a premium page with photos, a price list and a short address. Features and prices:\n{url}",
+      "subject": "{name} is now listed on Polvia",
+      "body": "Hello,\n\nwe have added {name} to the Polvia catalog. You can find the listing here:\n{url}\n\n{premium}If anything needs correcting, just reply to this message.\n\nThe Polvia team"
     },
     "confirmationEmail": {
       "subject": "We have received your submission: {name}",

@@ -73,6 +73,20 @@ describe('submitDraft — zapis zgloszenia', () => {
         );
     });
 
+    it.each([
+        ['zaznaczona', { premiumInfoConsent: 'on' }, true],
+        ['niezaznaczona', {}, false],
+    ])('zgoda na premium %s trafia do zapisu, a nie do wpisu', async (_name, fields, expected) => {
+        const h = savedHarness();
+        const draftId = await saveDraft(STORED);
+
+        await submitDraft({ formData: submitForm(draftId, fields), ip: IP }, h.deps);
+
+        const [saved] = h.saveSubmission.mock.calls[0];
+        expect(saved.premiumInfoConsent).toBe(expected);
+        expect(JSON.stringify(saved.entry.json)).not.toContain('premiumInfoConsent');
+    });
+
     it('po zapisie operator dostaje powiadomienie z linkiem, bez zalacznikow', async () => {
         const h = savedHarness();
         const draftId = await saveDraft(STORED);

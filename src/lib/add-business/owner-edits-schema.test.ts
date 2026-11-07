@@ -55,8 +55,20 @@ describe('parseOwnerEdits', () => {
                 pin: null,
                 submitterEmail: 'wlasciciel@nowak.pl',
                 notes: 'Prosze o dodanie',
+                premiumInfoConsent: false,
             },
         });
+    });
+
+    it.each([
+        ['zaznaczony checkbox', { premiumInfoConsent: 'on' }, true],
+        ['brak pola', {}, false],
+        ['wartosc inna niz checkbox', { premiumInfoConsent: 'false' }, false],
+    ])('zgoda na premium: %s', (_name, overrides, expected) => {
+        const result = parseOwnerEdits(validForm(overrides));
+
+        if (!result.ok) throw new Error(JSON.stringify(result.fieldErrors));
+        expect(result.data.premiumInfoConsent).toBe(expected);
     });
 
     it('pola ustawione na pusty string (nie pominiete) staja sie null, nie 0', () => {

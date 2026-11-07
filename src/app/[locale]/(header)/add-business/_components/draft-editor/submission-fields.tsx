@@ -49,6 +49,14 @@ export function SubmissionFields({ errors, onLogoChange }: SubmissionFieldsProps
                 maxLength={NOTES_MAX_LENGTH}
                 error={errors.notes}
             />
+            <label className="flex items-start gap-2 text-sm text-gray-800 dark:text-gray-200">
+                <input
+                    type="checkbox"
+                    name="premiumInfoConsent"
+                    className="mt-0.5 size-4 shrink-0 accent-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                />
+                {t('fields.premiumConsent')}
+            </label>
             <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t.rich('fields.privacyNotice', {
                     link: chunks => (

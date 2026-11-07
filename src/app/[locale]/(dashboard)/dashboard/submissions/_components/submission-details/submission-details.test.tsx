@@ -38,6 +38,7 @@ const SUBMISSION: ServiceSubmission = {
     manualPin: false,
     submitterEmail: 'wlasciciel@nowak.pl',
     notes: 'Prosze o kontakt.',
+    premiumInfoConsent: false,
     locale: 'pl',
     source: 'page',
     sourceUrl: 'https://nowak.pl/',
@@ -60,6 +61,15 @@ describe('SubmissionDetails', () => {
         expect(screen.getByText('Changed by the owner: phoneNumber')).toBeInTheDocument();
         expect(screen.getByText('public/services/kancelaria-nowak.png')).toBeInTheDocument();
         expect(await axe(container)).toHaveNoViolations();
+    });
+
+    it.each([
+        [true, 'Yes'],
+        [false, 'No'],
+    ])('zgoda na premium %s jest widoczna w danych zglaszajacego', (premiumInfoConsent, label) => {
+        render(<SubmissionDetails submission={{ ...SUBMISSION, premiumInfoConsent }} />);
+
+        expect(screen.getByText('Premium info consent').nextElementSibling).toHaveTextContent(label);
     });
 
     it('adres spoza http(s) jest tekstem, nie linkiem', () => {

@@ -61,6 +61,7 @@ export interface OwnerEdits {
     pin: ManualPin | null;
     submitterEmail: string;
     notes: string | null;
+    premiumInfoConsent: boolean;
 }
 
 const REQUIRED_FIELDS = ['name', 'city', 'submitterEmail'] as const;
@@ -98,6 +99,7 @@ const ownerEditsSchema = z
         pin: pinSchema,
         submitterEmail: optionalEmail,
         notes: optionalText(NOTES_MAX_LENGTH),
+        premiumInfoConsent: z.boolean(),
     })
     .superRefine((input, ctx) => {
         addRequiredIssues(input, ctx);
@@ -162,6 +164,8 @@ function readRawFields(formData: FormData): Record<string, unknown> {
         pin: { lat: field('pinLat'), lng: field('pinLng') },
         submitterEmail: field('submitterEmail'),
         notes: field('notes'),
+        // Tylko wartosc checkboxa: zgoda nie moze powstac z brakujacego ani dowolnego pola.
+        premiumInfoConsent: field('premiumInfoConsent') === 'on',
     };
 }
 

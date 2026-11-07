@@ -60,6 +60,7 @@ function input(overrides: Partial<SubmissionEmailInput> = {}): SubmissionEmailIn
         stored: { locale: 'pl', source: 'page', sourceUrl: 'https://nowak.pl/' },
         submitterEmail: 'wlasciciel@nowak.pl',
         notes: 'Prosze o dodanie godzin w sobote.',
+        premiumInfoConsent: false,
         logo: LOGO,
         manualPin: false,
         ...overrides,
@@ -92,6 +93,13 @@ describe('buildOperatorEmail', () => {
         const json = mail.attachments?.[0]?.content;
         expect(typeof json === 'string' && JSON.parse(json)).toEqual(ENTRY.json);
         expect(mail.attachments?.[1]?.content).toBe(LOGO);
+    });
+
+    it.each([
+        [true, 'Zgoda na informację o premium: tak'],
+        [false, 'Zgoda na informację o premium: nie'],
+    ])('mail zapasowy przekazuje zgode na premium (%s)', (premiumInfoConsent, expected) => {
+        expect(buildOperatorEmail(input({ premiumInfoConsent })).text).toContain(expected);
     });
 
     it('bez logo wysyla jeden zalacznik i sekcje "Brak logo"', () => {

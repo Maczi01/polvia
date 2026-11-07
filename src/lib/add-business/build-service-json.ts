@@ -41,7 +41,7 @@ type LocationJson = ServiceJson['locations'][number];
 
 export interface BuildServiceJsonInput {
     stored: StoredDraft;
-    edits: Omit<OwnerEdits, 'submitterEmail' | 'notes' | 'pin'>;
+    edits: Omit<OwnerEdits, 'submitterEmail' | 'notes' | 'premiumInfoConsent' | 'pin'>;
     /**
      * Aktualne wspolrzedne: `stored.geo`, wynik relokacji / ponownego geokodowania albo
      * pinezka ustawiona recznie przez wlasciciela.
