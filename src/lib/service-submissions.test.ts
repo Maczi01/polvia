@@ -50,6 +50,7 @@ const INPUT: SubmissionEmailInput = {
     stored: { locale: 'uk', source: 'page', sourceUrl: 'https://nowak.pl/' },
     submitterEmail: 'wlasciciel@nowak.pl',
     notes: 'Uwagi',
+    premiumInfoConsent: true,
     logo: LOGO,
     manualPin: true,
 };
@@ -100,6 +101,7 @@ describe('saveServiceSubmission', () => {
             manualPin: true,
             submitterEmail: 'wlasciciel@nowak.pl',
             notes: 'Uwagi',
+            premiumInfoConsent: true,
             locale: 'uk',
             source: 'page',
             sourceUrl: 'https://nowak.pl/',

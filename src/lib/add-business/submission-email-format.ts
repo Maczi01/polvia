@@ -14,6 +14,7 @@ export interface SubmissionEmailInput {
     stored: Pick<StoredDraft, 'locale' | 'source' | 'sourceUrl'>;
     submitterEmail: string;
     notes: string | null;
+    premiumInfoConsent: boolean;
     /** PNG po `processLogoUpload` / `processLogoCandidate`; `null` = brak logo. */
     logo: Buffer | null;
     /** Wspolrzedne z pinezki ustawionej recznie przez wlasciciela, bez geokodowania. */

@@ -682,7 +682,8 @@
       "submitterEmailHint": "Wyślemy na niego potwierdzenie zgłoszenia. Nie publikujemy go.",
       "notes": "Uwagi (opcjonalnie)",
       "notesHint": "Np. inna kategoria albo kolejny punkt w innym mieście.",
-      "privacyNotice": "Adres e-mail i uwagi wykorzystamy tylko do obsługi zgłoszenia i usuniemy je najpóźniej 6 miesięcy po jego rozpatrzeniu. Treść strony lub opis firmy przekazujemy do OpenAI, także poza EOG. Więcej w <link>polityce prywatności</link>.",
+      "premiumConsent": "Chcę otrzymać e-mailem jednorazową informację o płatnej stronie premium w Polvia. Zgoda jest dobrowolna i nie wpływa na rozpatrzenie zgłoszenia. Możesz ją cofnąć w każdej chwili, pisząc na polvia.services@gmail.com.",
+      "privacyNotice": "Adres e-mail i uwagi wykorzystamy do obsługi zgłoszenia, a adres także do informacji o stronie premium, jeśli zaznaczysz zgodę. Usuniemy je najpóźniej 6 miesięcy po rozpatrzeniu zgłoszenia. Treść strony lub opis firmy przekazujemy do OpenAI, także poza EOG. Więcej w <link>polityce prywatności</link>.",
       "requiredMark": "(wymagane)"
     },
     "hours": {
@@ -808,6 +809,11 @@
       "wrongSocialService": "Ten link prowadzi do innego serwisu niż to pole.",
       "invalidPhone": "To nie wygląda na numer telefonu. Wpisz cyfry, np. +48 500 600 700.",
       "pinOutsidePoland": "Pinezka musi być w Polsce."
+    },
+    "publishedEmail": {
+      "premium": "W formularzu wyrażono zgodę na informację o stronie premium, dlatego ją dołączamy. Wpis można rozbudować do strony premium ze zdjęciami, cennikiem i krótkim adresem. Zakres i ceny:\n{url}",
+      "subject": "Firma {name} jest już w katalogu Polvia",
+      "body": "Dzień dobry,\n\ndodaliśmy firmę {name} do katalogu Polvia. Wpis znajdziesz tutaj:\n{url}\n\n{premium}Jeśli coś wymaga poprawy, po prostu odpowiedz na tę wiadomość.\n\nZespół Polvia"
     },
     "confirmationEmail": {
       "subject": "Otrzymaliśmy zgłoszenie firmy {name}",

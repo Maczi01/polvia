@@ -4,13 +4,23 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { hasDashboardAccess } from '@/lib/dashboard-access';
+import { sendMail } from '@/lib/mailer';
 import {
     isSubmissionPublishingEnabled,
     publishServiceSubmission,
     type PublishedSubmission,
     type PublishErrorCode,
 } from '@/lib/publish-submission';
-import { deleteServiceSubmission, setServiceSubmissionStatus } from '@/lib/service-submissions';
+import {
+    deleteServiceSubmission,
+    getServiceSubmission,
+    setServiceSubmissionStatus,
+} from '@/lib/service-submissions';
+import {
+    REPLY_LINK_PLACEHOLDER,
+    REPLY_SUBJECT_MAX_LENGTH,
+    REPLY_TEXT_MAX_LENGTH,
+} from '@/lib/submission-reply-limits';
 import { SUBMISSION_STATUSES, type SubmissionStatus } from '@/lib/submission-status';
 
 type ActionErrorCode = 'FORBIDDEN' | 'BAD_INPUT' | 'NOT_FOUND' | 'SAVE_FAILED';
@@ -30,12 +40,32 @@ export type PublishSubmissionResult =
           error: { code: ActionErrorCode | PublishErrorCode | 'LOCAL_ONLY'; message: string };
       };
 
+export type SendSubmissionReplyResult =
+    | { data: { id: string }; error?: undefined }
+    | {
+          data?: undefined;
+          error: { code: ActionErrorCode | 'NOT_PUBLISHED' | 'SEND_FAILED'; message: string };
+      };
+
 const idSchema = z.string().uuid();
+
+const replySchema = z.object({
+    id: idSchema,
+    subject: z.string().trim().min(1).max(REPLY_SUBJECT_MAX_LENGTH),
+    text: z
+        .string()
+        .trim()
+        .min(1)
+        .max(REPLY_TEXT_MAX_LENGTH)
+        .refine(text => !text.includes(REPLY_LINK_PLACEHOLDER)),
+});
 
 const inputSchema = z.object({
     id: idSchema,
     status: z.enum(SUBMISSION_STATUSES),
 });
+
+const SEND_FAILED_MESSAGE = 'Could not send the email. Try again.';
 
 const failure = (code: ActionErrorCode, message: string) => ({ error: { code, message } });
 
@@ -109,4 +139,46 @@ export async function deleteSubmission(id: string): Promise<DeleteSubmissionResu
 
     revalidatePath('/[locale]/dashboard/submissions', 'page');
     return { data: { id: input.data } };
+}
+
+/**
+ * Odbiorca pochodzi z wiersza, nigdy z wejscia: akcja nie moze sluzyc do wysylki na dowolny adres.
+ * Tylko po dodaniu firmy, bo tresc mowi, ze wpis jest juz w katalogu.
+ */
+export async function sendSubmissionReply(
+    id: string,
+    subject: string,
+    text: string,
+): Promise<SendSubmissionReplyResult> {
+    if (!(await hasDashboardAccess())) return failure('FORBIDDEN', 'Access denied');
+
+    const input = replySchema.safeParse({ id, subject, text });
+    if (!input.success) return failure('BAD_INPUT', 'Fill in the subject and message.');
+
+    try {
+        const submission = await getServiceSubmission(input.data.id);
+        if (!submission) return failure('NOT_FOUND', 'Submission not found');
+        if (submission.status !== 'added') {
+            return {
+                error: { code: 'NOT_PUBLISHED', message: 'Publish the submission first.' },
+            };
+        }
+
+        const sent = await sendMail({
+            to: submission.submitterEmail,
+            subject: input.data.subject,
+            text: input.data.text,
+        });
+        if (!sent.ok) {
+            return { error: { code: 'SEND_FAILED', message: SEND_FAILED_MESSAGE } };
+        }
+    } catch (error) {
+        console.error('submission reply not sent', {
+            id: input.data.id,
+            reason: error instanceof Error ? error.name : 'unknown',
+        });
+        return { error: { code: 'SEND_FAILED', message: SEND_FAILED_MESSAGE } };
+    }
+
+    return { data: { id: input.data.id } };
 }

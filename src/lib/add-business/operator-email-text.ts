@@ -95,13 +95,15 @@ function warningSections({ entry, logo, manualPin }: SubmissionEmailInput): stri
     return warnings;
 }
 
-function sourceLines({ stored, submitterEmail }: SubmissionEmailInput): string[] {
+function sourceLines(input: SubmissionEmailInput): string[] {
+    const { stored, submitterEmail, premiumInfoConsent } = input;
     const mode = stored.source === 'page' ? 'strona (szkic z linku)' : 'ręczny (bez strony)';
     return [
         line('Tryb', mode),
         line('Link źródłowy', stored.sourceUrl),
         line('Locale zgłoszenia', stored.locale),
         line('Zgłaszający', submitterEmail),
+        line('Zgoda na informację o premium', premiumInfoConsent ? 'tak' : 'nie'),
     ];
 }
 

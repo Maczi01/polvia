@@ -105,6 +105,9 @@ export function SubmissionDetails({ submission }: { submission: ServiceSubmissio
                         </a>
                     </Row>
                     <Row label="Notes">{submission.notes}</Row>
+                    <Row label="Premium info consent">
+                        {submission.premiumInfoConsent ? 'Yes' : 'No'}
+                    </Row>
                     <Row label="Form language">{submission.locale}</Row>
                     <Row label="Source">{submission.source}</Row>
                     <Row label="Source URL">

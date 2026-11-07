@@ -326,6 +326,8 @@ export const serviceSubmissionsTable = pgTable('service_submissions', {
     manualPin: boolean('manual_pin').notNull(),
     submitterEmail: varchar('submitter_email', { length: 255 }).notNull(),
     notes: text('notes'),
+    /** Zgoda na jednorazowa informacje o premium w mailu; bez niej mail nie moze jej zawierac. */
+    premiumInfoConsent: boolean('premium_info_consent').notNull().default(false),
     locale: varchar('locale', { length: 5 }).notNull(),
     source: varchar('source', { length: 20 }).notNull(),
     sourceUrl: text('source_url'),

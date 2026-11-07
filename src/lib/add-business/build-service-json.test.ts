@@ -73,6 +73,7 @@ function untouchedEdits(draft: BusinessDraft = DRAFT): OwnerEdits {
         pin: null,
         submitterEmail: 'wlasciciel@nowak.pl',
         notes: null,
+        premiumInfoConsent: false,
     };
 }
 

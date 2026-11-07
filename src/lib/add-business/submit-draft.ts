@@ -230,7 +230,7 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     const limit = await consumeSubmitLimit(ip);
     if (!limit.allowed) return { status: 'limited', retryAfter: limit.retryAfter };
 
-    const { submitterEmail, notes, pin, ...edits } = parsed.data;
+    const { submitterEmail, notes, premiumInfoConsent, pin, ...edits } = parsed.data;
     const manualPin = pin !== null && current.stored.draft.coverage !== 'online';
     const [geo, logo] = await Promise.all([
         resolveGeo(current.stored, edits, pin, deps.geocode),
@@ -244,7 +244,7 @@ async function submit(request: SubmitRequest, deps: SubmitDraftDeps): Promise<Su
     const entry = buildServiceJson({ stored, edits, geo, hasLogo: logo !== null });
     if (!entry.ok) return actionFailure(entry.code);
 
-    const mail = { entry, stored, submitterEmail, notes, logo, manualPin };
+    const mail = { entry, stored, submitterEmail, notes, premiumInfoConsent, logo, manualPin };
     const delivered = await deliverToOperator(mail, deps);
     if (!delivered.ok) return actionFailure(delivered.code);
 

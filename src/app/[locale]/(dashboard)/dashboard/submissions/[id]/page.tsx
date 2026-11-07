@@ -5,10 +5,12 @@ import { Link } from '@/i18n/navigation';
 import { hasDashboardAccess } from '@/lib/dashboard-access';
 import { isSubmissionPublishingEnabled } from '@/lib/publish-submission';
 import { getServiceSubmission } from '@/lib/service-submissions';
+import { buildSubmissionReplyDraft } from '@/lib/submission-reply';
 
 import { SubmissionDeleteButton } from '../_components/submission-delete-button/submission-delete-button';
 import { SubmissionDetails } from '../_components/submission-details/submission-details';
 import { SubmissionPublishButton } from '../_components/submission-publish-button/submission-publish-button';
+import { SubmissionReplyForm } from '../_components/submission-reply-form/submission-reply-form';
 import { SubmissionStatusBadge } from '../_components/submission-status-badge';
 import { SubmissionStatusControl } from '../_components/submission-status-control/submission-status-control';
 
@@ -23,6 +25,8 @@ export default async function SubmissionPage({ params }: { params: Promise<{ id:
     if (!submission) notFound();
 
     const basePath = `/dashboard/submissions/${submission.id}`;
+    const replyDraft =
+        submission.status === 'added' ? await buildSubmissionReplyDraft(submission) : null;
 
     return (
         <div className="max-w-4xl space-y-6">
@@ -66,6 +70,17 @@ export default async function SubmissionPage({ params }: { params: Promise<{ id:
                 )}
                 <SubmissionDeleteButton id={submission.id} name={submission.name} />
             </div>
+
+            {replyDraft && (
+                <SubmissionReplyForm
+                    id={submission.id}
+                    to={submission.submitterEmail}
+                    locale={submission.locale}
+                    hasPremiumConsent={submission.premiumInfoConsent}
+                    initialSubject={replyDraft.subject}
+                    initialText={replyDraft.text}
+                />
+            )}
 
             <SubmissionDetails submission={submission} />
         </div>

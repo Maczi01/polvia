@@ -194,6 +194,21 @@ describe('<DraftEditor />', () => {
         expect(formData.get('category')).toBeNull();
     });
 
+    it('zgoda na premium jest domyslnie odznaczona i idzie tylko po zaznaczeniu', async () => {
+        const onSubmit = jest.fn();
+        await renderEditor({ onSubmit });
+
+        const consent = screen.getByRole('checkbox', { name: /płatnej stronie premium/ });
+        expect(consent).not.toBeChecked();
+
+        await submitEditor();
+        expect(onSubmit.mock.calls[0][0].get('premiumInfoConsent')).toBeNull();
+
+        await userEvent.click(consent);
+        await submitEditor();
+        expect(onSubmit.mock.calls[1][0].get('premiumInfoConsent')).toBe('on');
+    });
+
     it('zaznaczony bialoruski trafia do wysylki jako kod be', async () => {
         const onSubmit = jest.fn();
         await renderEditor({ onSubmit });
