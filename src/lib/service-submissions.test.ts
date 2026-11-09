@@ -11,6 +11,7 @@ import {
     deleteServiceSubmission,
     getServiceSubmission,
     getServiceSubmissionLogo,
+    markServiceSubmissionReplySent,
     saveServiceSubmission,
     setServiceSubmissionStatus,
     SUBMISSION_SAVE_TIMEOUT_MS,
@@ -195,6 +196,23 @@ describe('setServiceSubmissionStatus', () => {
     it('nieistniejace zgloszenie daje false', async () => {
         mockUpdateRows([]);
         await expect(setServiceSubmissionStatus(ID, 'rejected')).resolves.toBe(false);
+    });
+});
+
+describe('markServiceSubmissionReplySent', () => {
+    const SENT_AT = new Date('2026-11-09T09:30:00.000Z');
+
+    it('zapisuje date wysylki bez ruszania updatedAt i ja zwraca', async () => {
+        const set = mockUpdateRows([{ replySentAt: SENT_AT }]);
+
+        await expect(markServiceSubmissionReplySent(ID, SENT_AT)).resolves.toEqual(SENT_AT);
+
+        expect(set).toHaveBeenCalledWith({ replySentAt: SENT_AT });
+    });
+
+    it('nieistniejace zgloszenie daje null', async () => {
+        mockUpdateRows([]);
+        await expect(markServiceSubmissionReplySent(ID, SENT_AT)).resolves.toBeNull();
     });
 });
 

@@ -42,6 +42,7 @@ const SUBMISSION: ServiceSubmission = {
     locale: 'pl',
     source: 'page',
     sourceUrl: 'https://nowak.pl/',
+    replySentAt: null,
     createdAt: new Date('2026-11-06T10:00:00Z'),
     hasLogo: true,
 };
@@ -70,6 +71,15 @@ describe('SubmissionDetails', () => {
         render(<SubmissionDetails submission={{ ...SUBMISSION, premiumInfoConsent }} />);
 
         expect(screen.getByText('Premium info consent').nextElementSibling).toHaveTextContent(label);
+    });
+
+    it.each([
+        [new Date('2026-11-09T09:30:00.000Z'), '9 Nov 2026, 10:30'],
+        [null, 'Not yet'],
+    ])('data wysylki odpowiedzi %s jest widoczna', (replySentAt, label) => {
+        render(<SubmissionDetails submission={{ ...SUBMISSION, replySentAt }} />);
+
+        expect(screen.getByText('Reply sent').nextElementSibling).toHaveTextContent(label);
     });
 
     it('adres spoza http(s) jest tekstem, nie linkiem', () => {

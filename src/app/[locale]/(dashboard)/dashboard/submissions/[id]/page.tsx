@@ -79,6 +79,7 @@ export default async function SubmissionPage({ params }: { params: Promise<{ id:
                     hasPremiumConsent={submission.premiumInfoConsent}
                     initialSubject={replyDraft.subject}
                     initialText={replyDraft.text}
+                    sentAt={submission.replySentAt?.toISOString() ?? null}
                 />
             )}
 
