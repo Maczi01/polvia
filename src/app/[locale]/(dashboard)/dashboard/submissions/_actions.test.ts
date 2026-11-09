@@ -7,6 +7,7 @@ import { isSubmissionPublishingEnabled, publishServiceSubmission } from '@/lib/p
 import {
     deleteServiceSubmission,
     getServiceSubmission,
+    markServiceSubmissionReplySent,
     type ServiceSubmission,
     setServiceSubmissionStatus,
 } from '@/lib/service-submissions';
@@ -30,6 +31,7 @@ jest.mock('@/lib/publish-submission', () => ({
 jest.mock('@/lib/service-submissions', () => ({
     deleteServiceSubmission: jest.fn(),
     getServiceSubmission: jest.fn(),
+    markServiceSubmissionReplySent: jest.fn(),
     setServiceSubmissionStatus: jest.fn(),
 }));
 
@@ -197,20 +199,65 @@ describe('sendSubmissionReply', () => {
     const mockGet = jest.mocked(getServiceSubmission);
     const mockSend = jest.mocked(sendMail);
 
-    function submission(status: ServiceSubmission['status']): ServiceSubmission {
-        return { id: ID, status, submitterEmail: OWNER } as ServiceSubmission;
+    const SENT_AT = new Date('2026-11-09T09:30:00.000Z');
+    const EARLIER = new Date('2026-11-08T12:00:00.000Z');
+    const mockMarkSent = jest.mocked(markServiceSubmissionReplySent);
+
+    function submission(
+        status: ServiceSubmission['status'],
+        replySentAt: Date | null = null,
+    ): ServiceSubmission {
+        return { id: ID, status, submitterEmail: OWNER, replySentAt } as ServiceSubmission;
     }
 
     beforeEach(() => {
         mockGet.mockResolvedValue(submission('added'));
         mockSend.mockResolvedValue({ ok: true });
+        mockMarkSent.mockResolvedValue(SENT_AT);
     });
 
-    it('wysyla edytowana tresc na adres zglaszajacego z bazy', async () => {
+    it('wysyla edytowana tresc na adres zglaszajacego z bazy i zapisuje date', async () => {
         const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
 
-        expect(result).toEqual({ data: { id: ID } });
+        expect(result).toEqual({ data: { id: ID, sentAt: SENT_AT.toISOString() } });
         expect(mockSend).toHaveBeenCalledWith({ to: OWNER, subject: SUBJECT, text: TEXT });
+        expect(mockMarkSent).toHaveBeenCalledWith(ID, expect.any(Date));
+    });
+
+    it('juz wyslana odpowiedz bez potwierdzenia ponownej wysylki daje ALREADY_SENT', async () => {
+        mockGet.mockResolvedValue(submission('added', EARLIER));
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result.error?.code).toBe('ALREADY_SENT');
+        expect(mockSend).not.toHaveBeenCalled();
+        expect(mockMarkSent).not.toHaveBeenCalled();
+    });
+
+    it('potwierdzona ponowna wysylka idzie i nadpisuje date', async () => {
+        mockGet.mockResolvedValue(submission('added', EARLIER));
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT, true);
+
+        expect(result.data?.sentAt).toBe(SENT_AT.toISOString());
+        expect(mockSend).toHaveBeenCalledTimes(1);
+    });
+
+    it('wyslany mail bez zapisanej daty to nadal sukces, nie SEND_FAILED', async () => {
+        mockMarkSent.mockRejectedValue(new Error(`params: ${OWNER}`));
+
+        const result = await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(result).toEqual({ data: { id: ID, sentAt: null } });
+        expect(JSON.stringify(jest.mocked(console.error).mock.calls)).not.toContain(OWNER);
+    });
+
+    it('nieudana wysylka nie zapisuje daty', async () => {
+        mockSend.mockResolvedValue({ ok: false, code: 'SEND_FAILED' });
+
+        await sendSubmissionReply(ID, SUBJECT, TEXT);
+
+        expect(mockMarkSent).not.toHaveBeenCalled();
     });
 
     it('bez dostepu odmawia, zanim czegokolwiek dotknie', async () => {

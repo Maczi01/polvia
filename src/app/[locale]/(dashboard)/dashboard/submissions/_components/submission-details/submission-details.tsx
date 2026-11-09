@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { formatAddress, formatHours } from '@/lib/add-business/submission-email-format';
 import type { ServiceSubmission } from '@/lib/service-submissions';
+import { formatReplySentAt } from '@/lib/submission-reply-sent-at';
 
 const HTTP_PROTOCOLS = new Set(['http:', 'https:']);
 
@@ -107,6 +108,11 @@ export function SubmissionDetails({ submission }: { submission: ServiceSubmissio
                     <Row label="Notes">{submission.notes}</Row>
                     <Row label="Premium info consent">
                         {submission.premiumInfoConsent ? 'Yes' : 'No'}
+                    </Row>
+                    <Row label="Reply sent">
+                        {submission.replySentAt
+                            ? formatReplySentAt(submission.replySentAt)
+                            : 'Not yet'}
                     </Row>
                     <Row label="Form language">{submission.locale}</Row>
                     <Row label="Source">{submission.source}</Row>

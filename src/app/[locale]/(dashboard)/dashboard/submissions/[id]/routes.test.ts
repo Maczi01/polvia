@@ -40,6 +40,7 @@ const SUBMISSION: ServiceSubmission = {
     locale: 'pl',
     source: 'owner',
     sourceUrl: null,
+    replySentAt: null,
     createdAt: new Date('2026-11-06T10:00:00Z'),
     hasLogo: false,
 };

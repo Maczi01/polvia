@@ -313,6 +313,9 @@ export const newsletterTable = pgTable('newsletter_subscribers', {
  * Bez relacji do `services`: to poczekalnia, wpis powstaje dopiero z pliku w `data/services/`.
  * Logo w bazie, bo system plikow Vercela jest efemeryczny; po `sharp` to PNG do 512 px.
  * `submitter_email` i `notes` to dane osobowe zglaszajacego — tylko dla panelu.
+ *
+ * RLS wlaczone bez polityk: role inne niz wlasciciel tabeli (aplikacja laczy sie jako wlasciciel)
+ * nie czytaja wierszy. Bez `enableRLS()` `drizzle-kit push` proponuje je wylaczyc.
  */
 export const serviceSubmissionsTable = pgTable('service_submissions', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -332,8 +335,10 @@ export const serviceSubmissionsTable = pgTable('service_submissions', {
     source: varchar('source', { length: 20 }).notNull(),
     sourceUrl: text('source_url'),
     logo: bytea('logo'),
+    /** Ostatnia odpowiedz z panelu; `null` = nic nie wyslano. Nie zmienia `updatedAt` (retencja). */
+    replySentAt: timestamp('reply_sent_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}).enableRLS();
 
 export type { Coverage } from '../lib/coverage';

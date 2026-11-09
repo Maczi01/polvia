@@ -14,6 +14,7 @@ import {
 import {
     deleteServiceSubmission,
     getServiceSubmission,
+    markServiceSubmissionReplySent,
     setServiceSubmissionStatus,
 } from '@/lib/service-submissions';
 import {
@@ -41,10 +42,14 @@ export type PublishSubmissionResult =
       };
 
 export type SendSubmissionReplyResult =
-    | { data: { id: string }; error?: undefined }
+    /** `sentAt: null` = mail poszedl, ale data sie nie zapisala. */
+    | { data: { id: string; sentAt: string | null }; error?: undefined }
     | {
           data?: undefined;
-          error: { code: ActionErrorCode | 'NOT_PUBLISHED' | 'SEND_FAILED'; message: string };
+          error: {
+              code: ActionErrorCode | 'NOT_PUBLISHED' | 'ALREADY_SENT' | 'SEND_FAILED';
+              message: string;
+          };
       };
 
 const idSchema = z.string().uuid();
@@ -142,13 +147,32 @@ export async function deleteSubmission(id: string): Promise<DeleteSubmissionResu
 }
 
 /**
+ * Mail juz poszedl, wiec blad zapisu daty nie moze wrocic jako porazka wysylki: operator
+ * wyslalby drugi raz. `null` mowi formularzowi, ze sladu w bazie nie ma.
+ */
+async function recordReplySent(id: string): Promise<string | null> {
+    try {
+        const sentAt = await markServiceSubmissionReplySent(id, new Date());
+        return sentAt?.toISOString() ?? null;
+    } catch (error) {
+        console.error('submission reply sent but date not saved', {
+            id,
+            reason: error instanceof Error ? error.name : 'unknown',
+        });
+        return null;
+    }
+}
+
+/**
  * Odbiorca pochodzi z wiersza, nigdy z wejscia: akcja nie moze sluzyc do wysylki na dowolny adres.
- * Tylko po dodaniu firmy, bo tresc mowi, ze wpis jest juz w katalogu.
+ * Tylko po dodaniu firmy, bo tresc mowi, ze wpis jest juz w katalogu. Ponowna wysylka wymaga
+ * `isResendConfirmed`: formularz otwarty przed pierwsza wysylka (druga karta) o niej nie wie.
  */
 export async function sendSubmissionReply(
     id: string,
     subject: string,
     text: string,
+    isResendConfirmed = false,
 ): Promise<SendSubmissionReplyResult> {
     if (!(await hasDashboardAccess())) return failure('FORBIDDEN', 'Access denied');
 
@@ -161,6 +185,14 @@ export async function sendSubmissionReply(
         if (submission.status !== 'added') {
             return {
                 error: { code: 'NOT_PUBLISHED', message: 'Publish the submission first.' },
+            };
+        }
+        if (submission.replySentAt && isResendConfirmed !== true) {
+            return {
+                error: {
+                    code: 'ALREADY_SENT',
+                    message: 'A reply was already sent. Reload the page to see when.',
+                },
             };
         }
 
@@ -180,5 +212,7 @@ export async function sendSubmissionReply(
         return { error: { code: 'SEND_FAILED', message: SEND_FAILED_MESSAGE } };
     }
 
-    return { data: { id: input.data.id } };
+    const sentAt = await recordReplySent(input.data.id);
+    revalidatePath('/[locale]/dashboard/submissions', 'layout');
+    return { data: { id: input.data.id, sentAt } };
 }

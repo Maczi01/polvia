@@ -112,6 +112,7 @@ const submissionColumns = {
     locale: serviceSubmissionsTable.locale,
     source: serviceSubmissionsTable.source,
     sourceUrl: serviceSubmissionsTable.sourceUrl,
+    replySentAt: serviceSubmissionsTable.replySentAt,
     createdAt: serviceSubmissionsTable.createdAt,
     hasLogo: sql<boolean>`${serviceSubmissionsTable.logo} is not null`,
 };
@@ -160,6 +161,22 @@ export async function setServiceSubmissionStatus(
         .where(eq(serviceSubmissionsTable.id, id))
         .returning({ id: serviceSubmissionsTable.id });
     return rows.length > 0;
+}
+
+/**
+ * Slad wysylki odpowiedzi. Bez `updatedAt`: od niego liczy sie termin usuniecia, a ten biegnie od
+ * rozpatrzenia, nie od maila. `null` = nie ma takiego zgloszenia.
+ */
+export async function markServiceSubmissionReplySent(
+    id: string,
+    sentAt: Date,
+): Promise<Date | null> {
+    const [row] = await db
+        .update(serviceSubmissionsTable)
+        .set({ replySentAt: sentAt })
+        .where(eq(serviceSubmissionsTable.id, id))
+        .returning({ replySentAt: serviceSubmissionsTable.replySentAt });
+    return row?.replySentAt ?? null;
 }
 
 /** Trwale, razem z logo i danymi zglaszajacego. `false` = nie ma takiego zgloszenia. */

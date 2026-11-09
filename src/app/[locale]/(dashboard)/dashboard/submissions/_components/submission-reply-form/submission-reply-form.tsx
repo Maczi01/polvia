@@ -10,6 +10,7 @@ import {
     REPLY_SUBJECT_MAX_LENGTH,
     REPLY_TEXT_MAX_LENGTH,
 } from '@/lib/submission-reply-limits';
+import { formatReplySentAt } from '@/lib/submission-reply-sent-at';
 
 import { sendSubmissionReply } from '../../_actions';
 
@@ -17,7 +18,7 @@ const UNREACHABLE_MESSAGE = 'Could not reach the server. Try again.';
 
 type SendState =
     | { status: 'idle' }
-    | { status: 'sent' }
+    | { status: 'sent'; isDateSaved: boolean }
     | { status: 'failed'; message: string };
 
 interface SubmissionReplyFormProps {
@@ -27,9 +28,16 @@ interface SubmissionReplyFormProps {
     hasPremiumConsent: boolean;
     initialSubject: string;
     initialText: string;
+    /** ISO z `service_submissions.reply_sent_at`; `null` = jeszcze nic nie wyslano. */
+    sentAt: string | null;
 }
 
-/** Wysylka nie zostawia sladu w bazie, wiec „sent” trwa do edycji albo odswiezenia strony. */
+function confirmMessage(to: string, lastSentAt: string | null): string {
+    if (!lastSentAt) return `Send this email to ${to}?`;
+    return `A reply was already sent on ${formatReplySentAt(new Date(lastSentAt))}. Send again to ${to}?`;
+}
+
+/** Data wysylki jest w bazie; „sent” w stanie tylko blokuje przycisk do kolejnej edycji. */
 export function SubmissionReplyForm({
     id,
     to,
@@ -37,28 +45,31 @@ export function SubmissionReplyForm({
     hasPremiumConsent,
     initialSubject,
     initialText,
+    sentAt,
 }: SubmissionReplyFormProps) {
     const fieldId = useId();
     const [isPending, startTransition] = useTransition();
     const [subject, setSubject] = useState(initialSubject);
     const [text, setText] = useState(initialText);
     const [sendState, setSendState] = useState<SendState>({ status: 'idle' });
+    const [lastSentAt, setLastSentAt] = useState(sentAt);
 
     const isLinkMissing = text.includes(REPLY_LINK_PLACEHOLDER);
     const isSendable =
         subject.trim().length > 0 && text.trim().length > 0 && !isLinkMissing && !isPending;
 
     const handleSend = () => {
-        if (!confirm(`Send this email to ${to}?`)) return;
+        if (!confirm(confirmMessage(to, lastSentAt))) return;
         setSendState({ status: 'idle' });
         startTransition(async () => {
             try {
-                const result = await sendSubmissionReply(id, subject, text);
-                setSendState(
-                    result.error
-                        ? { status: 'failed', message: result.error.message }
-                        : { status: 'sent' },
-                );
+                const result = await sendSubmissionReply(id, subject, text, lastSentAt !== null);
+                if (result.error) {
+                    setSendState({ status: 'failed', message: result.error.message });
+                    return;
+                }
+                if (result.data.sentAt) setLastSentAt(result.data.sentAt);
+                setSendState({ status: 'sent', isDateSaved: result.data.sentAt !== null });
             } catch (error) {
                 console.error('submission reply request failed', error);
                 setSendState({ status: 'failed', message: UNREACHABLE_MESSAGE });
@@ -78,6 +89,11 @@ export function SubmissionReplyForm({
                         ? 'The submitter agreed to premium information, so the message includes it.'
                         : 'No consent to premium information: do not add an offer to this message.'}
                 </p>
+                {lastSentAt && (
+                    <p className="text-sm font-medium">
+                        Reply sent on {formatReplySentAt(new Date(lastSentAt))}.
+                    </p>
+                )}
             </div>
             <div className="space-y-1">
                 <label htmlFor={`${fieldId}-subject`} className="text-sm font-medium">
@@ -119,10 +135,13 @@ export function SubmissionReplyForm({
                 disabled={!isSendable || sendState.status === 'sent'}
                 onClick={handleSend}
             >
-                {isPending ? 'Sending…' : 'Send email'}
+                {isPending ? 'Sending…' : lastSentAt ? 'Send again' : 'Send email'}
             </Button>
             <p aria-live="polite" className="text-sm">
-                {sendState.status === 'sent' && `Sent to ${to}.`}
+                {sendState.status === 'sent' &&
+                    (sendState.isDateSaved
+                        ? `Sent to ${to}.`
+                        : `Sent to ${to}, but the send date was not saved.`)}
                 {sendState.status === 'failed' && (
                     <span className="text-destructive">{sendState.message}</span>
                 )}
